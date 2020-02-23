@@ -6,7 +6,7 @@ export function generateFile({ fullPath, lines }: {
 }): void;
 export function generateModels({ connection, sourceCasing, filenameCasing, schemas, }: {
     connection: any;
-    sourceCasing: any;
-    filenameCasing: any;
+    sourceCasing?: string;
+    filenameCasing?: string;
     schemas: any;
 }): Promise<void>;

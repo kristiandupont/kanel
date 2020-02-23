@@ -29,10 +29,19 @@ const generateFile = ({ fullPath, lines }) => {
 
 const getMappedType = type => {
   const typeMap = {
+    int2: 'number',
     int4: 'number',
+    float4: 'number',
     bool: 'boolean',
+    json: 'unknown',
     jsonb: 'unknown',
+    char: 'string',
+    varchar: 'string',
     text: 'string',
+    date: 'Date',
+    time: 'Date',
+    timetz: 'Date',
+    timestamp: 'Date',
     timestamptz: 'Date',
   };
 
@@ -85,7 +94,6 @@ const generateProperty = (considerDefaultValue, modelName, pc, cc) => ({
   const rawType = tags.type || idType || getMappedType(type) || type;
   const typeStr =
     nullable && !considerDefaultValue ? `${rawType} | null` : rawType;
-  // const typeStr = tags.type || idType || generateType({ type, nullable: nullable && !considerDefaultValue, name });
   lines.push(`  ${varName}: ${typeStr};`);
 
   return lines;
@@ -142,7 +150,10 @@ function generateModelFile(table, userTypes, modelDir, pc, cc, fc) {
   const generateInitializer = !tags['fixed'];
 
   const referencedIdTypes = R.uniq(
-    R.map(p => p.parent.split('.')[0], R.filter(p => !!p.parent, table.columns))
+    R.map(
+      p => p.parent.split('.')[0],
+      R.filter(p => !!p.parent, table.columns)
+    )
   );
   R.forEach(referencedIdType => {
     lines.push(
@@ -355,31 +366,10 @@ async function generateTypeFiles(types, modelDir, fromCase, filenameCase) {
   R.forEach(t => generateTypeFile(t, modelDir, fc), types);
 }
 
-async function generateSchemaFiles({
-  db,
-  schema,
-  tablesToSkip,
-  modelDir,
-  fromCase,
-  filenameCase,
-}) {
-  const { tables, types } = await extractSchema(schema, tablesToSkip, db);
-
-  await generateTypeFiles(types, modelDir, fromCase, filenameCase);
-
-  await generateModelFiles(
-    tables,
-    R.pluck('name', types),
-    modelDir,
-    fromCase,
-    filenameCase
-  );
-}
-
 async function generateModels({
   connection,
-  sourceCasing,
-  filenameCasing,
+  sourceCasing = 'snake',
+  filenameCasing = 'pascal',
   schemas,
 }) {
   console.log(
@@ -393,22 +383,35 @@ async function generateModels({
   };
   const db = knex(knexConfig);
 
-  const fromCase = sourceCasing;
-  const filenameCase = filenameCasing;
-
   for (const schema of schemas) {
-    console.log(` - Clearing old files in ${schema.modelFolder}`);
-    await rmfr(schema.modelFolder, { glob: true });
-    fs.mkdirSync(schema.modelFolder);
+    if (schema.preDeleteModelFolder) {
+      console.log(` - Clearing old files in ${schema.modelFolder}`);
+      await rmfr(schema.modelFolder, { glob: true });
+    }
+    if (!fs.existsSync(schema.modelFolder)) {
+      fs.mkdirSync(schema.modelFolder);
+    }
 
-    await generateSchemaFiles({
-      db,
-      schema: schema.name,
-      tablesToSkip: schema.tablesToIgnore,
-      modelDir: schema.modelFolder,
-      fromCase,
-      filenameCase,
-    });
+    const { tables, types } = await extractSchema(
+      schema.name,
+      schema.tablesToIgnore || [],
+      db
+    );
+
+    await generateTypeFiles(
+      types,
+      schema.modelFolder,
+      sourceCasing,
+      filenameCasing
+    );
+
+    await generateModelFiles(
+      tables,
+      R.pluck('name', types),
+      schema.modelFolder,
+      sourceCasing ,
+      filenameCasing
+    );
   }
 }
 

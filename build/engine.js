@@ -56,7 +56,6 @@ var extractSchema = require('extract-pg-schema').extractSchema;
  */
 var generateFile = function (_a) {
     var fullPath = _a.fullPath, lines = _a.lines;
-    var packageDir = path.join(__dirname, '..');
     var relativePath = path.relative(process.cwd(), fullPath);
     console.log(" - " + relativePath);
     var allLines = __spreadArrays([
@@ -70,10 +69,19 @@ var generateFile = function (_a) {
 };
 var getMappedType = function (type) {
     var typeMap = {
+        int2: 'number',
         int4: 'number',
+        float4: 'number',
         bool: 'boolean',
+        json: 'unknown',
         jsonb: 'unknown',
+        char: 'string',
+        varchar: 'string',
         text: 'string',
+        date: 'Date',
+        time: 'Date',
+        timetz: 'Date',
+        timestamp: 'Date',
         timestamptz: 'Date',
     };
     return typeMap[type];
@@ -114,7 +122,6 @@ var generateProperty = function (considerDefaultValue, modelName, pc, cc) { retu
     var varName = optional ? cc(name) + "?" : name;
     var rawType = tags.type || idType || getMappedType(type) || type;
     var typeStr = nullable && !considerDefaultValue ? rawType + " |\u00A0null" : rawType;
-    // const typeStr = tags.type || idType || generateType({ type, nullable: nullable && !considerDefaultValue, name });
     lines.push("  " + varName + ": " + typeStr + ";");
     return lines;
 }; };
@@ -139,40 +146,40 @@ function generateInterface(_a, pc, cc) {
     return lines;
 }
 /**
- * @param {Table} model
+ * @param {Table} table
  */
-function generateModelFile(model, userTypes, modelDir, pc, cc, fc) {
+function generateModelFile(table, userTypes, modelDir, pc, cc, fc) {
     var lines = [];
-    var comment = model.comment, tags = model.tags;
+    var comment = table.comment, tags = table.tags;
     var generateInitializer = !tags['fixed'];
-    var referencedIdTypes = R.uniq(R.map(function (p) { return p.parent.split('.')[0]; }, R.filter(function (p) { return !!p.parent; }, model.columns)));
+    var referencedIdTypes = R.uniq(R.map(function (p) { return p.parent.split('.')[0]; }, R.filter(function (p) { return !!p.parent; }, table.columns)));
     R.forEach(function (referencedIdType) {
         lines.push("import { " + pc(referencedIdType) + "Id } from './" + fc(referencedIdType) + "';");
     }, referencedIdTypes);
     if (referencedIdTypes.length) {
         lines.push('');
     }
-    var appliedUserTypes = R.map(function (p) { return p.type; }, R.filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, model.columns));
+    var appliedUserTypes = R.map(function (p) { return p.type; }, R.filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, table.columns));
     R.forEach(function (importedType) {
         lines.push("import " + importedType + " from './" + fc(importedType) + "';");
     }, appliedUserTypes);
     if (appliedUserTypes.length) {
         lines.push('');
     }
-    var overriddenTypes = R.map(function (p) { return p.tags.type; }, R.filter(function (p) { return !!p.tags.type; }, model.columns));
+    var overriddenTypes = R.map(function (p) { return p.tags.type; }, R.filter(function (p) { return !!p.tags.type; }, table.columns));
     R.forEach(function (importedType) {
         lines.push("import " + importedType + " from '../" + fc(importedType) + "';");
     }, overriddenTypes);
     if (overriddenTypes.length) {
         lines.push('');
     }
-    if (R.any(function (p) { return p.name === 'id'; }, model.columns)) {
-        lines.push("export type " + pc(model.name) + "Id = number & { __flavor?: '" + model.name + "' };");
+    if (R.any(function (p) { return p.name === 'id'; }, table.columns)) {
+        lines.push("export type " + pc(table.name) + "Id = number & { __flavor?: '" + table.name + "' };");
         lines.push('');
     }
     var interfaceLines = generateInterface({
-        name: model.name,
-        properties: model.columns,
+        name: table.name,
+        properties: table.columns,
         considerDefaultValues: false,
         comment: comment,
         exportAs: 'default',
@@ -181,27 +188,27 @@ function generateModelFile(model, userTypes, modelDir, pc, cc, fc) {
     if (generateInitializer) {
         lines.push('');
         var initializerInterfaceLines = generateInterface({
-            name: pc(model.name) + "Initializer",
-            modelName: model.name,
-            properties: R.reject(R.propEq('name', 'createdAt'), model.columns),
+            name: pc(table.name) + "Initializer",
+            modelName: table.name,
+            properties: R.reject(R.propEq('name', 'createdAt'), table.columns),
             considerDefaultValues: true,
             comment: comment,
             exportAs: true,
         }, pc, cc);
         lines.push.apply(lines, initializerInterfaceLines);
     }
-    var filename = fc(model.name) + ".ts";
+    var filename = fc(table.name) + ".ts";
     var fullPath = path.join(modelDir, filename);
     generateFile({ fullPath: fullPath, lines: lines });
 }
 /**
- * @param {Table[]} models
+ * @param {Table[]} tables
  */
-function generateModelIndexFile(models, modelDir, pc, fc, cc) {
+function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
     var isFixed = function (m) { return m.tags['fixed']; };
     var hasIdColumn = function (m) { return R.any(function (p) { return p.name === 'id'; }, m.columns); };
-    var creatableModels = R.reject(isFixed, models);
-    var modelsWithIdColumn = R.filter(hasIdColumn, models);
+    var creatableModels = R.reject(isFixed, tables);
+    var modelsWithIdColumn = R.filter(hasIdColumn, tables);
     var importLine = function (m) {
         var importInitializer = !isFixed(m);
         var importId = hasIdColumn(m);
@@ -222,13 +229,13 @@ function generateModelIndexFile(models, modelDir, pc, fc, cc) {
         ], (exportInitializer ? [pc(m.name) + "Initializer"] : []), (exportId ? [pc(m.name) + "Id"] : []));
         return "  " + exports.join(', ') + ",";
     };
-    var lines = __spreadArrays(R.map(importLine, models), [
+    var lines = __spreadArrays(R.map(importLine, tables), [
         '',
         'type Model ='
-    ], R.map(function (model) { return "  | " + pc(model.name); }, models), [
+    ], R.map(function (model) { return "  | " + pc(model.name); }, tables), [
         '',
         'interface ModelTypeMap {'
-    ], R.map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + ";"; }, models), [
+    ], R.map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + ";"; }, tables), [
         '}',
         '',
         'type ModelId ='
@@ -246,7 +253,7 @@ function generateModelIndexFile(models, modelDir, pc, fc, cc) {
         '}',
         '',
         'export {'
-    ], R.map(exportLine, models), [
+    ], R.map(exportLine, tables), [
         '',
         '  Model,',
         '  ModelTypeMap,',
@@ -260,17 +267,17 @@ function generateModelIndexFile(models, modelDir, pc, fc, cc) {
     generateFile({ fullPath: fullPath, lines: lines });
 }
 /**
- * @param {Table[]} models
+ * @param {Table[]} tables
  */
-function generateModelFiles(models, userTypes, modelDir, fromCase, filenameCase) {
+function generateModelFiles(tables, userTypes, modelDir, fromCase, filenameCase) {
     return __awaiter(this, void 0, void 0, function () {
         var pc, cc, fc;
         return __generator(this, function (_a) {
             pc = recase(fromCase, 'pascal');
             cc = recase(fromCase, 'camel');
             fc = recase(fromCase, filenameCase);
-            R.forEach(function (model) { return generateModelFile(model, userTypes, modelDir, pc, cc, fc); }, models);
-            generateModelIndexFile(models, modelDir, pc, fc, cc);
+            R.forEach(function (table) { return generateModelFile(table, userTypes, modelDir, pc, cc, fc); }, tables);
+            generateModelIndexFile(tables, modelDir, pc, fc, cc);
             return [2 /*return*/];
         });
     });
@@ -309,32 +316,12 @@ function generateTypeFiles(types, modelDir, fromCase, filenameCase) {
         });
     });
 }
-function generateSchemaFiles(_a) {
-    var db = _a.db, schema = _a.schema, tablesToSkip = _a.tablesToSkip, modelDir = _a.modelDir, fromCase = _a.fromCase, filenameCase = _a.filenameCase;
-    return __awaiter(this, void 0, void 0, function () {
-        var _b, tables, types;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0: return [4 /*yield*/, extractSchema(schema, tablesToSkip, db)];
-                case 1:
-                    _b = _c.sent(), tables = _b.tables, types = _b.types;
-                    return [4 /*yield*/, generateTypeFiles(types, modelDir, fromCase, filenameCase)];
-                case 2:
-                    _c.sent();
-                    return [4 /*yield*/, generateModelFiles(tables, R.pluck('name', types), modelDir, fromCase, filenameCase)];
-                case 3:
-                    _c.sent();
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
 function generateModels(_a) {
-    var connection = _a.connection, sourceCasing = _a.sourceCasing, filenameCasing = _a.filenameCasing, schemas = _a.schemas;
+    var connection = _a.connection, _b = _a.sourceCasing, sourceCasing = _b === void 0 ? 'snake' : _b, _c = _a.filenameCasing, filenameCasing = _c === void 0 ? 'pascal' : _c, schemas = _a.schemas;
     return __awaiter(this, void 0, void 0, function () {
-        var knexConfig, db, fromCase, filenameCase, _i, schemas_1, schema;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var knexConfig, db, _i, schemas_1, schema, _d, tables, types;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
                 case 0:
                     console.log("Connecting to " + chalk.greenBright(connection.database) + " on " + connection.host);
                     knexConfig = {
@@ -342,33 +329,35 @@ function generateModels(_a) {
                         connection: connection,
                     };
                     db = knex(knexConfig);
-                    fromCase = sourceCasing;
-                    filenameCase = filenameCasing;
                     _i = 0, schemas_1 = schemas;
-                    _b.label = 1;
+                    _e.label = 1;
                 case 1:
-                    if (!(_i < schemas_1.length)) return [3 /*break*/, 5];
+                    if (!(_i < schemas_1.length)) return [3 /*break*/, 8];
                     schema = schemas_1[_i];
+                    if (!schema.preDeleteModelFolder) return [3 /*break*/, 3];
                     console.log(" - Clearing old files in " + schema.modelFolder);
                     return [4 /*yield*/, rmfr(schema.modelFolder, { glob: true })];
                 case 2:
-                    _b.sent();
-                    fs.mkdirSync(schema.modelFolder);
-                    return [4 /*yield*/, generateSchemaFiles({
-                            db: db,
-                            schema: schema.name,
-                            tablesToSkip: schema.tablesToIgnore,
-                            modelDir: schema.modelFolder,
-                            fromCase: fromCase,
-                            filenameCase: filenameCase,
-                        })];
+                    _e.sent();
+                    _e.label = 3;
                 case 3:
-                    _b.sent();
-                    _b.label = 4;
+                    if (!fs.existsSync(schema.modelFolder)) {
+                        fs.mkdirSync(schema.modelFolder);
+                    }
+                    return [4 /*yield*/, extractSchema(schema.name, schema.tablesToIgnore || [], db)];
                 case 4:
+                    _d = _e.sent(), tables = _d.tables, types = _d.types;
+                    return [4 /*yield*/, generateTypeFiles(types, schema.modelFolder, sourceCasing, filenameCasing)];
+                case 5:
+                    _e.sent();
+                    return [4 /*yield*/, generateModelFiles(tables, R.pluck('name', types), schema.modelFolder, sourceCasing, filenameCasing)];
+                case 6:
+                    _e.sent();
+                    _e.label = 7;
+                case 7:
                     _i++;
                     return [3 /*break*/, 1];
-                case 5: return [2 /*return*/];
+                case 8: return [2 /*return*/];
             }
         });
     });
