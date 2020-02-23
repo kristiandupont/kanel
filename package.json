@@ -17,7 +17,9 @@
     "extract-pg-schema": "^1.0.0",
     "knex": "^0.20.9",
     "optionator": "^0.8.3",
-    "ramda": "^0.27.0"
+    "pg": "^7.18.2",
+    "ramda": "^0.27.0",
+    "rmfr": "^2.0.0"
   },
   "devDependencies": {
     "@types/knex": "^0.16.1",

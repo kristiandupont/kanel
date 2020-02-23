@@ -17,6 +17,8 @@ $ kanel
 
 Here is an example configuration file:
 ```javascript
+const path = require('path');
+
 module.exports = {
   connection: {
     host: 'localhost',
@@ -26,11 +28,15 @@ module.exports = {
     charset: 'utf8',
   },
 
+  filenameCasing: 'dash',
+  sourceCasing: 'snake',
+  preDeleteModelFolder: true,
+
   schemas: [
     {
       name: 'public',
       tablesToIgnore: ['knex_migrations', 'knex_migrations_lock'],
-      modelFolder: path.join(packageDir, 'src', 'models'),
+      modelFolder: path.join(__dirname, 'src', 'models'),
     },
   ],
 };
