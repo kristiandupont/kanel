@@ -1,6 +1,6 @@
 {
   "name": "kanel",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "main": "build/engine.js",
   "repository": "git@github.com:kristiandupont/kanel.git",
