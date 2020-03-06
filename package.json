@@ -9,7 +9,10 @@
     "kanel": "./bin/kanel"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
+    "run-example": "node build/cli -c ./example/.kanelrc",
+    "stop-example-db": "docker stop dvd-rental"
   },
   "dependencies": {
     "@kristiandupont/recase": "^1.1.0",

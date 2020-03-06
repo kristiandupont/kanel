@@ -42,3 +42,6 @@ module.exports = {
 };
 
 ```
+
+To see an example of the result, check out the [/example](example) folder. It uses the [Sample Database](https://www.postgresqltutorial.com/postgresql-sample-database/) from www.postgresqltutorial.com.
+
