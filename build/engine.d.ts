@@ -1,5 +1,3 @@
-export type Table = any;
-export type Type = any;
 export const generateFile: ({ fullPath, lines }: {
     fullPath: any;
     lines: any;
