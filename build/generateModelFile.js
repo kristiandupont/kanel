@@ -15,7 +15,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = __importDefault(require("path"));
-var _a = require('ramda'), forEach = _a.forEach, map = _a.map, filter = _a.filter, reject = _a.reject, propEq = _a.propEq, uniq = _a.uniq;
+var ramda_1 = require("ramda");
 var generateFile_1 = __importDefault(require("./generateFile"));
 var generateInterface_1 = __importDefault(require("./generateInterface"));
 /**
@@ -29,30 +29,30 @@ var generateModelFile = function (tableOrView, isView, typeMap, userTypes, model
     var lines = [];
     var comment = tableOrView.comment, tags = tableOrView.tags;
     var generateInitializer = !tags['fixed'] && !isView;
-    var referencedIdTypes = uniq(map(function (p) { return p.parent.split('.')[0]; }, filter(function (p) { return !!p.parent; }, tableOrView.columns)));
-    forEach(function (referencedIdType) {
+    var referencedIdTypes = ramda_1.uniq(ramda_1.map(function (p) { return p.parent.split('.')[0]; }, ramda_1.filter(function (p) { return !!p.parent; }, tableOrView.columns)));
+    ramda_1.forEach(function (referencedIdType) {
         lines.push("import { " + pc(referencedIdType) + "Id } from './" + fc(referencedIdType) + "';");
     }, referencedIdTypes);
     if (referencedIdTypes.length) {
         lines.push('');
     }
-    var appliedUserTypes = map(function (p) { return p.type; }, filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, tableOrView.columns));
-    forEach(function (importedType) {
+    var appliedUserTypes = ramda_1.map(function (p) { return p.type; }, ramda_1.filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, tableOrView.columns));
+    ramda_1.forEach(function (importedType) {
         lines.push("import " + pc(importedType) + " from './" + fc(importedType) + "';");
     }, appliedUserTypes);
     if (appliedUserTypes.length) {
         lines.push('');
     }
-    var overriddenTypes = map(function (p) { return p.tags.type; }, filter(function (p) { return !!p.tags.type; }, tableOrView.columns));
-    forEach(function (importedType) {
+    var overriddenTypes = ramda_1.map(function (p) { return p.tags.type; }, ramda_1.filter(function (p) { return !!p.tags.type; }, tableOrView.columns));
+    ramda_1.forEach(function (importedType) {
         lines.push("import " + pc(importedType) + " from '../" + fc(importedType) + "';");
     }, overriddenTypes);
     if (overriddenTypes.length) {
         lines.push('');
     }
     // If there's one and only one primary key, that's the identifier.
-    var hasIdentifier = filter(function (c) { return c.isPrimary; }, tableOrView.columns).length === 1;
-    var columns = map(function (c) { return (__assign(__assign({}, c), { isIdentifier: hasIdentifier && c.isPrimary })); }, tableOrView.columns);
+    var hasIdentifier = ramda_1.filter(function (c) { return c.isPrimary; }, tableOrView.columns).length === 1;
+    var columns = ramda_1.map(function (c) { return (__assign(__assign({}, c), { isIdentifier: hasIdentifier && c.isPrimary })); }, tableOrView.columns);
     if (hasIdentifier) {
         lines.push("export type " + pc(tableOrView.name) + "Id = number & { __flavor?: '" + tableOrView.name + "' };");
         lines.push('');
@@ -70,7 +70,7 @@ var generateModelFile = function (tableOrView, isView, typeMap, userTypes, model
         var initializerInterfaceLines = generateInterface_1.default({
             name: pc(tableOrView.name) + "Initializer",
             modelName: tableOrView.name,
-            properties: reject(propEq('name', 'createdAt'), columns),
+            properties: ramda_1.reject(ramda_1.propEq('name', 'createdAt'), columns),
             considerDefaultValues: true,
             comment: comment,
             exportAs: true,

@@ -2,7 +2,7 @@ import path from 'path';
 import chalk from 'chalk';
 // @ts-ignore
 import optionator from 'optionator';
-import generateModels from './generateModels';
+import processDatabase from './processDatabase';
 // @ts-ignore
 // const { version } = require('../package.json');
 const version = '0.0.4';
@@ -47,7 +47,7 @@ async function main() {
   const config = require(configFile);
 
   try {
-    const exitCode = await generateModels(config);
+    const exitCode = await processDatabase(config);
     process.exit(exitCode);
   } catch (error) {
     console.error(error);

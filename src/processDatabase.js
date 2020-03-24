@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import knex from 'knex';
 import rmfr from 'rmfr';
 import fs from 'fs';
-import { pluck } from 'ramda';
+import { pluck, reject } from 'ramda';
 import { extractSchema } from 'extract-pg-schema';
 import generateModelFiles from './generateModelFiles';
 import generateTypeFiles from './generateTypeFiles';
@@ -25,13 +25,14 @@ const defaultTypeMap = {
   timestamptz: 'Date',
 };
 
-async function generateModels({
+const processDatabase = async ({
   connection,
   sourceCasing = 'snake',
   filenameCasing = 'pascal',
+  preDeleteModelFolder = false,
   customTypeMap = {},
   schemas,
-}) {
+}) => {
   const typeMap = { ...defaultTypeMap, ...customTypeMap };
 
   console.log(
@@ -46,7 +47,7 @@ async function generateModels({
   const db = knex(knexConfig);
 
   for (const schema of schemas) {
-    if (schema.preDeleteModelFolder) {
+    if (preDeleteModelFolder) {
       console.log(` - Clearing old files in ${schema.modelFolder}`);
       await rmfr(schema.modelFolder, { glob: true });
     }
@@ -55,6 +56,7 @@ async function generateModels({
     }
 
     const { tables, views, types } = await extractSchema(schema.name, db);
+    const rejectIgnored = reject(m => (schema.ignore || []).includes(m.name))
 
     await generateTypeFiles(
       types,
@@ -64,8 +66,8 @@ async function generateModels({
     );
 
     await generateModelFiles(
-      tables,
-      views,
+      rejectIgnored(tables),
+      rejectIgnored(views),
       typeMap,
       pluck('name', types),
       schema.modelFolder,
@@ -73,6 +75,6 @@ async function generateModels({
       filenameCasing
     );
   }
-}
+};
 
-export default generateModels;
+export default processDatabase;

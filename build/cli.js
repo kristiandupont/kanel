@@ -43,7 +43,7 @@ var path_1 = __importDefault(require("path"));
 var chalk_1 = __importDefault(require("chalk"));
 // @ts-ignore
 var optionator_1 = __importDefault(require("optionator"));
-var generateModels_1 = __importDefault(require("./generateModels"));
+var processDatabase_1 = __importDefault(require("./processDatabase"));
 // @ts-ignore
 // const { version } = require('../package.json');
 var version = '0.0.4';
@@ -88,7 +88,7 @@ function main() {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, generateModels_1.default(config)];
+                    return [4 /*yield*/, processDatabase_1.default(config)];
                 case 2:
                     exitCode = _a.sent();
                     process.exit(exitCode);

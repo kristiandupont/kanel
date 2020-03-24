@@ -11,7 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = __importDefault(require("path"));
-var _a = require('ramda'), map = _a.map, filter = _a.filter, reject = _a.reject;
+var ramda_1 = require("ramda");
 var generateFile_1 = __importDefault(require("./generateFile"));
 /**
  * @param {Table[]} tables
@@ -19,10 +19,10 @@ var generateFile_1 = __importDefault(require("./generateFile"));
 function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
     var isFixed = function (m) { return m.isView || m.tags['fixed']; };
     var hasIdentifier = function (m) {
-        return filter(function (c) { return c.isPrimary; }, m.columns).length === 1;
+        return ramda_1.filter(function (c) { return c.isPrimary; }, m.columns).length === 1;
     };
-    var creatableModels = reject(isFixed, tables);
-    var modelsWithIdColumn = filter(hasIdentifier, tables);
+    var creatableModels = ramda_1.reject(isFixed, tables);
+    var modelsWithIdColumn = ramda_1.filter(hasIdentifier, tables);
     var importLine = function (m) {
         var importInitializer = !isFixed(m);
         var importId = hasIdentifier(m);
@@ -43,31 +43,31 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
         ], (exportInitializer ? [pc(m.name) + "Initializer"] : []), (exportId ? [pc(m.name) + "Id"] : []));
         return "  " + exports.join(', ') + ",";
     };
-    var lines = __spreadArrays(map(importLine, tables), [
+    var lines = __spreadArrays(ramda_1.map(importLine, tables), [
         '',
         'type Model ='
-    ], map(function (model) { return "  | " + pc(model.name); }, tables), [
+    ], ramda_1.map(function (model) { return "  | " + pc(model.name); }, tables), [
         '',
         'interface ModelTypeMap {'
-    ], map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + ";"; }, tables), [
+    ], ramda_1.map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + ";"; }, tables), [
         '}',
         '',
         'type ModelId ='
-    ], map(function (model) { return "  | " + pc(model.name) + "Id"; }, modelsWithIdColumn), [
+    ], ramda_1.map(function (model) { return "  | " + pc(model.name) + "Id"; }, modelsWithIdColumn), [
         '',
         'interface ModelIdTypeMap {'
-    ], map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + "Id;"; }, modelsWithIdColumn), [
+    ], ramda_1.map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + "Id;"; }, modelsWithIdColumn), [
         '}',
         '',
         'type Initializer ='
-    ], map(function (model) { return "  | " + pc(model.name) + "Initializer"; }, creatableModels), [
+    ], ramda_1.map(function (model) { return "  | " + pc(model.name) + "Initializer"; }, creatableModels), [
         '',
         'interface InitializerTypeMap {'
-    ], map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + "Initializer;"; }, creatableModels), [
+    ], ramda_1.map(function (model) { return "  '" + cc(model.name) + "': " + pc(model.name) + "Initializer;"; }, creatableModels), [
         '}',
         '',
         'export {'
-    ], map(exportLine, tables), [
+    ], ramda_1.map(exportLine, tables), [
         '',
         '  Model,',
         '  ModelTypeMap,',

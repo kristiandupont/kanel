@@ -75,10 +75,10 @@ var defaultTypeMap = {
     timestamp: 'Date',
     timestamptz: 'Date',
 };
-function generateModels(_a) {
-    var connection = _a.connection, _b = _a.sourceCasing, sourceCasing = _b === void 0 ? 'snake' : _b, _c = _a.filenameCasing, filenameCasing = _c === void 0 ? 'pascal' : _c, _d = _a.customTypeMap, customTypeMap = _d === void 0 ? {} : _d, schemas = _a.schemas;
-    return __awaiter(this, void 0, void 0, function () {
-        var typeMap, knexConfig, db, _i, schemas_1, schema, _e, tables, views, types;
+var processDatabase = function (_a) {
+    var connection = _a.connection, _b = _a.sourceCasing, sourceCasing = _b === void 0 ? 'snake' : _b, _c = _a.filenameCasing, filenameCasing = _c === void 0 ? 'pascal' : _c, _d = _a.preDeleteModelFolder, preDeleteModelFolder = _d === void 0 ? false : _d, _e = _a.customTypeMap, customTypeMap = _e === void 0 ? {} : _e, schemas = _a.schemas;
+    return __awaiter(void 0, void 0, void 0, function () {
+        var typeMap, knexConfig, db, _loop_1, _i, schemas_1, schema;
         return __generator(this, function (_f) {
             switch (_f.label) {
                 case 0:
@@ -89,37 +89,50 @@ function generateModels(_a) {
                         connection: connection,
                     };
                     db = knex_1.default(knexConfig);
+                    _loop_1 = function (schema) {
+                        var _a, tables, views, types, rejectIgnored;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0:
+                                    if (!preDeleteModelFolder) return [3 /*break*/, 2];
+                                    console.log(" - Clearing old files in " + schema.modelFolder);
+                                    return [4 /*yield*/, rmfr_1.default(schema.modelFolder, { glob: true })];
+                                case 1:
+                                    _b.sent();
+                                    _b.label = 2;
+                                case 2:
+                                    if (!fs_1.default.existsSync(schema.modelFolder)) {
+                                        fs_1.default.mkdirSync(schema.modelFolder);
+                                    }
+                                    return [4 /*yield*/, extract_pg_schema_1.extractSchema(schema.name, db)];
+                                case 3:
+                                    _a = _b.sent(), tables = _a.tables, views = _a.views, types = _a.types;
+                                    rejectIgnored = ramda_1.reject(function (m) { return (schema.ignore || []).includes(m.name); });
+                                    return [4 /*yield*/, generateTypeFiles_1.default(types, schema.modelFolder, sourceCasing, filenameCasing)];
+                                case 4:
+                                    _b.sent();
+                                    return [4 /*yield*/, generateModelFiles_1.default(rejectIgnored(tables), rejectIgnored(views), typeMap, ramda_1.pluck('name', types), schema.modelFolder, sourceCasing, filenameCasing)];
+                                case 5:
+                                    _b.sent();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    };
                     _i = 0, schemas_1 = schemas;
                     _f.label = 1;
                 case 1:
-                    if (!(_i < schemas_1.length)) return [3 /*break*/, 8];
+                    if (!(_i < schemas_1.length)) return [3 /*break*/, 4];
                     schema = schemas_1[_i];
-                    if (!schema.preDeleteModelFolder) return [3 /*break*/, 3];
-                    console.log(" - Clearing old files in " + schema.modelFolder);
-                    return [4 /*yield*/, rmfr_1.default(schema.modelFolder, { glob: true })];
+                    return [5 /*yield**/, _loop_1(schema)];
                 case 2:
                     _f.sent();
                     _f.label = 3;
                 case 3:
-                    if (!fs_1.default.existsSync(schema.modelFolder)) {
-                        fs_1.default.mkdirSync(schema.modelFolder);
-                    }
-                    return [4 /*yield*/, extract_pg_schema_1.extractSchema(schema.name, db)];
-                case 4:
-                    _e = _f.sent(), tables = _e.tables, views = _e.views, types = _e.types;
-                    return [4 /*yield*/, generateTypeFiles_1.default(types, schema.modelFolder, sourceCasing, filenameCasing)];
-                case 5:
-                    _f.sent();
-                    return [4 /*yield*/, generateModelFiles_1.default(tables, views, typeMap, ramda_1.pluck('name', types), schema.modelFolder, sourceCasing, filenameCasing)];
-                case 6:
-                    _f.sent();
-                    _f.label = 7;
-                case 7:
                     _i++;
                     return [3 /*break*/, 1];
-                case 8: return [2 /*return*/];
+                case 4: return [2 /*return*/];
             }
         });
     });
-}
-exports.default = generateModels;
+};
+exports.default = processDatabase;

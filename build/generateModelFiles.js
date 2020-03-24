@@ -57,7 +57,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var forEach = require('ramda').forEach;
+var ramda_1 = require("ramda");
 var recase_1 = require("@kristiandupont/recase");
 var generateModelFile_1 = __importDefault(require("./generateModelFile"));
 var generateModelIndexFile_1 = __importDefault(require("./generateModelIndexFile"));
@@ -71,10 +71,10 @@ function generateModelFiles(tables, views, typeMap, userTypes, modelDir, fromCas
             pc = recase_1.recase(fromCase, 'pascal');
             cc = recase_1.recase(fromCase, 'camel');
             fc = recase_1.recase(fromCase, filenameCase);
-            forEach(function (table) {
+            ramda_1.forEach(function (table) {
                 return generateModelFile_1.default(table, false, typeMap, userTypes, modelDir, pc, cc, fc);
             }, tables);
-            forEach(function (view) {
+            ramda_1.forEach(function (view) {
                 return generateModelFile_1.default(view, true, typeMap, userTypes, modelDir, pc, cc, fc);
             }, views);
             generateModelIndexFile_1.default(__spreadArrays(tables, views.map(function (v) { return (__assign(__assign({}, v), { isView: true })); })), modelDir, pc, fc, cc);
