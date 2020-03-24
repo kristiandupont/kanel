@@ -1,6 +1,6 @@
-const os = require('os');
-const path = require('path');
-const fs = require('fs');
+import os from 'os';
+import path from 'path';
+import fs from 'fs';
 
 const generateFile = ({ fullPath, lines }) => {
   const relativePath = path.relative(process.cwd(), fullPath);
@@ -16,4 +16,4 @@ const generateFile = ({ fullPath, lines }) => {
   fs.writeFileSync(fullPath, content, 'utf-8');
 };
 
-module.exports = generateFile;
+export default generateFile;

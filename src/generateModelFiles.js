@@ -1,7 +1,7 @@
-const R = require('ramda');
-const { recase } = require('@kristiandupont/recase');
-const generateModelFile = require('./generateModelFile');
-const generateModelIndexFile = require('./generateModelIndexFile');
+const { forEach } = require('ramda');
+import { recase } from '@kristiandupont/recase';
+import generateModelFile from './generateModelFile';
+import generateModelIndexFile from './generateModelIndexFile';
 
 /**
  * @param {Table[]} tables
@@ -18,12 +18,12 @@ async function generateModelFiles(
   const pc = recase(fromCase, 'pascal');
   const cc = recase(fromCase, 'camel');
   const fc = recase(fromCase, filenameCase);
-  R.forEach(
+  forEach(
     (table) =>
       generateModelFile(table, false, typeMap, userTypes, modelDir, pc, cc, fc),
     tables
   );
-  R.forEach(
+  forEach(
     (view) =>
       generateModelFile(view, true, typeMap, userTypes, modelDir, pc, cc, fc),
     views
@@ -37,4 +37,4 @@ async function generateModelFiles(
   );
 }
 
-module.exports = generateModelFiles;
+export default generateModelFiles;

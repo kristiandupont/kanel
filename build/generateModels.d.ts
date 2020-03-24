@@ -1,4 +1,4 @@
-export = generateModels;
+export default generateModels;
 declare function generateModels({ connection, sourceCasing, filenameCasing, customTypeMap, schemas, }: {
     connection: any;
     sourceCasing?: string;

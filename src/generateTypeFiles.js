@@ -1,6 +1,6 @@
-const R = require('ramda');
-const { recase } = require('@kristiandupont/recase');
-const generateTypeFile = require('./generateTypeFile');
+import { forEach } from 'ramda';
+import { recase }  from '@kristiandupont/recase';
+import generateTypeFile from './generateTypeFile';
 
 /**
  * @param {Type[]} types
@@ -8,7 +8,7 @@ const generateTypeFile = require('./generateTypeFile');
 async function generateTypeFiles(types, modelDir, fromCase, filenameCase) {
   const fc = recase(fromCase, filenameCase);
   const pc = recase(fromCase, 'pascal');
-  R.forEach((t) => generateTypeFile(t, modelDir, fc, pc), types);
+  forEach((t) => generateTypeFile(t, modelDir, fc, pc), types);
 }
 
-module.exports = generateTypeFiles;
+export default generateTypeFiles;

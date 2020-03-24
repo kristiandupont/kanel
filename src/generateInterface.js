@@ -1,4 +1,4 @@
-const R = require('ramda');
+import { forEach, map, head, tail, flatten } from 'ramda';
 
 const generateProperty = (
   considerDefaultValue,
@@ -30,7 +30,7 @@ const generateProperty = (
   if (defaultValue && considerDefaultValue) {
     commentLines.push(`Default value: ${defaultValue}`);
   }
-  R.forEach((index) => {
+  forEach((index) => {
     if (index.isPrimary) {
       commentLines.push(`Primary key. Index: ${index.name}`);
     } else {
@@ -42,7 +42,7 @@ const generateProperty = (
     lines.push(`  /** ${commentLines[0]} */`);
   } else if (commentLines.length > 1) {
     lines.push('  /**');
-    lines.push(...R.map((c) => `   * ${c}`, commentLines));
+    lines.push(...map((c) => `   * ${c}`, commentLines));
     lines.push('  */');
   }
   const optional = considerDefaultValue && (defaultValue || nullable);
@@ -80,18 +80,18 @@ const generateInterface = (
   }
   const extendsStr = baseInterface ? `extends ${baseInterface}` : '';
   lines.push(`${exportStr}interface ${pc(name)} ${extendsStr} {`);
-  const props = R.map(
+  const props = map(
     generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc),
     properties
   );
-  const propLines = R.flatten([
-    R.head(props),
+  const propLines = flatten([
+    head(props),
     // @ts-ignore
-    ...R.map((p) => ['', ...p], R.tail(props)),
+    ...map((p) => ['', ...p], tail(props)),
   ]);
   lines.push(...propLines);
   lines.push('}');
   return lines;
 };
 
-module.exports = generateInterface;
+export default generateInterface;

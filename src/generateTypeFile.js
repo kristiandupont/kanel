@@ -1,6 +1,6 @@
-const path = require('path');
-const R = require('ramda');
-const generateFile = require('./generateFile');
+import path from 'path';
+import { map } from 'ramda';
+import generateFile from './generateFile';
 
 /**
  * @param {Type} type
@@ -12,7 +12,7 @@ async function generateTypeFile(type, modelDir, fc, pc) {
     lines.push(`/** ${comment} */`);
   }
   lines.push(
-    `type ${pc(type.name)} = ${R.map((v) => `'${v}'`, type.values).join(
+    `type ${pc(type.name)} = ${map((v) => `'${v}'`, type.values).join(
       ' | '
     )};`
   );
@@ -22,4 +22,4 @@ async function generateTypeFile(type, modelDir, fc, pc) {
   generateFile({ fullPath, lines });
 }
 
-module.exports = generateTypeFile;
+export default generateTypeFile;

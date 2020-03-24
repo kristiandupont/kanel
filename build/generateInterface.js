@@ -1,3 +1,4 @@
+"use strict";
 var __spreadArrays = (this && this.__spreadArrays) || function () {
     for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
     for (var r = Array(s), k = 0, i = 0; i < il; i++)
@@ -5,7 +6,8 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
-var R = require('ramda');
+Object.defineProperty(exports, "__esModule", { value: true });
+var ramda_1 = require("ramda");
 var generateProperty = function (considerDefaultValue, modelName, typeMap, pc, cc) { return function (_a) {
     var name = _a.name, type = _a.type, nullable = _a.nullable, isIdentifier = _a.isIdentifier, parent = _a.parent, defaultValue = _a.defaultValue, indices = _a.indices, comment = _a.comment, tags = _a.tags;
     var lines = [];
@@ -20,7 +22,7 @@ var generateProperty = function (considerDefaultValue, modelName, typeMap, pc, c
     if (defaultValue && considerDefaultValue) {
         commentLines.push("Default value: " + defaultValue);
     }
-    R.forEach(function (index) {
+    ramda_1.forEach(function (index) {
         if (index.isPrimary) {
             commentLines.push("Primary key. Index: " + index.name);
         }
@@ -33,7 +35,7 @@ var generateProperty = function (considerDefaultValue, modelName, typeMap, pc, c
     }
     else if (commentLines.length > 1) {
         lines.push('  /**');
-        lines.push.apply(lines, R.map(function (c) { return "   * " + c; }, commentLines));
+        lines.push.apply(lines, ramda_1.map(function (c) { return "   * " + c; }, commentLines));
         lines.push('  */');
     }
     var optional = considerDefaultValue && (defaultValue || nullable);
@@ -55,12 +57,12 @@ var generateInterface = function (_a, typeMap, pc, cc) {
     }
     var extendsStr = baseInterface ? "extends " + baseInterface : '';
     lines.push(exportStr + "interface " + pc(name) + " " + extendsStr + " {");
-    var props = R.map(generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc), properties);
-    var propLines = R.flatten(__spreadArrays([
-        R.head(props)
-    ], R.map(function (p) { return __spreadArrays([''], p); }, R.tail(props))));
+    var props = ramda_1.map(generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc), properties);
+    var propLines = ramda_1.flatten(__spreadArrays([
+        ramda_1.head(props)
+    ], ramda_1.map(function (p) { return __spreadArrays([''], p); }, ramda_1.tail(props))));
     lines.push.apply(lines, propLines);
     lines.push('}');
     return lines;
 };
-module.exports = generateInterface;
+exports.default = generateInterface;

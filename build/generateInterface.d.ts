@@ -1,4 +1,4 @@
-export = generateInterface;
+export default generateInterface;
 declare function generateInterface({ name, modelName, baseInterface, properties, considerDefaultValues, comment, exportAs, }: {
     name: any;
     modelName?: any;

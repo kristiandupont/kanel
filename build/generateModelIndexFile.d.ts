@@ -1,4 +1,4 @@
-export = generateModelIndexFile;
+export default generateModelIndexFile;
 /**
  * @param {Table[]} tables
  */

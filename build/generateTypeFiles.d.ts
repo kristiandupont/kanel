@@ -1,4 +1,4 @@
-export = generateTypeFiles;
+export default generateTypeFiles;
 /**
  * @param {Type[]} types
  */

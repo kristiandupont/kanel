@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,9 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var path = require('path');
-var R = require('ramda');
-var generateFile = require('./generateFile');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var path_1 = __importDefault(require("path"));
+var ramda_1 = require("ramda");
+var generateFile_1 = __importDefault(require("./generateFile"));
 /**
  * @param {Type} type
  */
@@ -49,13 +54,13 @@ function generateTypeFile(type, modelDir, fc, pc) {
             if (comment) {
                 lines.push("/** " + comment + " */");
             }
-            lines.push("type " + pc(type.name) + " = " + R.map(function (v) { return "'" + v + "'"; }, type.values).join(' | ') + ";");
+            lines.push("type " + pc(type.name) + " = " + ramda_1.map(function (v) { return "'" + v + "'"; }, type.values).join(' | ') + ";");
             lines.push("export default " + pc(type.name) + ";");
             filename = fc(type.name) + ".ts";
-            fullPath = path.join(modelDir, filename);
-            generateFile({ fullPath: fullPath, lines: lines });
+            fullPath = path_1.default.join(modelDir, filename);
+            generateFile_1.default({ fullPath: fullPath, lines: lines });
             return [2 /*return*/];
         });
     });
 }
-module.exports = generateTypeFile;
+exports.default = generateTypeFile;

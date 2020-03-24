@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -45,14 +46,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var chalk = require('chalk');
-var knex = require('knex');
-var rmfr = require('rmfr');
-var fs = require('fs');
-var R = require('ramda');
-var extractSchema = require('extract-pg-schema').extractSchema;
-var generateModelFiles = require('./generateModelFiles');
-var generateTypeFiles = require('./generateTypeFiles');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var chalk_1 = __importDefault(require("chalk"));
+var knex_1 = __importDefault(require("knex"));
+var rmfr_1 = __importDefault(require("rmfr"));
+var fs_1 = __importDefault(require("fs"));
+var ramda_1 = require("ramda");
+var extract_pg_schema_1 = require("extract-pg-schema");
+var generateModelFiles_1 = __importDefault(require("./generateModelFiles"));
+var generateTypeFiles_1 = __importDefault(require("./generateTypeFiles"));
 var defaultTypeMap = {
     int2: 'number',
     int4: 'number',
@@ -78,12 +83,12 @@ function generateModels(_a) {
             switch (_f.label) {
                 case 0:
                     typeMap = __assign(__assign({}, defaultTypeMap), customTypeMap);
-                    console.log("Connecting to " + chalk.greenBright(connection.database) + " on " + connection.host);
+                    console.log("Connecting to " + chalk_1.default.greenBright(connection.database) + " on " + connection.host);
                     knexConfig = {
                         client: 'pg',
                         connection: connection,
                     };
-                    db = knex(knexConfig);
+                    db = knex_1.default(knexConfig);
                     _i = 0, schemas_1 = schemas;
                     _f.label = 1;
                 case 1:
@@ -91,21 +96,21 @@ function generateModels(_a) {
                     schema = schemas_1[_i];
                     if (!schema.preDeleteModelFolder) return [3 /*break*/, 3];
                     console.log(" - Clearing old files in " + schema.modelFolder);
-                    return [4 /*yield*/, rmfr(schema.modelFolder, { glob: true })];
+                    return [4 /*yield*/, rmfr_1.default(schema.modelFolder, { glob: true })];
                 case 2:
                     _f.sent();
                     _f.label = 3;
                 case 3:
-                    if (!fs.existsSync(schema.modelFolder)) {
-                        fs.mkdirSync(schema.modelFolder);
+                    if (!fs_1.default.existsSync(schema.modelFolder)) {
+                        fs_1.default.mkdirSync(schema.modelFolder);
                     }
-                    return [4 /*yield*/, extractSchema(schema.name, db)];
+                    return [4 /*yield*/, extract_pg_schema_1.extractSchema(schema.name, db)];
                 case 4:
                     _e = _f.sent(), tables = _e.tables, views = _e.views, types = _e.types;
-                    return [4 /*yield*/, generateTypeFiles(types, schema.modelFolder, sourceCasing, filenameCasing)];
+                    return [4 /*yield*/, generateTypeFiles_1.default(types, schema.modelFolder, sourceCasing, filenameCasing)];
                 case 5:
                     _f.sent();
-                    return [4 /*yield*/, generateModelFiles(tables, views, typeMap, R.pluck('name', types), schema.modelFolder, sourceCasing, filenameCasing)];
+                    return [4 /*yield*/, generateModelFiles_1.default(tables, views, typeMap, ramda_1.pluck('name', types), schema.modelFolder, sourceCasing, filenameCasing)];
                 case 6:
                     _f.sent();
                     _f.label = 7;
@@ -117,4 +122,4 @@ function generateModels(_a) {
         });
     });
 }
-module.exports = generateModels;
+exports.default = generateModels;

@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,10 +10,14 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var path = require('path');
-var R = require('ramda');
-var generateFile = require('./generateFile');
-var generateInterface = require('./generateInterface');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var path_1 = __importDefault(require("path"));
+var _a = require('ramda'), forEach = _a.forEach, map = _a.map, filter = _a.filter, reject = _a.reject, propEq = _a.propEq, uniq = _a.uniq;
+var generateFile_1 = __importDefault(require("./generateFile"));
+var generateInterface_1 = __importDefault(require("./generateInterface"));
 /**
  * @typedef { import('extract-pg-schema').Table } Table
  * @typedef { import('extract-pg-schema').Type } Type
@@ -24,35 +29,35 @@ var generateModelFile = function (tableOrView, isView, typeMap, userTypes, model
     var lines = [];
     var comment = tableOrView.comment, tags = tableOrView.tags;
     var generateInitializer = !tags['fixed'] && !isView;
-    var referencedIdTypes = R.uniq(R.map(function (p) { return p.parent.split('.')[0]; }, R.filter(function (p) { return !!p.parent; }, tableOrView.columns)));
-    R.forEach(function (referencedIdType) {
+    var referencedIdTypes = uniq(map(function (p) { return p.parent.split('.')[0]; }, filter(function (p) { return !!p.parent; }, tableOrView.columns)));
+    forEach(function (referencedIdType) {
         lines.push("import { " + pc(referencedIdType) + "Id } from './" + fc(referencedIdType) + "';");
     }, referencedIdTypes);
     if (referencedIdTypes.length) {
         lines.push('');
     }
-    var appliedUserTypes = R.map(function (p) { return p.type; }, R.filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, tableOrView.columns));
-    R.forEach(function (importedType) {
+    var appliedUserTypes = map(function (p) { return p.type; }, filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, tableOrView.columns));
+    forEach(function (importedType) {
         lines.push("import " + pc(importedType) + " from './" + fc(importedType) + "';");
     }, appliedUserTypes);
     if (appliedUserTypes.length) {
         lines.push('');
     }
-    var overriddenTypes = R.map(function (p) { return p.tags.type; }, R.filter(function (p) { return !!p.tags.type; }, tableOrView.columns));
-    R.forEach(function (importedType) {
+    var overriddenTypes = map(function (p) { return p.tags.type; }, filter(function (p) { return !!p.tags.type; }, tableOrView.columns));
+    forEach(function (importedType) {
         lines.push("import " + pc(importedType) + " from '../" + fc(importedType) + "';");
     }, overriddenTypes);
     if (overriddenTypes.length) {
         lines.push('');
     }
     // If there's one and only one primary key, that's the identifier.
-    var hasIdentifier = R.filter(function (c) { return c.isPrimary; }, tableOrView.columns).length === 1;
-    var columns = R.map(function (c) { return (__assign(__assign({}, c), { isIdentifier: hasIdentifier && c.isPrimary })); }, tableOrView.columns);
+    var hasIdentifier = filter(function (c) { return c.isPrimary; }, tableOrView.columns).length === 1;
+    var columns = map(function (c) { return (__assign(__assign({}, c), { isIdentifier: hasIdentifier && c.isPrimary })); }, tableOrView.columns);
     if (hasIdentifier) {
         lines.push("export type " + pc(tableOrView.name) + "Id = number & { __flavor?: '" + tableOrView.name + "' };");
         lines.push('');
     }
-    var interfaceLines = generateInterface({
+    var interfaceLines = generateInterface_1.default({
         name: tableOrView.name,
         properties: columns,
         considerDefaultValues: false,
@@ -62,10 +67,10 @@ var generateModelFile = function (tableOrView, isView, typeMap, userTypes, model
     lines.push.apply(lines, interfaceLines);
     if (generateInitializer) {
         lines.push('');
-        var initializerInterfaceLines = generateInterface({
+        var initializerInterfaceLines = generateInterface_1.default({
             name: pc(tableOrView.name) + "Initializer",
             modelName: tableOrView.name,
-            properties: R.reject(R.propEq('name', 'createdAt'), columns),
+            properties: reject(propEq('name', 'createdAt'), columns),
             considerDefaultValues: true,
             comment: comment,
             exportAs: true,
@@ -73,7 +78,7 @@ var generateModelFile = function (tableOrView, isView, typeMap, userTypes, model
         lines.push.apply(lines, initializerInterfaceLines);
     }
     var filename = fc(tableOrView.name) + ".ts";
-    var fullPath = path.join(modelDir, filename);
-    generateFile({ fullPath: fullPath, lines: lines });
+    var fullPath = path_1.default.join(modelDir, filename);
+    generateFile_1.default({ fullPath: fullPath, lines: lines });
 };
-module.exports = generateModelFile;
+exports.default = generateModelFile;

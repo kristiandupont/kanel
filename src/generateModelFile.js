@@ -1,7 +1,7 @@
-const path = require('path');
-const R = require('ramda');
-const generateFile = require('./generateFile');
-const generateInterface = require('./generateInterface');
+import path from 'path';
+const { forEach, map, filter, reject, propEq, uniq } = require('ramda');
+import generateFile from './generateFile';
+import generateInterface from './generateInterface';
 
 /**
  * @typedef { import('extract-pg-schema').Table } Table
@@ -24,13 +24,13 @@ const generateModelFile = (
   const lines = [];
   const { comment, tags } = tableOrView;
   const generateInitializer = !tags['fixed'] && !isView;
-  const referencedIdTypes = R.uniq(
-    R.map(
+  const referencedIdTypes = uniq(
+    map(
       (p) => p.parent.split('.')[0],
-      R.filter((p) => !!p.parent, tableOrView.columns)
+      filter((p) => !!p.parent, tableOrView.columns)
     )
   );
-  R.forEach((referencedIdType) => {
+  forEach((referencedIdType) => {
     lines.push(
       `import { ${pc(referencedIdType)}Id } from './${fc(referencedIdType)}';`
     );
@@ -38,21 +38,21 @@ const generateModelFile = (
   if (referencedIdTypes.length) {
     lines.push('');
   }
-  const appliedUserTypes = R.map(
+  const appliedUserTypes = map(
     (p) => p.type,
-    R.filter((p) => userTypes.indexOf(p.type) !== -1, tableOrView.columns)
+    filter((p) => userTypes.indexOf(p.type) !== -1, tableOrView.columns)
   );
-  R.forEach((importedType) => {
+  forEach((importedType) => {
     lines.push(`import ${pc(importedType)} from './${fc(importedType)}';`);
   }, appliedUserTypes);
   if (appliedUserTypes.length) {
     lines.push('');
   }
-  const overriddenTypes = R.map(
+  const overriddenTypes = map(
     (p) => p.tags.type,
-    R.filter((p) => !!p.tags.type, tableOrView.columns)
+    filter((p) => !!p.tags.type, tableOrView.columns)
   );
-  R.forEach((importedType) => {
+  forEach((importedType) => {
     lines.push(`import ${pc(importedType)} from '../${fc(importedType)}';`);
   }, overriddenTypes);
   if (overriddenTypes.length) {
@@ -60,8 +60,8 @@ const generateModelFile = (
   }
   // If there's one and only one primary key, that's the identifier.
   const hasIdentifier =
-    R.filter((c) => c.isPrimary, tableOrView.columns).length === 1;
-  const columns = R.map(
+    filter((c) => c.isPrimary, tableOrView.columns).length === 1;
+  const columns = map(
     (c) => ({
       ...c,
       isIdentifier: hasIdentifier && c.isPrimary,
@@ -95,7 +95,7 @@ const generateModelFile = (
       {
         name: `${pc(tableOrView.name)}Initializer`,
         modelName: tableOrView.name,
-        properties: R.reject(R.propEq('name', 'createdAt'), columns),
+        properties: reject(propEq('name', 'createdAt'), columns),
         considerDefaultValues: true,
         comment,
         exportAs: true,
@@ -111,4 +111,4 @@ const generateModelFile = (
   generateFile({ fullPath, lines });
 };
 
-module.exports = generateModelFile;
+export default generateModelFile;

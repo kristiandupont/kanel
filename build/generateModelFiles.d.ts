@@ -1,4 +1,4 @@
-export = generateModelFiles;
+export default generateModelFiles;
 /**
  * @param {Table[]} tables
  */

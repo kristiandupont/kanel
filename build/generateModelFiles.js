@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -52,10 +53,14 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
-var R = require('ramda');
-var recase = require('@kristiandupont/recase').recase;
-var generateModelFile = require('./generateModelFile');
-var generateModelIndexFile = require('./generateModelIndexFile');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var forEach = require('ramda').forEach;
+var recase_1 = require("@kristiandupont/recase");
+var generateModelFile_1 = __importDefault(require("./generateModelFile"));
+var generateModelIndexFile_1 = __importDefault(require("./generateModelIndexFile"));
 /**
  * @param {Table[]} tables
  */
@@ -63,18 +68,18 @@ function generateModelFiles(tables, views, typeMap, userTypes, modelDir, fromCas
     return __awaiter(this, void 0, void 0, function () {
         var pc, cc, fc;
         return __generator(this, function (_a) {
-            pc = recase(fromCase, 'pascal');
-            cc = recase(fromCase, 'camel');
-            fc = recase(fromCase, filenameCase);
-            R.forEach(function (table) {
-                return generateModelFile(table, false, typeMap, userTypes, modelDir, pc, cc, fc);
+            pc = recase_1.recase(fromCase, 'pascal');
+            cc = recase_1.recase(fromCase, 'camel');
+            fc = recase_1.recase(fromCase, filenameCase);
+            forEach(function (table) {
+                return generateModelFile_1.default(table, false, typeMap, userTypes, modelDir, pc, cc, fc);
             }, tables);
-            R.forEach(function (view) {
-                return generateModelFile(view, true, typeMap, userTypes, modelDir, pc, cc, fc);
+            forEach(function (view) {
+                return generateModelFile_1.default(view, true, typeMap, userTypes, modelDir, pc, cc, fc);
             }, views);
-            generateModelIndexFile(__spreadArrays(tables, views.map(function (v) { return (__assign(__assign({}, v), { isView: true })); })), modelDir, pc, fc, cc);
+            generateModelIndexFile_1.default(__spreadArrays(tables, views.map(function (v) { return (__assign(__assign({}, v), { isView: true })); })), modelDir, pc, fc, cc);
             return [2 /*return*/];
         });
     });
 }
-module.exports = generateModelFiles;
+exports.default = generateModelFiles;

@@ -1,6 +1,6 @@
-const path = require('path');
-const R = require('ramda');
-const generateFile = require('./generateFile');
+import path from 'path';
+const { map, filter, reject } = require('ramda');
+import generateFile from './generateFile';
 
 /**
  * @param {Table[]} tables
@@ -8,9 +8,9 @@ const generateFile = require('./generateFile');
 function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
   const isFixed = (m) => m.isView || m.tags['fixed'];
   const hasIdentifier = (m) =>
-    R.filter((c) => c.isPrimary, m.columns).length === 1;
-  const creatableModels = R.reject(isFixed, tables);
-  const modelsWithIdColumn = R.filter(hasIdentifier, tables);
+    filter((c) => c.isPrimary, m.columns).length === 1;
+  const creatableModels = reject(isFixed, tables);
+  const modelsWithIdColumn = filter(hasIdentifier, tables);
   const importLine = (m) => {
     const importInitializer = !isFixed(m);
     const importId = hasIdentifier(m);
@@ -38,37 +38,37 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
     return `  ${exports.join(', ')},`;
   };
   const lines = [
-    ...R.map(importLine, tables),
+    ...map(importLine, tables),
     '',
     'type Model =',
-    ...R.map((model) => `  | ${pc(model.name)}`, tables),
+    ...map((model) => `  | ${pc(model.name)}`, tables),
     '',
     'interface ModelTypeMap {',
-    ...R.map((model) => `  '${cc(model.name)}': ${pc(model.name)};`, tables),
+    ...map((model) => `  '${cc(model.name)}': ${pc(model.name)};`, tables),
     '}',
     '',
     'type ModelId =',
-    ...R.map((model) => `  | ${pc(model.name)}Id`, modelsWithIdColumn),
+    ...map((model) => `  | ${pc(model.name)}Id`, modelsWithIdColumn),
     '',
     'interface ModelIdTypeMap {',
-    ...R.map(
+    ...map(
       (model) => `  '${cc(model.name)}': ${pc(model.name)}Id;`,
       modelsWithIdColumn
     ),
     '}',
     '',
     'type Initializer =',
-    ...R.map((model) => `  | ${pc(model.name)}Initializer`, creatableModels),
+    ...map((model) => `  | ${pc(model.name)}Initializer`, creatableModels),
     '',
     'interface InitializerTypeMap {',
-    ...R.map(
+    ...map(
       (model) => `  '${cc(model.name)}': ${pc(model.name)}Initializer;`,
       creatableModels
     ),
     '}',
     '',
     'export {',
-    ...R.map(exportLine, tables),
+    ...map(exportLine, tables),
     '',
     '  Model,',
     '  ModelTypeMap,',
@@ -82,4 +82,4 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
   generateFile({ fullPath, lines });
 }
 
-module.exports = generateModelIndexFile;
+export default generateModelIndexFile;

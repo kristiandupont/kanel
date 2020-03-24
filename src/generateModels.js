@@ -1,11 +1,11 @@
-const chalk = require('chalk');
-const knex = require('knex');
-const rmfr = require('rmfr');
-const fs = require('fs');
-const R = require('ramda');
-const { extractSchema } = require('extract-pg-schema');
-const generateModelFiles = require('./generateModelFiles');
-const generateTypeFiles = require('./generateTypeFiles');
+import chalk from 'chalk';
+import knex from 'knex';
+import rmfr from 'rmfr';
+import fs from 'fs';
+import { pluck } from 'ramda';
+import { extractSchema } from 'extract-pg-schema';
+import generateModelFiles from './generateModelFiles';
+import generateTypeFiles from './generateTypeFiles';
 
 const defaultTypeMap = {
   int2: 'number',
@@ -67,7 +67,7 @@ async function generateModels({
       tables,
       views,
       typeMap,
-      R.pluck('name', types),
+      pluck('name', types),
       schema.modelFolder,
       sourceCasing,
       filenameCasing
@@ -75,4 +75,4 @@ async function generateModels({
   }
 }
 
-module.exports = generateModels;
+export default generateModels;

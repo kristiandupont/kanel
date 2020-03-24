@@ -46,7 +46,7 @@ var optionator_1 = __importDefault(require("optionator"));
 var generateModels_1 = __importDefault(require("./generateModels"));
 // @ts-ignore
 // const { version } = require('../package.json');
-var version = '0.1.1';
+var version = '0.0.4';
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var o, options, configFile, config, exitCode, error_1;

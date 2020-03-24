@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,9 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var R = require('ramda');
-var recase = require('@kristiandupont/recase').recase;
-var generateTypeFile = require('./generateTypeFile');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var ramda_1 = require("ramda");
+var recase_1 = require("@kristiandupont/recase");
+var generateTypeFile_1 = __importDefault(require("./generateTypeFile"));
 /**
  * @param {Type[]} types
  */
@@ -44,11 +49,11 @@ function generateTypeFiles(types, modelDir, fromCase, filenameCase) {
     return __awaiter(this, void 0, void 0, function () {
         var fc, pc;
         return __generator(this, function (_a) {
-            fc = recase(fromCase, filenameCase);
-            pc = recase(fromCase, 'pascal');
-            R.forEach(function (t) { return generateTypeFile(t, modelDir, fc, pc); }, types);
+            fc = recase_1.recase(fromCase, filenameCase);
+            pc = recase_1.recase(fromCase, 'pascal');
+            ramda_1.forEach(function (t) { return generateTypeFile_1.default(t, modelDir, fc, pc); }, types);
             return [2 /*return*/];
         });
     });
 }
-module.exports = generateTypeFiles;
+exports.default = generateTypeFiles;
