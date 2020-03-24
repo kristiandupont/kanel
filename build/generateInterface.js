@@ -1,0 +1,66 @@
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
+var R = require('ramda');
+var generateProperty = function (considerDefaultValue, modelName, typeMap, pc, cc) { return function (_a) {
+    var name = _a.name, type = _a.type, nullable = _a.nullable, isIdentifier = _a.isIdentifier, parent = _a.parent, defaultValue = _a.defaultValue, indices = _a.indices, comment = _a.comment, tags = _a.tags;
+    var lines = [];
+    var idType;
+    var commentLines = comment ? [comment] : [];
+    if (isIdentifier) {
+        idType = pc(modelName) + "Id";
+    }
+    else if (parent) {
+        idType = pc(parent.split('.')[0]) + "Id";
+    }
+    if (defaultValue && considerDefaultValue) {
+        commentLines.push("Default value: " + defaultValue);
+    }
+    R.forEach(function (index) {
+        if (index.isPrimary) {
+            commentLines.push("Primary key. Index: " + index.name);
+        }
+        else {
+            commentLines.push("Index: " + index.name);
+        }
+    }, indices);
+    if (commentLines.length === 1) {
+        lines.push("  /** " + commentLines[0] + " */");
+    }
+    else if (commentLines.length > 1) {
+        lines.push('  /**');
+        lines.push.apply(lines, R.map(function (c) { return "   * " + c; }, commentLines));
+        lines.push('  */');
+    }
+    var optional = considerDefaultValue && (defaultValue || nullable);
+    var varName = optional ? cc(name) + "?" : cc(name);
+    var rawType = tags.type || idType || typeMap[type] || pc(type);
+    var typeStr = nullable && !considerDefaultValue ? rawType + " |\u00A0null" : rawType;
+    lines.push("  " + varName + ": " + typeStr + ";");
+    return lines;
+}; };
+var generateInterface = function (_a, typeMap, pc, cc) {
+    var name = _a.name, _b = _a.modelName, modelName = _b === void 0 ? null : _b, _c = _a.baseInterface, baseInterface = _c === void 0 ? null : _c, properties = _a.properties, considerDefaultValues = _a.considerDefaultValues, comment = _a.comment, exportAs = _a.exportAs;
+    var lines = [];
+    if (comment) {
+        lines.push('/**', " * " + comment, ' */');
+    }
+    var exportStr = '';
+    if (exportAs) {
+        exportStr = exportAs === 'default' ? 'export default ' : 'export ';
+    }
+    var extendsStr = baseInterface ? "extends " + baseInterface : '';
+    lines.push(exportStr + "interface " + pc(name) + " " + extendsStr + " {");
+    var props = R.map(generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc), properties);
+    var propLines = R.flatten(__spreadArrays([
+        R.head(props)
+    ], R.map(function (p) { return __spreadArrays([''], p); }, R.tail(props))));
+    lines.push.apply(lines, propLines);
+    lines.push('}');
+    return lines;
+};
+module.exports = generateInterface;
