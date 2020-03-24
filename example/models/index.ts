@@ -13,11 +13,9 @@ import Inventory, { InventoryInitializer, InventoryId } from './Inventory';
 import Language, { LanguageInitializer, LanguageId } from './Language';
 import Payment, { PaymentInitializer, PaymentId } from './Payment';
 import Rental, { RentalInitializer, RentalId } from './Rental';
-import Staff, { StaffInitializer, StaffId } from './Staff';
 import Store, { StoreInitializer, StoreId } from './Store';
 import ActorInfo from './ActorInfo';
 import CustomerList from './CustomerList';
-import FilmList from './FilmList';
 import NicerButSlowerFilmList from './NicerButSlowerFilmList';
 import SalesByFilmCategory from './SalesByFilmCategory';
 import SalesByStore from './SalesByStore';
@@ -37,11 +35,9 @@ type Model =
   | Language
   | Payment
   | Rental
-  | Staff
   | Store
   | ActorInfo
   | CustomerList
-  | FilmList
   | NicerButSlowerFilmList
   | SalesByFilmCategory
   | SalesByStore
@@ -61,11 +57,9 @@ interface ModelTypeMap {
   'language': Language;
   'payment': Payment;
   'rental': Rental;
-  'staff': Staff;
   'store': Store;
   'actorInfo': ActorInfo;
   'customerList': CustomerList;
-  'filmList': FilmList;
   'nicerButSlowerFilmList': NicerButSlowerFilmList;
   'salesByFilmCategory': SalesByFilmCategory;
   'salesByStore': SalesByStore;
@@ -84,7 +78,6 @@ type ModelId =
   | LanguageId
   | PaymentId
   | RentalId
-  | StaffId
   | StoreId
 
 interface ModelIdTypeMap {
@@ -99,7 +92,6 @@ interface ModelIdTypeMap {
   'language': LanguageId;
   'payment': PaymentId;
   'rental': RentalId;
-  'staff': StaffId;
   'store': StoreId;
 }
 
@@ -117,7 +109,6 @@ type Initializer =
   | LanguageInitializer
   | PaymentInitializer
   | RentalInitializer
-  | StaffInitializer
   | StoreInitializer
 
 interface InitializerTypeMap {
@@ -134,7 +125,6 @@ interface InitializerTypeMap {
   'language': LanguageInitializer;
   'payment': PaymentInitializer;
   'rental': RentalInitializer;
-  'staff': StaffInitializer;
   'store': StoreInitializer;
 }
 
@@ -152,11 +142,9 @@ export {
   Language, LanguageInitializer, LanguageId,
   Payment, PaymentInitializer, PaymentId,
   Rental, RentalInitializer, RentalId,
-  Staff, StaffInitializer, StaffId,
   Store, StoreInitializer, StoreId,
   ActorInfo,
   CustomerList,
-  FilmList,
   NicerButSlowerFilmList,
   SalesByFilmCategory,
   SalesByStore,

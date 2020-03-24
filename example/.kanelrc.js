@@ -23,6 +23,7 @@ module.exports = {
     {
       name: 'public',
       modelFolder: path.join(__dirname, 'models'),
+      ignore: ['film_list', 'staff']
     },
   ],
 };
