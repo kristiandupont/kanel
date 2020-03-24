@@ -2,35 +2,11 @@ const chalk = require('chalk');
 const knex = require('knex');
 const rmfr = require('rmfr');
 const fs = require('fs');
-const path = require('path');
 const R = require('ramda');
 const { recase } = require('@kristiandupont/recase');
 const { extractSchema } = require('extract-pg-schema');
-const generateFile = require('./generateFile')
 const generateModelFiles = require("./generateModelFiles");
-
-/**
- * @param {Type} type
- */
-async function generateTypeFile(type, modelDir, fc, pc) {
-  const lines = [];
-
-  const { comment } = type;
-
-  if (comment) {
-    lines.push(`/** ${comment} */`);
-  }
-  lines.push(
-    `type ${pc(type.name)} = ${R.map((v) => `'${v}'`, type.values).join(
-      ' | '
-    )};`
-  );
-  lines.push(`export default ${pc(type.name)};`);
-
-  const filename = `${fc(type.name)}.ts`;
-  const fullPath = path.join(modelDir, filename);
-  generateFile({ fullPath, lines });
-}
+const generateTypeFile = require("./generateTypeFile");
 
 /**
  * @param {Type[]} types

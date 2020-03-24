@@ -1,7 +1,3 @@
-export const generateFile: ({ fullPath, lines }: {
-    fullPath: any;
-    lines: any;
-}) => void;
 export function generateModels({ connection, sourceCasing, filenameCasing, customTypeMap, schemas, }: {
     connection: any;
     sourceCasing?: string;
@@ -9,3 +5,4 @@ export function generateModels({ connection, sourceCasing, filenameCasing, custo
     customTypeMap?: {};
     schemas: any;
 }): Promise<void>;
+export declare const generateFile: any;

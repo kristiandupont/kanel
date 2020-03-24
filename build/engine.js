@@ -49,33 +49,11 @@ var chalk = require('chalk');
 var knex = require('knex');
 var rmfr = require('rmfr');
 var fs = require('fs');
-var path = require('path');
 var R = require('ramda');
 var recase = require('@kristiandupont/recase').recase;
 var extractSchema = require('extract-pg-schema').extractSchema;
-var generateFile = require('./generateFile');
 var generateModelFiles = require("./generateModelFiles");
-/**
- * @param {Type} type
- */
-function generateTypeFile(type, modelDir, fc, pc) {
-    return __awaiter(this, void 0, void 0, function () {
-        var lines, comment, filename, fullPath;
-        return __generator(this, function (_a) {
-            lines = [];
-            comment = type.comment;
-            if (comment) {
-                lines.push("/** " + comment + " */");
-            }
-            lines.push("type " + pc(type.name) + " = " + R.map(function (v) { return "'" + v + "'"; }, type.values).join(' | ') + ";");
-            lines.push("export default " + pc(type.name) + ";");
-            filename = fc(type.name) + ".ts";
-            fullPath = path.join(modelDir, filename);
-            generateFile({ fullPath: fullPath, lines: lines });
-            return [2 /*return*/];
-        });
-    });
-}
+var generateTypeFile = require("./generateTypeFile");
 /**
  * @param {Type[]} types
  */
