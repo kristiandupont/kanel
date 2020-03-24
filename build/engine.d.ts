@@ -1,9 +1,9 @@
 export type Table = any;
 export type Type = any;
-export function generateFile({ fullPath, lines }: {
+export const generateFile: ({ fullPath, lines }: {
     fullPath: any;
     lines: any;
-}): void;
+}) => void;
 export function generateModels({ connection, sourceCasing, filenameCasing, customTypeMap, schemas, }: {
     connection: any;
     sourceCasing?: string;

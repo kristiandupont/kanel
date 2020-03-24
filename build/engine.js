@@ -57,27 +57,14 @@ var knex = require('knex');
 var rmfr = require('rmfr');
 var fs = require('fs');
 var path = require('path');
-var os = require('os');
 var R = require('ramda');
 var recase = require('@kristiandupont/recase').recase;
 var extractSchema = require('extract-pg-schema').extractSchema;
+var generateFile = require('./generateFile');
 /**
  * @typedef { import('extract-pg-schema').Table } Table
  * @typedef { import('extract-pg-schema').Type } Type
  */
-var generateFile = function (_a) {
-    var fullPath = _a.fullPath, lines = _a.lines;
-    var relativePath = path.relative(process.cwd(), fullPath);
-    console.log(" - " + relativePath);
-    var allLines = __spreadArrays([
-        "// Automatically generated. Don't change this file manually.",
-        ''
-    ], lines, [
-        '',
-    ]);
-    var content = allLines.join(os.EOL);
-    fs.writeFileSync(fullPath, content, 'utf-8');
-};
 var generateProperty = function (considerDefaultValue, modelName, typeMap, pc, cc) { return function (_a) {
     var name = _a.name, type = _a.type, nullable = _a.nullable, isIdentifier = _a.isIdentifier, parent = _a.parent, defaultValue = _a.defaultValue, indices = _a.indices, comment = _a.comment, tags = _a.tags;
     var lines = [];

@@ -3,29 +3,15 @@ const knex = require('knex');
 const rmfr = require('rmfr');
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 const R = require('ramda');
 const { recase } = require('@kristiandupont/recase');
 const { extractSchema } = require('extract-pg-schema');
+const generateFile = require('./generateFile')
 
 /**
  * @typedef { import('extract-pg-schema').Table } Table
  * @typedef { import('extract-pg-schema').Type } Type
  */
-
-const generateFile = ({ fullPath, lines }) => {
-  const relativePath = path.relative(process.cwd(), fullPath);
-  console.log(` - ${relativePath}`);
-  const allLines = [
-    "// Automatically generated. Don't change this file manually.",
-    '',
-    ...lines,
-    '',
-  ];
-
-  const content = allLines.join(os.EOL);
-  fs.writeFileSync(fullPath, content, 'utf-8');
-};
 
 const generateProperty = (
   considerDefaultValue,
