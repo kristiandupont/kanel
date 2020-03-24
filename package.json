@@ -17,7 +17,7 @@
   "dependencies": {
     "@kristiandupont/recase": "^1.1.0",
     "chalk": "^3.0.0",
-    "extract-pg-schema": "^1.0.0",
+    "extract-pg-schema": "^1.2.0",
     "knex": "^0.20.9",
     "optionator": "^0.8.3",
     "pg": "^7.18.2",
@@ -29,6 +29,7 @@
     "@types/node": "^13.7.1",
     "@types/ramda": "^0.26.41",
     "eslint": "^6.8.0",
+    "prettier": "^2.0.1",
     "typescript": "^3.7.5"
   },
   "prettier": {

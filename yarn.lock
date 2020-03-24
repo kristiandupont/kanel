@@ -597,10 +597,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-pg-schema@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-1.0.0.tgz#1704c57777c2b4a42c8b853ef3ab6e4829b4a75e"
-  integrity sha512-sQfrkIkt/LZNhdLxIMe/Vn/9NdgOzBj01HnLIix3EUFJeakUQUFS6/gzJagV5+mfjts71Jdg1dMAXDapB/mgeA==
+extract-pg-schema@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-1.2.0.tgz#190442ce81bd6c657b0d57dbbfb5f97f3f1fef59"
+  integrity sha512-EUyt+nCnn/xaFx5RTlvUltF58WI3g5yFTOgakMjn+aUbLR1stel6eYfVQ7NmtwEJkOJuSvbbbmO4SkRlNmdGvQ==
   dependencies:
     ramda "^0.26.1"
 
@@ -1491,6 +1491,11 @@ prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
+
+prettier@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.1.tgz#3f00ac71263be34684b2b2c8d7e7f63737592dac"
+  integrity sha512-piXGBcY1zoFOG0MvHpNE5reAGseLmaCRifQ/fmfF49BcYkInEs/naD/unxGNAeOKFA5+JxVrPyMvMlpzcd20UA==
 
 progress@^2.0.0:
   version "2.0.3"
