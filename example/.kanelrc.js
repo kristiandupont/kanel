@@ -11,7 +11,13 @@ module.exports = {
   },
 
   // filenameCasing: 'dash',
+  sourceCasing: null,
   preDeleteModelFolder: true,
+
+  customTypeMap: {
+    tsvector: 'string',
+    bpchar: 'string'
+  },
 
   schemas: [
     {

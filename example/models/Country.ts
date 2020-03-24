@@ -1,12 +1,14 @@
 // Automatically generated. Don't change this file manually.
 
+export type CountryId = number & { __flavor?: 'country' };
+
 export default interface Country  {
   /** Primary key. Index: country_pkey */
-  country_id: number;
+  countryId: CountryId;
 
   country: string;
 
-  last_update: Date;
+  lastUpdate: Date;
 }
 
 export interface CountryInitializer  {
@@ -14,7 +16,7 @@ export interface CountryInitializer  {
    * Default value: nextval('country_country_id_seq'::regclass)
    * Primary key. Index: country_pkey
   */
-  countryId?: number;
+  countryId?: CountryId;
 
   country: string;
 

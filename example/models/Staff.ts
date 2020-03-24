@@ -2,19 +2,21 @@
 
 import { AddressId } from './Address';
 
+export type StaffId = number & { __flavor?: 'staff' };
+
 export default interface Staff  {
   /** Primary key. Index: staff_pkey */
-  staff_id: number;
+  staffId: StaffId;
 
-  first_name: string;
+  firstName: string;
 
-  last_name: string;
+  lastName: string;
 
-  address_id: AddressId;
+  addressId: AddressId;
 
   email: string | null;
 
-  store_id: number;
+  storeId: number;
 
   active: boolean;
 
@@ -22,9 +24,9 @@ export default interface Staff  {
 
   password: string | null;
 
-  last_update: Date;
+  lastUpdate: Date;
 
-  picture: bytea | null;
+  picture: Bytea | null;
 }
 
 export interface StaffInitializer  {
@@ -32,17 +34,17 @@ export interface StaffInitializer  {
    * Default value: nextval('staff_staff_id_seq'::regclass)
    * Primary key. Index: staff_pkey
   */
-  staffId?: number;
+  staffId?: StaffId;
 
-  first_name: string;
+  firstName: string;
 
-  last_name: string;
+  lastName: string;
 
-  address_id: AddressId;
+  addressId: AddressId;
 
   email?: string;
 
-  store_id: number;
+  storeId: number;
 
   /** Default value: true */
   active?: boolean;
@@ -54,5 +56,5 @@ export interface StaffInitializer  {
   /** Default value: now() */
   lastUpdate?: Date;
 
-  picture?: bytea;
+  picture?: Bytea;
 }

@@ -1,20 +1,27 @@
 // Automatically generated. Don't change this file manually.
 
-import Actor, { ActorInitializer } from './Actor';
-import Address, { AddressInitializer } from './Address';
-import Category, { CategoryInitializer } from './Category';
-import City, { CityInitializer } from './City';
-import Country, { CountryInitializer } from './Country';
-import Customer, { CustomerInitializer } from './Customer';
-import Film, { FilmInitializer } from './Film';
+import Actor, { ActorInitializer, ActorId } from './Actor';
+import Address, { AddressInitializer, AddressId } from './Address';
+import Category, { CategoryInitializer, CategoryId } from './Category';
+import City, { CityInitializer, CityId } from './City';
+import Country, { CountryInitializer, CountryId } from './Country';
+import Customer, { CustomerInitializer, CustomerId } from './Customer';
+import Film, { FilmInitializer, FilmId } from './Film';
 import FilmActor, { FilmActorInitializer } from './FilmActor';
 import FilmCategory, { FilmCategoryInitializer } from './FilmCategory';
-import Inventory, { InventoryInitializer } from './Inventory';
-import Language, { LanguageInitializer } from './Language';
-import Payment, { PaymentInitializer } from './Payment';
-import Rental, { RentalInitializer } from './Rental';
-import Staff, { StaffInitializer } from './Staff';
-import Store, { StoreInitializer } from './Store';
+import Inventory, { InventoryInitializer, InventoryId } from './Inventory';
+import Language, { LanguageInitializer, LanguageId } from './Language';
+import Payment, { PaymentInitializer, PaymentId } from './Payment';
+import Rental, { RentalInitializer, RentalId } from './Rental';
+import Staff, { StaffInitializer, StaffId } from './Staff';
+import Store, { StoreInitializer, StoreId } from './Store';
+import ActorInfo from './ActorInfo';
+import CustomerList from './CustomerList';
+import FilmList from './FilmList';
+import NicerButSlowerFilmList from './NicerButSlowerFilmList';
+import SalesByFilmCategory from './SalesByFilmCategory';
+import SalesByStore from './SalesByStore';
+import StaffList from './StaffList';
 
 type Model =
   | Actor
@@ -32,6 +39,13 @@ type Model =
   | Rental
   | Staff
   | Store
+  | ActorInfo
+  | CustomerList
+  | FilmList
+  | NicerButSlowerFilmList
+  | SalesByFilmCategory
+  | SalesByStore
+  | StaffList
 
 interface ModelTypeMap {
   'actor': Actor;
@@ -49,11 +63,44 @@ interface ModelTypeMap {
   'rental': Rental;
   'staff': Staff;
   'store': Store;
+  'actorInfo': ActorInfo;
+  'customerList': CustomerList;
+  'filmList': FilmList;
+  'nicerButSlowerFilmList': NicerButSlowerFilmList;
+  'salesByFilmCategory': SalesByFilmCategory;
+  'salesByStore': SalesByStore;
+  'staffList': StaffList;
 }
 
 type ModelId =
+  | ActorId
+  | AddressId
+  | CategoryId
+  | CityId
+  | CountryId
+  | CustomerId
+  | FilmId
+  | InventoryId
+  | LanguageId
+  | PaymentId
+  | RentalId
+  | StaffId
+  | StoreId
 
 interface ModelIdTypeMap {
+  'actor': ActorId;
+  'address': AddressId;
+  'category': CategoryId;
+  'city': CityId;
+  'country': CountryId;
+  'customer': CustomerId;
+  'film': FilmId;
+  'inventory': InventoryId;
+  'language': LanguageId;
+  'payment': PaymentId;
+  'rental': RentalId;
+  'staff': StaffId;
+  'store': StoreId;
 }
 
 type Initializer =
@@ -92,21 +139,28 @@ interface InitializerTypeMap {
 }
 
 export {
-  Actor, ActorInitializer,
-  Address, AddressInitializer,
-  Category, CategoryInitializer,
-  City, CityInitializer,
-  Country, CountryInitializer,
-  Customer, CustomerInitializer,
-  Film, FilmInitializer,
+  Actor, ActorInitializer, ActorId,
+  Address, AddressInitializer, AddressId,
+  Category, CategoryInitializer, CategoryId,
+  City, CityInitializer, CityId,
+  Country, CountryInitializer, CountryId,
+  Customer, CustomerInitializer, CustomerId,
+  Film, FilmInitializer, FilmId,
   FilmActor, FilmActorInitializer,
   FilmCategory, FilmCategoryInitializer,
-  Inventory, InventoryInitializer,
-  Language, LanguageInitializer,
-  Payment, PaymentInitializer,
-  Rental, RentalInitializer,
-  Staff, StaffInitializer,
-  Store, StoreInitializer,
+  Inventory, InventoryInitializer, InventoryId,
+  Language, LanguageInitializer, LanguageId,
+  Payment, PaymentInitializer, PaymentId,
+  Rental, RentalInitializer, RentalId,
+  Staff, StaffInitializer, StaffId,
+  Store, StoreInitializer, StoreId,
+  ActorInfo,
+  CustomerList,
+  FilmList,
+  NicerButSlowerFilmList,
+  SalesByFilmCategory,
+  SalesByStore,
+  StaffList,
 
   Model,
   ModelTypeMap,

@@ -2,9 +2,11 @@
 
 import { CityId } from './City';
 
+export type AddressId = number & { __flavor?: 'address' };
+
 export default interface Address  {
   /** Primary key. Index: address_pkey */
-  address_id: number;
+  addressId: AddressId;
 
   address: string;
 
@@ -13,13 +15,13 @@ export default interface Address  {
   district: string;
 
   /** Index: idx_fk_city_id */
-  city_id: CityId;
+  cityId: CityId;
 
-  postal_code: string | null;
+  postalCode: string | null;
 
   phone: string;
 
-  last_update: Date;
+  lastUpdate: Date;
 }
 
 export interface AddressInitializer  {
@@ -27,7 +29,7 @@ export interface AddressInitializer  {
    * Default value: nextval('address_address_id_seq'::regclass)
    * Primary key. Index: address_pkey
   */
-  addressId?: number;
+  addressId?: AddressId;
 
   address: string;
 
@@ -36,7 +38,7 @@ export interface AddressInitializer  {
   district: string;
 
   /** Index: idx_fk_city_id */
-  city_id: CityId;
+  cityId: CityId;
 
   postalCode?: string;
 

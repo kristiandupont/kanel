@@ -4,22 +4,24 @@ import { CustomerId } from './Customer';
 import { StaffId } from './Staff';
 import { RentalId } from './Rental';
 
+export type PaymentId = number & { __flavor?: 'payment' };
+
 export default interface Payment  {
   /** Primary key. Index: payment_pkey */
-  payment_id: number;
+  paymentId: PaymentId;
 
   /** Index: idx_fk_customer_id */
-  customer_id: CustomerId;
+  customerId: CustomerId;
 
   /** Index: idx_fk_staff_id */
-  staff_id: StaffId;
+  staffId: StaffId;
 
   /** Index: idx_fk_rental_id */
-  rental_id: RentalId;
+  rentalId: RentalId;
 
-  amount: numeric;
+  amount: number;
 
-  payment_date: Date;
+  paymentDate: Date;
 }
 
 export interface PaymentInitializer  {
@@ -27,18 +29,18 @@ export interface PaymentInitializer  {
    * Default value: nextval('payment_payment_id_seq'::regclass)
    * Primary key. Index: payment_pkey
   */
-  paymentId?: number;
+  paymentId?: PaymentId;
 
   /** Index: idx_fk_customer_id */
-  customer_id: CustomerId;
+  customerId: CustomerId;
 
   /** Index: idx_fk_staff_id */
-  staff_id: StaffId;
+  staffId: StaffId;
 
   /** Index: idx_fk_rental_id */
-  rental_id: RentalId;
+  rentalId: RentalId;
 
-  amount: numeric;
+  amount: number;
 
-  payment_date: Date;
+  paymentDate: Date;
 }

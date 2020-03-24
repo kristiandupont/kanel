@@ -5,26 +5,26 @@ import { FilmId } from './Film';
 
 export default interface FilmActor  {
   /** Primary key. Index: film_actor_pkey */
-  actor_id: ActorId;
+  actorId: ActorId;
 
   /**
    * Primary key. Index: film_actor_pkey
    * Index: idx_fk_film_id
   */
-  film_id: FilmId;
+  filmId: FilmId;
 
-  last_update: Date;
+  lastUpdate: Date;
 }
 
 export interface FilmActorInitializer  {
   /** Primary key. Index: film_actor_pkey */
-  actor_id: ActorId;
+  actorId: ActorId;
 
   /**
    * Primary key. Index: film_actor_pkey
    * Index: idx_fk_film_id
   */
-  film_id: FilmId;
+  filmId: FilmId;
 
   /** Default value: now() */
   lastUpdate?: Date;

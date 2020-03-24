@@ -1,15 +1,17 @@
 // Automatically generated. Don't change this file manually.
 
+export type ActorId = number & { __flavor?: 'actor' };
+
 export default interface Actor  {
   /** Primary key. Index: actor_pkey */
-  actor_id: number;
+  actorId: ActorId;
 
-  first_name: string;
+  firstName: string;
 
   /** Index: idx_actor_last_name */
-  last_name: string;
+  lastName: string;
 
-  last_update: Date;
+  lastUpdate: Date;
 }
 
 export interface ActorInitializer  {
@@ -17,12 +19,12 @@ export interface ActorInitializer  {
    * Default value: nextval('actor_actor_id_seq'::regclass)
    * Primary key. Index: actor_pkey
   */
-  actorId?: number;
+  actorId?: ActorId;
 
-  first_name: string;
+  firstName: string;
 
   /** Index: idx_actor_last_name */
-  last_name: string;
+  lastName: string;
 
   /** Default value: now() */
   lastUpdate?: Date;

@@ -3,16 +3,18 @@
 import { StaffId } from './Staff';
 import { AddressId } from './Address';
 
+export type StoreId = number & { __flavor?: 'store' };
+
 export default interface Store  {
   /** Primary key. Index: store_pkey */
-  store_id: number;
+  storeId: StoreId;
 
   /** Index: idx_unq_manager_staff_id */
-  manager_staff_id: StaffId;
+  managerStaffId: StaffId;
 
-  address_id: AddressId;
+  addressId: AddressId;
 
-  last_update: Date;
+  lastUpdate: Date;
 }
 
 export interface StoreInitializer  {
@@ -20,12 +22,12 @@ export interface StoreInitializer  {
    * Default value: nextval('store_store_id_seq'::regclass)
    * Primary key. Index: store_pkey
   */
-  storeId?: number;
+  storeId?: StoreId;
 
   /** Index: idx_unq_manager_staff_id */
-  manager_staff_id: StaffId;
+  managerStaffId: StaffId;
 
-  address_id: AddressId;
+  addressId: AddressId;
 
   /** Default value: now() */
   lastUpdate?: Date;
