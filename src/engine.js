@@ -3,20 +3,9 @@ const knex = require('knex');
 const rmfr = require('rmfr');
 const fs = require('fs');
 const R = require('ramda');
-const { recase } = require('@kristiandupont/recase');
 const { extractSchema } = require('extract-pg-schema');
 const generateModelFiles = require("./generateModelFiles");
-const generateTypeFile = require("./generateTypeFile");
-
-/**
- * @param {Type[]} types
- */
-async function generateTypeFiles(types, modelDir, fromCase, filenameCase) {
-  const fc = recase(fromCase, filenameCase);
-  const pc = recase(fromCase, 'pascal');
-
-  R.forEach((t) => generateTypeFile(t, modelDir, fc, pc), types);
-}
+const generateTypeFiles = require("./generateTypeFiles");
 
 const defaultTypeMap = {
   int2: 'number',
@@ -87,6 +76,5 @@ async function generateModels({
 }
 
 module.exports = {
-  generateFile,
   generateModels,
 };

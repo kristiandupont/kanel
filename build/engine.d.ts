@@ -5,4 +5,3 @@ export function generateModels({ connection, sourceCasing, filenameCasing, custo
     customTypeMap?: {};
     schemas: any;
 }): Promise<void>;
-export declare const generateFile: any;

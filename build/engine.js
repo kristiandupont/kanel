@@ -50,24 +50,9 @@ var knex = require('knex');
 var rmfr = require('rmfr');
 var fs = require('fs');
 var R = require('ramda');
-var recase = require('@kristiandupont/recase').recase;
 var extractSchema = require('extract-pg-schema').extractSchema;
 var generateModelFiles = require("./generateModelFiles");
-var generateTypeFile = require("./generateTypeFile");
-/**
- * @param {Type[]} types
- */
-function generateTypeFiles(types, modelDir, fromCase, filenameCase) {
-    return __awaiter(this, void 0, void 0, function () {
-        var fc, pc;
-        return __generator(this, function (_a) {
-            fc = recase(fromCase, filenameCase);
-            pc = recase(fromCase, 'pascal');
-            R.forEach(function (t) { return generateTypeFile(t, modelDir, fc, pc); }, types);
-            return [2 /*return*/];
-        });
-    });
-}
+var generateTypeFiles = require("./generateTypeFiles");
 var defaultTypeMap = {
     int2: 'number',
     int4: 'number',
@@ -133,6 +118,5 @@ function generateModels(_a) {
     });
 }
 module.exports = {
-    generateFile: generateFile,
     generateModels: generateModels,
 };
