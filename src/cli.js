@@ -5,7 +5,7 @@ import optionator from 'optionator';
 import generateModels from './generateModels';
 // @ts-ignore
 // const { version } = require('../package.json');
-const version = '0.1.1';
+const version = '0.0.4';
 
 async function main() {
   const o = optionator({

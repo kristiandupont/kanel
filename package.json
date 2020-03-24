@@ -1,8 +1,8 @@
 {
   "name": "kanel",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
-  "main": "build/engine.js",
+  "main": "build/index.js",
   "repository": "git@github.com:kristiandupont/kanel.git",
   "author": "Kristian Dupont <kristian@kristiandupont.com>",
   "bin": {
