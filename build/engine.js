@@ -45,13 +45,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
 var chalk = require('chalk');
 var knex = require('knex');
 var rmfr = require('rmfr');
@@ -61,29 +54,7 @@ var R = require('ramda');
 var recase = require('@kristiandupont/recase').recase;
 var extractSchema = require('extract-pg-schema').extractSchema;
 var generateFile = require('./generateFile');
-var generateModelFile = require("./generateModelFile");
-var generateModelIndexFile = require("./generateModelIndexFile");
-/**
- * @param {Table[]} tables
- */
-function generateModelFiles(tables, views, typeMap, userTypes, modelDir, fromCase, filenameCase) {
-    return __awaiter(this, void 0, void 0, function () {
-        var pc, cc, fc;
-        return __generator(this, function (_a) {
-            pc = recase(fromCase, 'pascal');
-            cc = recase(fromCase, 'camel');
-            fc = recase(fromCase, filenameCase);
-            R.forEach(function (table) {
-                return generateModelFile(table, false, typeMap, userTypes, modelDir, pc, cc, fc);
-            }, tables);
-            R.forEach(function (view) {
-                return generateModelFile(view, true, typeMap, userTypes, modelDir, pc, cc, fc);
-            }, views);
-            generateModelIndexFile(__spreadArrays(tables, views.map(function (v) { return (__assign(__assign({}, v), { isView: true })); })), modelDir, pc, fc, cc);
-            return [2 /*return*/];
-        });
-    });
-}
+var generateModelFiles = require("./generateModelFiles");
 /**
  * @param {Type} type
  */

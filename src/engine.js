@@ -1,4 +1,3 @@
-
 const chalk = require('chalk');
 const knex = require('knex');
 const rmfr = require('rmfr');
@@ -8,45 +7,7 @@ const R = require('ramda');
 const { recase } = require('@kristiandupont/recase');
 const { extractSchema } = require('extract-pg-schema');
 const generateFile = require('./generateFile')
-const generateModelFile = require("./generateModelFile");
-const generateModelIndexFile = require("./generateModelIndexFile");
-
-/**
- * @param {Table[]} tables
- */
-async function generateModelFiles(
-  tables,
-  views,
-  typeMap,
-  userTypes,
-  modelDir,
-  fromCase,
-  filenameCase
-) {
-  const pc = recase(fromCase, 'pascal');
-  const cc = recase(fromCase, 'camel');
-  const fc = recase(fromCase, filenameCase);
-
-  R.forEach(
-    (table) =>
-      generateModelFile(table, false, typeMap, userTypes, modelDir, pc, cc, fc),
-    tables
-  );
-
-  R.forEach(
-    (view) =>
-      generateModelFile(view, true, typeMap, userTypes, modelDir, pc, cc, fc),
-    views
-  );
-
-  generateModelIndexFile(
-    [...tables, ...views.map((v) => ({ ...v, isView: true }))],
-    modelDir,
-    pc,
-    fc,
-    cc
-  );
-}
+const generateModelFiles = require("./generateModelFiles");
 
 /**
  * @param {Type} type
