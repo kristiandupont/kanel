@@ -4,8 +4,8 @@ const rmfr = require('rmfr');
 const fs = require('fs');
 const R = require('ramda');
 const { extractSchema } = require('extract-pg-schema');
-const generateModelFiles = require("./generateModelFiles");
-const generateTypeFiles = require("./generateTypeFiles");
+const generateModelFiles = require('./generateModelFiles');
+const generateTypeFiles = require('./generateTypeFiles');
 
 const defaultTypeMap = {
   int2: 'number',
@@ -75,6 +75,4 @@ async function generateModels({
   }
 }
 
-module.exports = {
-  generateModels,
-};
+module.exports = generateModels;
