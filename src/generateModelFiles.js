@@ -1,4 +1,4 @@
-const { forEach } = require('ramda');
+import { forEach } from 'ramda';
 import { recase } from '@kristiandupont/recase';
 import generateModelFile from './generateModelFile';
 import generateModelIndexFile from './generateModelIndexFile';

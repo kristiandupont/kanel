@@ -1,5 +1,5 @@
 import path from 'path';
-const { map, filter, reject } = require('ramda');
+import { map, filter, reject } from 'ramda';
 import generateFile from './generateFile';
 
 /**

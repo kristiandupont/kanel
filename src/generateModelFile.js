@@ -1,5 +1,5 @@
 import path from 'path';
-const { forEach, map, filter, reject, propEq, uniq } = require('ramda');
+import { forEach, map, filter, reject, propEq, uniq } from 'ramda';
 import generateFile from './generateFile';
 import generateInterface from './generateInterface';
 
