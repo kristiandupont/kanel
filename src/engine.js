@@ -27,31 +27,17 @@ const generateFile = ({ fullPath, lines }) => {
   fs.writeFileSync(fullPath, content, 'utf-8');
 };
 
-const getMappedType = type => {
-  const typeMap = {
-    int2: 'number',
-    int4: 'number',
-    float4: 'number',
-    bool: 'boolean',
-    json: 'unknown',
-    jsonb: 'unknown',
-    char: 'string',
-    varchar: 'string',
-    text: 'string',
-    date: 'Date',
-    time: 'Date',
-    timetz: 'Date',
-    timestamp: 'Date',
-    timestamptz: 'Date',
-  };
-
-  return typeMap[type];
-};
-
-const generateProperty = (considerDefaultValue, modelName, pc, cc) => ({
+const generateProperty = (
+  considerDefaultValue,
+  modelName,
+  typeMap,
+  pc,
+  cc
+) => ({
   name,
   type,
   nullable,
+  isIdentifier,
   parent,
   defaultValue,
   indices,
@@ -63,19 +49,17 @@ const generateProperty = (considerDefaultValue, modelName, pc, cc) => ({
   let idType;
 
   const commentLines = comment ? [comment] : [];
-  if (parent) {
+  if (isIdentifier) {
+    idType = `${pc(modelName)}Id`;
+  } else if (parent) {
     idType = `${pc(parent.split('.')[0])}Id`;
   }
   if (defaultValue && considerDefaultValue) {
     commentLines.push(`Default value: ${defaultValue}`);
   }
-  R.forEach(index => {
+  R.forEach((index) => {
     if (index.isPrimary) {
-      if (name === 'id') {
-        idType = `${pc(modelName)}Id`;
-      } else {
-        commentLines.push(`Primary key. Index: ${index.name}`);
-      }
+      commentLines.push(`Primary key. Index: ${index.name}`);
     } else {
       commentLines.push(`Index: ${index.name}`);
     }
@@ -85,13 +69,13 @@ const generateProperty = (considerDefaultValue, modelName, pc, cc) => ({
     lines.push(`  /** ${commentLines[0]} */`);
   } else if (commentLines.length > 1) {
     lines.push('  /**');
-    lines.push(...R.map(c => `   * ${c}`, commentLines));
+    lines.push(...R.map((c) => `   * ${c}`, commentLines));
     lines.push('  */');
   }
   const optional = considerDefaultValue && (defaultValue || nullable);
-  const varName = optional ? `${cc(name)}?` : name;
+  const varName = optional ? `${cc(name)}?` : cc(name);
 
-  const rawType = tags.type || idType || getMappedType(type) || type;
+  const rawType = tags.type || idType || typeMap[type] || pc(type);
   const typeStr =
     nullable && !considerDefaultValue ? `${rawType} | null` : rawType;
   lines.push(`  ${varName}: ${typeStr};`);
@@ -109,6 +93,7 @@ function generateInterface(
     comment,
     exportAs,
   },
+  typeMap,
   pc,
   cc
 ) {
@@ -126,13 +111,13 @@ function generateInterface(
   const extendsStr = baseInterface ? `extends ${baseInterface}` : '';
   lines.push(`${exportStr}interface ${pc(name)} ${extendsStr} {`);
   const props = R.map(
-    generateProperty(considerDefaultValues, modelName || name, pc, cc),
+    generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc),
     properties
   );
   const propLines = R.flatten([
     R.head(props),
     // @ts-ignore
-    ...R.map(p => ['', ...p], R.tail(props)),
+    ...R.map((p) => ['', ...p], R.tail(props)),
   ]);
   lines.push(...propLines);
   lines.push('}');
@@ -141,21 +126,30 @@ function generateInterface(
 }
 
 /**
- * @param {Table} table
+ * @param {Table} tableOrView
  */
-function generateModelFile(table, userTypes, modelDir, pc, cc, fc) {
+function generateModelFile(
+  tableOrView,
+  isView,
+  typeMap,
+  userTypes,
+  modelDir,
+  pc,
+  cc,
+  fc
+) {
   const lines = [];
 
-  const { comment, tags } = table;
-  const generateInitializer = !tags['fixed'];
+  const { comment, tags } = tableOrView;
+  const generateInitializer = !tags['fixed'] && !isView;
 
   const referencedIdTypes = R.uniq(
     R.map(
-      p => p.parent.split('.')[0],
-      R.filter(p => !!p.parent, table.columns)
+      (p) => p.parent.split('.')[0],
+      R.filter((p) => !!p.parent, tableOrView.columns)
     )
   );
-  R.forEach(referencedIdType => {
+  R.forEach((referencedIdType) => {
     lines.push(
       `import { ${pc(referencedIdType)}Id } from './${fc(referencedIdType)}';`
     );
@@ -165,31 +159,43 @@ function generateModelFile(table, userTypes, modelDir, pc, cc, fc) {
   }
 
   const appliedUserTypes = R.map(
-    p => p.type,
-    R.filter(p => userTypes.indexOf(p.type) !== -1, table.columns)
+    (p) => p.type,
+    R.filter((p) => userTypes.indexOf(p.type) !== -1, tableOrView.columns)
   );
-  R.forEach(importedType => {
-    lines.push(`import ${importedType} from './${fc(importedType)}';`);
+  R.forEach((importedType) => {
+    lines.push(`import ${pc(importedType)} from './${fc(importedType)}';`);
   }, appliedUserTypes);
   if (appliedUserTypes.length) {
     lines.push('');
   }
 
   const overriddenTypes = R.map(
-    p => p.tags.type,
-    R.filter(p => !!p.tags.type, table.columns)
+    (p) => p.tags.type,
+    R.filter((p) => !!p.tags.type, tableOrView.columns)
   );
-  R.forEach(importedType => {
-    lines.push(`import ${importedType} from '../${fc(importedType)}';`);
+  R.forEach((importedType) => {
+    lines.push(`import ${pc(importedType)} from '../${fc(importedType)}';`);
   }, overriddenTypes);
   if (overriddenTypes.length) {
     lines.push('');
   }
 
-  if (R.any(p => p.name === 'id', table.columns)) {
+  // If there's one and only one primary key, that's the identifier.
+  const hasIdentifier =
+    R.filter((c) => c.isPrimary, tableOrView.columns).length === 1;
+
+  const columns = R.map(
+    (c) => ({
+      ...c,
+      isIdentifier: hasIdentifier && c.isPrimary,
+    }),
+    tableOrView.columns
+  );
+
+  if (hasIdentifier) {
     lines.push(
-      `export type ${pc(table.name)}Id = number & { __flavor?: '${
-        table.name
+      `export type ${pc(tableOrView.name)}Id = number & { __flavor?: '${
+        tableOrView.name
       }' };`
     );
     lines.push('');
@@ -197,12 +203,13 @@ function generateModelFile(table, userTypes, modelDir, pc, cc, fc) {
 
   const interfaceLines = generateInterface(
     {
-      name: table.name,
-      properties: table.columns,
+      name: tableOrView.name,
+      properties: columns,
       considerDefaultValues: false,
       comment,
       exportAs: 'default',
     },
+    typeMap,
     pc,
     cc
   );
@@ -212,20 +219,21 @@ function generateModelFile(table, userTypes, modelDir, pc, cc, fc) {
     lines.push('');
     const initializerInterfaceLines = generateInterface(
       {
-        name: `${pc(table.name)}Initializer`,
-        modelName: table.name,
-        properties: R.reject(R.propEq('name', 'createdAt'), table.columns),
+        name: `${pc(tableOrView.name)}Initializer`,
+        modelName: tableOrView.name,
+        properties: R.reject(R.propEq('name', 'createdAt'), columns),
         considerDefaultValues: true,
         comment,
         exportAs: true,
       },
+      typeMap,
       pc,
       cc
     );
     lines.push(...initializerInterfaceLines);
   }
 
-  const filename = `${fc(table.name)}.ts`;
+  const filename = `${fc(tableOrView.name)}.ts`;
   const fullPath = path.join(modelDir, filename);
   generateFile({ fullPath, lines });
 }
@@ -234,15 +242,17 @@ function generateModelFile(table, userTypes, modelDir, pc, cc, fc) {
  * @param {Table[]} tables
  */
 function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
-  const isFixed = m => m.tags['fixed'];
-  const hasIdColumn = m => R.any(p => p.name === 'id', m.columns);
+  const isFixed = (m) => m.isView || m.tags['fixed'];
+
+  const hasIdentifier = (m) =>
+    R.filter((c) => c.isPrimary, m.columns).length === 1;
 
   const creatableModels = R.reject(isFixed, tables);
-  const modelsWithIdColumn = R.filter(hasIdColumn, tables);
+  const modelsWithIdColumn = R.filter(hasIdentifier, tables);
 
-  const importLine = m => {
+  const importLine = (m) => {
     const importInitializer = !isFixed(m);
-    const importId = hasIdColumn(m);
+    const importId = hasIdentifier(m);
     const additionalImports = importInitializer || importId;
     if (!additionalImports) {
       return `import ${pc(m.name)} from './${fc(m.name)}';`;
@@ -257,9 +267,9 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
     }
   };
 
-  const exportLine = m => {
+  const exportLine = (m) => {
     const exportInitializer = !isFixed(m);
-    const exportId = hasIdColumn(m);
+    const exportId = hasIdentifier(m);
     const exports = [
       pc(m.name),
       ...(exportInitializer ? [`${pc(m.name)}Initializer`] : []),
@@ -272,28 +282,28 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
     ...R.map(importLine, tables),
     '',
     'type Model =',
-    ...R.map(model => `  | ${pc(model.name)}`, tables),
+    ...R.map((model) => `  | ${pc(model.name)}`, tables),
     '',
     'interface ModelTypeMap {',
-    ...R.map(model => `  '${cc(model.name)}': ${pc(model.name)};`, tables),
+    ...R.map((model) => `  '${cc(model.name)}': ${pc(model.name)};`, tables),
     '}',
     '',
     'type ModelId =',
-    ...R.map(model => `  | ${pc(model.name)}Id`, modelsWithIdColumn),
+    ...R.map((model) => `  | ${pc(model.name)}Id`, modelsWithIdColumn),
     '',
     'interface ModelIdTypeMap {',
     ...R.map(
-      model => `  '${cc(model.name)}': ${pc(model.name)}Id;`,
+      (model) => `  '${cc(model.name)}': ${pc(model.name)}Id;`,
       modelsWithIdColumn
     ),
     '}',
     '',
     'type Initializer =',
-    ...R.map(model => `  | ${pc(model.name)}Initializer`, creatableModels),
+    ...R.map((model) => `  | ${pc(model.name)}Initializer`, creatableModels),
     '',
     'interface InitializerTypeMap {',
     ...R.map(
-      model => `  '${cc(model.name)}': ${pc(model.name)}Initializer;`,
+      (model) => `  '${cc(model.name)}': ${pc(model.name)}Initializer;`,
       creatableModels
     ),
     '}',
@@ -319,6 +329,8 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
  */
 async function generateModelFiles(
   tables,
+  views,
+  typeMap,
   userTypes,
   modelDir,
   fromCase,
@@ -329,17 +341,30 @@ async function generateModelFiles(
   const fc = recase(fromCase, filenameCase);
 
   R.forEach(
-    table => generateModelFile(table, userTypes, modelDir, pc, cc, fc),
+    (table) =>
+      generateModelFile(table, false, typeMap, userTypes, modelDir, pc, cc, fc),
     tables
   );
 
-  generateModelIndexFile(tables, modelDir, pc, fc, cc);
+  R.forEach(
+    (view) =>
+      generateModelFile(view, true, typeMap, userTypes, modelDir, pc, cc, fc),
+    views
+  );
+
+  generateModelIndexFile(
+    [...tables, ...views.map((v) => ({ ...v, isView: true }))],
+    modelDir,
+    pc,
+    fc,
+    cc
+  );
 }
 
 /**
  * @param {Type} type
  */
-async function generateTypeFile(type, modelDir, fc) {
+async function generateTypeFile(type, modelDir, fc, pc) {
   const lines = [];
 
   const { comment } = type;
@@ -348,9 +373,11 @@ async function generateTypeFile(type, modelDir, fc) {
     lines.push(`/** ${comment} */`);
   }
   lines.push(
-    `type ${type.name} = ${R.map(v => `'${v}'`, type.values).join(' | ')};`
+    `type ${pc(type.name)} = ${R.map((v) => `'${v}'`, type.values).join(
+      ' | '
+    )};`
   );
-  lines.push(`export default ${type.name};`);
+  lines.push(`export default ${pc(type.name)};`);
 
   const filename = `${fc(type.name)}.ts`;
   const fullPath = path.join(modelDir, filename);
@@ -362,16 +389,38 @@ async function generateTypeFile(type, modelDir, fc) {
  */
 async function generateTypeFiles(types, modelDir, fromCase, filenameCase) {
   const fc = recase(fromCase, filenameCase);
+  const pc = recase(fromCase, 'pascal');
 
-  R.forEach(t => generateTypeFile(t, modelDir, fc), types);
+  R.forEach((t) => generateTypeFile(t, modelDir, fc, pc), types);
 }
+
+const defaultTypeMap = {
+  int2: 'number',
+  int4: 'number',
+  float4: 'number',
+  numeric: 'number',
+  bool: 'boolean',
+  json: 'unknown',
+  jsonb: 'unknown',
+  char: 'string',
+  varchar: 'string',
+  text: 'string',
+  date: 'Date',
+  time: 'Date',
+  timetz: 'Date',
+  timestamp: 'Date',
+  timestamptz: 'Date',
+};
 
 async function generateModels({
   connection,
   sourceCasing = 'snake',
   filenameCasing = 'pascal',
+  customTypeMap = {},
   schemas,
 }) {
+  const typeMap = { ...defaultTypeMap, ...customTypeMap };
+
   console.log(
     `Connecting to ${chalk.greenBright(connection.database)} on ${
       connection.host
@@ -392,11 +441,7 @@ async function generateModels({
       fs.mkdirSync(schema.modelFolder);
     }
 
-    const { tables, types } = await extractSchema(
-      schema.name,
-      schema.tablesToIgnore || [],
-      db
-    );
+    const { tables, views, types } = await extractSchema(schema.name, db);
 
     await generateTypeFiles(
       types,
@@ -407,9 +452,11 @@ async function generateModels({
 
     await generateModelFiles(
       tables,
+      views,
+      typeMap,
       R.pluck('name', types),
       schema.modelFolder,
-      sourceCasing ,
+      sourceCasing,
       filenameCasing
     );
   }
