@@ -35,7 +35,7 @@ module.exports = {
   schemas: [
     {
       name: 'public',
-      tablesToIgnore: ['knex_migrations', 'knex_migrations_lock'],
+      ignore: ['knex_migrations', 'knex_migrations_lock'],
       modelFolder: path.join(__dirname, 'src', 'models'),
     },
   ],
