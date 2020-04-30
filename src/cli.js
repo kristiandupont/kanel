@@ -5,7 +5,7 @@ import optionator from 'optionator';
 import processDatabase from './processDatabase';
 // @ts-ignore
 // const { version } = require('../package.json');
-const version = '0.0.4';
+const version = '0.0.5';
 
 async function main() {
   const o = optionator({
