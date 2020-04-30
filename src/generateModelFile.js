@@ -58,9 +58,12 @@ const generateModelFile = (
   if (overriddenTypes.length) {
     lines.push('');
   }
+
+  const primaryColumns = filter((c) => c.isPrimary, tableOrView.columns);
+
   // If there's one and only one primary key, that's the identifier.
-  const hasIdentifier =
-    filter((c) => c.isPrimary, tableOrView.columns).length === 1;
+  const hasIdentifier = primaryColumns.length === 1;
+
   const columns = map(
     (c) => ({
       ...c,
@@ -68,14 +71,18 @@ const generateModelFile = (
     }),
     tableOrView.columns
   );
+
   if (hasIdentifier) {
+    const [{type, tags}] = primaryColumns
+    const innerType = tags.type || typeMap[type] || pc(type)
     lines.push(
-      `export type ${pc(tableOrView.name)}Id = number & { __flavor?: '${
+      `export type ${pc(tableOrView.name)}Id = ${innerType} & { __flavor?: '${
         tableOrView.name
       }' };`
     );
     lines.push('');
   }
+
   const interfaceLines = generateInterface(
     {
       name: tableOrView.name,

@@ -50,11 +50,14 @@ var generateModelFile = function (tableOrView, isView, typeMap, userTypes, model
     if (overriddenTypes.length) {
         lines.push('');
     }
+    var primaryColumns = ramda_1.filter(function (c) { return c.isPrimary; }, tableOrView.columns);
     // If there's one and only one primary key, that's the identifier.
-    var hasIdentifier = ramda_1.filter(function (c) { return c.isPrimary; }, tableOrView.columns).length === 1;
+    var hasIdentifier = primaryColumns.length === 1;
     var columns = ramda_1.map(function (c) { return (__assign(__assign({}, c), { isIdentifier: hasIdentifier && c.isPrimary })); }, tableOrView.columns);
     if (hasIdentifier) {
-        lines.push("export type " + pc(tableOrView.name) + "Id = number & { __flavor?: '" + tableOrView.name + "' };");
+        var _a = primaryColumns[0], type = _a.type, tags_1 = _a.tags;
+        var innerType = tags_1.type || typeMap[type] || pc(type);
+        lines.push("export type " + pc(tableOrView.name) + "Id = " + innerType + " & { __flavor?: '" + tableOrView.name + "' };");
         lines.push('');
     }
     var interfaceLines = generateInterface_1.default({
