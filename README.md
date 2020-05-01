@@ -50,8 +50,11 @@ module.exports = {
 
 To see an example of the result, check out the [/example](example) folder. It uses the [Sample Database](https://www.postgresqltutorial.com/postgresql-sample-database/) from www.postgresqltutorial.com.
 
-Kanel will extract postgres comments on your tables, columns etc., and add them as jsdoc comments on your models. For more info, see
-https://www.postgresql.org/docs/9.1/sql-comment.html
+Kanel will scan tables, views and enum types. It will generate a model type for each table and view. Additionally, it will create an _initializer_ type for tables that aren't tagged `@fixed` in the comment. Initializer types
+represent the requirements for creating a new row in the table. Columns that are nullable or have default values are considered optional.
+
+Documentation is extracted from postgres comments on your tables, columns etc., as jsdoc.
+For more info about postgres comments, see: https://www.postgresql.org/docs/9.1/sql-comment.html
 
 -----
 
