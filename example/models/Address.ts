@@ -4,7 +4,7 @@ import { CityId } from './City';
 
 export type AddressId = number & { __flavor?: 'address' };
 
-export default interface Address  {
+export default interface Address {
   /** Primary key. Index: address_pkey */
   addressId: AddressId;
 
@@ -24,7 +24,7 @@ export default interface Address  {
   lastUpdate: Date;
 }
 
-export interface AddressInitializer  {
+export interface AddressInitializer {
   /**
    * Default value: nextval('address_address_id_seq'::regclass)
    * Primary key. Index: address_pkey

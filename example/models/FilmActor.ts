@@ -3,7 +3,7 @@
 import { ActorId } from './Actor';
 import { FilmId } from './Film';
 
-export default interface FilmActor  {
+export default interface FilmActor {
   /** Primary key. Index: film_actor_pkey */
   actorId: ActorId;
 
@@ -16,7 +16,7 @@ export default interface FilmActor  {
   lastUpdate: Date;
 }
 
-export interface FilmActorInitializer  {
+export interface FilmActorInitializer {
   /** Primary key. Index: film_actor_pkey */
   actorId: ActorId;
 

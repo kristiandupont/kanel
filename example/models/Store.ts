@@ -5,7 +5,7 @@ import { AddressId } from './Address';
 
 export type StoreId = number & { __flavor?: 'store' };
 
-export default interface Store  {
+export default interface Store {
   /** Primary key. Index: store_pkey */
   storeId: StoreId;
 
@@ -17,7 +17,7 @@ export default interface Store  {
   lastUpdate: Date;
 }
 
-export interface StoreInitializer  {
+export interface StoreInitializer {
   /**
    * Default value: nextval('store_store_id_seq'::regclass)
    * Primary key. Index: store_pkey

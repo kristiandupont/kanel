@@ -1,6 +1,6 @@
 // Automatically generated. Don't change this file manually.
 
-export default interface CustomerList  {
+export default interface CustomerList {
   id: number | null;
 
   name: string | null;

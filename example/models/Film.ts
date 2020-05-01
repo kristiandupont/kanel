@@ -6,7 +6,7 @@ import MpaaRating from './MpaaRating';
 
 export type FilmId = number & { __flavor?: 'film' };
 
-export default interface Film  {
+export default interface Film {
   /** Primary key. Index: film_pkey */
   filmId: FilmId;
 
@@ -38,7 +38,7 @@ export default interface Film  {
   fulltext: string;
 }
 
-export interface FilmInitializer  {
+export interface FilmInitializer {
   /**
    * Default value: nextval('film_film_id_seq'::regclass)
    * Primary key. Index: film_pkey

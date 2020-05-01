@@ -2,7 +2,7 @@
 
 import MpaaRating from './MpaaRating';
 
-export default interface NicerButSlowerFilmList  {
+export default interface NicerButSlowerFilmList {
   fid: number | null;
 
   title: string | null;

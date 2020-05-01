@@ -2,7 +2,7 @@
 
 export type ActorId = number & { __flavor?: 'actor' };
 
-export default interface Actor  {
+export default interface Actor {
   /** Primary key. Index: actor_pkey */
   actorId: ActorId;
 
@@ -14,7 +14,7 @@ export default interface Actor  {
   lastUpdate: Date;
 }
 
-export interface ActorInitializer  {
+export interface ActorInitializer {
   /**
    * Default value: nextval('actor_actor_id_seq'::regclass)
    * Primary key. Index: actor_pkey

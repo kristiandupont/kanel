@@ -4,7 +4,7 @@ import { AddressId } from './Address';
 
 export type CustomerId = number & { __flavor?: 'customer' };
 
-export default interface Customer  {
+export default interface Customer {
   /** Primary key. Index: customer_pkey */
   customerId: CustomerId;
 
@@ -30,7 +30,7 @@ export default interface Customer  {
   active: number | null;
 }
 
-export interface CustomerInitializer  {
+export interface CustomerInitializer {
   /**
    * Default value: nextval('customer_customer_id_seq'::regclass)
    * Primary key. Index: customer_pkey

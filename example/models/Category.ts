@@ -2,7 +2,7 @@
 
 export type CategoryId = number & { __flavor?: 'category' };
 
-export default interface Category  {
+export default interface Category {
   /** Primary key. Index: category_pkey */
   categoryId: CategoryId;
 
@@ -11,7 +11,7 @@ export default interface Category  {
   lastUpdate: Date;
 }
 
-export interface CategoryInitializer  {
+export interface CategoryInitializer {
   /**
    * Default value: nextval('category_category_id_seq'::regclass)
    * Primary key. Index: category_pkey

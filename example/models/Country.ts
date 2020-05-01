@@ -2,7 +2,7 @@
 
 export type CountryId = number & { __flavor?: 'country' };
 
-export default interface Country  {
+export default interface Country {
   /** Primary key. Index: country_pkey */
   countryId: CountryId;
 
@@ -11,7 +11,7 @@ export default interface Country  {
   lastUpdate: Date;
 }
 
-export interface CountryInitializer  {
+export interface CountryInitializer {
   /**
    * Default value: nextval('country_country_id_seq'::regclass)
    * Primary key. Index: country_pkey

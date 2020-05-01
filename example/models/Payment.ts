@@ -6,7 +6,7 @@ import { RentalId } from './Rental';
 
 export type PaymentId = number & { __flavor?: 'payment' };
 
-export default interface Payment  {
+export default interface Payment {
   /** Primary key. Index: payment_pkey */
   paymentId: PaymentId;
 
@@ -24,7 +24,7 @@ export default interface Payment  {
   paymentDate: Date;
 }
 
-export interface PaymentInitializer  {
+export interface PaymentInitializer {
   /**
    * Default value: nextval('payment_payment_id_seq'::regclass)
    * Primary key. Index: payment_pkey

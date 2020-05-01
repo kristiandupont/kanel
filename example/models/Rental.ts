@@ -6,7 +6,7 @@ import { StaffId } from './Staff';
 
 export type RentalId = number & { __flavor?: 'rental' };
 
-export default interface Rental  {
+export default interface Rental {
   /** Primary key. Index: rental_pkey */
   rentalId: RentalId;
 
@@ -29,7 +29,7 @@ export default interface Rental  {
   lastUpdate: Date;
 }
 
-export interface RentalInitializer  {
+export interface RentalInitializer {
   /**
    * Default value: nextval('rental_rental_id_seq'::regclass)
    * Primary key. Index: rental_pkey

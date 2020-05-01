@@ -3,7 +3,7 @@
 import { FilmId } from './Film';
 import { CategoryId } from './Category';
 
-export default interface FilmCategory  {
+export default interface FilmCategory {
   /** Primary key. Index: film_category_pkey */
   filmId: FilmId;
 
@@ -13,7 +13,7 @@ export default interface FilmCategory  {
   lastUpdate: Date;
 }
 
-export interface FilmCategoryInitializer  {
+export interface FilmCategoryInitializer {
   /** Primary key. Index: film_category_pkey */
   filmId: FilmId;
 

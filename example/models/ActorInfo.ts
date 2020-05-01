@@ -1,6 +1,6 @@
 // Automatically generated. Don't change this file manually.
 
-export default interface ActorInfo  {
+export default interface ActorInfo {
   /** This is the identifier for the actor */
   actorId: number | null;
 
