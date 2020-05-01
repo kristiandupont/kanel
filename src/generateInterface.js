@@ -78,8 +78,8 @@ const generateInterface = (
   if (exportAs) {
     exportStr = exportAs === 'default' ? 'export default ' : 'export ';
   }
-  const extendsStr = baseInterface ? `extends ${baseInterface}` : '';
-  lines.push(`${exportStr}interface ${pc(name)} ${extendsStr} {`);
+  const extendsStr = baseInterface ? ` extends ${baseInterface}` : '';
+  lines.push(`${exportStr}interface ${pc(name)}${extendsStr} {`);
   const props = map(
     generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc),
     properties

@@ -55,8 +55,8 @@ var generateInterface = function (_a, typeMap, pc, cc) {
     if (exportAs) {
         exportStr = exportAs === 'default' ? 'export default ' : 'export ';
     }
-    var extendsStr = baseInterface ? "extends " + baseInterface : '';
-    lines.push(exportStr + "interface " + pc(name) + " " + extendsStr + " {");
+    var extendsStr = baseInterface ? " extends " + baseInterface : '';
+    lines.push(exportStr + "interface " + pc(name) + extendsStr + " {");
     var props = ramda_1.map(generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc), properties);
     var propLines = ramda_1.flatten(__spreadArrays([
         ramda_1.head(props)

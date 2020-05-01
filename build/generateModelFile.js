@@ -29,7 +29,7 @@ var generateModelFile = function (tableOrView, isView, typeMap, userTypes, model
     var lines = [];
     var comment = tableOrView.comment, tags = tableOrView.tags;
     var generateInitializer = !tags['fixed'] && !isView;
-    var referencedIdTypes = ramda_1.uniq(ramda_1.map(function (p) { return p.parent.split('.')[0]; }, ramda_1.filter(function (p) { return !!p.parent; }, tableOrView.columns)));
+    var referencedIdTypes = ramda_1.pipe(ramda_1.filter(function (p) { return Boolean(p.parent); }), ramda_1.map(function (p) { return p.parent.split('.')[0]; }), ramda_1.filter(function (p) { return p !== tableOrView.name; }), ramda_1.uniq)(tableOrView.columns);
     ramda_1.forEach(function (referencedIdType) {
         lines.push("import { " + pc(referencedIdType) + "Id } from './" + fc(referencedIdType) + "';");
     }, referencedIdTypes);

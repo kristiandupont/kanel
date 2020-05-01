@@ -1,5 +1,5 @@
 import path from 'path';
-import { forEach, map, filter, reject, propEq, uniq } from 'ramda';
+import { forEach, map, filter, reject, propEq, uniq, pipe } from 'ramda';
 import generateFile from './generateFile';
 import generateInterface from './generateInterface';
 
@@ -24,12 +24,12 @@ const generateModelFile = (
   const lines = [];
   const { comment, tags } = tableOrView;
   const generateInitializer = !tags['fixed'] && !isView;
-  const referencedIdTypes = uniq(
-    map(
-      (p) => p.parent.split('.')[0],
-      filter((p) => !!p.parent, tableOrView.columns)
-    )
-  );
+  const referencedIdTypes = pipe(
+    filter((p) => Boolean(p.parent)),
+    map((p) => p.parent.split('.')[0]),
+    filter((p) => p !== tableOrView.name),
+    uniq
+  )(tableOrView.columns);
   forEach((referencedIdType) => {
     lines.push(
       `import { ${pc(referencedIdType)}Id } from './${fc(referencedIdType)}';`
@@ -73,8 +73,8 @@ const generateModelFile = (
   );
 
   if (hasIdentifier) {
-    const [{type, tags}] = primaryColumns
-    const innerType = tags.type || typeMap[type] || pc(type)
+    const [{ type, tags }] = primaryColumns;
+    const innerType = tags.type || typeMap[type] || pc(type);
     lines.push(
       `export type ${pc(tableOrView.name)}Id = ${innerType} & { __flavor?: '${
         tableOrView.name
