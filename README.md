@@ -1,6 +1,6 @@
 # Kanel
 
-Generate Typescript types from your database
+Generate Typescript types from a live database
 
 _Works with Postgres databases._
 
@@ -15,6 +15,8 @@ To run, make sure you are in a folder that has a `.kanelrc.js` configuration fil
 $ kanel
 ```
 
+## Configuration
+
 Here is an example configuration file:
 ```javascript
 const path = require('path');
@@ -25,7 +27,6 @@ module.exports = {
     user: 'postgres',
     password: 'postgres',
     database: 'acme',
-    charset: 'utf8',
   },
 
   filenameCasing: 'dash',
@@ -47,6 +48,38 @@ module.exports = {
 };
 
 ```
+
+The configuration file contains the following fields:
+
+### `connection` *(Required)*
+This is the database connection object. It follows the [`client`](https://node-postgres.com/api/client) constructor in [pg](https://www.npmjs.com/package/pg). As you will typically want to run Kanel on your development machine, you probably want a simple localhost connection as in the example above.
+
+### `filenameCasing`
+Specifies how you like your files cased. Can be any of the [recase](https://www.npmjs.com/package/@kristiandupont/recase) options: `dash`, `snake`, `camel` or `pascal`. Default is `pascal` which means your generated files will have filenames that look like this: `UserProfile.ts`.
+
+### `sourceCasing`
+Specifies what the casing of your database entities are. The standard is for entities to be snake cased, so the default is `snake` but if you for any reason use another convention, you can specify it here.
+
+### `preDeleteModelFolder`
+Delete the model folder before generating files? Set this to `true` if you want to make sure that there are no deprecated models in your model folder after running Kanel. Defaults to `false`.
+
+### `customTypeMap`
+This allows you to specify (or override) which types to map to. Kanel recognizes the most common types and applies the most likely Typescript type to it, but you might want to override this. This map maps from postgres type to typescript type.
+
+### `schemas`
+This is an array of schemas to process. 
+These contain the following fields:
+
+### `schema.name`
+Name of the schema.
+
+### `schema.modelFolder`
+Folder on disk where the models will be stored. Note that if `preDeleteModelFolder` above is set, this folder will be deleted and recreated when Kanel is run.
+
+### `schema.ignore`
+An array of tables and views to ignore. Use this if there are things in your database you don't care to generate models for like migration information etc.
+
+## Example
 
 To see an example of the result, check out the [/example](example) folder. It uses the [Sample Database](https://www.postgresqltutorial.com/postgresql-sample-database/) from www.postgresqltutorial.com.
 
