@@ -12,9 +12,7 @@ async function generateTypeFile(type, modelDir, fc, pc) {
     lines.push(`/** ${comment} */`);
   }
   lines.push(
-    `type ${pc(type.name)} = ${map((v) => `'${v}'`, type.values).join(
-      ' | '
-    )};`
+    `type ${pc(type.name)} = ${map((v) => `'${v}'`, type.values).join(' | ')};`
   );
   lines.push(`export default ${pc(type.name)};`);
   const filename = `${fc(type.name)}.ts`;

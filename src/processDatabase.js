@@ -4,8 +4,10 @@ import rmfr from 'rmfr';
 import fs from 'fs';
 import { pluck, reject } from 'ramda';
 import { extractSchema } from 'extract-pg-schema';
-import generateModelFiles from './generateModelFiles';
-import generateTypeFiles from './generateTypeFiles';
+import { recase } from '@kristiandupont/recase';
+import generateModelFile from './generateModelFile';
+import generateTypeFile from './generateTypeFile';
+import generateIndexFile from './generateIndexFile';
 
 const defaultTypeMap = {
   int2: 'number',
@@ -55,24 +57,34 @@ const processDatabase = async ({
       fs.mkdirSync(schema.modelFolder);
     }
 
-    const { tables, views, types } = await extractSchema(schema.name, db);
-    const rejectIgnored = reject(m => (schema.ignore || []).includes(m.name))
+    const pc = recase(sourceCasing, 'pascal');
+    const cc = recase(sourceCasing, 'camel');
+    const fc = recase(sourceCasing, filenameCasing);
 
-    await generateTypeFiles(
-      types,
-      schema.modelFolder,
-      sourceCasing,
-      filenameCasing
+    const { tables, views, types } = await extractSchema(schema.name, db);
+    const rejectIgnored = reject((m) => (schema.ignore || []).includes(m.name));
+    const includedTables = rejectIgnored(tables);
+    const includedViews = rejectIgnored(views).map((v) => ({
+      ...v,
+      isView: true,
+    }));
+
+    types.forEach((t) => generateTypeFile(t, schema.modelFolder, fc, pc));
+
+    const userTypes = pluck('name', types);
+    includedTables.forEach((t) =>
+      generateModelFile(t, typeMap, userTypes, schema.modelFolder, pc, cc, fc)
+    );
+    includedViews.forEach((v) =>
+      generateModelFile(v, typeMap, userTypes, schema.modelFolder, pc, cc, fc)
     );
 
-    await generateModelFiles(
-      rejectIgnored(tables),
-      rejectIgnored(views),
-      typeMap,
-      pluck('name', types),
+    generateIndexFile(
+      [...includedTables, ...includedViews],
       schema.modelFolder,
-      sourceCasing,
-      filenameCasing
+      pc,
+      cc,
+      fc
     );
   }
 };

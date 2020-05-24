@@ -13,7 +13,6 @@ import generateInterface from './generateInterface';
  */
 const generateModelFile = (
   tableOrView,
-  isView,
   typeMap,
   userTypes,
   modelDir,
@@ -23,7 +22,7 @@ const generateModelFile = (
 ) => {
   const lines = [];
   const { comment, tags } = tableOrView;
-  const generateInitializer = !tags['fixed'] && !isView;
+  const generateInitializer = !tags['fixed'] && !tableOrView.isView;
   const referencedIdTypes = pipe(
     filter((p) => Boolean(p.parent)),
     map((p) => p.parent.split('.')[0]),

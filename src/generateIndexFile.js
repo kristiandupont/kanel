@@ -5,7 +5,7 @@ import generateFile from './generateFile';
 /**
  * @param {Table[]} tables
  */
-function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
+function generateIndexFile(tables, modelDir, pc, cc, fc) {
   const isFixed = (m) => m.isView || m.tags['fixed'];
   const hasIdentifier = (m) =>
     filter((c) => c.isPrimary, m.columns).length === 1;
@@ -82,4 +82,4 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
   generateFile({ fullPath, lines });
 }
 
-export default generateModelIndexFile;
+export default generateIndexFile;

@@ -46,6 +46,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -56,8 +63,10 @@ var rmfr_1 = __importDefault(require("rmfr"));
 var fs_1 = __importDefault(require("fs"));
 var ramda_1 = require("ramda");
 var extract_pg_schema_1 = require("extract-pg-schema");
-var generateModelFiles_1 = __importDefault(require("./generateModelFiles"));
-var generateTypeFiles_1 = __importDefault(require("./generateTypeFiles"));
+var recase_1 = require("@kristiandupont/recase");
+var generateModelFile_1 = __importDefault(require("./generateModelFile"));
+var generateTypeFile_1 = __importDefault(require("./generateTypeFile"));
+var generateIndexFile_1 = __importDefault(require("./generateIndexFile"));
 var defaultTypeMap = {
     int2: 'number',
     int4: 'number',
@@ -90,7 +99,7 @@ var processDatabase = function (_a) {
                     };
                     db = knex_1.default(knexConfig);
                     _loop_1 = function (schema) {
-                        var _a, tables, views, types, rejectIgnored;
+                        var pc, cc, fc, _a, tables, views, types, rejectIgnored, includedTables, includedViews, userTypes;
                         return __generator(this, function (_b) {
                             switch (_b.label) {
                                 case 0:
@@ -104,16 +113,24 @@ var processDatabase = function (_a) {
                                     if (!fs_1.default.existsSync(schema.modelFolder)) {
                                         fs_1.default.mkdirSync(schema.modelFolder);
                                     }
+                                    pc = recase_1.recase(sourceCasing, 'pascal');
+                                    cc = recase_1.recase(sourceCasing, 'camel');
+                                    fc = recase_1.recase(sourceCasing, filenameCasing);
                                     return [4 /*yield*/, extract_pg_schema_1.extractSchema(schema.name, db)];
                                 case 3:
                                     _a = _b.sent(), tables = _a.tables, views = _a.views, types = _a.types;
                                     rejectIgnored = ramda_1.reject(function (m) { return (schema.ignore || []).includes(m.name); });
-                                    return [4 /*yield*/, generateTypeFiles_1.default(types, schema.modelFolder, sourceCasing, filenameCasing)];
-                                case 4:
-                                    _b.sent();
-                                    return [4 /*yield*/, generateModelFiles_1.default(rejectIgnored(tables), rejectIgnored(views), typeMap, ramda_1.pluck('name', types), schema.modelFolder, sourceCasing, filenameCasing)];
-                                case 5:
-                                    _b.sent();
+                                    includedTables = rejectIgnored(tables);
+                                    includedViews = rejectIgnored(views).map(function (v) { return (__assign(__assign({}, v), { isView: true })); });
+                                    types.forEach(function (t) { return generateTypeFile_1.default(t, schema.modelFolder, fc, pc); });
+                                    userTypes = ramda_1.pluck('name', types);
+                                    includedTables.forEach(function (t) {
+                                        return generateModelFile_1.default(t, typeMap, userTypes, schema.modelFolder, pc, cc, fc);
+                                    });
+                                    includedViews.forEach(function (v) {
+                                        return generateModelFile_1.default(v, typeMap, userTypes, schema.modelFolder, pc, cc, fc);
+                                    });
+                                    generateIndexFile_1.default(__spreadArrays(includedTables, includedViews), schema.modelFolder, pc, cc, fc);
                                     return [2 /*return*/];
                             }
                         });

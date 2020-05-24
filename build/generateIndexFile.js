@@ -16,7 +16,7 @@ var generateFile_1 = __importDefault(require("./generateFile"));
 /**
  * @param {Table[]} tables
  */
-function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
+function generateIndexFile(tables, modelDir, pc, cc, fc) {
     var isFixed = function (m) { return m.isView || m.tags['fixed']; };
     var hasIdentifier = function (m) {
         return ramda_1.filter(function (c) { return c.isPrimary; }, m.columns).length === 1;
@@ -80,4 +80,4 @@ function generateModelIndexFile(tables, modelDir, pc, fc, cc) {
     var fullPath = path_1.default.join(modelDir, 'index.ts');
     generateFile_1.default({ fullPath: fullPath, lines: lines });
 }
-exports.default = generateModelIndexFile;
+exports.default = generateIndexFile;
