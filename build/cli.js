@@ -46,7 +46,7 @@ var optionator_1 = __importDefault(require("optionator"));
 var processDatabase_1 = __importDefault(require("./processDatabase"));
 // @ts-ignore
 // const { version } = require('../package.json');
-var version = '0.0.6';
+var version = '0.1.0';
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var o, options, configFile, config, exitCode, error_1;
