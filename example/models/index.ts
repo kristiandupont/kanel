@@ -20,6 +20,7 @@ import NicerButSlowerFilmList from './NicerButSlowerFilmList';
 import SalesByFilmCategory from './SalesByFilmCategory';
 import SalesByStore from './SalesByStore';
 import StaffList from './StaffList';
+import MpaaRating from './MpaaRating';
 
 type Model =
   | Actor
@@ -149,6 +150,7 @@ export {
   SalesByFilmCategory,
   SalesByStore,
   StaffList,
+  MpaaRating,
 
   Model,
   ModelTypeMap,
