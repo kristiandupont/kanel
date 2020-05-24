@@ -5,8 +5,9 @@ import generateFile from './generateFile';
 /**
  * @param {Table[]} tables
  */
-function generateIndexFile(tables, modelDir, pc, cc, fc) {
+function generateIndexFile(tables, userTypes, modelDir, pc, cc, fc) {
   const isFixed = (m) => m.isView || m.tags['fixed'];
+
   const hasIdentifier = (m) =>
     filter((c) => c.isPrimary, m.columns).length === 1;
   const creatableModels = reject(isFixed, tables);
@@ -39,6 +40,7 @@ function generateIndexFile(tables, modelDir, pc, cc, fc) {
   };
   const lines = [
     ...map(importLine, tables),
+    ...map(t => `import ${pc(t)} from './${fc(t)}';`, userTypes),
     '',
     'type Model =',
     ...map((model) => `  | ${pc(model.name)}`, tables),
@@ -69,6 +71,7 @@ function generateIndexFile(tables, modelDir, pc, cc, fc) {
     '',
     'export {',
     ...map(exportLine, tables),
+    ...map(t => `  ${pc(t)},`, userTypes),
     '',
     '  Model,',
     '  ModelTypeMap,',

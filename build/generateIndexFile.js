@@ -16,7 +16,7 @@ var generateFile_1 = __importDefault(require("./generateFile"));
 /**
  * @param {Table[]} tables
  */
-function generateIndexFile(tables, modelDir, pc, cc, fc) {
+function generateIndexFile(tables, userTypes, modelDir, pc, cc, fc) {
     var isFixed = function (m) { return m.isView || m.tags['fixed']; };
     var hasIdentifier = function (m) {
         return ramda_1.filter(function (c) { return c.isPrimary; }, m.columns).length === 1;
@@ -43,7 +43,7 @@ function generateIndexFile(tables, modelDir, pc, cc, fc) {
         ], (exportInitializer ? [pc(m.name) + "Initializer"] : []), (exportId ? [pc(m.name) + "Id"] : []));
         return "  " + exports.join(', ') + ",";
     };
-    var lines = __spreadArrays(ramda_1.map(importLine, tables), [
+    var lines = __spreadArrays(ramda_1.map(importLine, tables), ramda_1.map(function (t) { return "import " + pc(t) + " from './" + fc(t) + "';"; }, userTypes), [
         '',
         'type Model ='
     ], ramda_1.map(function (model) { return "  | " + pc(model.name); }, tables), [
@@ -67,7 +67,7 @@ function generateIndexFile(tables, modelDir, pc, cc, fc) {
         '}',
         '',
         'export {'
-    ], ramda_1.map(exportLine, tables), [
+    ], ramda_1.map(exportLine, tables), ramda_1.map(function (t) { return "  " + pc(t) + ","; }, userTypes), [
         '',
         '  Model,',
         '  ModelTypeMap,',

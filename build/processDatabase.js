@@ -130,7 +130,7 @@ var processDatabase = function (_a) {
                                     includedViews.forEach(function (v) {
                                         return generateModelFile_1.default(v, typeMap, userTypes, schema.modelFolder, pc, cc, fc);
                                     });
-                                    generateIndexFile_1.default(__spreadArrays(includedTables, includedViews), schema.modelFolder, pc, cc, fc);
+                                    generateIndexFile_1.default(__spreadArrays(includedTables, includedViews), userTypes, schema.modelFolder, pc, cc, fc);
                                     return [2 /*return*/];
                             }
                         });

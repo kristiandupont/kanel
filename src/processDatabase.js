@@ -81,6 +81,7 @@ const processDatabase = async ({
 
     generateIndexFile(
       [...includedTables, ...includedViews],
+      userTypes,
       schema.modelFolder,
       pc,
       cc,
