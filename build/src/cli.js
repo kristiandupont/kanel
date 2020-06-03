@@ -45,8 +45,7 @@ var chalk_1 = __importDefault(require("chalk"));
 var optionator_1 = __importDefault(require("optionator"));
 var processDatabase_1 = __importDefault(require("./processDatabase"));
 // @ts-ignore
-// const { version } = require('../package.json');
-var version = '0.1.0';
+var version = require('../package.json').version;
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var o, options, configFile, config, exitCode, error_1;
@@ -62,6 +61,12 @@ function main() {
                                 alias: 'h',
                                 type: 'Boolean',
                                 description: 'displays help',
+                            },
+                            {
+                                option: 'version',
+                                alias: 'v',
+                                type: 'Boolean',
+                                description: 'displays version',
                             },
                             {
                                 option: 'config',
@@ -80,6 +85,10 @@ function main() {
                     }
                     if (options.help) {
                         console.log(o.generateHelp());
+                        process.exit(0);
+                    }
+                    if (options.version) {
+                        console.log(version);
                         process.exit(0);
                     }
                     console.log("" + chalk_1.default.greenBright('Kanel'));

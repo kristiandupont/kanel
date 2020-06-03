@@ -1,6 +1,6 @@
 {
   "name": "kanel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "main": "build/index.js",
   "repository": "git@github.com:kristiandupont/kanel.git",
@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
-    "run-example": "node build/cli -c ./example/.kanelrc",
+    "run-example": "node build/src/cli -c ./example/.kanelrc",
     "stop-example-db": "docker stop dvd-rental"
   },
   "dependencies": {

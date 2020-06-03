@@ -4,8 +4,7 @@ import chalk from 'chalk';
 import optionator from 'optionator';
 import processDatabase from './processDatabase';
 // @ts-ignore
-// const { version } = require('../package.json');
-const version = '0.1.0';
+const { version } = require('../package.json');
 
 async function main() {
   const o = optionator({
@@ -17,6 +16,12 @@ async function main() {
         alias: 'h',
         type: 'Boolean',
         description: 'displays help',
+      },
+      {
+        option: 'version',
+        alias: 'v',
+        type: 'Boolean',
+        description: 'displays version',
       },
       {
         option: 'config',
@@ -39,6 +44,11 @@ async function main() {
 
   if (options.help) {
     console.log(o.generateHelp());
+    process.exit(0);
+  }
+
+  if (options.version) {
+    console.log(version);
     process.exit(0);
   }
 
