@@ -8,7 +8,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var ramda_1 = require("ramda");
-var generateProperty = function (considerDefaultValue, modelName, typeMap, pc, cc) { return function (_a) {
+var generateProperty = function (considerDefaultValue, modelName, typeMap, pc) { return function (_a) {
     var name = _a.name, type = _a.type, nullable = _a.nullable, isIdentifier = _a.isIdentifier, parent = _a.parent, defaultValue = _a.defaultValue, indices = _a.indices, comment = _a.comment, tags = _a.tags;
     var lines = [];
     var idType;
@@ -39,13 +39,13 @@ var generateProperty = function (considerDefaultValue, modelName, typeMap, pc, c
         lines.push('  */');
     }
     var optional = considerDefaultValue && (defaultValue || nullable);
-    var varName = optional ? cc(name) + "?" : cc(name);
+    var varName = optional ? name + "?" : name;
     var rawType = tags.type || idType || typeMap[type] || pc(type);
     var typeStr = nullable && !considerDefaultValue ? rawType + " |\u00A0null" : rawType;
     lines.push("  " + varName + ": " + typeStr + ";");
     return lines;
 }; };
-var generateInterface = function (_a, typeMap, pc, cc) {
+var generateInterface = function (_a, typeMap, pc) {
     var name = _a.name, _b = _a.modelName, modelName = _b === void 0 ? null : _b, _c = _a.baseInterface, baseInterface = _c === void 0 ? null : _c, properties = _a.properties, considerDefaultValues = _a.considerDefaultValues, comment = _a.comment, exportAs = _a.exportAs;
     var lines = [];
     if (comment) {
@@ -57,7 +57,7 @@ var generateInterface = function (_a, typeMap, pc, cc) {
     }
     var extendsStr = baseInterface ? " extends " + baseInterface : '';
     lines.push(exportStr + "interface " + pc(name) + extendsStr + " {");
-    var props = ramda_1.map(generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc), properties);
+    var props = ramda_1.map(generateProperty(considerDefaultValues, modelName || name, typeMap, pc), properties);
     var propLines = ramda_1.flatten(__spreadArrays([
         ramda_1.head(props)
     ], ramda_1.map(function (p) { return __spreadArrays([''], p); }, ramda_1.tail(props))));

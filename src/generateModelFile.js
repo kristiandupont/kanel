@@ -17,7 +17,6 @@ const generateModelFile = (
   userTypes,
   modelDir,
   pc,
-  cc,
   fc
 ) => {
   const lines = [];
@@ -92,7 +91,6 @@ const generateModelFile = (
     },
     typeMap,
     pc,
-    cc
   );
   lines.push(...interfaceLines);
   if (generateInitializer) {
@@ -108,7 +106,6 @@ const generateModelFile = (
       },
       typeMap,
       pc,
-      cc
     );
     lines.push(...initializerInterfaceLines);
   }

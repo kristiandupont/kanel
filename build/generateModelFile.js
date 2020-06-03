@@ -25,7 +25,7 @@ var generateInterface_1 = __importDefault(require("./generateInterface"));
 /**
  * @param {Table} tableOrView
  */
-var generateModelFile = function (tableOrView, typeMap, userTypes, modelDir, pc, cc, fc) {
+var generateModelFile = function (tableOrView, typeMap, userTypes, modelDir, pc, fc) {
     var lines = [];
     var comment = tableOrView.comment, tags = tableOrView.tags;
     var generateInitializer = !tags['fixed'] && !tableOrView.isView;
@@ -66,7 +66,7 @@ var generateModelFile = function (tableOrView, typeMap, userTypes, modelDir, pc,
         considerDefaultValues: false,
         comment: comment,
         exportAs: 'default',
-    }, typeMap, pc, cc);
+    }, typeMap, pc);
     lines.push.apply(lines, interfaceLines);
     if (generateInitializer) {
         lines.push('');
@@ -77,7 +77,7 @@ var generateModelFile = function (tableOrView, typeMap, userTypes, modelDir, pc,
             considerDefaultValues: true,
             comment: comment,
             exportAs: true,
-        }, typeMap, pc, cc);
+        }, typeMap, pc);
         lines.push.apply(lines, initializerInterfaceLines);
     }
     var filename = fc(tableOrView.name) + ".ts";

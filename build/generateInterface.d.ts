@@ -7,4 +7,4 @@ declare function generateInterface({ name, modelName, baseInterface, properties,
     considerDefaultValues: any;
     comment: any;
     exportAs: any;
-}, typeMap: any, pc: any, cc: any): any[];
+}, typeMap: any, pc: any): any[];

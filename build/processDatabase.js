@@ -125,10 +125,10 @@ var processDatabase = function (_a) {
                                     types.forEach(function (t) { return generateTypeFile_1.default(t, schema.modelFolder, fc, pc); });
                                     userTypes = ramda_1.pluck('name', types);
                                     includedTables.forEach(function (t) {
-                                        return generateModelFile_1.default(t, typeMap, userTypes, schema.modelFolder, pc, cc, fc);
+                                        return generateModelFile_1.default(t, typeMap, userTypes, schema.modelFolder, pc, fc);
                                     });
                                     includedViews.forEach(function (v) {
-                                        return generateModelFile_1.default(v, typeMap, userTypes, schema.modelFolder, pc, cc, fc);
+                                        return generateModelFile_1.default(v, typeMap, userTypes, schema.modelFolder, pc, fc);
                                     });
                                     generateIndexFile_1.default(__spreadArrays(includedTables, includedViews), userTypes, schema.modelFolder, pc, cc, fc);
                                     return [2 /*return*/];

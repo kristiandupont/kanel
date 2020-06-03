@@ -73,10 +73,10 @@ const processDatabase = async ({
 
     const userTypes = pluck('name', types);
     includedTables.forEach((t) =>
-      generateModelFile(t, typeMap, userTypes, schema.modelFolder, pc, cc, fc)
+      generateModelFile(t, typeMap, userTypes, schema.modelFolder, pc, fc)
     );
     includedViews.forEach((v) =>
-      generateModelFile(v, typeMap, userTypes, schema.modelFolder, pc, cc, fc)
+      generateModelFile(v, typeMap, userTypes, schema.modelFolder, pc, fc)
     );
 
     generateIndexFile(

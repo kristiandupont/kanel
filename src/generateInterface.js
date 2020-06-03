@@ -5,7 +5,6 @@ const generateProperty = (
   modelName,
   typeMap,
   pc,
-  cc
 ) => ({
   name,
   type,
@@ -46,7 +45,7 @@ const generateProperty = (
     lines.push('  */');
   }
   const optional = considerDefaultValue && (defaultValue || nullable);
-  const varName = optional ? `${cc(name)}?` : cc(name);
+  const varName = optional ? `${name}?` : name;
 
   const rawType = tags.type || idType || typeMap[type] || pc(type);
   const typeStr =
@@ -68,7 +67,6 @@ const generateInterface = (
   },
   typeMap,
   pc,
-  cc
 ) => {
   const lines = [];
   if (comment) {
@@ -81,7 +79,7 @@ const generateInterface = (
   const extendsStr = baseInterface ? ` extends ${baseInterface}` : '';
   lines.push(`${exportStr}interface ${pc(name)}${extendsStr} {`);
   const props = map(
-    generateProperty(considerDefaultValues, modelName || name, typeMap, pc, cc),
+    generateProperty(considerDefaultValues, modelName || name, typeMap, pc),
     properties
   );
   const propLines = flatten([
