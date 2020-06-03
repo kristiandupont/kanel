@@ -1,12 +1,14 @@
 // Automatically generated. Don't change this file manually.
 
+import ActorId from '../ActorId';
+
 export default interface ActorInfo {
   /** This is the identifier for the actor */
-  actorId: number | null;
+  actor_id: ActorId | null;
 
-  firstName: string | null;
+  first_name: string | null;
 
-  lastName: string | null;
+  last_name: string | null;
 
-  filmInfo: string | null;
+  film_info: string | null;
 }

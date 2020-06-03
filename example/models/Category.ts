@@ -4,11 +4,11 @@ export type CategoryId = number & { __flavor?: 'category' };
 
 export default interface Category {
   /** Primary key. Index: category_pkey */
-  categoryId: CategoryId;
+  category_id: CategoryId;
 
   name: string;
 
-  lastUpdate: Date;
+  last_update: Date;
 }
 
 export interface CategoryInitializer {
@@ -16,10 +16,10 @@ export interface CategoryInitializer {
    * Default value: nextval('category_category_id_seq'::regclass)
    * Primary key. Index: category_pkey
   */
-  categoryId?: CategoryId;
+  category_id?: CategoryId;
 
   name: string;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 }

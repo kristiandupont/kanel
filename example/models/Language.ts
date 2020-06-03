@@ -4,11 +4,11 @@ export type LanguageId = number & { __flavor?: 'language' };
 
 export default interface Language {
   /** Primary key. Index: language_pkey */
-  languageId: LanguageId;
+  language_id: LanguageId;
 
   name: string;
 
-  lastUpdate: Date;
+  last_update: Date;
 }
 
 export interface LanguageInitializer {
@@ -16,10 +16,10 @@ export interface LanguageInitializer {
    * Default value: nextval('language_language_id_seq'::regclass)
    * Primary key. Index: language_pkey
   */
-  languageId?: LanguageId;
+  language_id?: LanguageId;
 
   name: string;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 }

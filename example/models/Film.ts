@@ -8,31 +8,31 @@ export type FilmId = number & { __flavor?: 'film' };
 
 export default interface Film {
   /** Primary key. Index: film_pkey */
-  filmId: FilmId;
+  film_id: FilmId;
 
   /** Index: idx_title */
   title: string;
 
   description: string | null;
 
-  releaseYear: number | null;
+  release_year: number | null;
 
   /** Index: idx_fk_language_id */
-  languageId: LanguageId;
+  language_id: LanguageId;
 
-  rentalDuration: number;
+  rental_duration: number;
 
-  rentalRate: number;
+  rental_rate: number;
 
   length: number | null;
 
-  replacementCost: number;
+  replacement_cost: number;
 
   rating: MpaaRating | null;
 
-  lastUpdate: Date;
+  last_update: Date;
 
-  specialFeatures: Text | null;
+  special_features: Text | null;
 
   /** Index: film_fulltext_idx */
   fulltext: string;
@@ -43,36 +43,36 @@ export interface FilmInitializer {
    * Default value: nextval('film_film_id_seq'::regclass)
    * Primary key. Index: film_pkey
   */
-  filmId?: FilmId;
+  film_id?: FilmId;
 
   /** Index: idx_title */
   title: string;
 
   description?: string;
 
-  releaseYear?: number;
+  release_year?: number;
 
   /** Index: idx_fk_language_id */
-  languageId: LanguageId;
+  language_id: LanguageId;
 
   /** Default value: 3 */
-  rentalDuration?: number;
+  rental_duration?: number;
 
   /** Default value: 4.99 */
-  rentalRate?: number;
+  rental_rate?: number;
 
   length?: number;
 
   /** Default value: 19.99 */
-  replacementCost?: number;
+  replacement_cost?: number;
 
   /** Default value: 'G'::mpaa_rating */
   rating?: MpaaRating;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 
-  specialFeatures?: Text;
+  special_features?: Text;
 
   /** Index: film_fulltext_idx */
   fulltext: string;

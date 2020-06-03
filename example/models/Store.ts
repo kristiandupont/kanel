@@ -7,14 +7,14 @@ export type StoreId = number & { __flavor?: 'store' };
 
 export default interface Store {
   /** Primary key. Index: store_pkey */
-  storeId: StoreId;
+  store_id: StoreId;
 
   /** Index: idx_unq_manager_staff_id */
-  managerStaffId: StaffId;
+  manager_staff_id: StaffId;
 
-  addressId: AddressId;
+  address_id: AddressId;
 
-  lastUpdate: Date;
+  last_update: Date;
 }
 
 export interface StoreInitializer {
@@ -22,13 +22,13 @@ export interface StoreInitializer {
    * Default value: nextval('store_store_id_seq'::regclass)
    * Primary key. Index: store_pkey
   */
-  storeId?: StoreId;
+  store_id?: StoreId;
 
   /** Index: idx_unq_manager_staff_id */
-  managerStaffId: StaffId;
+  manager_staff_id: StaffId;
 
-  addressId: AddressId;
+  address_id: AddressId;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 }

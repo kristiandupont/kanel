@@ -8,20 +8,20 @@ export type PaymentId = number & { __flavor?: 'payment' };
 
 export default interface Payment {
   /** Primary key. Index: payment_pkey */
-  paymentId: PaymentId;
+  payment_id: PaymentId;
 
   /** Index: idx_fk_customer_id */
-  customerId: CustomerId;
+  customer_id: CustomerId;
 
   /** Index: idx_fk_staff_id */
-  staffId: StaffId;
+  staff_id: StaffId;
 
   /** Index: idx_fk_rental_id */
-  rentalId: RentalId;
+  rental_id: RentalId;
 
   amount: number;
 
-  paymentDate: Date;
+  payment_date: Date;
 }
 
 export interface PaymentInitializer {
@@ -29,18 +29,18 @@ export interface PaymentInitializer {
    * Default value: nextval('payment_payment_id_seq'::regclass)
    * Primary key. Index: payment_pkey
   */
-  paymentId?: PaymentId;
+  payment_id?: PaymentId;
 
   /** Index: idx_fk_customer_id */
-  customerId: CustomerId;
+  customer_id: CustomerId;
 
   /** Index: idx_fk_staff_id */
-  staffId: StaffId;
+  staff_id: StaffId;
 
   /** Index: idx_fk_rental_id */
-  rentalId: RentalId;
+  rental_id: RentalId;
 
   amount: number;
 
-  paymentDate: Date;
+  payment_date: Date;
 }

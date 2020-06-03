@@ -4,14 +4,14 @@ export type ActorId = number & { __flavor?: 'actor' };
 
 export default interface Actor {
   /** Primary key. Index: actor_pkey */
-  actorId: ActorId;
+  actor_id: ActorId;
 
-  firstName: string;
+  first_name: string;
 
   /** Index: idx_actor_last_name */
-  lastName: string;
+  last_name: string;
 
-  lastUpdate: Date;
+  last_update: Date;
 }
 
 export interface ActorInitializer {
@@ -19,13 +19,13 @@ export interface ActorInitializer {
    * Default value: nextval('actor_actor_id_seq'::regclass)
    * Primary key. Index: actor_pkey
   */
-  actorId?: ActorId;
+  actor_id?: ActorId;
 
-  firstName: string;
+  first_name: string;
 
   /** Index: idx_actor_last_name */
-  lastName: string;
+  last_name: string;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 }

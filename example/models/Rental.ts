@@ -8,25 +8,25 @@ export type RentalId = number & { __flavor?: 'rental' };
 
 export default interface Rental {
   /** Primary key. Index: rental_pkey */
-  rentalId: RentalId;
+  rental_id: RentalId;
 
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
-  rentalDate: Date;
+  rental_date: Date;
 
   /**
    * Index: idx_fk_inventory_id
    * Index: idx_unq_rental_rental_date_inventory_id_customer_id
   */
-  inventoryId: InventoryId;
+  inventory_id: InventoryId;
 
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
-  customerId: CustomerId;
+  customer_id: CustomerId;
 
-  returnDate: Date | null;
+  return_date: Date | null;
 
-  staffId: StaffId;
+  staff_id: StaffId;
 
-  lastUpdate: Date;
+  last_update: Date;
 }
 
 export interface RentalInitializer {
@@ -34,24 +34,24 @@ export interface RentalInitializer {
    * Default value: nextval('rental_rental_id_seq'::regclass)
    * Primary key. Index: rental_pkey
   */
-  rentalId?: RentalId;
+  rental_id?: RentalId;
 
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
-  rentalDate: Date;
+  rental_date: Date;
 
   /**
    * Index: idx_fk_inventory_id
    * Index: idx_unq_rental_rental_date_inventory_id_customer_id
   */
-  inventoryId: InventoryId;
+  inventory_id: InventoryId;
 
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
-  customerId: CustomerId;
+  customer_id: CustomerId;
 
-  returnDate?: Date;
+  return_date?: Date;
 
-  staffId: StaffId;
+  staff_id: StaffId;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 }

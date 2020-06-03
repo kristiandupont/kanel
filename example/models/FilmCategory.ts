@@ -5,21 +5,21 @@ import { CategoryId } from './Category';
 
 export default interface FilmCategory {
   /** Primary key. Index: film_category_pkey */
-  filmId: FilmId;
+  film_id: FilmId;
 
   /** Primary key. Index: film_category_pkey */
-  categoryId: CategoryId;
+  category_id: CategoryId;
 
-  lastUpdate: Date;
+  last_update: Date;
 }
 
 export interface FilmCategoryInitializer {
   /** Primary key. Index: film_category_pkey */
-  filmId: FilmId;
+  film_id: FilmId;
 
   /** Primary key. Index: film_category_pkey */
-  categoryId: CategoryId;
+  category_id: CategoryId;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 }

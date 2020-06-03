@@ -6,15 +6,15 @@ export type InventoryId = number & { __flavor?: 'inventory' };
 
 export default interface Inventory {
   /** Primary key. Index: inventory_pkey */
-  inventoryId: InventoryId;
+  inventory_id: InventoryId;
 
   /** Index: idx_store_id_film_id */
-  filmId: FilmId;
+  film_id: FilmId;
 
   /** Index: idx_store_id_film_id */
-  storeId: number;
+  store_id: number;
 
-  lastUpdate: Date;
+  last_update: Date;
 }
 
 export interface InventoryInitializer {
@@ -22,14 +22,14 @@ export interface InventoryInitializer {
    * Default value: nextval('inventory_inventory_id_seq'::regclass)
    * Primary key. Index: inventory_pkey
   */
-  inventoryId?: InventoryId;
+  inventory_id?: InventoryId;
 
   /** Index: idx_store_id_film_id */
-  filmId: FilmId;
+  film_id: FilmId;
 
   /** Index: idx_store_id_film_id */
-  storeId: number;
+  store_id: number;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 }

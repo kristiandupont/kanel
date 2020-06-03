@@ -5,5 +5,5 @@ export default interface SalesByStore {
 
   manager: string | null;
 
-  totalSales: number | null;
+  total_sales: number | null;
 }

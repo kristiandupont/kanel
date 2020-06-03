@@ -6,26 +6,26 @@ export type CustomerId = number & { __flavor?: 'customer' };
 
 export default interface Customer {
   /** Primary key. Index: customer_pkey */
-  customerId: CustomerId;
+  customer_id: CustomerId;
 
   /** Index: idx_fk_store_id */
-  storeId: number;
+  store_id: number;
 
-  firstName: string;
+  first_name: string;
 
   /** Index: idx_last_name */
-  lastName: string;
+  last_name: string;
 
   email: string | null;
 
   /** Index: idx_fk_address_id */
-  addressId: AddressId;
+  address_id: AddressId;
 
   activebool: boolean;
 
-  createDate: Date;
+  create_date: Date;
 
-  lastUpdate: Date | null;
+  last_update: Date | null;
 
   active: number | null;
 }
@@ -35,29 +35,29 @@ export interface CustomerInitializer {
    * Default value: nextval('customer_customer_id_seq'::regclass)
    * Primary key. Index: customer_pkey
   */
-  customerId?: CustomerId;
+  customer_id?: CustomerId;
 
   /** Index: idx_fk_store_id */
-  storeId: number;
+  store_id: number;
 
-  firstName: string;
+  first_name: string;
 
   /** Index: idx_last_name */
-  lastName: string;
+  last_name: string;
 
   email?: string;
 
   /** Index: idx_fk_address_id */
-  addressId: AddressId;
+  address_id: AddressId;
 
   /** Default value: true */
   activebool?: boolean;
 
   /** Default value: ('now'::text)::date */
-  createDate?: Date;
+  create_date?: Date;
 
   /** Default value: now() */
-  lastUpdate?: Date;
+  last_update?: Date;
 
   active?: number;
 }
