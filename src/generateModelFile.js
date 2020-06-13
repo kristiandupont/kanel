@@ -36,10 +36,10 @@ const generateModelFile = (
   if (referencedIdTypes.length) {
     lines.push('');
   }
-  const appliedUserTypes = map(
+  const appliedUserTypes = uniq(map(
     (p) => p.type,
     filter((p) => userTypes.indexOf(p.type) !== -1, tableOrView.columns)
-  );
+  ));
   forEach((importedType) => {
     lines.push(`import ${pc(importedType)} from './${fc(importedType)}';`);
   }, appliedUserTypes);
