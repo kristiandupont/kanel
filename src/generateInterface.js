@@ -1,11 +1,6 @@
 import { forEach, map, head, tail, flatten } from 'ramda';
 
-const generateProperty = (
-  considerDefaultValue,
-  modelName,
-  typeMap,
-  pc,
-) => ({
+const generateProperty = (considerDefaultValue, modelName, typeMap, pc) => ({
   name,
   type,
   nullable,
@@ -49,7 +44,7 @@ const generateProperty = (
 
   const rawType = tags.type || idType || typeMap[type] || pc(type);
   const typeStr =
-    nullable && !considerDefaultValue ? `${rawType} | null` : rawType;
+    nullable && !considerDefaultValue ? `${rawType} | null` : rawType;
   lines.push(`  ${varName}: ${typeStr};`);
 
   return lines;
@@ -66,7 +61,7 @@ const generateInterface = (
     exportAs,
   },
   typeMap,
-  pc,
+  pc
 ) => {
   const lines = [];
   if (comment) {
