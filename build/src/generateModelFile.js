@@ -36,7 +36,7 @@ var generateModelFile = function (tableOrView, typeMap, userTypes, modelDir, pc,
     if (referencedIdTypes.length) {
         lines.push('');
     }
-    var appliedUserTypes = ramda_1.map(function (p) { return p.type; }, ramda_1.filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, tableOrView.columns));
+    var appliedUserTypes = ramda_1.uniq(ramda_1.map(function (p) { return p.type; }, ramda_1.filter(function (p) { return userTypes.indexOf(p.type) !== -1; }, tableOrView.columns)));
     ramda_1.forEach(function (importedType) {
         lines.push("import " + pc(importedType) + " from './" + fc(importedType) + "';");
     }, appliedUserTypes);
