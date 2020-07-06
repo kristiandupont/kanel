@@ -41,7 +41,7 @@ var generateProperty = function (considerDefaultValue, modelName, typeMap, pc) {
     var optional = considerDefaultValue && (defaultValue || nullable);
     var varName = optional ? name + "?" : name;
     var rawType = tags.type || idType || typeMap[type] || pc(type);
-    var typeStr = nullable && !considerDefaultValue ? rawType + " |\u00A0null" : rawType;
+    var typeStr = nullable && !considerDefaultValue ? rawType + " | null" : rawType;
     lines.push("  " + varName + ": " + typeStr + ";");
     return lines;
 }; };
