@@ -1984,7 +1984,7 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-pg-schema@^1.4.0:
+extract-pg-schema@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-1.5.1.tgz#86a6c47fe13b102b6c19ea79c2331499dbbcb8c0"
   integrity sha512-qBX+umPkdDBDikz8eJ3KuLn3IlJ3m63RQtN/dnvAE36TgH5wYNgsRkc+D+p+s6sFJ2+FH97qOxinnmonx04lTw==
