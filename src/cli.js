@@ -3,6 +3,7 @@ import chalk from 'chalk';
 // @ts-ignore
 import optionator from 'optionator';
 import processDatabase from './processDatabase';
+import { logger } from './logger';
 // @ts-ignore
 const { version } = require('../package.json');
 
@@ -38,7 +39,7 @@ async function main() {
   try {
     options = o.parseArgv(process.argv);
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
     process.exit(1);
   }
 
@@ -52,15 +53,21 @@ async function main() {
     process.exit(0);
   }
 
-  console.log(`${chalk.greenBright('Kanel')}`);
   const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
   const config = require(configFile);
+
+  if (config.logLevel !== undefined) {
+    logger({ level: config.logLevel });
+  }
+
+  logger.log(chalk.greenBright('Kanel'));
+  logger.quiet`${chalk.greenBright('Kanel')}: Creating psql types`;
 
   try {
     const exitCode = await processDatabase(config);
     process.exit(exitCode);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     process.exit(1);
   }
 }
