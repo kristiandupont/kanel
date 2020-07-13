@@ -8,6 +8,7 @@ import { recase } from '@kristiandupont/recase';
 import generateModelFile from './generateModelFile';
 import generateTypeFile from './generateTypeFile';
 import generateIndexFile from './generateIndexFile';
+import { logger } from './logger';
 
 const defaultTypeMap = {
   int2: 'number',
@@ -37,7 +38,7 @@ const processDatabase = async ({
 }) => {
   const typeMap = { ...defaultTypeMap, ...customTypeMap };
 
-  console.log(
+  logger.log(
     `Connecting to ${chalk.greenBright(connection.database)} on ${
       connection.host
     }`
@@ -50,7 +51,7 @@ const processDatabase = async ({
 
   for (const schema of schemas) {
     if (preDeleteModelFolder) {
-      console.log(` - Clearing old files in ${schema.modelFolder}`);
+      logger.log(` - Clearing old files in ${schema.modelFolder}`);
       await rmfr(schema.modelFolder, { glob: true });
     }
     if (!fs.existsSync(schema.modelFolder)) {
