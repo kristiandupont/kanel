@@ -25,13 +25,13 @@
     "stop-example-db": "docker stop dvd-rental"
   },
   "dependencies": {
-    "@kristiandupont/recase": "^1.1.0",
+    "@kristiandupont/recase": "^1.1.1",
     "chalk": "^3.0.0",
     "extract-pg-schema": "^1.5.1",
-    "knex": "^0.20.9",
-    "optionator": "^0.8.3",
-    "pg": "^7.18.2",
-    "ramda": "^0.27.0",
+    "knex": "^0.21.4",
+    "optionator": "^0.9.1",
+    "pg": "^8.3.0",
+    "ramda": "^0.27.1",
     "rmfr": "^2.0.0"
   },
   "devDependencies": {
