@@ -1,5 +1,6 @@
 import path from 'path';
 import { forEach, map, filter, reject, propEq, uniq, pipe } from 'ramda';
+import { recase } from '@kristiandupont/recase';
 import generateFile from './generateFile';
 import generateInterface from './generateInterface';
 
@@ -16,9 +17,14 @@ const generateModelFile = (
   typeMap,
   userTypes,
   modelDir,
-  pc,
-  fc
+  sourceCasing,
+  typeCasing,
+  propertyCasing,
+  filenameCasing
 ) => {
+  const tc = recase(sourceCasing, typeCasing);
+  const fc = recase(sourceCasing, filenameCasing);
+
   const lines = [];
   const { comment, tags } = tableOrView;
   const generateInitializer = !tags['fixed'] && !tableOrView.isView;
@@ -30,18 +36,20 @@ const generateModelFile = (
   )(tableOrView.columns);
   forEach((referencedIdType) => {
     lines.push(
-      `import { ${pc(referencedIdType)}Id } from './${fc(referencedIdType)}';`
+      `import { ${tc(referencedIdType)}Id } from './${fc(referencedIdType)}';`
     );
   }, referencedIdTypes);
   if (referencedIdTypes.length) {
     lines.push('');
   }
-  const appliedUserTypes = uniq(map(
-    (p) => p.type,
-    filter((p) => userTypes.indexOf(p.type) !== -1, tableOrView.columns)
-  ));
+  const appliedUserTypes = uniq(
+    map(
+      (p) => p.type,
+      filter((p) => userTypes.indexOf(p.type) !== -1, tableOrView.columns)
+    )
+  );
   forEach((importedType) => {
-    lines.push(`import ${pc(importedType)} from './${fc(importedType)}';`);
+    lines.push(`import ${tc(importedType)} from './${fc(importedType)}';`);
   }, appliedUserTypes);
   if (appliedUserTypes.length) {
     lines.push('');
@@ -51,7 +59,7 @@ const generateModelFile = (
     filter((p) => !!p.tags.type, tableOrView.columns)
   );
   forEach((importedType) => {
-    lines.push(`import ${pc(importedType)} from '../${fc(importedType)}';`);
+    lines.push(`import ${tc(importedType)} from '../${fc(importedType)}';`);
   }, overriddenTypes);
   if (overriddenTypes.length) {
     lines.push('');
@@ -72,9 +80,9 @@ const generateModelFile = (
 
   if (hasIdentifier) {
     const [{ type, tags }] = primaryColumns;
-    const innerType = tags.type || typeMap[type] || pc(type);
+    const innerType = tags.type || typeMap[type] || tc(type);
     lines.push(
-      `export type ${pc(tableOrView.name)}Id = ${innerType} & { __flavor?: '${
+      `export type ${tc(tableOrView.name)}Id = ${innerType} & { __flavor?: '${
         tableOrView.name
       }' };`
     );
@@ -90,14 +98,16 @@ const generateModelFile = (
       exportAs: 'default',
     },
     typeMap,
-    pc,
+    sourceCasing,
+    typeCasing,
+    propertyCasing
   );
   lines.push(...interfaceLines);
   if (generateInitializer) {
     lines.push('');
     const initializerInterfaceLines = generateInterface(
       {
-        name: `${pc(tableOrView.name)}Initializer`,
+        name: `${tc(tableOrView.name)}Initializer`,
         modelName: tableOrView.name,
         properties: reject(propEq('name', 'createdAt'), columns),
         considerDefaultValues: true,
@@ -105,7 +115,9 @@ const generateModelFile = (
         exportAs: true,
       },
       typeMap,
-      pc,
+      sourceCasing,
+      typeCasing,
+      propertyCasing
     );
     lines.push(...initializerInterfaceLines);
   }

@@ -1,11 +1,24 @@
 import path from 'path';
 import { map, filter, reject } from 'ramda';
+import { recase } from '@kristiandupont/recase';
 import generateFile from './generateFile';
 
 /**
  * @param {Table[]} tables
  */
-function generateIndexFile(tables, userTypes, modelDir, pc, cc, fc) {
+function generateIndexFile(
+  tables,
+  userTypes,
+  modelDir,
+  sourceCasing,
+  typeCasing,
+  propertyCasing,
+  filenameCasing
+) {
+  const tc = recase(sourceCasing, typeCasing);
+  const pc = recase(sourceCasing, propertyCasing);
+  const fc = recase(sourceCasing, filenameCasing);
+
   const isFixed = (m) => m.isView || m.tags['fixed'];
 
   const hasIdentifier = (m) =>
@@ -17,13 +30,13 @@ function generateIndexFile(tables, userTypes, modelDir, pc, cc, fc) {
     const importId = hasIdentifier(m);
     const additionalImports = importInitializer || importId;
     if (!additionalImports) {
-      return `import ${pc(m.name)} from './${fc(m.name)}';`;
+      return `import ${tc(m.name)} from './${fc(m.name)}';`;
     } else {
       const imports = [
-        ...(importInitializer ? [`${pc(m.name)}Initializer`] : []),
-        ...(importId ? [`${pc(m.name)}Id`] : []),
+        ...(importInitializer ? [`${tc(m.name)}Initializer`] : []),
+        ...(importId ? [`${tc(m.name)}Id`] : []),
       ];
-      return `import ${pc(m.name)}, { ${imports.join(', ')} } from './${fc(
+      return `import ${tc(m.name)}, { ${imports.join(', ')} } from './${fc(
         m.name
       )}';`;
     }
@@ -32,46 +45,46 @@ function generateIndexFile(tables, userTypes, modelDir, pc, cc, fc) {
     const exportInitializer = !isFixed(m);
     const exportId = hasIdentifier(m);
     const exports = [
-      pc(m.name),
-      ...(exportInitializer ? [`${pc(m.name)}Initializer`] : []),
-      ...(exportId ? [`${pc(m.name)}Id`] : []),
+      tc(m.name),
+      ...(exportInitializer ? [`${tc(m.name)}Initializer`] : []),
+      ...(exportId ? [`${tc(m.name)}Id`] : []),
     ];
     return `  ${exports.join(', ')},`;
   };
   const lines = [
     ...map(importLine, tables),
-    ...map(t => `import ${pc(t)} from './${fc(t)}';`, userTypes),
+    ...map((t) => `import ${tc(t)} from './${fc(t)}';`, userTypes),
     '',
     'type Model =',
-    ...map((model) => `  | ${pc(model.name)}`, tables),
+    ...map((model) => `  | ${tc(model.name)}`, tables),
     '',
     'interface ModelTypeMap {',
-    ...map((model) => `  '${cc(model.name)}': ${pc(model.name)};`, tables),
+    ...map((model) => `  '${pc(model.name)}': ${tc(model.name)};`, tables),
     '}',
     '',
     'type ModelId =',
-    ...map((model) => `  | ${pc(model.name)}Id`, modelsWithIdColumn),
+    ...map((model) => `  | ${tc(model.name)}Id`, modelsWithIdColumn),
     '',
     'interface ModelIdTypeMap {',
     ...map(
-      (model) => `  '${cc(model.name)}': ${pc(model.name)}Id;`,
+      (model) => `  '${pc(model.name)}': ${tc(model.name)}Id;`,
       modelsWithIdColumn
     ),
     '}',
     '',
     'type Initializer =',
-    ...map((model) => `  | ${pc(model.name)}Initializer`, creatableModels),
+    ...map((model) => `  | ${tc(model.name)}Initializer`, creatableModels),
     '',
     'interface InitializerTypeMap {',
     ...map(
-      (model) => `  '${cc(model.name)}': ${pc(model.name)}Initializer;`,
+      (model) => `  '${pc(model.name)}': ${tc(model.name)}Initializer;`,
       creatableModels
     ),
     '}',
     '',
     'export {',
     ...map(exportLine, tables),
-    ...map(t => `  ${pc(t)},`, userTypes),
+    ...map((t) => `  ${tc(t)},`, userTypes),
     '',
     '  Model,',
     '  ModelTypeMap,',

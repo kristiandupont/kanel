@@ -4,7 +4,6 @@ import rmfr from 'rmfr';
 import fs from 'fs';
 import { pluck, reject } from 'ramda';
 import { extractSchema } from 'extract-pg-schema';
-import { recase } from '@kristiandupont/recase';
 import generateModelFile from './generateModelFile';
 import generateTypeFile from './generateTypeFile';
 import generateIndexFile from './generateIndexFile';
@@ -30,8 +29,10 @@ const defaultTypeMap = {
 
 const processDatabase = async ({
   connection,
-  sourceCasing = 'snake',
-  filenameCasing = 'pascal',
+  sourceCasing = null,
+  typeCasing = null,
+  propertyCasing = null,
+  filenameCasing = null,
   preDeleteModelFolder = false,
   customTypeMap = {},
   schemas,
@@ -58,10 +59,6 @@ const processDatabase = async ({
       fs.mkdirSync(schema.modelFolder);
     }
 
-    const pc = recase(sourceCasing, 'pascal');
-    const cc = recase(sourceCasing, 'camel');
-    const fc = recase(sourceCasing, filenameCasing);
-
     const { tables, views, types } = await extractSchema(schema.name, db);
     const rejectIgnored = reject((m) => (schema.ignore || []).includes(m.name));
     const includedTables = rejectIgnored(tables);
@@ -70,23 +67,50 @@ const processDatabase = async ({
       isView: true,
     }));
 
-    types.forEach((t) => generateTypeFile(t, schema.modelFolder, fc, pc));
+    types.forEach((t) =>
+      generateTypeFile(
+        t,
+        schema.modelFolder,
+        sourceCasing,
+        typeCasing,
+        filenameCasing
+      )
+    );
 
     const userTypes = pluck('name', types);
     includedTables.forEach((t) =>
-      generateModelFile(t, typeMap, userTypes, schema.modelFolder, pc, fc)
+      generateModelFile(
+        t,
+        typeMap,
+        userTypes,
+        schema.modelFolder,
+        sourceCasing,
+        typeCasing,
+        propertyCasing,
+        filenameCasing
+      )
     );
     includedViews.forEach((v) =>
-      generateModelFile(v, typeMap, userTypes, schema.modelFolder, pc, fc)
+      generateModelFile(
+        v,
+        typeMap,
+        userTypes,
+        schema.modelFolder,
+        sourceCasing,
+        typeCasing,
+        propertyCasing,
+        filenameCasing
+      )
     );
 
     generateIndexFile(
       [...includedTables, ...includedViews],
       userTypes,
       schema.modelFolder,
-      pc,
-      cc,
-      fc
+      sourceCasing,
+      typeCasing,
+      propertyCasing,
+      filenameCasing
     );
   }
 };

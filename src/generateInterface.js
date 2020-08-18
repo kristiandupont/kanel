@@ -1,6 +1,13 @@
 import { forEach, map, head, tail, flatten } from 'ramda';
+import { recase } from '@kristiandupont/recase';
 
-const generateProperty = (considerDefaultValue, modelName, typeMap, pc) => ({
+const generateProperty = (
+  considerDefaultValue,
+  modelName,
+  typeMap,
+  tc,
+  pc
+) => ({
   name,
   type,
   nullable,
@@ -17,9 +24,9 @@ const generateProperty = (considerDefaultValue, modelName, typeMap, pc) => ({
 
   const commentLines = comment ? [comment] : [];
   if (isIdentifier) {
-    idType = `${pc(modelName)}Id`;
+    idType = `${tc(modelName)}Id`;
   } else if (parent) {
-    idType = `${pc(parent.split('.')[0])}Id`;
+    idType = `${tc(parent.split('.')[0])}Id`;
   }
   if (defaultValue && considerDefaultValue) {
     commentLines.push(`Default value: ${defaultValue}`);
@@ -40,9 +47,9 @@ const generateProperty = (considerDefaultValue, modelName, typeMap, pc) => ({
     lines.push('  */');
   }
   const optional = considerDefaultValue && (defaultValue || nullable);
-  const varName = optional ? `${name}?` : name;
+  const varName = optional ? `${pc(name)}?` : pc(name);
 
-  const rawType = tags.type || idType || typeMap[type] || pc(type);
+  const rawType = tags.type || idType || typeMap[type] || tc(type);
   const typeStr =
     nullable && !considerDefaultValue ? `${rawType} | null` : rawType;
   lines.push(`  ${varName}: ${typeStr};`);
@@ -61,8 +68,13 @@ const generateInterface = (
     exportAs,
   },
   typeMap,
-  pc
+  sourceCasing,
+  typeCasing,
+  propertyCasing
 ) => {
+  const tc = recase(sourceCasing, typeCasing);
+  const pc = recase(sourceCasing, propertyCasing);
+
   const lines = [];
   if (comment) {
     lines.push('/**', ` * ${comment}`, ' */');
@@ -72,9 +84,9 @@ const generateInterface = (
     exportStr = exportAs === 'default' ? 'export default ' : 'export ';
   }
   const extendsStr = baseInterface ? ` extends ${baseInterface}` : '';
-  lines.push(`${exportStr}interface ${pc(name)}${extendsStr} {`);
+  lines.push(`${exportStr}interface ${tc(name)}${extendsStr} {`);
   const props = map(
-    generateProperty(considerDefaultValues, modelName || name, typeMap, pc),
+    generateProperty(considerDefaultValues, modelName || name, typeMap, tc, pc),
     properties
   );
   const propLines = flatten([
