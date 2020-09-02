@@ -16,7 +16,7 @@ export default interface Customer {
   /** Index: idx_last_name */
   last_name: string;
 
-  email: string | null;
+  email: string | null;
 
   /** Index: idx_fk_address_id */
   address_id: AddressId;
@@ -25,9 +25,9 @@ export default interface Customer {
 
   create_date: Date;
 
-  last_update: Date | null;
+  last_update: Date | null;
 
-  active: number | null;
+  active: number | null;
 }
 
 export interface CustomerInitializer {

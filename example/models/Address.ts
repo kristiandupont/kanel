@@ -10,14 +10,14 @@ export default interface Address {
 
   address: string;
 
-  address2: string | null;
+  address2: string | null;
 
   district: string;
 
   /** Index: idx_fk_city_id */
   city_id: CityId;
 
-  postal_code: string | null;
+  postal_code: string | null;
 
   phone: string;
 

@@ -52,19 +52,19 @@ interface ModelTypeMap {
   'country': Country;
   'customer': Customer;
   'film': Film;
-  'filmActor': FilmActor;
-  'filmCategory': FilmCategory;
+  'film_actor': FilmActor;
+  'film_category': FilmCategory;
   'inventory': Inventory;
   'language': Language;
   'payment': Payment;
   'rental': Rental;
   'store': Store;
-  'actorInfo': ActorInfo;
-  'customerList': CustomerList;
-  'nicerButSlowerFilmList': NicerButSlowerFilmList;
-  'salesByFilmCategory': SalesByFilmCategory;
-  'salesByStore': SalesByStore;
-  'staffList': StaffList;
+  'actor_info': ActorInfo;
+  'customer_list': CustomerList;
+  'nicer_but_slower_film_list': NicerButSlowerFilmList;
+  'sales_by_film_category': SalesByFilmCategory;
+  'sales_by_store': SalesByStore;
+  'staff_list': StaffList;
 }
 
 type ModelId =
@@ -120,8 +120,8 @@ interface InitializerTypeMap {
   'country': CountryInitializer;
   'customer': CustomerInitializer;
   'film': FilmInitializer;
-  'filmActor': FilmActorInitializer;
-  'filmCategory': FilmCategoryInitializer;
+  'film_actor': FilmActorInitializer;
+  'film_category': FilmCategoryInitializer;
   'inventory': InventoryInitializer;
   'language': LanguageInitializer;
   'payment': PaymentInitializer;

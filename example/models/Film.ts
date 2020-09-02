@@ -13,9 +13,9 @@ export default interface Film {
   /** Index: idx_title */
   title: string;
 
-  description: string | null;
+  description: string | null;
 
-  release_year: number | null;
+  release_year: number | null;
 
   /** Index: idx_fk_language_id */
   language_id: LanguageId;
@@ -24,15 +24,15 @@ export default interface Film {
 
   rental_rate: number;
 
-  length: number | null;
+  length: number | null;
 
   replacement_cost: number;
 
-  rating: MpaaRating | null;
+  rating: MpaaRating | null;
 
   last_update: Date;
 
-  special_features: Text | null;
+  special_features: Text[] | null;
 
   /** Index: film_fulltext_idx */
   fulltext: string;
@@ -72,7 +72,7 @@ export interface FilmInitializer {
   /** Default value: now() */
   last_update?: Date;
 
-  special_features?: Text;
+  special_features?: Text[];
 
   /** Index: film_fulltext_idx */
   fulltext: string;

@@ -1,19 +1,19 @@
 // Automatically generated. Don't change this file manually.
 
 export default interface StaffList {
-  id: number | null;
+  id: number | null;
 
-  name: string | null;
+  name: string | null;
 
-  address: string | null;
+  address: string | null;
 
-  zip code: string | null;
+  zip code: string | null;
 
-  phone: string | null;
+  phone: string | null;
 
-  city: string | null;
+  city: string | null;
 
-  country: string | null;
+  country: string | null;
 
-  sid: number | null;
+  sid: number | null;
 }

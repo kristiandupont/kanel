@@ -3,19 +3,19 @@
 import MpaaRating from './MpaaRating';
 
 export default interface NicerButSlowerFilmList {
-  fid: number | null;
+  fid: number | null;
 
-  title: string | null;
+  title: string | null;
 
-  description: string | null;
+  description: string | null;
 
-  category: string | null;
+  category: string | null;
 
-  price: number | null;
+  price: number | null;
 
-  length: number | null;
+  length: number | null;
 
-  rating: MpaaRating | null;
+  rating: MpaaRating | null;
 
-  actors: string | null;
+  actors: string | null;
 }

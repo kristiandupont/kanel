@@ -10,8 +10,8 @@ module.exports = {
     port: 54321
   },
 
-  // filenameCasing: 'dash',
-  sourceCasing: null,
+  filenameCasing: 'pascal',
+  typeCasing: 'pascal',
   preDeleteModelFolder: true,
 
   customTypeMap: {

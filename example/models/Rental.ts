@@ -22,7 +22,7 @@ export default interface Rental {
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
   customer_id: CustomerId;
 
-  return_date: Date | null;
+  return_date: Date | null;
 
   staff_id: StaffId;
 
