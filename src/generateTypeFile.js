@@ -4,7 +4,7 @@ import { recase } from '@kristiandupont/recase';
 import generateFile from './generateFile';
 
 /**
- * @param {Type} type
+ * @param {import('extract-pg-schema').Type} type
  */
 async function generateTypeFile(
   type,

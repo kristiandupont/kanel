@@ -12,6 +12,7 @@ import { logger } from './logger';
 const defaultTypeMap = {
   int2: 'number',
   int4: 'number',
+  int8: 'number',
   float4: 'number',
   numeric: 'number',
   bool: 'boolean',
@@ -27,6 +28,9 @@ const defaultTypeMap = {
   timestamptz: 'Date',
 };
 
+/**
+ * @param {import('./Config').default} config
+ */
 const processDatabase = async ({
   connection,
   sourceCasing = null,
@@ -37,6 +41,7 @@ const processDatabase = async ({
   customTypeMap = {},
   schemas,
 }) => {
+//const processDatabase = async (config) => {
   const typeMap = { ...defaultTypeMap, ...customTypeMap };
 
   logger.log(

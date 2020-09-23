@@ -4,7 +4,7 @@ import { recase } from '@kristiandupont/recase';
 import generateFile from './generateFile';
 
 /**
- * @param {Table[]} tables
+ * @param {import('extract-pg-schema').Table[]} tables
  */
 function generateIndexFile(
   tables,

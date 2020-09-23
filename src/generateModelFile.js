@@ -7,10 +7,11 @@ import generateInterface from './generateInterface';
 /**
  * @typedef { import('extract-pg-schema').Table } Table
  * @typedef { import('extract-pg-schema').Type } Type
+ * @typedef { Table & { isView?: boolean } } TableOrView
  */
 
 /**
- * @param {Table} tableOrView
+ * @param {TableOrView} tableOrView
  */
 const generateModelFile = (
   tableOrView,
@@ -29,10 +30,12 @@ const generateModelFile = (
   const { comment, tags } = tableOrView;
   const generateInitializer = !tags['fixed'] && !tableOrView.isView;
   const referencedIdTypes = pipe(
+    // @ts-ignore
     filter((p) => Boolean(p.parent)),
     map((p) => p.parent.split('.')[0]),
     filter((p) => p !== tableOrView.name),
     uniq
+  // @ts-ignore
   )(tableOrView.columns);
   forEach((referencedIdType) => {
     lines.push(

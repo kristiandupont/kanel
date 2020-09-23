@@ -64,8 +64,8 @@ async function main() {
   logger.quiet`${chalk.greenBright('Kanel')}: Creating psql types`;
 
   try {
-    const exitCode = await processDatabase(config);
-    process.exit(exitCode);
+    await processDatabase(config);
+    process.exit(0);
   } catch (error) {
     logger.error(error);
     process.exit(1);
