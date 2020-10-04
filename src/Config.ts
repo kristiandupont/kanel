@@ -1,6 +1,8 @@
 import { PgConnectionConfig } from 'knex';
 import Casing from './Casing';
 
+export type TypeMap = { [index: string]: string };
+
 type SchemaConfig = {
   name: string;
   ignore?: string[];
@@ -14,7 +16,7 @@ type Config = {
   propertyCasing?: Casing;
   filenameCasing?: Casing;
   preDeleteModelFolder?: Boolean;
-  customTypeMap?: { [index: string]: string };
+  customTypeMap?: TypeMap;
   schemas: SchemaConfig[];
 };
 

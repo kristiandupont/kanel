@@ -2,31 +2,10 @@ import chalk from 'chalk';
 import knex from 'knex';
 import rmfr from 'rmfr';
 import fs from 'fs';
-import { pluck, reject } from 'ramda';
 import { extractSchema } from 'extract-pg-schema';
-import generateModelFile from './generateModelFile';
-import generateTypeFile from './generateTypeFile';
-import generateIndexFile from './generateIndexFile';
+import defaultTypeMap from './defaultTypeMap';
 import { logger } from './logger';
-
-const defaultTypeMap = {
-  int2: 'number',
-  int4: 'number',
-  int8: 'number',
-  float4: 'number',
-  numeric: 'number',
-  bool: 'boolean',
-  json: 'unknown',
-  jsonb: 'unknown',
-  char: 'string',
-  varchar: 'string',
-  text: 'string',
-  date: 'Date',
-  time: 'Date',
-  timetz: 'Date',
-  timestamp: 'Date',
-  timestamptz: 'Date',
-};
+import processSchema from './processSchema';
 
 /**
  * @param {import('./Config').default} config
@@ -41,8 +20,8 @@ const processDatabase = async ({
   customTypeMap = {},
   schemas,
 }) => {
-//const processDatabase = async (config) => {
   const typeMap = { ...defaultTypeMap, ...customTypeMap };
+  const casings = { sourceCasing, typeCasing, propertyCasing, filenameCasing };
 
   logger.log(
     `Connecting to ${chalk.greenBright(connection.database)} on ${
@@ -53,7 +32,6 @@ const processDatabase = async ({
     client: 'pg',
     connection,
   };
-  const db = knex(knexConfig);
 
   for (const schema of schemas) {
     if (preDeleteModelFolder) {
@@ -64,59 +42,10 @@ const processDatabase = async ({
       fs.mkdirSync(schema.modelFolder);
     }
 
-    const { tables, views, types } = await extractSchema(schema.name, db);
-    const rejectIgnored = reject((m) => (schema.ignore || []).includes(m.name));
-    const includedTables = rejectIgnored(tables);
-    const includedViews = rejectIgnored(views).map((v) => ({
-      ...v,
-      isView: true,
-    }));
+    const db = knex(knexConfig);
+    const extractedSchemaObject = await extractSchema(schema.name, db);
 
-    types.forEach((t) =>
-      generateTypeFile(
-        t,
-        schema.modelFolder,
-        sourceCasing,
-        typeCasing,
-        filenameCasing
-      )
-    );
-
-    const userTypes = pluck('name', types);
-    includedTables.forEach((t) =>
-      generateModelFile(
-        t,
-        typeMap,
-        userTypes,
-        schema.modelFolder,
-        sourceCasing,
-        typeCasing,
-        propertyCasing,
-        filenameCasing
-      )
-    );
-    includedViews.forEach((v) =>
-      generateModelFile(
-        v,
-        typeMap,
-        userTypes,
-        schema.modelFolder,
-        sourceCasing,
-        typeCasing,
-        propertyCasing,
-        filenameCasing
-      )
-    );
-
-    generateIndexFile(
-      [...includedTables, ...includedViews],
-      userTypes,
-      schema.modelFolder,
-      sourceCasing,
-      typeCasing,
-      propertyCasing,
-      filenameCasing
-    );
+    await processSchema(schema, extractedSchemaObject, typeMap, casings);
   }
 };
 

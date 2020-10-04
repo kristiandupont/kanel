@@ -6,18 +6,10 @@ import generateFile from './generateFile';
 /**
  * @param {import('extract-pg-schema').Table[]} tables
  */
-function generateIndexFile(
-  tables,
-  userTypes,
-  modelDir,
-  sourceCasing,
-  typeCasing,
-  propertyCasing,
-  filenameCasing
-) {
-  const tc = recase(sourceCasing, typeCasing);
-  const pc = recase(sourceCasing, propertyCasing);
-  const fc = recase(sourceCasing, filenameCasing);
+function generateIndexFile(tables, userTypes, modelDir, casings) {
+  const tc = recase(casings.sourceCasing, casings.typeCasing);
+  const pc = recase(casings.sourceCasing, casings.propertyCasing);
+  const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
   const isFixed = (m) => m.isView || m.tags['fixed'];
 

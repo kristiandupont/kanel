@@ -6,15 +6,9 @@ import generateFile from './generateFile';
 /**
  * @param {import('extract-pg-schema').Type} type
  */
-async function generateTypeFile(
-  type,
-  modelDir,
-  sourceCasing,
-  typeCasing,
-  filenameCasing
-) {
-  const fc = recase(sourceCasing, filenameCasing);
-  const tc = recase(sourceCasing, typeCasing);
+async function generateTypeFile(type, modelDir, casings) {
+  const fc = recase(casings.sourceCasing, casings.filenameCasing);
+  const tc = recase(casings.sourceCasing, casings.typeCasing);
 
   const lines = [];
   const { comment } = type;

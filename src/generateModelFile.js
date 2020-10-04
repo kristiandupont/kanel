@@ -8,23 +8,24 @@ import generateInterface from './generateInterface';
  * @typedef { import('extract-pg-schema').Table } Table
  * @typedef { import('extract-pg-schema').Type } Type
  * @typedef { Table & { isView?: boolean } } TableOrView
+ * @typedef { import('./Casing').default } Casing
  */
 
 /**
  * @param {TableOrView} tableOrView
+ * @param {import('./Config').TypeMap} typeMap
+ * @param {string | any[]} userTypes
+ * @param {string} modelDir
  */
 const generateModelFile = (
   tableOrView,
   typeMap,
   userTypes,
   modelDir,
-  sourceCasing,
-  typeCasing,
-  propertyCasing,
-  filenameCasing
+  casings
 ) => {
-  const tc = recase(sourceCasing, typeCasing);
-  const fc = recase(sourceCasing, filenameCasing);
+  const tc = recase(casings.sourceCasing, casings.typeCasing);
+  const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
   const lines = [];
   const { comment, tags } = tableOrView;
@@ -35,7 +36,7 @@ const generateModelFile = (
     map((p) => p.parent.split('.')[0]),
     filter((p) => p !== tableOrView.name),
     uniq
-  // @ts-ignore
+    // @ts-ignore
   )(tableOrView.columns);
   forEach((referencedIdType) => {
     lines.push(
