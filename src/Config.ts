@@ -3,7 +3,7 @@ import Casing from './Casing';
 
 export type TypeMap = { [index: string]: string };
 
-type SchemaConfig = {
+export type SchemaConfig = {
   name: string;
   ignore?: string[];
   modelFolder: string;

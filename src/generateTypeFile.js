@@ -1,12 +1,12 @@
-import path from 'path';
 import { map } from 'ramda';
 import { recase } from '@kristiandupont/recase';
-import generateFile from './generateFile';
 
 /**
  * @param {import('extract-pg-schema').Type} type
+ * @param {import('./Casing').Casings} casings
+ * @returns {string[]}
  */
-async function generateTypeFile(type, modelDir, casings) {
+function generateTypeFile(type, casings) {
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
   const tc = recase(casings.sourceCasing, casings.typeCasing);
 
@@ -19,9 +19,7 @@ async function generateTypeFile(type, modelDir, casings) {
     `type ${tc(type.name)} = ${map((v) => `'${v}'`, type.values).join(' | ')};`
   );
   lines.push(`export default ${tc(type.name)};`);
-  const filename = `${fc(type.name)}.ts`;
-  const fullPath = path.join(modelDir, filename);
-  generateFile({ fullPath, lines });
+  return lines;
 }
 
 export default generateTypeFile;

@@ -1,2 +1,2 @@
-export { default as generateFile } from './generateFile';
+export { default as writeFile } from './writeFile';
 export { default as processDatabase } from './processDatabase';

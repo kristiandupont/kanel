@@ -1,7 +1,5 @@
-import path from 'path';
 import { forEach, map, filter, reject, propEq, uniq, pipe } from 'ramda';
 import { recase } from '@kristiandupont/recase';
-import generateFile from './generateFile';
 import generateInterface from './generateInterface';
 
 /**
@@ -15,15 +13,10 @@ import generateInterface from './generateInterface';
  * @param {TableOrView} tableOrView
  * @param {import('./Config').TypeMap} typeMap
  * @param {string | any[]} userTypes
- * @param {string} modelDir
+ * @param {import('./Casing').Casings} casings
+ * @returns {string[]}
  */
-const generateModelFile = (
-  tableOrView,
-  typeMap,
-  userTypes,
-  modelDir,
-  casings
-) => {
+const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
   const tc = recase(casings.sourceCasing, casings.typeCasing);
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
@@ -102,9 +95,7 @@ const generateModelFile = (
       exportAs: 'default',
     },
     typeMap,
-    sourceCasing,
-    typeCasing,
-    propertyCasing
+    casings
   );
   lines.push(...interfaceLines);
   if (generateInitializer) {
@@ -119,15 +110,11 @@ const generateModelFile = (
         exportAs: true,
       },
       typeMap,
-      sourceCasing,
-      typeCasing,
-      propertyCasing
+      casings
     );
     lines.push(...initializerInterfaceLines);
   }
-  const filename = `${fc(tableOrView.name)}.ts`;
-  const fullPath = path.join(modelDir, filename);
-  generateFile({ fullPath, lines });
+  return lines;
 };
 
 export default generateModelFile;

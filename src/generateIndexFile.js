@@ -1,12 +1,13 @@
-import path from 'path';
 import { map, filter, reject } from 'ramda';
 import { recase } from '@kristiandupont/recase';
-import generateFile from './generateFile';
 
 /**
  * @param {import('extract-pg-schema').Table[]} tables
+ * @param {string[]} userTypes
+ * @param {import('./Casing').Casings} casings
+ * @returns {string[]}
  */
-function generateIndexFile(tables, userTypes, modelDir, casings) {
+function generateIndexFile(tables, userTypes, casings) {
   const tc = recase(casings.sourceCasing, casings.typeCasing);
   const pc = recase(casings.sourceCasing, casings.propertyCasing);
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
@@ -86,8 +87,7 @@ function generateIndexFile(tables, userTypes, modelDir, casings) {
     '  InitializerTypeMap',
     '};',
   ];
-  const fullPath = path.join(modelDir, 'index.ts');
-  generateFile({ fullPath, lines });
+  return lines;
 }
 
 export default generateIndexFile;

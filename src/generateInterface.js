@@ -68,12 +68,10 @@ const generateInterface = (
     exportAs,
   },
   typeMap,
-  sourceCasing,
-  typeCasing,
-  propertyCasing
+  casings
 ) => {
-  const tc = recase(sourceCasing, typeCasing);
-  const pc = recase(sourceCasing, propertyCasing);
+  const tc = recase(casings.sourceCasing, casings.typeCasing);
+  const pc = recase(casings.sourceCasing, casings.propertyCasing);
 
   const lines = [];
   if (comment) {

@@ -33,19 +33,19 @@ const processDatabase = async ({
     connection,
   };
 
-  for (const schema of schemas) {
+  for (const schemaConfig of schemas) {
     if (preDeleteModelFolder) {
-      logger.log(` - Clearing old files in ${schema.modelFolder}`);
-      await rmfr(schema.modelFolder, { glob: true });
+      logger.log(` - Clearing old files in ${schemaConfig.modelFolder}`);
+      await rmfr(schemaConfig.modelFolder, { glob: true });
     }
-    if (!fs.existsSync(schema.modelFolder)) {
-      fs.mkdirSync(schema.modelFolder);
+    if (!fs.existsSync(schemaConfig.modelFolder)) {
+      fs.mkdirSync(schemaConfig.modelFolder);
     }
 
     const db = knex(knexConfig);
-    const extractedSchemaObject = await extractSchema(schema.name, db);
+    const schema = await extractSchema(schemaConfig.name, db);
 
-    await processSchema(schema, extractedSchemaObject, typeMap, casings);
+    await processSchema(schemaConfig, schema, typeMap, casings);
   }
 };
 
