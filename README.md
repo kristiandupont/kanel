@@ -84,6 +84,14 @@ Delete the model folder before generating files? Set this to `true` if you want 
 
 This allows you to specify (or override) which types to map to. Kanel recognizes the most common types and applies the most likely Typescript type to it, but you might want to override this. This map maps from postgres type to typescript type.
 
+### `modelHooks`
+
+If you need to perform some modification of any or all of the models before writing the files, you can do so with a hook. The `modelHooks` property can be an array of functions that can modify the contents. They should have the following signature: `(lines: string[], src: Model) => string[]`. The first argument is the array of strings that represent the lines in the file. The second is the model as returned from `extract-pg-schema` -- you can see an example [here](https://github.com/kristiandupont/extract-pg-schema#table).
+
+### `typeHooks`
+
+Like the `modelHooks` property, this property can specify a number of hooks to attach to generation of type (enum) files. They have the same signature, only the `src` parameter is a [type](https://github.com/kristiandupont/extract-pg-schema#type) object.
+
 ### `schemas`
 
 This is an array of schemas to process.
