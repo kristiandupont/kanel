@@ -7,6 +7,16 @@ import defaultTypeMap from './defaultTypeMap';
 import { logger } from './logger';
 import processSchema from './processSchema';
 
+const labelAsGenerated = (lines, { name }) => [
+  "// Automatically generated. Don't change this file manually.",
+  '',
+  ...lines,
+];
+
+const addEmptyLineAtEnd = (lines) => [...lines, ''];
+
+const defaultHooks = [labelAsGenerated, addEmptyLineAtEnd];
+
 /**
  * @param {import('./Config').default} config
  */
@@ -18,10 +28,14 @@ const processDatabase = async ({
   filenameCasing = null,
   preDeleteModelFolder = false,
   customTypeMap = {},
+  modelHooks = [],
+  typeHooks = [],
   schemas,
 }) => {
   const typeMap = { ...defaultTypeMap, ...customTypeMap };
   const casings = { sourceCasing, typeCasing, propertyCasing, filenameCasing };
+  const modelProcessChain = [...defaultHooks, ...modelHooks];
+  const typeProcessChain = [...defaultHooks, ...typeHooks];
 
   logger.log(
     `Connecting to ${chalk.greenBright(connection.database)} on ${
@@ -45,7 +59,14 @@ const processDatabase = async ({
     const db = knex(knexConfig);
     const schema = await extractSchema(schemaConfig.name, db);
 
-    await processSchema(schemaConfig, schema, typeMap, casings);
+    await processSchema(
+      schemaConfig,
+      schema,
+      typeMap,
+      casings,
+      modelProcessChain,
+      typeProcessChain
+    );
   }
 };
 

@@ -7,7 +7,6 @@ import { recase } from '@kristiandupont/recase';
  * @returns {string[]}
  */
 function generateTypeFile(type, casings) {
-  const fc = recase(casings.sourceCasing, casings.filenameCasing);
   const tc = recase(casings.sourceCasing, casings.typeCasing);
 
   const lines = [];

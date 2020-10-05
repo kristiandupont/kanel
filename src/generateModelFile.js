@@ -5,32 +5,31 @@ import generateInterface from './generateInterface';
 /**
  * @typedef { import('extract-pg-schema').Table } Table
  * @typedef { import('extract-pg-schema').Type } Type
- * @typedef { Table & { isView?: boolean } } TableOrView
- * @typedef { import('./Casing').default } Casing
+ * @typedef { Table & { isView: boolean } } Model
  */
 
 /**
- * @param {TableOrView} tableOrView
+ * @param {Model} model
  * @param {import('./Config').TypeMap} typeMap
  * @param {string | any[]} userTypes
  * @param {import('./Casing').Casings} casings
  * @returns {string[]}
  */
-const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
+const generateModelFile = (model, typeMap, userTypes, casings) => {
   const tc = recase(casings.sourceCasing, casings.typeCasing);
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
   const lines = [];
-  const { comment, tags } = tableOrView;
-  const generateInitializer = !tags['fixed'] && !tableOrView.isView;
+  const { comment, tags } = model;
+  const generateInitializer = !tags['fixed'] && !model.isView;
   const referencedIdTypes = pipe(
     // @ts-ignore
     filter((p) => Boolean(p.parent)),
     map((p) => p.parent.split('.')[0]),
-    filter((p) => p !== tableOrView.name),
+    filter((p) => p !== model.name),
     uniq
     // @ts-ignore
-  )(tableOrView.columns);
+  )(model.columns);
   forEach((referencedIdType) => {
     lines.push(
       `import { ${tc(referencedIdType)}Id } from './${fc(referencedIdType)}';`
@@ -42,7 +41,7 @@ const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
   const appliedUserTypes = uniq(
     map(
       (p) => p.type,
-      filter((p) => userTypes.indexOf(p.type) !== -1, tableOrView.columns)
+      filter((p) => userTypes.indexOf(p.type) !== -1, model.columns)
     )
   );
   forEach((importedType) => {
@@ -53,7 +52,7 @@ const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
   }
   const overriddenTypes = map(
     (p) => p.tags.type,
-    filter((p) => !!p.tags.type, tableOrView.columns)
+    filter((p) => !!p.tags.type, model.columns)
   );
   forEach((importedType) => {
     lines.push(`import ${tc(importedType)} from '../${fc(importedType)}';`);
@@ -62,7 +61,7 @@ const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
     lines.push('');
   }
 
-  const primaryColumns = filter((c) => c.isPrimary, tableOrView.columns);
+  const primaryColumns = filter((c) => c.isPrimary, model.columns);
 
   // If there's one and only one primary key, that's the identifier.
   const hasIdentifier = primaryColumns.length === 1;
@@ -72,15 +71,15 @@ const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
       ...c,
       isIdentifier: hasIdentifier && c.isPrimary,
     }),
-    tableOrView.columns
+    model.columns
   );
 
   if (hasIdentifier) {
     const [{ type, tags }] = primaryColumns;
     const innerType = tags.type || typeMap[type] || tc(type);
     lines.push(
-      `export type ${tc(tableOrView.name)}Id = ${innerType} & { __flavor?: '${
-        tableOrView.name
+      `export type ${tc(model.name)}Id = ${innerType} & { __flavor?: '${
+        model.name
       }' };`
     );
     lines.push('');
@@ -88,7 +87,7 @@ const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
 
   const interfaceLines = generateInterface(
     {
-      name: tableOrView.name,
+      name: model.name,
       properties: columns,
       considerDefaultValues: false,
       comment,
@@ -102,8 +101,8 @@ const generateModelFile = (tableOrView, typeMap, userTypes, casings) => {
     lines.push('');
     const initializerInterfaceLines = generateInterface(
       {
-        name: `${tc(tableOrView.name)}Initializer`,
-        modelName: tableOrView.name,
+        name: `${tc(model.name)}Initializer`,
+        modelName: model.name,
         properties: reject(propEq('name', 'createdAt'), columns),
         considerDefaultValues: true,
         comment,
