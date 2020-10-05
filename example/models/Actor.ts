@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: actor
 
 export type ActorId = number & { __flavor?: 'actor' };
 

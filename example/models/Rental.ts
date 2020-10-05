@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: rental
 
 import { InventoryId } from './Inventory';
 import { CustomerId } from './Customer';

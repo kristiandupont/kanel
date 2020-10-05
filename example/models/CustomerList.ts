@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: customer_list
 
 export default interface CustomerList {
   id: number | null;

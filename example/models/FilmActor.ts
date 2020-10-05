@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: film_actor
 
 import { ActorId } from './Actor';
 import { FilmId } from './Film';

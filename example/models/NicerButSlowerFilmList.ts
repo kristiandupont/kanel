@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: nicer_but_slower_film_list
 
 import MpaaRating from './MpaaRating';
 

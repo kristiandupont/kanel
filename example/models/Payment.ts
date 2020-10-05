@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: payment
 
 import { CustomerId } from './Customer';
 import { StaffId } from './Staff';

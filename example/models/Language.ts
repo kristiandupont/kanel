@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: language
 
 export type LanguageId = number & { __flavor?: 'language' };
 

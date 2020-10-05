@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: store
 
 import { StaffId } from './Staff';
 import { AddressId } from './Address';

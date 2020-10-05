@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: film_category
 
 import { FilmId } from './Film';
 import { CategoryId } from './Category';

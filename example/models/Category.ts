@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: category
 
 export type CategoryId = number & { __flavor?: 'category' };
 

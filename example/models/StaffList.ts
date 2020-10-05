@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: staff_list
 
 export default interface StaffList {
   id: number | null;

@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: country
 
 export type CountryId = number & { __flavor?: 'country' };
 

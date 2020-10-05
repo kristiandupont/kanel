@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: actor_info
 
 export default interface ActorInfo {
   actor_id: number | null;

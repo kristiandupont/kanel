@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: city
 
 import { CountryId } from './Country';
 

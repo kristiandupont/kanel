@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: undefined
 
 import Actor, { ActorInitializer, ActorId } from './Actor';
 import Address, { AddressInitializer, AddressId } from './Address';

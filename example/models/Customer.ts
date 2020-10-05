@@ -1,4 +1,5 @@
 // Automatically generated. Don't change this file manually.
+// Name: customer
 
 import { AddressId } from './Address';
 
