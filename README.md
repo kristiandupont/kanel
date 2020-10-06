@@ -1,6 +1,7 @@
 # Kanel
 
 Generate Typescript types from a live database
+Introduction to the idea is outlined [here](https://medium.com/@kristiandupont/generating-typescript-types-from-postgres-48661868ef84).
 
 _Works with Postgres databases._
 
