@@ -1,28 +1,49 @@
 {
   "name": "kanel",
+  "version": "0.5.0",
   "keywords": [
     "postgresql",
     "schema",
     "typescript"
   ],
+  "repository": "git@github.com:kristiandupont/kanel.git",
+  "license": "MIT",
   "author": {
     "name": "Kristian Dupont",
     "url": "http://www.kristiandupont.com"
   },
-  "repository": "git@github.com:kristiandupont/kanel.git",
-  "license": "MIT",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
-  "version": "0.5.0",
   "bin": {
     "kanel": "./bin/kanel"
   },
+  "files": [
+    "build/",
+    "bin/"
+  ],
   "scripts": {
     "build": "tsc",
-    "version": "yarn build",
-    "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
     "run-example": "node build/src/cli -c ./example/.kanelrc",
-    "stop-example-db": "docker stop dvd-rental"
+    "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
+    "stop-example-db": "docker stop dvd-rental",
+    "version": "yarn build"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/src/**/*.test.js"
+    ],
+    "transform": {
+      "^.+\\.(ts|js)$": "ts-jest"
+    }
   },
   "dependencies": {
     "@kristiandupont/recase": "^1.1.1",
@@ -45,27 +66,6 @@
     "prettier": "^2.1.1",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
-  },
-  "files": [
-    "build/",
-    "bin/"
-  ],
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "transform": {
-      "^.+\\.(ts|js)$": "ts-jest"
-    },
-    "testMatch": [
-      "<rootDir>/src/**/*.test.js"
-    ],
-    "testEnvironment": "node"
-  },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "es5"
   },
   "np": {
     "tests": false
