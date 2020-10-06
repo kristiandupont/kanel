@@ -9,13 +9,25 @@ _Works with Postgres databases._
 Install with:
 
 ```
-$ npm i -g kanel
+$ npm i -D kanel
 ```
 
-To run, make sure you are in a folder that has a `.kanelrc.js` configuration file, and type:
+or
 
 ```
-$ kanel
+$ yarn add --dev kanel
+```
+
+To run, make sure you are in a folder that has a `.kanelrc.js` configuration file and that your database is running, and type:
+
+```
+npx kanel
+```
+
+or
+
+```
+$ yarn kanel
 ```
 
 ## Configuration
