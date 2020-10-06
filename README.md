@@ -21,7 +21,7 @@ $ yarn add --dev kanel
 To run, make sure you are in a folder that has a `.kanelrc.js` configuration file and that your database is running, and type:
 
 ```
-npx kanel
+$ npx kanel
 ```
 
 or
