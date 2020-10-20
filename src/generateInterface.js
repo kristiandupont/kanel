@@ -46,8 +46,11 @@ const generateProperty = (
     lines.push(...map((c) => `   * ${c}`, commentLines));
     lines.push('   */');
   }
+
+  const wrappedName = name.indexOf(' ') !== -1 ? `'${name}'` : name;
+
   const optional = considerDefaultValue && (defaultValue || nullable);
-  const varName = optional ? `${pc(name)}?` : pc(name);
+  const varName = optional ? `${pc(wrappedName)}?` : pc(wrappedName);
 
   const rawType = tags.type || idType || typeMap[type] || tc(type);
   const typeStr =

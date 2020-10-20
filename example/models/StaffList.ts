@@ -8,7 +8,7 @@ export default interface StaffList {
 
   address: string | null;
 
-  zip code: string | null;
+  'zip code': string | null;
 
   phone: string | null;
 
