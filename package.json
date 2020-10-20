@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "lint": "yarn eslint . -f visualstudio --report-unused-disable-directives --ext .js,.ts",
     "run-example": "node build/src/cli -c ./example/.kanelrc",
     "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
     "stop-example-db": "docker stop dvd-rental",
@@ -60,10 +61,13 @@
     "@types/knex": "^0.16.1",
     "@types/node": "^14.6.2",
     "@types/ramda": "^0.27.14",
+    "@typescript-eslint/parser": "^4.5.0",
     "eslint": "^7.8.1",
+    "eslint-config-prettier": "^6.13.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.4.2",
     "np": "^6.5.0",
-    "prettier": "^2.1.1",
+    "prettier": "^2.1.2",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
   },
