@@ -44,7 +44,7 @@ const generateProperty = (
   } else if (commentLines.length > 1) {
     lines.push('  /**');
     lines.push(...map((c) => `   * ${c}`, commentLines));
-    lines.push('  */');
+    lines.push('   */');
   }
   const optional = considerDefaultValue && (defaultValue || nullable);
   const varName = optional ? `${pc(name)}?` : pc(name);

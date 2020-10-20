@@ -16,7 +16,7 @@ export interface CategoryInitializer {
   /**
    * Default value: nextval('category_category_id_seq'::regclass)
    * Primary key. Index: category_pkey
-  */
+   */
   category_id?: CategoryId;
 
   name: string;

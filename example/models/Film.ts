@@ -43,7 +43,7 @@ export interface FilmInitializer {
   /**
    * Default value: nextval('film_film_id_seq'::regclass)
    * Primary key. Index: film_pkey
-  */
+   */
   film_id?: FilmId;
 
   /** Index: idx_title */

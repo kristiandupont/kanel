@@ -16,7 +16,7 @@ export interface CountryInitializer {
   /**
    * Default value: nextval('country_country_id_seq'::regclass)
    * Primary key. Index: country_pkey
-  */
+   */
   country_id?: CountryId;
 
   country: string;

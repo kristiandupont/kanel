@@ -29,7 +29,7 @@ export interface AddressInitializer {
   /**
    * Default value: nextval('address_address_id_seq'::regclass)
    * Primary key. Index: address_pkey
-  */
+   */
   address_id?: AddressId;
 
   address: string;

@@ -19,7 +19,7 @@ export interface ActorInitializer {
   /**
    * Default value: nextval('actor_actor_id_seq'::regclass)
    * Primary key. Index: actor_pkey
-  */
+   */
   actor_id?: ActorId;
 
   first_name: string;

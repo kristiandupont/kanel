@@ -16,7 +16,7 @@ export interface LanguageInitializer {
   /**
    * Default value: nextval('language_language_id_seq'::regclass)
    * Primary key. Index: language_pkey
-  */
+   */
   language_id?: LanguageId;
 
   name: string;

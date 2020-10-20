@@ -22,7 +22,7 @@ export interface StoreInitializer {
   /**
    * Default value: nextval('store_store_id_seq'::regclass)
    * Primary key. Index: store_pkey
-  */
+   */
   store_id?: StoreId;
 
   /** Index: idx_unq_manager_staff_id */

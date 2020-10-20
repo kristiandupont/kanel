@@ -35,7 +35,7 @@ export interface CustomerInitializer {
   /**
    * Default value: nextval('customer_customer_id_seq'::regclass)
    * Primary key. Index: customer_pkey
-  */
+   */
   customer_id?: CustomerId;
 
   /** Index: idx_fk_store_id */

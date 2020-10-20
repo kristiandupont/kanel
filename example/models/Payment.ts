@@ -29,7 +29,7 @@ export interface PaymentInitializer {
   /**
    * Default value: nextval('payment_payment_id_seq'::regclass)
    * Primary key. Index: payment_pkey
-  */
+   */
   payment_id?: PaymentId;
 
   /** Index: idx_fk_customer_id */

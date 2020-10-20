@@ -21,7 +21,7 @@ export interface CityInitializer {
   /**
    * Default value: nextval('city_city_id_seq'::regclass)
    * Primary key. Index: city_pkey
-  */
+   */
   city_id?: CityId;
 
   city: string;

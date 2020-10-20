@@ -17,7 +17,7 @@ export default interface Rental {
   /**
    * Index: idx_fk_inventory_id
    * Index: idx_unq_rental_rental_date_inventory_id_customer_id
-  */
+   */
   inventory_id: InventoryId;
 
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
@@ -34,7 +34,7 @@ export interface RentalInitializer {
   /**
    * Default value: nextval('rental_rental_id_seq'::regclass)
    * Primary key. Index: rental_pkey
-  */
+   */
   rental_id?: RentalId;
 
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
@@ -43,7 +43,7 @@ export interface RentalInitializer {
   /**
    * Index: idx_fk_inventory_id
    * Index: idx_unq_rental_rental_date_inventory_id_customer_id
-  */
+   */
   inventory_id: InventoryId;
 
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */

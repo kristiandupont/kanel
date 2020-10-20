@@ -22,7 +22,7 @@ export interface InventoryInitializer {
   /**
    * Default value: nextval('inventory_inventory_id_seq'::regclass)
    * Primary key. Index: inventory_pkey
-  */
+   */
   inventory_id?: InventoryId;
 
   /** Index: idx_store_id_film_id */
