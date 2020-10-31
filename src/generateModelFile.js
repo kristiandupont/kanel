@@ -1,27 +1,30 @@
 import { forEach, map, filter, reject, propEq, uniq, pipe } from 'ramda';
 import { recase } from '@kristiandupont/recase';
 import generateInterface from './generateInterface';
+import ImportGenerator from './importGenerator';
+import path from 'path';
 
 /**
  * @typedef { import('extract-pg-schema').Table } Table
  * @typedef { import('extract-pg-schema').Type } Type
  * @typedef { Table & { isView: boolean } } Model
+ * @typedef {import('./Config').TypeMap} TypeMap
+ * @typedef {import('./Casing').Casings} Casings
  */
 
 /**
  * @param {Model} model
- * @param {import('./Config').TypeMap} typeMap
- * @param {string | any[]} userTypes
- * @param {import('./Casing').Casings} casings
+ * @param {{ typeMap: TypeMap, userTypes: (string | any)[], casings: Casings, folder: string }} p1
  * @returns {string[]}
  */
-const generateModelFile = (model, typeMap, userTypes, casings) => {
+const generateModelFile = (model, { typeMap, userTypes, casings, folder }) => {
   const tc = recase(casings.sourceCasing, casings.typeCasing);
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
   const lines = [];
+
+  const importGenerator = new ImportGenerator(folder);
   const { comment, tags } = model;
-  const generateInitializer = !tags['fixed'] && !model.isView;
   const referencedIdTypes = pipe(
     // @ts-ignore
     filter((p) => Boolean(p.parent)),
@@ -30,24 +33,22 @@ const generateModelFile = (model, typeMap, userTypes, casings) => {
     uniq
     // @ts-ignore
   )(model.columns);
-  forEach((referencedIdType) => {
-    lines.push(
-      `import { ${tc(referencedIdType)}Id } from './${fc(referencedIdType)}';`
-    );
-  }, referencedIdTypes);
-  if (referencedIdTypes.length) {
-    lines.push('');
-  }
+  referencedIdTypes.forEach((i) =>
+    importGenerator.addImport(`${tc(i)}Id`, false, path.join(folder, fc(i)))
+  );
   const appliedUserTypes = uniq(
     map(
       (p) => p.type,
       filter((p) => userTypes.indexOf(p.type) !== -1, model.columns)
     )
   );
-  forEach((importedType) => {
-    lines.push(`import ${tc(importedType)} from './${fc(importedType)}';`);
-  }, appliedUserTypes);
-  if (appliedUserTypes.length) {
+  appliedUserTypes.forEach((t) =>
+    importGenerator.addImport(tc(t), true, path.join(folder, fc(t)))
+  );
+  const importLines = importGenerator.generateLines();
+  lines.push(...importLines);
+
+  if (importLines.length) {
     lines.push('');
   }
   const overriddenTypes = map(
@@ -97,6 +98,8 @@ const generateModelFile = (model, typeMap, userTypes, casings) => {
     casings
   );
   lines.push(...interfaceLines);
+
+  const generateInitializer = !tags['fixed'] && !model.isView;
   if (generateInitializer) {
     lines.push('');
     const initializerInterfaceLines = generateInterface(

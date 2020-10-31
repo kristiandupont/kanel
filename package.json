@@ -27,11 +27,13 @@
     "run-example": "node build/src/cli -c ./example/.kanelrc",
     "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
     "stop-example-db": "docker stop dvd-rental",
+    "test": "yarn jest",
     "version": "yarn build"
   },
   "prettier": {
     "singleQuote": true,
-    "trailingComma": "es5"
+    "trailingComma": "es5",
+    "endOfLine": "auto"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -40,7 +42,7 @@
     ],
     "testEnvironment": "node",
     "testMatch": [
-      "<rootDir>/src/**/*.test.js"
+      "<rootDir>/src/**/*.test.(js|ts)"
     ],
     "transform": {
       "^.+\\.(ts|js)$": "ts-jest"
@@ -71,7 +73,5 @@
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
   },
-  "np": {
-    "tests": false
-  }
+  "np": {}
 }

@@ -54,7 +54,12 @@ const processSchema = async (
   const userTypes = pluck('name', types);
 
   includedModels.forEach((m) => {
-    const modelFileLines = generateModelFile(m, typeMap, userTypes, casings);
+    const modelFileLines = generateModelFile(m, {
+      typeMap,
+      userTypes,
+      casings,
+      folder: schemaConfig.modelFolder,
+    });
     const wetModelFileLines = applyHooks(modelProcessChain, m, modelFileLines);
     const filename = `${fc(m.name)}.ts`;
     writeFile({
