@@ -54,8 +54,6 @@ const processDatabase = async ({
     indexBy((s) => s.name, schemas)
   );
 
-  console.log({ schemaFolderMap });
-
   for (const schemaConfig of schemas) {
     if (preDeleteModelFolder) {
       logger.log(` - Clearing old files in ${schemaConfig.modelFolder}`);

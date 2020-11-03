@@ -2,7 +2,6 @@
 // Name: film
 
 import { LanguageId } from './Language';
-
 import MpaaRating from './MpaaRating';
 
 export type FilmId = number & { __flavor?: 'film' };
