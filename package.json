@@ -51,7 +51,7 @@
   "dependencies": {
     "@kristiandupont/recase": "^1.1.1",
     "chalk": "^4.1.0",
-    "extract-pg-schema": "^1.7.1",
+    "extract-pg-schema": "^1.7.2",
     "knex": "^0.21.5",
     "optionator": "^0.9.1",
     "pg": "^8.3.3",
