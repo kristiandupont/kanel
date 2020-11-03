@@ -1,7 +1,9 @@
 import chalk from 'chalk';
 import knex from 'knex';
 import rmfr from 'rmfr';
+import path from 'path';
 import fs from 'fs';
+import { indexBy, map } from 'ramda';
 import { extractSchema } from 'extract-pg-schema';
 import defaultTypeMap from './defaultTypeMap';
 import { logger } from './logger';
@@ -47,6 +49,13 @@ const processDatabase = async ({
     connection,
   };
 
+  const schemaFolderMap = map(
+    (s) => path.resolve(s.modelFolder),
+    indexBy((s) => s.name, schemas)
+  );
+
+  console.log({ schemaFolderMap });
+
   for (const schemaConfig of schemas) {
     if (preDeleteModelFolder) {
       logger.log(` - Clearing old files in ${schemaConfig.modelFolder}`);
@@ -65,7 +74,8 @@ const processDatabase = async ({
       typeMap,
       casings,
       modelProcessChain,
-      typeProcessChain
+      typeProcessChain,
+      schemaFolderMap
     );
   }
 };

@@ -5,36 +5,44 @@ import ImportGenerator from './importGenerator';
 import path from 'path';
 
 /**
- * @typedef { import('extract-pg-schema').Table } Table
+ * @typedef { import('extract-pg-schema').TableOrView } TableOrView
  * @typedef { import('extract-pg-schema').Type } Type
- * @typedef { Table & { isView: boolean } } Model
+ * @typedef { TableOrView & { isView: boolean } } Model
  * @typedef {import('./Config').TypeMap} TypeMap
  * @typedef {import('./Casing').Casings} Casings
  */
 
 /**
  * @param {Model} model
- * @param {{ typeMap: TypeMap, userTypes: (string | any)[], casings: Casings, folder: string }} p1
+ * @param {{ typeMap: TypeMap, userTypes: (string | any)[], casings: Casings, schemaName: string, schemaFolderMap: {[schemaName: string]: string} }} p1
  * @returns {string[]}
  */
-const generateModelFile = (model, { typeMap, userTypes, casings, folder }) => {
+const generateModelFile = (
+  model,
+  { typeMap, userTypes, casings, schemaName, schemaFolderMap }
+) => {
   const tc = recase(casings.sourceCasing, casings.typeCasing);
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
   const lines = [];
-
-  const importGenerator = new ImportGenerator(folder);
   const { comment, tags } = model;
+
+  const importGenerator = new ImportGenerator(schemaFolderMap[schemaName]);
   const referencedIdTypes = pipe(
     // @ts-ignore
-    filter((p) => Boolean(p.parent)),
-    map((p) => p.parent.split('.')[0]),
-    filter((p) => p !== model.name),
+    filter((p) => Boolean(p.reference)),
+    map((p) => p.reference),
+    reject((p) => p.schema === schemaName && p.table === model.name),
+    // @ts-ignore
     uniq
     // @ts-ignore
   )(model.columns);
   referencedIdTypes.forEach((i) =>
-    importGenerator.addImport(`${tc(i)}Id`, false, path.join(folder, fc(i)))
+    importGenerator.addImport(
+      `${tc(i.table)}Id`,
+      false,
+      path.join(schemaFolderMap[i.schema], fc(i.table))
+    )
   );
   const appliedUserTypes = uniq(
     map(
@@ -43,7 +51,12 @@ const generateModelFile = (model, { typeMap, userTypes, casings, folder }) => {
     )
   );
   appliedUserTypes.forEach((t) =>
-    importGenerator.addImport(tc(t), true, path.join(folder, fc(t)))
+    importGenerator.addImport(
+      tc(t),
+      true,
+      // TODO: this should be a configured usertype folder if requested.
+      path.join(schemaFolderMap[schemaName], fc(t))
+    )
   );
   const importLines = importGenerator.generateLines();
   lines.push(...importLines);

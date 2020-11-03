@@ -2,12 +2,12 @@ import { map, filter, reject } from 'ramda';
 import { recase } from '@kristiandupont/recase';
 
 /**
- * @param {import('extract-pg-schema').Table[]} tables
+ * @param {import('extract-pg-schema').TableOrView[]} models
  * @param {string[]} userTypes
  * @param {import('./Casing').Casings} casings
  * @returns {string[]}
  */
-function generateIndexFile(tables, userTypes, casings) {
+function generateIndexFile(models, userTypes, casings) {
   const tc = recase(casings.sourceCasing, casings.typeCasing);
   const pc = recase(casings.sourceCasing, casings.propertyCasing);
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
@@ -16,8 +16,8 @@ function generateIndexFile(tables, userTypes, casings) {
 
   const hasIdentifier = (m) =>
     filter((c) => c.isPrimary, m.columns).length === 1;
-  const creatableModels = reject(isFixed, tables);
-  const modelsWithIdColumn = filter(hasIdentifier, tables);
+  const creatableModels = reject(isFixed, models);
+  const modelsWithIdColumn = filter(hasIdentifier, models);
   const importLine = (m) => {
     const importInitializer = !isFixed(m);
     const importId = hasIdentifier(m);
@@ -45,14 +45,14 @@ function generateIndexFile(tables, userTypes, casings) {
     return `  ${exports.join(', ')},`;
   };
   const lines = [
-    ...map(importLine, tables),
+    ...map(importLine, models),
     ...map((t) => `import ${tc(t)} from './${fc(t)}';`, userTypes),
     '',
     'type Model =',
-    ...map((model) => `  | ${tc(model.name)}`, tables),
+    ...map((model) => `  | ${tc(model.name)}`, models),
     '',
     'interface ModelTypeMap {',
-    ...map((model) => `  '${pc(model.name)}': ${tc(model.name)};`, tables),
+    ...map((model) => `  '${pc(model.name)}': ${tc(model.name)};`, models),
     '}',
     '',
     'type ModelId =',
@@ -76,7 +76,7 @@ function generateIndexFile(tables, userTypes, casings) {
     '}',
     '',
     'export {',
-    ...map(exportLine, tables),
+    ...map(exportLine, models),
     ...map((t) => `  ${tc(t)},`, userTypes),
     '',
     '  Model,',

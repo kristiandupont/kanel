@@ -19,6 +19,7 @@ const applyHooks = (chain, src, lines) => {
  * @param {import('./Casing').Casings} casings
  * @param {(import("./Config").Hook<import('./generateModelFile').Model>)[]} modelProcessChain
  * @param {(import("./Config").Hook<import("extract-pg-schema").Type>)[]} typeProcessChain
+ * @param {{[schameName: string]: string}} schemaFolderMap
  */
 const processSchema = async (
   schemaConfig,
@@ -26,7 +27,8 @@ const processSchema = async (
   typeMap,
   casings,
   modelProcessChain,
-  typeProcessChain
+  typeProcessChain,
+  schemaFolderMap
 ) => {
   const { tables, views, types } = schema;
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
@@ -58,7 +60,8 @@ const processSchema = async (
       typeMap,
       userTypes,
       casings,
-      folder: schemaConfig.modelFolder,
+      schemaName: schemaConfig.name,
+      schemaFolderMap,
     });
     const wetModelFileLines = applyHooks(modelProcessChain, m, modelFileLines);
     const filename = `${fc(m.name)}.ts`;
