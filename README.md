@@ -48,7 +48,7 @@ module.exports = {
 
   filenameCasing: 'dash',
   typeCasing: 'pascal',
-  propertyCasing: 'camel',,
+  propertyCasing: 'camel',
   preDeleteModelFolder: true,
 
   customTypeMap: {
@@ -64,7 +64,6 @@ module.exports = {
     },
   ],
 };
-
 ```
 
 The configuration file contains the following fields:
