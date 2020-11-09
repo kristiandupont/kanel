@@ -119,7 +119,7 @@ const generateModelFile = (
       {
         name: `${tc(model.name)}Initializer`,
         modelName: model.name,
-        properties: reject(propEq('name', 'createdAt'), columns),
+        properties: columns,
         considerDefaultValues: true,
         comment,
         exportAs: true,
