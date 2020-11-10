@@ -1,8 +1,8 @@
 import path from 'path';
 
-type Import = {
-  name: string;
-  isDefault: boolean;
+type ImportSet = {
+  default?: string;
+  named: Set<string>;
 };
 
 class ImportGenerator {
@@ -12,7 +12,7 @@ class ImportGenerator {
     this.srcPath = srcPath;
   }
 
-  importMap: { [index: string]: Import[] } = {};
+  importMap: { [index: string]: ImportSet } = {};
 
   addImport(name: string, isDefault: boolean, libPath: string) {
     let relativePath = path.relative(this.srcPath, libPath);
@@ -27,10 +27,21 @@ class ImportGenerator {
     }
 
     if (!(relativePath in this.importMap)) {
-      this.importMap[relativePath] = [];
+      this.importMap[relativePath] = { named: new Set() };
     }
 
-    this.importMap[relativePath].push({ name, isDefault });
+    const importSet = this.importMap[relativePath];
+
+    if (isDefault) {
+      if (importSet.default && importSet.default !== name) {
+        throw new Error(
+          `Multiple default imports attempted: ${importSet.default} and ${name} from '${relativePath}'`
+        );
+      }
+      importSet.default = name;
+    } else {
+      importSet.named.add(name);
+    }
   }
 
   generateLines(): string[] {
@@ -39,9 +50,9 @@ class ImportGenerator {
     );
   }
 
-  generateLine(relativePath: string, imports: Import[]): any {
-    const defaultImport = imports.find((i) => i.isDefault)?.name;
-    const namedImports = imports.filter((i) => !i.isDefault).map((i) => i.name);
+  private generateLine(relativePath: string, importSet: ImportSet): any {
+    const defaultImport = importSet.default;
+    const namedImports = Array.from(importSet.named.values());
 
     const allImports = [
       ...(defaultImport ? [defaultImport] : []),

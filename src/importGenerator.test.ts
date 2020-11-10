@@ -36,4 +36,30 @@ describe('ImportGenerator', () => {
       "import defComb, { defNamed1, defNamed2, defNamed3 } from './comb';",
     ]);
   });
+
+  it('should ignore duplicates', () => {
+    const ig = new ImportGenerator('./');
+
+    ig.addImport('def', true, './pkg');
+    ig.addImport('def', true, './pkg');
+
+    ig.addImport('named1', false, './pkg');
+    ig.addImport('named2', false, './pkg');
+    ig.addImport('named1', false, './pkg');
+
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual([
+      "import def, { named1, named2 } from './pkg';",
+    ]);
+  });
+
+  it('should complain about multiple (different) default imports', () => {
+    const ig = new ImportGenerator('./');
+
+    ig.addImport('def', true, './pkg');
+
+    expect(() => ig.addImport('def2', true, './pkg')).toThrow(
+      "Multiple default imports attempted: def and def2 from './pkg'"
+    );
+  });
 });
