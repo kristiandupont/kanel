@@ -52,7 +52,12 @@ const generateProperty = (
   const optional = considerDefaultValue && (defaultValue || nullable);
   const varName = optional ? `${pc(wrappedName)}?` : pc(wrappedName);
 
-  const rawType = tags.type || idType || typeMap[type] || tc(type);
+  let rawType = tags.type || idType || typeMap[type];
+  if (!rawType) {
+    console.warn(`Unrecognized type: '${type}'`);
+    rawType = tc(type);
+  }
+
   const typeStr =
     nullable && !considerDefaultValue ? `${rawType} | null` : rawType;
   lines.push(`  ${varName}: ${typeStr};`);
