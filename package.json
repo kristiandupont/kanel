@@ -61,7 +61,7 @@
   "devDependencies": {
     "@types/jest": "26.0.17",
     "@types/knex": "0.16.1",
-    "@types/node": "14.14.10",
+    "@types/node": "14.14.11",
     "@types/ramda": "0.27.32",
     "@typescript-eslint/parser": "4.9.1",
     "eslint": "7.15.0",
