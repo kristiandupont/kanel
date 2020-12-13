@@ -48,9 +48,9 @@ export interface FilmInitializer {
   /** Index: idx_title */
   title: string;
 
-  description?: string;
+  description?: string | null;
 
-  release_year?: number;
+  release_year?: number | null;
 
   /** Index: idx_fk_language_id */
   language_id: LanguageId;
@@ -61,18 +61,18 @@ export interface FilmInitializer {
   /** Default value: 4.99 */
   rental_rate?: number;
 
-  length?: number;
+  length?: number | null;
 
   /** Default value: 19.99 */
   replacement_cost?: number;
 
   /** Default value: 'G'::mpaa_rating */
-  rating?: MpaaRating;
+  rating?: MpaaRating | null;
 
   /** Default value: now() */
   last_update?: Date;
 
-  special_features?: Text[];
+  special_features?: Text[] | null;
 
   /** Index: film_fulltext_idx */
   fulltext: string;

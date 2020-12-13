@@ -49,7 +49,7 @@ export interface RentalInitializer {
   /** Index: idx_unq_rental_rental_date_inventory_id_customer_id */
   customer_id: CustomerId;
 
-  return_date?: Date;
+  return_date?: Date | null;
 
   staff_id: StaffId;
 

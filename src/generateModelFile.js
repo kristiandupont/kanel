@@ -23,6 +23,7 @@ const generateModelFile = (
 ) => {
   const tc = recase(casings.sourceCasing, casings.typeCasing);
   const fc = recase(casings.sourceCasing, casings.filenameCasing);
+  const pc = recase(casings.sourceCasing, casings.propertyCasing);
 
   const lines = [];
   const { comment, tags } = model;
@@ -80,14 +81,6 @@ const generateModelFile = (
   // If there's one and only one primary key, that's the identifier.
   const hasIdentifier = primaryColumns.length === 1;
 
-  const columns = map(
-    (c) => ({
-      ...c,
-      isIdentifier: hasIdentifier && c.isPrimary,
-    }),
-    model.columns
-  );
-
   if (hasIdentifier) {
     const [{ type, tags }] = primaryColumns;
     const innerType = tags.type || typeMap[type] || tc(type);
@@ -99,34 +92,77 @@ const generateModelFile = (
     lines.push('');
   }
 
-  const interfaceLines = generateInterface(
-    {
-      name: model.name,
-      properties: columns,
-      considerDefaultValues: false,
-      comment,
-      exportAs: 'default',
-    },
-    typeMap,
-    casings
-  );
+  const properties = model.columns.map((c) => {
+    const wrappedName = c.name.indexOf(' ') !== -1 ? `'${c.name}'` : c.name;
+    const isIdentifier = hasIdentifier && c.isPrimary;
+    const idType = isIdentifier && `${tc(model.name)}Id`;
+    const referenceType = c.reference && `${tc(c.reference.table)}Id`;
+    /** @type {string} */
+    // @ts-ignore
+    let rawType = c.tags.type || idType || referenceType || typeMap[c.type];
+    if (!rawType) {
+      console.warn(`Unrecognized type: '${c.type}'`);
+      rawType = tc(c.type);
+    }
+    const typeName = c.nullable ? `${rawType} | null` : rawType;
+    const modelAttributes = {
+      commentLines: c.comment ? [c.comment] : [],
+      optional: false,
+    };
+    const initializerAttributes = {
+      omit: c.generated === 'ALWAYS',
+      commentLines: c.comment ? [c.comment] : [],
+      optional: c.defaultValue || c.nullable,
+    };
+
+    if (c.defaultValue) {
+      initializerAttributes.commentLines.push(
+        `Default value: ${c.defaultValue}`
+      );
+    }
+
+    c.indices.forEach((index) => {
+      const commentLine = index.isPrimary
+        ? `Primary key. Index: ${index.name}`
+        : `Index: ${index.name}`;
+      modelAttributes.commentLines.push(commentLine);
+      initializerAttributes.commentLines.push(commentLine);
+    });
+
+    return {
+      name: pc(wrappedName),
+      optional: false,
+      typeName,
+      modelAttributes,
+      initializerAttributes,
+    };
+  });
+
+  const interfaceLines = generateInterface({
+    name: tc(model.name),
+    properties: properties.map(({ modelAttributes, ...props }) => ({
+      ...props,
+      ...modelAttributes,
+    })),
+    comment,
+    exportAsDefault: true,
+  });
   lines.push(...interfaceLines);
 
   const generateInitializer = !tags['fixed'] && !model.isView;
   if (generateInitializer) {
     lines.push('');
-    const initializerInterfaceLines = generateInterface(
-      {
-        name: `${tc(model.name)}Initializer`,
-        modelName: model.name,
-        properties: columns,
-        considerDefaultValues: true,
-        comment,
-        exportAs: true,
-      },
-      typeMap,
-      casings
-    );
+    const initializerInterfaceLines = generateInterface({
+      name: `${tc(model.name)}Initializer`,
+      properties: properties
+        .filter((p) => !p.initializerAttributes.omit)
+        .map(({ initializerAttributes, ...props }) => ({
+          ...props,
+          ...initializerAttributes,
+        })),
+      comment,
+      exportAsDefault: false,
+    });
     lines.push(...initializerInterfaceLines);
   }
   return lines;

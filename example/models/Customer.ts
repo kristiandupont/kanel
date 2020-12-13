@@ -46,7 +46,7 @@ export interface CustomerInitializer {
   /** Index: idx_last_name */
   last_name: string;
 
-  email?: string;
+  email?: string | null;
 
   /** Index: idx_fk_address_id */
   address_id: AddressId;
@@ -58,7 +58,7 @@ export interface CustomerInitializer {
   create_date?: Date;
 
   /** Default value: now() */
-  last_update?: Date;
+  last_update?: Date | null;
 
-  active?: number;
+  active?: number | null;
 }

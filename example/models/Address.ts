@@ -34,14 +34,14 @@ export interface AddressInitializer {
 
   address: string;
 
-  address2?: string;
+  address2?: string | null;
 
   district: string;
 
   /** Index: idx_fk_city_id */
   city_id: CityId;
 
-  postal_code?: string;
+  postal_code?: string | null;
 
   phone: string;
 

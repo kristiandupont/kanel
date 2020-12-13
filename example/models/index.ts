@@ -15,6 +15,7 @@ import Language, { LanguageInitializer, LanguageId } from './Language';
 import Payment, { PaymentInitializer, PaymentId } from './Payment';
 import Rental, { RentalInitializer, RentalId } from './Rental';
 import Store, { StoreInitializer, StoreId } from './Store';
+import Users, { UsersInitializer } from './Users';
 import ActorInfo from './ActorInfo';
 import CustomerList from './CustomerList';
 import NicerButSlowerFilmList from './NicerButSlowerFilmList';
@@ -38,6 +39,7 @@ type Model =
   | Payment
   | Rental
   | Store
+  | Users
   | ActorInfo
   | CustomerList
   | NicerButSlowerFilmList
@@ -60,6 +62,7 @@ interface ModelTypeMap {
   'payment': Payment;
   'rental': Rental;
   'store': Store;
+  'users': Users;
   'actor_info': ActorInfo;
   'customer_list': CustomerList;
   'nicer_but_slower_film_list': NicerButSlowerFilmList;
@@ -112,6 +115,7 @@ type Initializer =
   | PaymentInitializer
   | RentalInitializer
   | StoreInitializer
+  | UsersInitializer
 
 interface InitializerTypeMap {
   'actor': ActorInitializer;
@@ -128,6 +132,7 @@ interface InitializerTypeMap {
   'payment': PaymentInitializer;
   'rental': RentalInitializer;
   'store': StoreInitializer;
+  'users': UsersInitializer;
 }
 
 export {
@@ -145,6 +150,7 @@ export {
   Payment, PaymentInitializer, PaymentId,
   Rental, RentalInitializer, RentalId,
   Store, StoreInitializer, StoreId,
+  Users, UsersInitializer,
   ActorInfo,
   CustomerList,
   NicerButSlowerFilmList,
