@@ -55,7 +55,6 @@ const generateModelFile = (
     importGenerator.addImport(
       tc(t),
       true,
-      // TODO: this should be a configured usertype folder if requested.
       path.join(schemaFolderMap[schemaName], fc(t))
     )
   );
