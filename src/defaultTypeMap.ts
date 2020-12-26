@@ -5,6 +5,7 @@ const defaultTypeMap: TypeMap = {
   int4: 'number',
   int8: 'number',
   float4: 'number',
+  float8: 'number',
   numeric: 'number',
   bool: 'boolean',
   json: 'unknown',
