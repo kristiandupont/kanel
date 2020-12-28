@@ -63,7 +63,7 @@
     "@types/knex": "0.16.1",
     "@types/node": "14.14.16",
     "@types/ramda": "0.27.34",
-    "@typescript-eslint/parser": "4.11.0",
+    "@typescript-eslint/parser": "4.11.1",
     "eslint": "7.16.0",
     "eslint-config-prettier": "7.1.0",
     "eslint-plugin-prettier": "3.3.0",
