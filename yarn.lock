@@ -503,7 +503,7 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@kristiandupont/recase@^1.1.1":
+"@kristiandupont/recase@1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@kristiandupont/recase/-/recase-1.1.1.tgz#c54454ebf23abedb2f37d8fe71f3b785dc87ee5c"
   integrity sha512-oDt82hNAu3X/bu2BGcrLDdfjrqR2UThwSiJRl+SizjBJT0U9CmWGJ+HYJxDLbo02PpyJCR9nPk26vrNt7xQ7BA==
