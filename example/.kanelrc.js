@@ -1,4 +1,5 @@
 const path = require('path');
+const { recase } = require('@kristiandupont/recase');
 
 // This hook will insert the name of the model or type right after the auto-generated warning comment.
 const insertNameComment = (lines, src) => {
@@ -16,8 +17,8 @@ module.exports = {
     port: 54321,
   },
 
-  filenameCasing: 'pascal',
-  typeCasing: 'pascal',
+  modelNominator: recase('snake', 'pascal'),
+  typeNominator: recase('snake', 'pascal'),
   preDeleteModelFolder: true,
 
   customTypeMap: {

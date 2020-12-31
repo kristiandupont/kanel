@@ -1,23 +1,20 @@
-import { map } from 'ramda';
-import { recase } from '@kristiandupont/recase';
-
 /**
  * @param {import('extract-pg-schema').Type} type
- * @param {import('./Casing').Casings} casings
+ * @param {(typeName: string) => string} nominator
  * @returns {string[]}
  */
-function generateTypeFile(type, casings) {
-  const tc = recase(casings.sourceCasing, casings.typeCasing);
-
+function generateTypeFile(type, nominator) {
   const lines = [];
   const { comment } = type;
   if (comment) {
     lines.push(`/** ${comment} */`);
   }
   lines.push(
-    `type ${tc(type.name)} = ${map((v) => `'${v}'`, type.values).join(' | ')};`
+    `type ${nominator(type.name)} = ${type.values
+      .map((v) => `'${v}'`)
+      .join(' | ')};`
   );
-  lines.push(`export default ${tc(type.name)};`);
+  lines.push(`export default ${nominator(type.name)};`);
   return lines;
 }
 

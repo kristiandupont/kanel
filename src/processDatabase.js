@@ -3,13 +3,14 @@ import knex from 'knex';
 import rmfr from 'rmfr';
 import path from 'path';
 import fs from 'fs';
-import { indexBy, map } from 'ramda';
+import { identity, indexBy, isEmpty, map } from 'ramda';
 import { extractSchema } from 'extract-pg-schema';
 import defaultTypeMap from './defaultTypeMap';
 import { logger } from './logger';
 import processSchema from './processSchema';
+import { nameIdentity } from './Config';
 
-const labelAsGenerated = (lines, { name }) => [
+const labelAsGenerated = (lines) => [
   "// Automatically generated. Don't change this file manually.",
   '',
   ...lines,
@@ -24,18 +25,40 @@ const defaultHooks = [labelAsGenerated, addEmptyLineAtEnd];
  */
 const processDatabase = async ({
   connection,
-  sourceCasing = null,
-  typeCasing = null,
-  propertyCasing = null,
-  filenameCasing = null,
   preDeleteModelFolder = false,
   customTypeMap = {},
+
   modelHooks = [],
+  modelNominator = nameIdentity,
+  initializerNominator = (modelName) => `${modelName}Initializer`,
+  idNominator = (modelName) => `${modelName}Id`,
+
   typeHooks = [],
+  typeNominator = nameIdentity,
+
+  fileNominator = identity,
+
   schemas,
+
+  ...unknownProps
 }) => {
+  if (!isEmpty(unknownProps)) {
+    console.warn(
+      `Unknown configuration properties: ${Object.keys(unknownProps).join(
+        ', '
+      )}`
+    );
+  }
+
   const typeMap = { ...defaultTypeMap, ...customTypeMap };
-  const casings = { sourceCasing, typeCasing, propertyCasing, filenameCasing };
+  /** @type {import('./Config').Nominators} */
+  const nominators = {
+    modelNominator,
+    initializerNominator,
+    idNominator,
+    typeNominator,
+    fileNominator,
+  };
   const modelProcessChain = [...defaultHooks, ...modelHooks];
   const typeProcessChain = [...defaultHooks, ...typeHooks];
 
@@ -70,7 +93,7 @@ const processDatabase = async ({
       schemaConfig,
       schema,
       typeMap,
-      casings,
+      nominators,
       modelProcessChain,
       typeProcessChain,
       schemaFolderMap

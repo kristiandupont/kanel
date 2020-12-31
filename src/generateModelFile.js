@@ -1,5 +1,4 @@
-import { forEach, map, filter, reject, propEq, uniq, pipe } from 'ramda';
-import { recase } from '@kristiandupont/recase';
+import { forEach, map, filter, reject, uniq, pipe } from 'ramda';
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
 import path from 'path';
@@ -8,22 +7,29 @@ import path from 'path';
  * @typedef { import('extract-pg-schema').TableOrView } TableOrView
  * @typedef { import('extract-pg-schema').Type } Type
  * @typedef { TableOrView & { isView: boolean } } Model
+ * @typedef { import('./Config').Nominators } Nominators
  * @typedef {import('./Config').TypeMap} TypeMap
- * @typedef {import('./Casing').Casings} Casings
  */
 
 /**
  * @param {Model} model
- * @param {{ typeMap: TypeMap, userTypes: (string | any)[], casings: Casings, schemaName: string, schemaFolderMap: {[schemaName: string]: string} }} p1
+ * @param {{ typeMap: TypeMap, userTypes: (string | any)[], schemaName: string, nominators: Nominators, externalTypesFolder?: string, schemaFolderMap: {[schemaName: string]: string} }} p1
  * @returns {string[]}
  */
 const generateModelFile = (
   model,
-  { typeMap, userTypes, casings, schemaName, schemaFolderMap }
+  {
+    typeMap,
+    userTypes,
+    schemaName,
+    nominators,
+    externalTypesFolder,
+    schemaFolderMap,
+  }
 ) => {
-  const tc = recase(casings.sourceCasing, casings.typeCasing);
-  const fc = recase(casings.sourceCasing, casings.filenameCasing);
-  const pc = recase(casings.sourceCasing, casings.propertyCasing);
+  const fc = nominators.fileNominator;
+  const makeIdName = (name) =>
+    nominators.idNominator(nominators.modelNominator(name), name);
 
   const lines = [];
   const { comment, tags } = model;
@@ -38,40 +44,46 @@ const generateModelFile = (
     uniq
     // @ts-ignore
   )(model.columns);
-  referencedIdTypes.forEach((i) =>
+  referencedIdTypes.forEach((i) => {
+    const givenName = nominators.modelNominator(i.table);
     importGenerator.addImport(
-      `${tc(i.table)}Id`,
+      nominators.idNominator(givenName, i.table),
       false,
-      path.join(schemaFolderMap[i.schema], fc(i.table))
-    )
-  );
+      path.join(schemaFolderMap[i.schema], fc(givenName, i.table))
+    );
+  });
   const appliedUserTypes = uniq(
     map(
       (p) => p.type,
       filter((p) => userTypes.indexOf(p.type) !== -1, model.columns)
     )
   );
-  appliedUserTypes.forEach((t) =>
+  appliedUserTypes.forEach((t) => {
+    const givenName = nominators.typeNominator(t);
     importGenerator.addImport(
-      tc(t),
+      givenName,
       true,
-      path.join(schemaFolderMap[schemaName], fc(t))
-    )
-  );
-  const importLines = importGenerator.generateLines();
-  lines.push(...importLines);
+      path.join(schemaFolderMap[schemaName], fc(givenName, t))
+    );
+  });
 
-  if (importLines.length) {
-    lines.push('');
-  }
   const overriddenTypes = map(
     (p) => p.tags.type,
     filter((p) => !!p.tags.type, model.columns)
   );
   forEach((importedType) => {
-    lines.push(`import ${tc(importedType)} from '../${fc(importedType)}';`);
+    const givenName = importedType; // We expect people to have used proper casing in their comments
+    importGenerator.addImport(
+      givenName,
+      true,
+      path.join(externalTypesFolder, fc(givenName, importedType))
+    );
   }, overriddenTypes);
-  if (overriddenTypes.length) {
+
+  const importLines = importGenerator.generateLines();
+  lines.push(...importLines);
+
+  if (importLines.length) {
     lines.push('');
   }
 
@@ -82,9 +94,10 @@ const generateModelFile = (
 
   if (hasIdentifier) {
     const [{ type, tags }] = primaryColumns;
-    const innerType = tags.type || typeMap[type] || tc(type);
+    const innerType =
+      tags.type || typeMap[type] || nominators.typeNominator(type);
     lines.push(
-      `export type ${tc(model.name)}Id = ${innerType} & { __flavor?: '${
+      `export type ${makeIdName(model.name)} = ${innerType} & { __flavor?: '${
         model.name
       }' };`
     );
@@ -94,14 +107,14 @@ const generateModelFile = (
   const properties = model.columns.map((c) => {
     const wrappedName = c.name.indexOf(' ') !== -1 ? `'${c.name}'` : c.name;
     const isIdentifier = hasIdentifier && c.isPrimary;
-    const idType = isIdentifier && `${tc(model.name)}Id`;
-    const referenceType = c.reference && `${tc(c.reference.table)}Id`;
+    const idType = isIdentifier && makeIdName(model.name);
+    const referenceType = c.reference && makeIdName(c.reference.table);
     /** @type {string} */
     // @ts-ignore
     let rawType = c.tags.type || idType || referenceType || typeMap[c.type];
     if (!rawType) {
       console.warn(`Unrecognized type: '${c.type}'`);
-      rawType = tc(c.type);
+      rawType = nominators.typeNominator(c.type);
     }
     const typeName = c.nullable ? `${rawType} | null` : rawType;
     const modelAttributes = {
@@ -129,7 +142,7 @@ const generateModelFile = (
     });
 
     return {
-      name: pc(wrappedName),
+      name: wrappedName,
       optional: false,
       typeName,
       modelAttributes,
@@ -137,8 +150,10 @@ const generateModelFile = (
     };
   });
 
+  const givenName = nominators.modelNominator(model.name);
+
   const interfaceLines = generateInterface({
-    name: tc(model.name),
+    name: givenName,
     properties: properties.map(({ modelAttributes, ...props }) => ({
       ...props,
       ...modelAttributes,
@@ -152,7 +167,7 @@ const generateModelFile = (
   if (generateInitializer) {
     lines.push('');
     const initializerInterfaceLines = generateInterface({
-      name: `${tc(model.name)}Initializer`,
+      name: nominators.initializerNominator(givenName, model.name),
       properties: properties
         .filter((p) => !p.initializerAttributes.omit)
         .map(({ initializerAttributes, ...props }) => ({

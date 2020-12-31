@@ -1,16 +1,16 @@
-import { map, filter, reject } from 'ramda';
-import { recase } from '@kristiandupont/recase';
+import { notDeepEqual } from 'assert';
+import { map, filter, reject, none } from 'ramda';
 
 /**
  * @param {import('extract-pg-schema').TableOrView[]} models
  * @param {string[]} userTypes
- * @param {import('./Casing').Casings} casings
+ * @param {import('./generateModelFile').Nominators} nominators
  * @returns {string[]}
  */
-function generateIndexFile(models, userTypes, casings) {
-  const tc = recase(casings.sourceCasing, casings.typeCasing);
-  const pc = recase(casings.sourceCasing, casings.propertyCasing);
-  const fc = recase(casings.sourceCasing, casings.filenameCasing);
+function generateIndexFile(models, userTypes, nominators) {
+  // const tc = recase(casings.sourceCasing, casings.typeCasing);
+  // const pc = recase(casings.sourceCasing, casings.propertyCasing);
+  // const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
   const isFixed = (m) => m.isView || m.tags['fixed'];
 
@@ -22,62 +22,104 @@ function generateIndexFile(models, userTypes, casings) {
     const importInitializer = !isFixed(m);
     const importId = hasIdentifier(m);
     const additionalImports = importInitializer || importId;
+    const givenName = nominators.modelNominator(m.name);
+    const fileName = nominators.fileNominator(givenName, m.name);
     if (!additionalImports) {
-      return `import ${tc(m.name)} from './${fc(m.name)}';`;
+      return `import ${givenName} from './${fileName}';`;
     } else {
       const imports = [
-        ...(importInitializer ? [`${tc(m.name)}Initializer`] : []),
-        ...(importId ? [`${tc(m.name)}Id`] : []),
+        ...(importInitializer
+          ? [nominators.initializerNominator(givenName, m.name)]
+          : []),
+        ...(importId ? [nominators.idNominator(givenName, m.name)] : []),
       ];
-      return `import ${tc(m.name)}, { ${imports.join(', ')} } from './${fc(
-        m.name
-      )}';`;
+      return `import ${givenName}, { ${imports.join(
+        ', '
+      )} } from './${fileName}';`;
     }
   };
   const exportLine = (m) => {
+    const givenName = nominators.modelNominator(m.name);
     const exportInitializer = !isFixed(m);
     const exportId = hasIdentifier(m);
     const exports = [
-      tc(m.name),
-      ...(exportInitializer ? [`${tc(m.name)}Initializer`] : []),
-      ...(exportId ? [`${tc(m.name)}Id`] : []),
+      givenName,
+      ...(exportInitializer
+        ? [nominators.initializerNominator(givenName, m.name)]
+        : []),
+      ...(exportId ? [nominators.idNominator(givenName, m.name)] : []),
     ];
     return `  ${exports.join(', ')},`;
   };
+
   const lines = [
     ...map(importLine, models),
-    ...map((t) => `import ${tc(t)} from './${fc(t)}';`, userTypes),
+    ...map(
+      (t) =>
+        `import ${nominators.typeNominator(
+          t
+        )} from './${nominators.fileNominator(
+          nominators.typeNominator(t),
+          t
+        )}';`,
+      userTypes
+    ),
     '',
     'type Model =',
-    ...map((model) => `  | ${tc(model.name)}`, models),
+    ...map((model) => `  | ${nominators.modelNominator(model.name)}`, models),
     '',
     'interface ModelTypeMap {',
-    ...map((model) => `  '${pc(model.name)}': ${tc(model.name)};`, models),
+    ...map(
+      (model) => `  '${model.name}': ${nominators.modelNominator(model.name)};`,
+      models
+    ),
     '}',
     '',
     'type ModelId =',
-    ...map((model) => `  | ${tc(model.name)}Id`, modelsWithIdColumn),
+    ...map(
+      (model) =>
+        `  | ${nominators.idNominator(
+          nominators.modelNominator(model.name),
+          model.name
+        )}`,
+      modelsWithIdColumn
+    ),
     '',
     'interface ModelIdTypeMap {',
     ...map(
-      (model) => `  '${pc(model.name)}': ${tc(model.name)}Id;`,
+      (model) =>
+        `  '${model.name}': ${nominators.idNominator(
+          nominators.modelNominator(model.name),
+          model.name
+        )};`,
       modelsWithIdColumn
     ),
     '}',
     '',
     'type Initializer =',
-    ...map((model) => `  | ${tc(model.name)}Initializer`, creatableModels),
+    ...map(
+      (model) =>
+        `  | ${nominators.initializerNominator(
+          nominators.modelNominator(model.name),
+          model.name
+        )}`,
+      creatableModels
+    ),
     '',
     'interface InitializerTypeMap {',
     ...map(
-      (model) => `  '${pc(model.name)}': ${tc(model.name)}Initializer;`,
+      (model) =>
+        `  '${model.name}': ${nominators.initializerNominator(
+          nominators.modelNominator(model.name),
+          model.name
+        )};`,
       creatableModels
     ),
     '}',
     '',
     'export {',
     ...map(exportLine, models),
-    ...map((t) => `  ${tc(t)},`, userTypes),
+    ...map((t) => `  ${nominators.typeNominator(t)},`, userTypes),
     '',
     '  Model,',
     '  ModelTypeMap,',

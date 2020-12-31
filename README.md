@@ -46,9 +46,6 @@ module.exports = {
     database: 'acme',
   },
 
-  filenameCasing: 'dash',
-  typeCasing: 'pascal',
-  propertyCasing: 'camel',
   preDeleteModelFolder: true,
 
   customTypeMap: {
@@ -68,56 +65,60 @@ module.exports = {
 
 The configuration file contains the following fields:
 
-### `connection` _(Required)_
+`connection` _(Required)_
 
 This is the database connection object. It follows the [`client`](https://node-postgres.com/api/client) constructor in [pg](https://www.npmjs.com/package/pg). As you will typically want to run Kanel on your development machine, you probably want a simple localhost connection as in the example above.
 
-### `filenameCasing`
-
-Specifies how you like your files cased. Can be any of the [recase](https://www.npmjs.com/package/@kristiandupont/recase) options: `dash`, `snake`, `camel` or `pascal`. Default is `pascal` which means your generated files will have filenames that look like this: `UserProfile.ts`.
-
-### `typeCasing`
-
-Specifies what the casing of types (interfaces) should be. If left undefined, they will preserve the casing in the database.
-
-### `propertyCasing`
-
-Specifies the casing of property names. If left undefined, they will preserve the casing in the database.
-
-### `sourceCasing`
-
-Specifies what the casing of your database entities are. This is mostly for edge cases, if left undefined it will typically just work but if you are experiencing trouble, it might help you specifying what the casing of your tables and columns is.
-
-### `preDeleteModelFolder`
+`preDeleteModelFolder`
 
 Delete the model folder before generating files? Set this to `true` if you want to make sure that there are no deprecated models in your model folder after running Kanel. Defaults to `false`.
 
-### `customTypeMap`
+`customTypeMap`
 
 This allows you to specify (or override) which types to map to. Kanel recognizes the most common types and applies the most likely Typescript type to it, but you might want to override this. This map maps from postgres type to typescript type.
 
-### `modelHooks`
+`modelHooks`
 
 If you need to perform some modification of any or all of the models before writing the files, you can do so with a hook. The `modelHooks` property can be an array of functions that can modify the contents. They should have the following signature: `(lines: string[], src: Model) => string[]`. The first argument is the array of strings that represent the lines in the file. The second is the model as returned from `extract-pg-schema` -- you can see an example [here](https://github.com/kristiandupont/extract-pg-schema#table).
 
-### `typeHooks`
+`modelNominator`
+
+A function (`(modelName: string) => string`) that converts a table or view name into an interface name. If, say, you use `snake_casing` for your database entities, but prefer `PascalCasing` for your interfaces, you can give this a function that makes such a conversion (the [recase](https://www.npmjs.com/package/@kristiandupont/recase) library will help you with this if you want -- see the example folder).
+
+`initializerNominator`
+
+A function (`(givenName: string, modelName: string) => string`) that converts a table or view name into the initializer name. The first parameter is the name that was produced by the model nominator, and the second parameter is the original, unprocessed name. This defaults to a function that appends `Initializer` to the name.
+
+`idNominator`
+
+A function (`(givenName: string, modelName: string) => string`) that converts a table or view name into the identifier name. The first parameter is the name that was produced by the model nominator, and the second parameter is the original, unprocessed name. This defaults to a function that appends `Id` to the name.
+
+`typeHooks`
 
 Like the `modelHooks` property, this property can specify a number of hooks to attach to generation of type (enum) files. They have the same signature, only the `src` parameter is a [type](https://github.com/kristiandupont/extract-pg-schema#type) object.
 
-### `schemas`
+`typeNominator`
+
+A function (`(modelName: string) => string`) that converts a custom postgres type (enum) name into a type name.
+
+`fileNominator`
+
+A function `(givenName: string, originalName: string)` that converts the name of a table, view or type into the corresponding file name. _NOTE_ this should return a string with no `.ts` extension, as it's used in `import` statements as well.
+
+`schemas` _(Required)_
 
 This is an array of schemas to process.
 These contain the following fields:
 
-### `schema.name`
+`schema.name` _(Required)_
 
 Name of the schema.
 
-### `schema.modelFolder`
+`schema.modelFolder` _(Required)_
 
 Folder on disk where the models will be stored. Note that if `preDeleteModelFolder` above is set, this folder will be deleted and recreated when Kanel is run.
 
-### `schema.ignore`
+`schema.ignore`
 
 An array of tables and views to ignore. Use this if there are things in your database you don't care to generate models for like migration information etc.
 
