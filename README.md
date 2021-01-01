@@ -85,6 +85,10 @@ If you need to perform some modification of any or all of the models before writ
 
 A function (`(modelName: string) => string`) that converts a table or view name into an interface name. If, say, you use `snake_casing` for your database entities, but prefer `PascalCasing` for your interfaces, you can give this a function that makes such a conversion (the [recase](https://www.npmjs.com/package/@kristiandupont/recase) library will help you with this if you want -- see the example folder).
 
+`propertyNominator`
+
+A function (`(propertyName: string, model: Model) => string`) that converts the name of a column to a property name. The model (table or view) that it belongs to is passed as the second parameter in case you should need it.
+
 `initializerNominator`
 
 A function (`(givenName: string, modelName: string) => string`) that converts a table or view name into the initializer name. The first parameter is the name that was produced by the model nominator, and the second parameter is the original, unprocessed name. This defaults to a function that appends `Initializer` to the name.

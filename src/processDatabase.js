@@ -30,6 +30,8 @@ const processDatabase = async ({
 
   modelHooks = [],
   modelNominator = nameIdentity,
+  propertyNominator = (propertyName) =>
+    propertyName.indexOf(' ') !== -1 ? `'${propertyName}'` : propertyName,
   initializerNominator = (modelName) => `${modelName}Initializer`,
   idNominator = (modelName) => `${modelName}Id`,
 
@@ -54,6 +56,7 @@ const processDatabase = async ({
   /** @type {import('./Config').Nominators} */
   const nominators = {
     modelNominator,
+    propertyNominator,
     initializerNominator,
     idNominator,
     typeNominator,

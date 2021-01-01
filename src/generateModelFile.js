@@ -27,7 +27,7 @@ const generateModelFile = (
     schemaFolderMap,
   }
 ) => {
-  const fc = nominators.fileNominator;
+  const fileNominator = nominators.fileNominator;
   const makeIdName = (name) =>
     nominators.idNominator(nominators.modelNominator(name), name);
 
@@ -47,9 +47,9 @@ const generateModelFile = (
   referencedIdTypes.forEach((i) => {
     const givenName = nominators.modelNominator(i.table);
     importGenerator.addImport(
-      nominators.idNominator(givenName, i.table),
+      makeIdName(i.table),
       false,
-      path.join(schemaFolderMap[i.schema], fc(givenName, i.table))
+      path.join(schemaFolderMap[i.schema], fileNominator(givenName, i.table))
     );
   });
   const appliedUserTypes = uniq(
@@ -63,7 +63,7 @@ const generateModelFile = (
     importGenerator.addImport(
       givenName,
       true,
-      path.join(schemaFolderMap[schemaName], fc(givenName, t))
+      path.join(schemaFolderMap[schemaName], fileNominator(givenName, t))
     );
   });
 
@@ -76,7 +76,7 @@ const generateModelFile = (
     importGenerator.addImport(
       givenName,
       true,
-      path.join(externalTypesFolder, fc(givenName, importedType))
+      path.join(externalTypesFolder, fileNominator(givenName, importedType))
     );
   }, overriddenTypes);
 
@@ -105,7 +105,6 @@ const generateModelFile = (
   }
 
   const properties = model.columns.map((c) => {
-    const wrappedName = c.name.indexOf(' ') !== -1 ? `'${c.name}'` : c.name;
     const isIdentifier = hasIdentifier && c.isPrimary;
     const idType = isIdentifier && makeIdName(model.name);
     const referenceType = c.reference && makeIdName(c.reference.table);
@@ -142,7 +141,7 @@ const generateModelFile = (
     });
 
     return {
-      name: wrappedName,
+      name: nominators.propertyNominator(c.name, model),
       optional: false,
       typeName,
       modelAttributes,

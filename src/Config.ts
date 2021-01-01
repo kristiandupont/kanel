@@ -18,6 +18,7 @@ export const nameIdentity = (name: string): GivenName => name as GivenName;
 
 export type Nominators = {
   modelNominator: (modelName: string) => GivenName;
+  propertyNominator: (propertyName: string, model: Model) => string;
   initializerNominator: (givenName: GivenName, modelName: string) => string;
   idNominator: (givenName: GivenName, modelName: string) => string;
   typeNominator: (typeName: string) => GivenName;
