@@ -97,9 +97,9 @@ const generateModelFile = (
     const innerType =
       tags.type || typeMap[type] || nominators.typeNominator(type);
     lines.push(
-      `export type ${makeIdName(model.name)} = ${innerType} & { __flavor?: '${
+      `export type ${makeIdName(
         model.name
-      }' };`
+      )} = ${innerType} & { " __flavor"?: '${model.name}' };`
     );
     lines.push('');
   }
