@@ -51,7 +51,7 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "extract-pg-schema": "^1.9.0",
-    "knex": "^0.21.5",
+    "knex": "^0.95.0",
     "optionator": "^0.9.1",
     "pg": "^8.3.3",
     "ramda": "^0.27.1",
