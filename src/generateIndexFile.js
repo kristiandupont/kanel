@@ -117,7 +117,7 @@ function generateIndexFile(models, userTypes, nominators) {
     ),
     '}',
     '',
-    'export {',
+    'export type {',
     ...map(exportLine, models),
     ...map((t) => `  ${nominators.typeNominator(t)},`, userTypes),
     '',
