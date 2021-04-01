@@ -6,14 +6,21 @@
     "schema",
     "typescript"
   ],
-  "repository": "git@github.com:kristiandupont/kanel.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kristiandupont/kanel.git"
+  },
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kristiandupont/kanel/issues"
+  },
+  "homepage": "https://github.com/kristiandupont/kanel#readme",
   "author": {
     "name": "Kristian Dupont",
     "url": "http://www.kristiandupont.com"
   },
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "bin": {
     "kanel": "./bin/kanel"
   },
