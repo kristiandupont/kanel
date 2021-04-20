@@ -1,7 +1,7 @@
 // Automatically generated. Don't change this file manually.
 // Name: country
 
-export type CountryId = number & { __flavor?: 'country' };
+export type CountryId = number & { " __flavor"?: 'country' };
 
 export default interface Country {
   /** Primary key. Index: country_pkey */

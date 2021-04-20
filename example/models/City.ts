@@ -3,7 +3,7 @@
 
 import { CountryId } from './Country';
 
-export type CityId = number & { __flavor?: 'city' };
+export type CityId = number & { " __flavor"?: 'city' };
 
 export default interface City {
   /** Primary key. Index: city_pkey */

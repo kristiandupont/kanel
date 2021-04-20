@@ -135,7 +135,7 @@ interface InitializerTypeMap {
   'users': UsersInitializer;
 }
 
-export {
+export type {
   Actor, ActorInitializer, ActorId,
   Address, AddressInitializer, AddressId,
   Category, CategoryInitializer, CategoryId,

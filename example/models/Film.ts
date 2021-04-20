@@ -4,7 +4,7 @@
 import { LanguageId } from './Language';
 import MpaaRating from './MpaaRating';
 
-export type FilmId = number & { __flavor?: 'film' };
+export type FilmId = number & { " __flavor"?: 'film' };
 
 export default interface Film {
   /** Primary key. Index: film_pkey */

@@ -5,7 +5,7 @@ import { InventoryId } from './Inventory';
 import { CustomerId } from './Customer';
 import { StaffId } from './Staff';
 
-export type RentalId = number & { __flavor?: 'rental' };
+export type RentalId = number & { " __flavor"?: 'rental' };
 
 export default interface Rental {
   /** Primary key. Index: rental_pkey */

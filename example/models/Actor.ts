@@ -1,7 +1,7 @@
 // Automatically generated. Don't change this file manually.
 // Name: actor
 
-export type ActorId = number & { __flavor?: 'actor' };
+export type ActorId = number & { " __flavor"?: 'actor' };
 
 export default interface Actor {
   /** Primary key. Index: actor_pkey */

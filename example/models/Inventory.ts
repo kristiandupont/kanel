@@ -3,7 +3,7 @@
 
 import { FilmId } from './Film';
 
-export type InventoryId = number & { __flavor?: 'inventory' };
+export type InventoryId = number & { " __flavor"?: 'inventory' };
 
 export default interface Inventory {
   /** Primary key. Index: inventory_pkey */
