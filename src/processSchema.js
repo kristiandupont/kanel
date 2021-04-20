@@ -28,7 +28,8 @@ const processSchema = async (
   nominators,
   modelProcessChain,
   typeProcessChain,
-  schemaFolderMap
+  schemaFolderMap,
+  makeIdType
 ) => {
   const { tables, views, types } = schema;
 
@@ -63,6 +64,7 @@ const processSchema = async (
       schemaName: schemaConfig.name,
       externalTypesFolder: schemaConfig.externalTypesFolder,
       schemaFolderMap,
+      makeIdType,
     });
     const wetModelFileLines = applyHooks(modelProcessChain, m, modelFileLines);
     const filename = `${nominators.fileNominator(

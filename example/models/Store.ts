@@ -4,7 +4,7 @@
 import { StaffId } from './Staff';
 import { AddressId } from './Address';
 
-export type StoreId = number & { __flavor?: 'store' };
+export type StoreId = number & { " __flavor"?: 'store' };
 
 export default interface Store {
   /** Primary key. Index: store_pkey */

@@ -5,7 +5,7 @@ import { CustomerId } from './Customer';
 import { StaffId } from './Staff';
 import { RentalId } from './Rental';
 
-export type PaymentId = number & { __flavor?: 'payment' };
+export type PaymentId = number & { " __flavor"?: 'payment' };
 
 export default interface Payment {
   /** Primary key. Index: payment_pkey */

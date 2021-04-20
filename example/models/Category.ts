@@ -1,7 +1,7 @@
 // Automatically generated. Don't change this file manually.
 // Name: category
 
-export type CategoryId = number & { __flavor?: 'category' };
+export type CategoryId = number & { " __flavor"?: 'category' };
 
 export default interface Category {
   /** Primary key. Index: category_pkey */

@@ -1,7 +1,7 @@
 // Automatically generated. Don't change this file manually.
 // Name: language
 
-export type LanguageId = number & { __flavor?: 'language' };
+export type LanguageId = number & { " __flavor"?: 'language' };
 
 export default interface Language {
   /** Primary key. Index: language_pkey */
