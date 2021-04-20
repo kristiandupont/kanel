@@ -35,6 +35,9 @@ const processDatabase = async ({
   initializerNominator = (modelName) => `${modelName}Initializer`,
   idNominator = (modelName) => `${modelName}Id`,
 
+  makeIdType = (innerType, modelName) =>
+    `${innerType} & { " __flavor"?: '${modelName}' };`,
+
   typeHooks = [],
   typeNominator = nameIdentity,
 
@@ -99,7 +102,8 @@ const processDatabase = async ({
       nominators,
       modelProcessChain,
       typeProcessChain,
-      schemaFolderMap
+      schemaFolderMap,
+      makeIdType
     );
   }
 };

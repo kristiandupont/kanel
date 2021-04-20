@@ -30,6 +30,7 @@ type Settings = {
   ignore?: string[];
   preDeleteModelFolder?: Boolean;
   customTypeMap?: TypeMap;
+  makeIdType?: (innerType: string, modelName: string) => string;
 
   modelHooks?: Hook<Model>[];
   typeHooks?: Hook<Type>[];

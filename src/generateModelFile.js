@@ -13,7 +13,7 @@ import path from 'path';
 
 /**
  * @param {Model} model
- * @param {{ typeMap: TypeMap, userTypes: (string | any)[], schemaName: string, nominators: Nominators, externalTypesFolder?: string, schemaFolderMap: {[schemaName: string]: string} }} p1
+ * @param {{ typeMap: TypeMap, userTypes: (string | any)[], schemaName: string, nominators: Nominators, externalTypesFolder?: string, schemaFolderMap: {[schemaName: string]: string}, makeIdType: (innerType: string, modelName: string) => string }} p1
  * @returns {string[]}
  */
 const generateModelFile = (
@@ -25,6 +25,7 @@ const generateModelFile = (
     nominators,
     externalTypesFolder,
     schemaFolderMap,
+    makeIdType,
   }
 ) => {
   const fileNominator = nominators.fileNominator;
@@ -94,12 +95,17 @@ const generateModelFile = (
 
   if (hasIdentifier) {
     const [{ type, tags }] = primaryColumns;
+
+    /** @type {string} */
+    // @ts-ignore
     const innerType =
       tags.type || typeMap[type] || nominators.typeNominator(type);
+
     lines.push(
-      `export type ${makeIdName(
+      `export type ${makeIdName(model.name)} = ${makeIdType(
+        innerType,
         model.name
-      )} = ${innerType} & { " __flavor"?: '${model.name}' };`
+      )}`
     );
     lines.push('');
   }
