@@ -1,5 +1,5 @@
 import { Type } from 'extract-pg-schema';
-import { PgConnectionConfig } from 'knex';
+import { ConnectionConfig } from 'pg';
 import { Model } from './generateModelFile';
 
 export type TypeMap = { [index: string]: string };
@@ -44,7 +44,7 @@ export type SchemaConfig = {
 } & Settings;
 
 type Config = {
-  connection?: PgConnectionConfig;
+  connection?: ConnectionConfig;
   schemas: SchemaConfig[];
 } & Settings;
 

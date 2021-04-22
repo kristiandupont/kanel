@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import knex from 'knex';
 import rmfr from 'rmfr';
 import path from 'path';
 import fs from 'fs';
@@ -73,10 +72,6 @@ const processDatabase = async ({
       connection.host
     }`
   );
-  const knexConfig = {
-    client: 'pg',
-    connection,
-  };
 
   const schemaFolderMap = map(
     (s) => path.resolve(s.modelFolder),
@@ -92,8 +87,7 @@ const processDatabase = async ({
       fs.mkdirSync(schemaConfig.modelFolder);
     }
 
-    const db = knex(knexConfig);
-    const schema = await extractSchema(schemaConfig.name, db);
+    const schema = await extractSchema(schemaConfig.name, connection);
 
     await processSchema(
       schemaConfig,
