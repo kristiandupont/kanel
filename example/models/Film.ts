@@ -1,3 +1,4 @@
+// @generated
 // Automatically generated. Don't change this file manually.
 // Name: film
 

@@ -10,6 +10,7 @@ import processSchema from './processSchema';
 import { nameIdentity } from './Config';
 
 const labelAsGenerated = (lines) => [
+  '// @generated',
   "// Automatically generated. Don't change this file manually.",
   '',
   ...lines,

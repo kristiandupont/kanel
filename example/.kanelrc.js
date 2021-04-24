@@ -3,8 +3,8 @@ const { recase } = require('@kristiandupont/recase');
 
 // This hook will insert the name of the model or type right after the auto-generated warning comment.
 const insertNameComment = (lines, src) => {
-  const [head, ...tail] = lines;
-  return [head, `// Name: ${src.name}`, ...tail];
+  const [h1, h2, ...tail] = lines;
+  return [h1, h2, `// Name: ${src.name}`, ...tail];
 };
 
 module.exports = {
