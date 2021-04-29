@@ -1,4 +1,4 @@
-import { forEach, map, filter, reject, uniq, pipe, evolve } from 'ramda';
+import { forEach, map, filter, reject, uniq, pipe } from 'ramda';
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
 import path from 'path';
@@ -53,7 +53,6 @@ const generateModelFile = (
       path.join(schemaFolderMap[i.schema], fileNominator(givenName, i.table))
     );
   });
-  console.log(model.columns);
   const cols = map(
     ({ isArray, type, subType, ...rest }) => ({
       type: isArray ? subType : type,
