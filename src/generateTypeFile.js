@@ -1,5 +1,5 @@
 /**
- * @param {import('extract-pg-schema').Type} type
+ * @param {import('extract-pg-schema').EnumType} type
  * @param {(typeName: string) => string} nominator
  * @returns {string[]}
  */
