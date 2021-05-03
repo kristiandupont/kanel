@@ -6,13 +6,14 @@ import path from 'path';
 /**
  * @typedef { import('extract-pg-schema').TableOrView } TableOrView
  * @typedef { import('extract-pg-schema').Type } Type
- * @typedef { TableOrView & { isView: boolean } } Model
+ * @typedef { import('./Model').TableModel } TableModel
+ * @typedef { import('./Model').ViewModel } ViewModel
  * @typedef { import('./Config').Nominators } Nominators
  * @typedef {import('./Config').TypeMap} TypeMap
  */
 
 /**
- * @param {Model} model
+ * @param {TableModel | ViewModel} model
  * @param {{ typeMap: TypeMap, userTypes: (string | any)[], schemaName: string, nominators: Nominators, externalTypesFolder?: string, schemaFolderMap: {[schemaName: string]: string}, makeIdType: (innerType: string, modelName: string) => string }} p1
  * @returns {string[]}
  */
@@ -168,7 +169,7 @@ const generateModelFile = (
   });
   lines.push(...interfaceLines);
 
-  const generateInitializer = !tags['fixed'] && !model.isView;
+  const generateInitializer = !tags['fixed'] && model.type === 'table';
   if (generateInitializer) {
     lines.push('');
     const initializerInterfaceLines = generateInterface({

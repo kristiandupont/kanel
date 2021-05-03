@@ -99,11 +99,11 @@ A function (`(givenName: string, modelName: string) => string`) that converts a 
 
 `typeHooks`
 
-Like the `modelHooks` property, this property can specify a number of hooks to attach to generation of type (enum) files. They have the same signature, only the `src` parameter is a [type](https://github.com/kristiandupont/extract-pg-schema#type) object.
+Like the `modelHooks` property, this property can specify a number of hooks to attach to generation of type (enum or composite) files. They have the same signature, only the `src` parameter is a [type](https://github.com/kristiandupont/extract-pg-schema#type) object.
 
 `typeNominator`
 
-A function (`(modelName: string) => string`) that converts a custom postgres type (enum) name into a type name.
+A function (`(modelName: string) => string`) that converts a custom postgres type (enum or composite) name into a type name.
 
 `fileNominator`
 
@@ -130,7 +130,7 @@ An array of tables and views to ignore. Use this if there are things in your dat
 
 To see an example of the result, check out the [/example](example) folder. It uses the [Sample Database](https://www.postgresqltutorial.com/postgresql-sample-database/) from www.postgresqltutorial.com.
 
-Kanel will scan tables, views and enum types. It will generate a model type for each table and view. Additionally, it will create an _initializer_ type for tables that aren't tagged `@fixed` in the comment. Initializer types
+Kanel will scan tables, views, composite and enum types. It will generate a model type for each table and view. Additionally, it will create an _initializer_ type for tables that aren't tagged `@fixed` in the comment. Initializer types
 represent the requirements for creating a new row in the table. Columns that are nullable or have default values are considered optional.
 
 Documentation is extracted from postgres comments on your tables, columns etc., as jsdoc.
