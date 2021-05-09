@@ -22,7 +22,8 @@ module.exports = {
   preDeleteModelFolder: true,
 
   customTypeMap: {
-    tsvector: 'string',
+    // There is no such package, this is just an example. See Film.ts to see the result.
+    tsvector: { name: 'TsVector', module: 'ts-vector', absoluteImport: true, defaultImport: true },
     bpchar: 'string',
   },
 

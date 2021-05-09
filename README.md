@@ -76,6 +76,18 @@ Delete the model folder before generating files? Set this to `true` if you want 
 `customTypeMap`
 
 This allows you to specify (or override) which types to map to. Kanel recognizes the most common types and applies the most likely Typescript type to it, but you might want to override this. This map maps from postgres type to typescript type.
+The values in this map can either be a simple string, in which case it's assumed to be a built-in type (like `string`), or it can be an object of the following type:
+
+```
+type ImportedType = {
+  name: string;
+  module: string;
+  absoluteImport: boolean;
+  defaultImport: boolean;
+};
+```
+
+In this case, you specify a name and a module to import the type from. If the module is an absolute import (i.e. listed in your `package.json` file), set `absoluteImport` to true. If it's set to false, it will represent a path relative to the `externalTypesFolder` if one is supplied, or a path relative to the model file itself if not. The final property, `defaultImport` specifies whether the type should be imported as the default from the module, or, if false, as a named import.
 
 `modelHooks`
 
@@ -125,6 +137,10 @@ Folder on disk where the models will be stored. Note that if `preDeleteModelFold
 `schema.ignore`
 
 An array of tables and views to ignore. Use this if there are things in your database you don't care to generate models for like migration information etc.
+
+`schema.externalTypesFolder`
+
+This will specify the folder to look for external types from. If you tag a column like this: `@type:Vector`, Kanel will use that as the type for the property and import that from a file by the same name in said folder.
 
 ## Example
 

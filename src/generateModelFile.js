@@ -9,7 +9,7 @@ import path from 'path';
  * @typedef { import('./Model').TableModel } TableModel
  * @typedef { import('./Model').ViewModel } ViewModel
  * @typedef { import('./Config').Nominators } Nominators
- * @typedef {import('./Config').TypeMap} TypeMap
+ * @typedef { import('./Config').TypeMap } TypeMap
  */
 
 /**
@@ -51,7 +51,8 @@ const generateModelFile = (
     importGenerator.addImport(
       makeIdName(i.table),
       false,
-      path.join(schemaFolderMap[i.schema], fileNominator(givenName, i.table))
+      path.join(schemaFolderMap[i.schema], fileNominator(givenName, i.table)),
+      false
     );
   });
   const appliedUserTypes = uniq(
@@ -65,7 +66,8 @@ const generateModelFile = (
     importGenerator.addImport(
       givenName,
       true,
-      path.join(schemaFolderMap[schemaName], fileNominator(givenName, t))
+      path.join(schemaFolderMap[schemaName], fileNominator(givenName, t)),
+      false
     );
   });
 
@@ -78,46 +80,38 @@ const generateModelFile = (
     importGenerator.addImport(
       givenName,
       true,
-      path.join(externalTypesFolder, fileNominator(givenName, importedType))
+      path.join(externalTypesFolder, fileNominator(givenName, importedType)),
+      false
     );
   }, overriddenTypes);
-
-  const importLines = importGenerator.generateLines();
-  lines.push(...importLines);
-
-  if (importLines.length) {
-    lines.push('');
-  }
 
   const primaryColumns = filter((c) => c.isPrimary, model.columns);
 
   // If there's one and only one primary key, that's the identifier.
   const hasIdentifier = primaryColumns.length === 1;
 
-  if (hasIdentifier) {
-    const [{ type, tags }] = primaryColumns;
-
-    /** @type {string} */
-    // @ts-ignore
-    const innerType =
-      tags.type || typeMap[type] || nominators.typeNominator(type);
-
-    lines.push(
-      `export type ${makeIdName(model.name)} = ${makeIdType(
-        innerType,
-        model.name
-      )}`
-    );
-    lines.push('');
-  }
-
   const properties = model.columns.map((c) => {
     const isIdentifier = hasIdentifier && c.isPrimary;
     const idType = isIdentifier && makeIdName(model.name);
     const referenceType = c.reference && makeIdName(c.reference.table);
-    /** @type {string} */
-    // @ts-ignore
     let rawType = c.tags.type || idType || referenceType || typeMap[c.type];
+    if (typeof rawType === 'boolean') {
+      throw new Error('@type tag must include the actual type: "@type:string"');
+    }
+    if (typeof rawType === 'object') {
+      importGenerator.addImport(
+        rawType.name,
+        rawType.defaultImport,
+        rawType.absoluteImport
+          ? rawType.module
+          : path.join(
+              externalTypesFolder || schemaFolderMap[schemaName],
+              rawType.module
+            ),
+        rawType.absoluteImport
+      );
+      rawType = rawType.name;
+    }
     if (!rawType) {
       console.warn(`Unrecognized type: '${c.type}'`);
       rawType = nominators.typeNominator(c.type);
@@ -155,6 +149,30 @@ const generateModelFile = (
       initializerAttributes,
     };
   });
+
+  const importLines = importGenerator.generateLines();
+  lines.push(...importLines);
+
+  if (importLines.length) {
+    lines.push('');
+  }
+
+  if (hasIdentifier) {
+    const [{ type, tags }] = primaryColumns;
+
+    /** @type {string} */
+    // @ts-ignore
+    const innerType =
+      tags.type || typeMap[type] || nominators.typeNominator(type);
+
+    lines.push(
+      `export type ${makeIdName(model.name)} = ${makeIdType(
+        innerType,
+        model.name
+      )}`
+    );
+    lines.push('');
+  }
 
   const givenName = nominators.modelNominator(model.name);
 
