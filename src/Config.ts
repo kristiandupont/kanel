@@ -2,7 +2,17 @@ import { Type } from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
 import { Model } from './Model';
 
-export type TypeMap = { [index: string]: string };
+type BuiltinType = string;
+type ImportedType = {
+  name: string;
+  module: string;
+  absoluteImport: boolean;
+  defaultImport: boolean;
+};
+
+export type TypeDefinition = BuiltinType | ImportedType;
+
+export type TypeMap = { [index: string]: TypeDefinition };
 
 export type Hook<T> = (lines: string[], src?: T) => string[];
 

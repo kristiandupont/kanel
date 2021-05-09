@@ -4,6 +4,7 @@
 
 import { LanguageId } from './Language';
 import MpaaRating from './MpaaRating';
+import TsVector from 'ts-vector';
 
 export type FilmId = number & { " __flavor"?: 'film' };
 
@@ -36,7 +37,7 @@ export default interface Film {
   special_features: Text[] | null;
 
   /** Index: film_fulltext_idx */
-  fulltext: string;
+  fulltext: TsVector;
 }
 
 export interface FilmInitializer {
@@ -76,5 +77,5 @@ export interface FilmInitializer {
   special_features?: Text[] | null;
 
   /** Index: film_fulltext_idx */
-  fulltext: string;
+  fulltext: TsVector;
 }

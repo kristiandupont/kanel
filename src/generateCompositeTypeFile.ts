@@ -44,7 +44,8 @@ const generateCompositeTypeFile = (
     importGenerator.addImport(
       givenName,
       true,
-      path.join(schemaFolderMap[schemaName], fileNominator(givenName, t))
+      path.join(schemaFolderMap[schemaName], fileNominator(givenName, t)),
+      false
     );
   });
 
@@ -63,7 +64,8 @@ const generateCompositeTypeFile = (
     importGenerator.addImport(
       givenName,
       true,
-      path.join(schemaFolderMap[schemaName], fileNominator(givenName, t))
+      path.join(schemaFolderMap[schemaName], fileNominator(givenName, t)),
+      false
     );
   });
 
@@ -79,7 +81,8 @@ const generateCompositeTypeFile = (
       path.join(
         externalTypesFolder,
         fileNominator(givenName, importedType as string)
-      )
+      ),
+      false
     );
   }, overriddenTypes);
 
