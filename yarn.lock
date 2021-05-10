@@ -2133,10 +2133,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-pg-schema@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-3.0.0.tgz#c5543943f385f88e8a547fa9530b01000178b434"
-  integrity sha512-Wc3VSv6uxhLlYaU4KOicdUWoPS3bnJBx+0xSafVm9hB4ZHsWrWtnq41HxrR3Xn+rWKfhX1j95AEuMX0eSbHDOw==
+extract-pg-schema@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-3.0.1.tgz#f9cc8701f9c2a43cfa72a723c37732dccd4e6d1b"
+  integrity sha512-r/rmhSkS5MiJAsidjwQsmMmgEz5IjK9tfb5ORRM6UAXHPNcC93jTmhz69YbPh9z16H32afGS+SuxICGGlCe8+w==
   dependencies:
     "@types/pg" "^7.14.11"
     knex "0.95.4"
