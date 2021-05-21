@@ -1,8 +1,18 @@
 import { Type } from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
-import { Model } from './generateModelFile';
+import { Model } from './Model';
 
-export type TypeMap = { [index: string]: string };
+type BuiltinType = string;
+type ImportedType = {
+  name: string;
+  module: string;
+  absoluteImport: boolean;
+  defaultImport: boolean;
+};
+
+export type TypeDefinition = BuiltinType | ImportedType;
+
+export type TypeMap = { [index: string]: TypeDefinition };
 
 export type Hook<T> = (lines: string[], src?: T) => string[];
 
@@ -11,7 +21,7 @@ export type Hook<T> = (lines: string[], src?: T) => string[];
 // (i.e. modelNominator or typeNominator), and make sure that those
 // are the ones passed into the secondary nominators that create
 // things like initializer and file names.
-type GivenName = string & { __brand: 'given-name' };
+export type GivenName = string & { __brand: 'given-name' };
 
 // Pass-through for defaults.
 export const nameIdentity = (name: string): GivenName => name as GivenName;

@@ -76,6 +76,18 @@ Delete the model folder before generating files? Set this to `true` if you want 
 `customTypeMap`
 
 This allows you to specify (or override) which types to map to. Kanel recognizes the most common types and applies the most likely Typescript type to it, but you might want to override this. This map maps from postgres type to typescript type.
+The values in this map can either be a simple string, in which case it's assumed to be a built-in type (like `string`), or it can be an object of the following type:
+
+```
+type ImportedType = {
+  name: string;
+  module: string;
+  absoluteImport: boolean;
+  defaultImport: boolean;
+};
+```
+
+In this case, you specify a name and a module to import the type from. If the module is an absolute import (i.e. listed in your `package.json` file), set `absoluteImport` to true. If it's set to false, it will represent a path relative to the `externalTypesFolder` if one is supplied, or a path relative to the model file itself if not. The final property, `defaultImport` specifies whether the type should be imported as the default from the module, or, if false, as a named import.
 
 `modelHooks`
 
@@ -99,11 +111,11 @@ A function (`(givenName: string, modelName: string) => string`) that converts a 
 
 `typeHooks`
 
-Like the `modelHooks` property, this property can specify a number of hooks to attach to generation of type (enum) files. They have the same signature, only the `src` parameter is a [type](https://github.com/kristiandupont/extract-pg-schema#type) object.
+Like the `modelHooks` property, this property can specify a number of hooks to attach to generation of type (enum or composite) files. They have the same signature, only the `src` parameter is a [type](https://github.com/kristiandupont/extract-pg-schema#type) object.
 
 `typeNominator`
 
-A function (`(modelName: string) => string`) that converts a custom postgres type (enum) name into a type name.
+A function (`(modelName: string) => string`) that converts a custom postgres type (enum or composite) name into a type name.
 
 `fileNominator`
 
@@ -126,11 +138,15 @@ Folder on disk where the models will be stored. Note that if `preDeleteModelFold
 
 An array of tables and views to ignore. Use this if there are things in your database you don't care to generate models for like migration information etc.
 
+`schema.externalTypesFolder`
+
+This will specify the folder to look for external types from. If you tag a column like this: `@type:Vector`, Kanel will use that as the type for the property and import that from a file by the same name in said folder.
+
 ## Example
 
 To see an example of the result, check out the [/example](example) folder. It uses the [Sample Database](https://www.postgresqltutorial.com/postgresql-sample-database/) from www.postgresqltutorial.com.
 
-Kanel will scan tables, views and enum types. It will generate a model type for each table and view. Additionally, it will create an _initializer_ type for tables that aren't tagged `@fixed` in the comment. Initializer types
+Kanel will scan tables, views, composite and enum types. It will generate a model type for each table and view. Additionally, it will create an _initializer_ type for tables that aren't tagged `@fixed` in the comment. Initializer types
 represent the requirements for creating a new row in the table. Columns that are nullable or have default values are considered optional.
 
 Documentation is extracted from postgres comments on your tables, columns etc., as jsdoc.

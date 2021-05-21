@@ -1,10 +1,17 @@
 import path from 'path';
 import { pipe, pluck, reject } from 'ramda';
+import generateCompositeTypeFile from './generateCompositeTypeFile';
 import generateModelFile from './generateModelFile';
 import generateTypeFile from './generateTypeFile';
 import generateIndexFile from './generateIndexFile';
+import getSupportedTypes from './getSupportedTypes';
 import writeFile from './writeFile';
 import { notDeepEqual } from 'assert';
+
+/**
+ * @typedef { import('./Model').TableModel } TableModel
+ * @typedef { import('./Model').ViewModel } ViewModel
+ */
 
 const applyHooks = (chain, src, lines) => {
   const boundChain = chain.map((f) => (l) => f(l, src));
@@ -17,7 +24,7 @@ const applyHooks = (chain, src, lines) => {
  * @param {import('extract-pg-schema').Schema} schema
  * @param {import('./Config').TypeMap} typeMap
  * @param {import('./Config').Nominators} nominators
- * @param {(import("./Config").Hook<import('./generateModelFile').Model>)[]} modelProcessChain
+ * @param {(import("./Config").Hook<import('./Model').Model>)[]} modelProcessChain
  * @param {(import("./Config").Hook<import("extract-pg-schema").Type>)[]} typeProcessChain
  * @param {{[schameName: string]: string}} schemaFolderMap
  */
@@ -33,7 +40,9 @@ const processSchema = async (
 ) => {
   const { tables, views, types } = schema;
 
-  types.forEach((t) => {
+  const { compositeTypes, enumTypes } = getSupportedTypes(types);
+
+  enumTypes.forEach((t) => {
     const typeFileLines = generateTypeFile(t, nominators.typeNominator);
     const wetTypeFileLines = applyHooks(typeProcessChain, t, typeFileLines);
     const givenName = nominators.typeNominator(t.name);
@@ -45,8 +54,8 @@ const processSchema = async (
   });
 
   const models = [
-    ...tables.map((t) => ({ ...t, isView: false })),
-    ...views.map((t) => ({ ...t, isView: true })),
+    ...tables.map((t) => /** @type {TableModel} */ ({ ...t, type: 'table' })),
+    ...views.map((t) => /** @type {ViewModel} */ ({ ...t, type: 'view' })),
   ];
 
   const rejectIgnored = reject((m) =>
@@ -55,6 +64,28 @@ const processSchema = async (
   const includedModels = rejectIgnored(models);
 
   const userTypes = pluck('name', types);
+  const tableOrViewTypes = pluck('name', includedModels);
+
+  compositeTypes.forEach((m) => {
+    const modelFileLines = generateCompositeTypeFile(m, {
+      typeMap,
+      userTypes,
+      tableOrViewTypes,
+      nominators,
+      schemaName: schemaConfig.name,
+      externalTypesFolder: schemaConfig.externalTypesFolder,
+      schemaFolderMap,
+    });
+    const wetModelFileLines = applyHooks(modelProcessChain, m, modelFileLines);
+    const filename = `${nominators.fileNominator(
+      nominators.modelNominator(m.name),
+      m.name
+    )}.ts`;
+    writeFile({
+      fullPath: path.join(schemaConfig.modelFolder, filename),
+      lines: wetModelFileLines,
+    });
+  });
 
   includedModels.forEach((m) => {
     const modelFileLines = generateModelFile(m, {

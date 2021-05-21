@@ -12,7 +12,7 @@ function generateIndexFile(models, userTypes, nominators) {
   // const pc = recase(casings.sourceCasing, casings.propertyCasing);
   // const fc = recase(casings.sourceCasing, casings.filenameCasing);
 
-  const isFixed = (m) => m.isView || m.tags['fixed'];
+  const isFixed = (m) => m.type !== 'table' || m.tags['fixed'];
 
   const hasIdentifier = (m) =>
     filter((c) => c.isPrimary, m.columns).length === 1;
