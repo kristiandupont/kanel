@@ -55,10 +55,17 @@ const generateModelFile = (
       false
     );
   });
+  const cols = map(
+    ({ isArray, type, subType, ...rest }) => ({
+      type: isArray ? subType : type,
+      ...rest,
+    }),
+    model.columns
+  );
   const appliedUserTypes = uniq(
     map(
       (p) => p.type,
-      filter((p) => userTypes.indexOf(p.type) !== -1, model.columns)
+      filter((p) => userTypes.indexOf(p.type) !== -1, cols)
     )
   );
   appliedUserTypes.forEach((t) => {
