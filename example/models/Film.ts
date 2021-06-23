@@ -24,11 +24,11 @@ export default interface Film {
 
   rental_duration: number;
 
-  rental_rate: number;
+  rental_rate: string;
 
   length: number | null;
 
-  replacement_cost: number;
+  replacement_cost: string;
 
   rating: MpaaRating | null;
 
@@ -61,12 +61,12 @@ export interface FilmInitializer {
   rental_duration?: number;
 
   /** Default value: 4.99 */
-  rental_rate?: number;
+  rental_rate?: string;
 
   length?: number | null;
 
   /** Default value: 19.99 */
-  replacement_cost?: number;
+  replacement_cost?: string;
 
   /** Default value: 'G'::mpaa_rating */
   rating?: MpaaRating | null;

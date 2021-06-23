@@ -44,6 +44,8 @@ const processDatabase = async ({
 
   fileNominator = identity,
 
+  resolveViews = false,
+
   schemas,
 
   ...unknownProps
@@ -92,7 +94,9 @@ const processDatabase = async ({
     const schema = await extractSchema(
       schemaConfig.name,
       connection,
-      resolveViews
+      schemaConfig.resolveViews !== undefined
+        ? schemaConfig.resolveViews
+        : resolveViews
     );
 
     await processSchema(

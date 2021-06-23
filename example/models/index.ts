@@ -16,12 +16,12 @@ import Language, { LanguageInitializer, LanguageId } from './Language';
 import Payment, { PaymentInitializer, PaymentId } from './Payment';
 import Rental, { RentalInitializer, RentalId } from './Rental';
 import Store, { StoreInitializer, StoreId } from './Store';
-import ActorInfo from './ActorInfo';
-import CustomerList from './CustomerList';
-import NicerButSlowerFilmList from './NicerButSlowerFilmList';
+import ActorInfo, { ActorInfoId } from './ActorInfo';
+import CustomerList, { CustomerListId } from './CustomerList';
+import NicerButSlowerFilmList, { NicerButSlowerFilmListId } from './NicerButSlowerFilmList';
 import SalesByFilmCategory from './SalesByFilmCategory';
 import SalesByStore from './SalesByStore';
-import StaffList from './StaffList';
+import StaffList, { StaffListId } from './StaffList';
 import MpaaRating from './MpaaRating';
 
 type Model =
@@ -82,6 +82,10 @@ type ModelId =
   | PaymentId
   | RentalId
   | StoreId
+  | ActorInfoId
+  | CustomerListId
+  | NicerButSlowerFilmListId
+  | StaffListId
 
 interface ModelIdTypeMap {
   'actor': ActorId;
@@ -96,6 +100,10 @@ interface ModelIdTypeMap {
   'payment': PaymentId;
   'rental': RentalId;
   'store': StoreId;
+  'actor_info': ActorInfoId;
+  'customer_list': CustomerListId;
+  'nicer_but_slower_film_list': NicerButSlowerFilmListId;
+  'staff_list': StaffListId;
 }
 
 type Initializer =
@@ -146,12 +154,12 @@ export type {
   Payment, PaymentInitializer, PaymentId,
   Rental, RentalInitializer, RentalId,
   Store, StoreInitializer, StoreId,
-  ActorInfo,
-  CustomerList,
-  NicerButSlowerFilmList,
+  ActorInfo, ActorInfoId,
+  CustomerList, CustomerListId,
+  NicerButSlowerFilmList, NicerButSlowerFilmListId,
   SalesByFilmCategory,
   SalesByStore,
-  StaffList,
+  StaffList, StaffListId,
   MpaaRating,
 
   Model,

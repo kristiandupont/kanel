@@ -30,6 +30,8 @@ module.exports = {
   modelHooks: [insertNameComment],
   typeHooks: [insertNameComment],
 
+  resolveViews: true,
+
   schemas: [
     {
       name: 'public',

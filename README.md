@@ -121,6 +121,10 @@ A function (`(modelName: string) => string`) that converts a custom postgres typ
 
 A function `(givenName: string, originalName: string)` that converts the name of a table, view or type into the corresponding file name. _NOTE_ this should return a string with no `.ts` extension, as it's used in `import` statements as well.
 
+`resolveViews`
+
+Since the reflection capabilities in Postgres are slightly limited when it comes to views, the generated models will not per default reflect things like nullable and references to other models. If you set this value to true, Kanel will attempt to parse the view definitions to figure out where the columns in the view stem from, and use those "source" columns for this information.
+
 `schemas` _(Required)_
 
 This is an array of schemas to process.

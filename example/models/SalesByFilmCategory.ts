@@ -3,7 +3,7 @@
 // Name: sales_by_film_category
 
 export default interface SalesByFilmCategory {
-  category: string | null;
+  category: string;
 
-  total_sales: number | null;
+  total_sales: string | null;
 }

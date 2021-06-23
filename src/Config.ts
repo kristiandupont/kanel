@@ -39,12 +39,13 @@ export type Nominators = {
 type Settings = {
   modelFolder?: string;
   ignore?: string[];
-  preDeleteModelFolder?: Boolean;
+  preDeleteModelFolder?: boolean;
   customTypeMap?: TypeMap;
   makeIdType?: (innerType: string, modelName: string) => string;
 
   modelHooks?: Hook<Model>[];
   typeHooks?: Hook<Type>[];
+  resolveViews?: boolean;
 } & Nominators;
 
 export type SchemaConfig = {

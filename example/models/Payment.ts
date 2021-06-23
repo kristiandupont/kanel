@@ -21,7 +21,7 @@ export default interface Payment {
   /** Index: idx_fk_rental_id */
   rental_id: RentalId;
 
-  amount: number;
+  amount: string;
 
   payment_date: Date;
 }
@@ -42,7 +42,7 @@ export interface PaymentInitializer {
   /** Index: idx_fk_rental_id */
   rental_id: RentalId;
 
-  amount: number;
+  amount: string;
 
   payment_date: Date;
 }

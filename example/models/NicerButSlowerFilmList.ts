@@ -4,16 +4,20 @@
 
 import MpaaRating from './MpaaRating';
 
-export default interface NicerButSlowerFilmList {
-  fid: number | null;
+export type NicerButSlowerFilmListId = number & { " __flavor"?: 'nicer_but_slower_film_list' };
 
-  title: string | null;
+export default interface NicerButSlowerFilmList {
+  /** Primary key. Index: film_pkey */
+  fid: NicerButSlowerFilmListId;
+
+  /** Index: idx_title */
+  title: string;
 
   description: string | null;
 
-  category: string | null;
+  category: string;
 
-  price: number | null;
+  price: string;
 
   length: number | null;
 

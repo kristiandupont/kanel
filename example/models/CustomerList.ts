@@ -2,22 +2,26 @@
 // Automatically generated. Don't change this file manually.
 // Name: customer_list
 
+export type CustomerListId = number & { " __flavor"?: 'customer_list' };
+
 export default interface CustomerList {
-  id: number | null;
+  /** Primary key. Index: customer_pkey */
+  id: CustomerListId;
 
   name: string | null;
 
-  address: string | null;
+  address: string;
 
   'zip code': string | null;
 
-  phone: string | null;
+  phone: string;
 
-  city: string | null;
+  city: string;
 
-  country: string | null;
+  country: string;
 
   notes: string | null;
 
-  sid: number | null;
+  /** Index: idx_fk_store_id */
+  sid: number;
 }

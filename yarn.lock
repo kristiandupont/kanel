@@ -2373,10 +2373,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-pg-schema@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-3.1.0.tgz#44e8e948b368c4b2191bcd000c79dbba4ea45607"
-  integrity sha512-zWBFBm0CejLzMtLd7ifz8a5NOOchRo2SCM8cbtgRYcvkHWCUIgWV1ZN4GsDViYJnaI+/TxYQNfJiEKzEgKhSrg==
+extract-pg-schema@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-3.1.1.tgz#331ea0b8b8f47aa88d859229d0370112b8774890"
+  integrity sha512-BweYZ8TNvktPA+tpTen2iBVN4h3m0Q/fAO2BSd3g8OLSsloR12xsq2i+/IZMeyvTcpyJ5b6q514RgnS1AkkLiA==
   dependencies:
     "@types/pg" "^8.0.0"
     jsonpath "^1.0.2"
