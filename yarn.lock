@@ -596,7 +596,7 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@kristiandupont/eslint-config@^1.0.1":
+"@kristiandupont/eslint-config@1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@kristiandupont/eslint-config/-/eslint-config-1.0.1.tgz#87ca65e36aab650c75726d279769bb3608e0e24f"
   integrity sha512-FpE5nZn05Gh52NbMONz5TWUaLeHiYtD3OxJkMKrxuy6EAQTsdCIwO8YvJvAVc9Xb7phfMy5rjviFtNvsuKeBlQ==
