@@ -3,10 +3,10 @@ import { TypeMap } from './Config';
 const defaultTypeMap: TypeMap = {
   int2: 'number',
   int4: 'number',
-  int8: 'number',
+  int8: 'string',
   float4: 'number',
-  float8: 'number',
-  numeric: 'number',
+  float8: 'string',
+  numeric: 'string',
   bool: 'boolean',
   json: 'unknown',
   jsonb: 'unknown',
