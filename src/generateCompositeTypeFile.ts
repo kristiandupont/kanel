@@ -1,9 +1,10 @@
 import { Attribute, CompositeType } from 'extract-pg-schema';
-import { forEach, map, filter, uniq } from 'ramda';
+import path from 'path';
+import { filter, forEach, map, uniq } from 'ramda';
+
 import { GivenName, Nominators, TypeMap } from './Config';
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
-import path from 'path';
 
 const generateCompositeTypeFile = (
   compositeType: CompositeType,
@@ -30,7 +31,7 @@ const generateCompositeTypeFile = (
   const fileNominator = nominators.fileNominator;
 
   const lines = [];
-  const { comment, tags } = compositeType;
+  const { comment } = compositeType;
 
   const importGenerator = new ImportGenerator(schemaFolderMap[schemaName]);
   const appliedUserTypes = uniq(
@@ -71,7 +72,7 @@ const generateCompositeTypeFile = (
 
   const overriddenTypes = map(
     (p: Attribute) => p.tags.type,
-    filter((p) => !!p.tags.type, compositeType.attributes)
+    filter((p) => Boolean(p.tags.type), compositeType.attributes)
   );
   forEach((importedType) => {
     const givenName = importedType as GivenName; // We expect people to have used proper casing in their comments

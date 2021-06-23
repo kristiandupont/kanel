@@ -1,9 +1,11 @@
-import path from 'path';
+/* eslint-disable no-console */
 import chalk from 'chalk';
 // @ts-ignore
 import optionator from 'optionator';
-import processDatabase from './processDatabase';
+import path from 'path';
+
 import { logger } from './logger';
+import processDatabase from './processDatabase';
 // @ts-ignore
 const { version } = require('../package.json');
 
@@ -61,7 +63,6 @@ async function main() {
   }
 
   logger.log(chalk.greenBright('Kanel'));
-  logger.quiet`${chalk.greenBright('Kanel')}: Creating psql types`;
 
   try {
     await processDatabase(config);

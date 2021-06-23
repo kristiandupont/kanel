@@ -1,5 +1,4 @@
-import { notDeepEqual } from 'assert';
-import { map, filter, reject, none } from 'ramda';
+import { filter, map, reject } from 'ramda';
 
 /**
  * @param {import('extract-pg-schema').TableOrView[]} models

@@ -1,5 +1,6 @@
 import { Type } from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
+
 import { Model } from './Model';
 
 type BuiltinType = string;

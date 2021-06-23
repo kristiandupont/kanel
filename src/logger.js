@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const LEVELS = {
   silent: 0,
   error: 1,

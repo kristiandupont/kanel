@@ -1,7 +1,8 @@
-import { forEach, map, filter, reject, uniq, pipe } from 'ramda';
+import path from 'path';
+import { filter, forEach, map, pipe, reject, uniq } from 'ramda';
+
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
-import path from 'path';
 
 /**
  * @typedef { import('extract-pg-schema').TableOrView } TableOrView
@@ -80,7 +81,7 @@ const generateModelFile = (
 
   const overriddenTypes = map(
     (p) => p.tags.type,
-    filter((p) => !!p.tags.type, model.columns)
+    filter((p) => Boolean(p.tags.type), model.columns)
   );
   forEach((importedType) => {
     const givenName = importedType; // We expect people to have used proper casing in their comments

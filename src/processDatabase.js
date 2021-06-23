@@ -1,13 +1,14 @@
 import chalk from 'chalk';
-import rmfr from 'rmfr';
-import path from 'path';
-import fs from 'fs';
-import { identity, indexBy, isEmpty, map } from 'ramda';
 import { extractSchema } from 'extract-pg-schema';
+import fs from 'fs';
+import path from 'path';
+import { identity, indexBy, isEmpty, map } from 'ramda';
+import rmfr from 'rmfr';
+
+import { nameIdentity } from './Config';
 import defaultTypeMap from './defaultTypeMap';
 import { logger } from './logger';
 import processSchema from './processSchema';
-import { nameIdentity } from './Config';
 
 const labelAsGenerated = (lines) => [
   '// @generated',
@@ -88,7 +89,11 @@ const processDatabase = async ({
       fs.mkdirSync(schemaConfig.modelFolder);
     }
 
-    const schema = await extractSchema(schemaConfig.name, connection);
+    const schema = await extractSchema(
+      schemaConfig.name,
+      connection,
+      resolveViews
+    );
 
     await processSchema(
       schemaConfig,

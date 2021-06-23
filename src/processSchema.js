@@ -1,12 +1,12 @@
 import path from 'path';
 import { pipe, pluck, reject } from 'ramda';
+
 import generateCompositeTypeFile from './generateCompositeTypeFile';
+import generateIndexFile from './generateIndexFile';
 import generateModelFile from './generateModelFile';
 import generateTypeFile from './generateTypeFile';
-import generateIndexFile from './generateIndexFile';
 import getSupportedTypes from './getSupportedTypes';
 import writeFile from './writeFile';
-import { notDeepEqual } from 'assert';
 
 /**
  * @typedef { import('./Model').TableModel } TableModel
