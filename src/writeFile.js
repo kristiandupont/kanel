@@ -5,7 +5,7 @@ import path from 'path';
 import { logger } from './logger';
 
 /**
- * @param {{ fullPath: string, lines: string[] }} p0
+ * @param {{ fullPath: string, lines: string[] }} p0
  */
 const writeFile = ({ fullPath, lines }) => {
   const relativePath = path.relative(process.cwd(), fullPath);
