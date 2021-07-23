@@ -5,10 +5,10 @@ Generate Typescript types from a live Postgres database.
 This is for people who don't like ORM's but who do like intellisense and type checking for their database access code.
 The recommended process is:
 
-1. Create a migration using Knex ir regular SQL.
+1. Create a migration using Knex or regular SQL.
 2. Run the migration on your local development database.
 3. Run Kanel on your dev database. It will create/update your type definitions.
-4. Review them, and compile your code. When everything works, commit the migration and other changes.
+4. Review them, and compile your code. When everything works, commit the migration together with the updated type definitions and other changes.
 
 Introduction to the idea is outlined [here](https://medium.com/@kristiandupont/generating-typescript-types-from-postgres-48661868ef84).
 
