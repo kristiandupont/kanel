@@ -16,7 +16,7 @@ const generateInterface = ({
   properties: Property[];
   exportAsDefault: boolean;
 }): string[] => {
-  const lines = [];
+  const lines: string[] = [];
 
   if (comment) {
     lines.push('/**', ` * ${comment}`, ' */');

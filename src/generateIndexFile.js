@@ -7,10 +7,6 @@ import { filter, map, reject } from 'ramda';
  * @returns {string[]}
  */
 function generateIndexFile(models, userTypes, nominators) {
-  // const tc = recase(casings.sourceCasing, casings.typeCasing);
-  // const pc = recase(casings.sourceCasing, casings.propertyCasing);
-  // const fc = recase(casings.sourceCasing, casings.filenameCasing);
-
   const isFixed = (m) => m.type !== 'table' || m.tags['fixed'];
 
   const hasIdentifier = (m) =>
