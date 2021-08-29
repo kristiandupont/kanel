@@ -91,17 +91,18 @@ function generateIndexFile(models, userTypes, nominators) {
     ),
     '}',
     '',
-    ...(creatableModels.length > 0 ?
-      [
-        'type Initializer =',
-        ...map(
-          (model) =>
-            `  | ${nominators.initializerNominator(
-              nominators.modelNominator(model.name),
-              model.name
-            )}`,
-          creatableModels
-        )]
+    ...(creatableModels.length > 0
+      ? [
+          'type Initializer =',
+          ...map(
+            (model) =>
+              `  | ${nominators.initializerNominator(
+                nominators.modelNominator(model.name),
+                model.name
+              )}`,
+            creatableModels
+          ),
+        ]
       : ['type Initializer = never']),
     '',
     'interface InitializerTypeMap {',
