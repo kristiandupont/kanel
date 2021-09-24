@@ -28,12 +28,12 @@ export type GivenName = string & { __brand: 'given-name' };
 export const nameIdentity = (name: string): GivenName => name as GivenName;
 
 export type Nominators = {
-  modelNominator: (modelName: string) => GivenName;
-  propertyNominator: (propertyName: string, model: Model) => string;
-  initializerNominator: (givenName: GivenName, modelName: string) => string;
-  idNominator: (givenName: GivenName, modelName: string) => string;
-  typeNominator: (typeName: string) => GivenName;
-  fileNominator: (givenName: GivenName, originalName: string) => string;
+  modelNominator?: (modelName: string) => GivenName;
+  propertyNominator?: (propertyName: string, model: Model) => string;
+  initializerNominator?: (givenName: GivenName, modelName: string) => string;
+  idNominator?: (givenName: GivenName, modelName: string) => string;
+  typeNominator?: (typeName: string) => GivenName;
+  fileNominator?: (givenName: GivenName, originalName: string) => string;
 };
 
 type Settings = {
