@@ -13,6 +13,8 @@ const defaultTypeMap: TypeMap = {
   char: 'string',
   varchar: 'string',
   text: 'string',
+  uuid: 'string',
+  inet: 'string',
   date: 'Date',
   time: 'Date',
   timetz: 'Date',

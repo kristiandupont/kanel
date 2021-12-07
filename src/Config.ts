@@ -22,7 +22,7 @@ export type Hook<T> = (lines: string[], src?: T) => string[];
 // (i.e. modelNominator or typeNominator), and make sure that those
 // are the ones passed into the secondary nominators that create
 // things like initializer and file names.
-export type GivenName = string & { __brand: 'given-name' };
+export type GivenName = string & { __brand?: 'given-name' };
 
 // Pass-through for defaults.
 export const nameIdentity = (name: string): GivenName => name as GivenName;
