@@ -154,6 +154,7 @@ Folder on disk where the models will be stored. Note that if `preDeleteModelFold
 `schema.ignore`
 
 An array of tables and views to ignore. Use this if there are things in your database you don't care to generate models for like migration information etc.
+Each item in the array can be either a string, a regular expression, or a function. If it's a string, it's assumed to be a table or view name. If it's a regular expression, it's matched against the table or view name. If it's a function, it's called with the table or view name as the first parameter and should return true if the table or view should be ignored.
 
 `schema.externalTypesFolder`
 

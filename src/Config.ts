@@ -1,6 +1,7 @@
 import { Type } from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
 
+import Matcher from './Matcher';
 import { Model } from './Model';
 
 type BuiltinType = string;
@@ -38,7 +39,7 @@ export type Nominators = {
 
 type Settings = {
   modelFolder?: string;
-  ignore?: string[];
+  ignore?: Matcher[];
   preDeleteModelFolder?: boolean;
   customTypeMap?: TypeMap;
   makeIdType?: (innerType: string, modelName: string) => string;
@@ -50,8 +51,6 @@ type Settings = {
 
 export type SchemaConfig = {
   name: string;
-  ignore?: string[];
-  modelFolder: string;
   externalTypesFolder?: string;
 } & Settings;
 

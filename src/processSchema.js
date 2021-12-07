@@ -6,6 +6,7 @@ import generateIndexFile from './generateIndexFile';
 import generateModelFile from './generateModelFile';
 import generateTypeFile from './generateTypeFile';
 import getSupportedTypes from './getSupportedTypes';
+import { isMatch } from './Matcher';
 import writeFile from './writeFile';
 
 /**
@@ -59,7 +60,7 @@ const processSchema = async (
   ];
 
   const rejectIgnored = reject((m) =>
-    (schemaConfig.ignore || []).includes(m.name)
+    (schemaConfig.ignore || []).some((matcher) => isMatch(m.name, matcher))
   );
   const includedModels = rejectIgnored(models);
 
