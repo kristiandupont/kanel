@@ -4,10 +4,13 @@ import path from 'path';
 
 import { logger } from './logger';
 
-/**
- * @param {{ fullPath: string, lines: string[] }} p0
- */
-const writeFile = ({ fullPath, lines }) => {
+const writeFile = ({
+  fullPath,
+  lines,
+}: {
+  fullPath: string;
+  lines: string[];
+}) => {
   const relativePath = path.relative(process.cwd(), fullPath);
   logger.log(` - ${relativePath}`);
 

@@ -1,9 +1,9 @@
-/**
- * @param {import('extract-pg-schema').EnumType} type
- * @param {(typeName: string) => string} nominator
- * @returns {string[]}
- */
-function generateTypeFile(type, nominator) {
+import { EnumType } from 'extract-pg-schema';
+
+function generateTypeFile(
+  type: EnumType,
+  nominator: (typeName: string) => string
+): string[] {
   const lines = [];
   const { comment } = type;
   if (comment) {
