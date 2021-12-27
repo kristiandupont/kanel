@@ -716,10 +716,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@kristiandupont/eslint-config@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@kristiandupont/eslint-config/-/eslint-config-1.2.1.tgz#3c59cb33ae362e938789e57a4e31d7c7a1a9e32d"
-  integrity sha512-wUsaNWrE9575k+9hr+W3IOmKw5kh1TTXVBolFwEY1DbznJC0zlM320LiCOSbbTMwXMyy1v+8HsagstnMhfr5Kw==
+"@kristiandupont/eslint-config@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@kristiandupont/eslint-config/-/eslint-config-1.2.2.tgz#73d3e8120455b43379b7a8b8a1de46bced3abe86"
+  integrity sha512-nL6ysa3J4cMvgQkOP/8OauNtgW9Xn7Nz34luX+eOzamiKmtgvWIUlzZmv6DKswJu8uA6+PsmMweANRD9Uk58Kw==
   dependencies:
     "@babel/eslint-parser" "^7.14.7"
     "@typescript-eslint/eslint-plugin" "^5.0.0"
@@ -5471,11 +5471,6 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
-
-typescript@4.5.2:
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.2.tgz#8ac1fba9f52256fdb06fb89e4122fa6a346c2998"
-  integrity sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==
 
 typescript@4.5.4:
   version "4.5.4"
