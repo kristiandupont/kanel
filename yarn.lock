@@ -977,10 +977,10 @@
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.3.2.tgz#fc8c2825e4ed2142473b4a81064e6e081463d1b3"
   integrity sha512-eI5Yrz3Qv4KPUa/nSIAi0h+qX0XyewOliug5F2QAtuRg6Kjg6jfmxe1GIwoIRhZspD1A0RP8ANrPwvEXXtRFog==
 
-"@types/ramda@0.27.60":
-  version "0.27.60"
-  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.27.60.tgz#fccfd7bb18cc074b7bcddeb7fcc36871723309a6"
-  integrity sha512-6ie74xhtl2ducVG8cC8mnYwpvIUWHBoLHbmvEsl5qPqJkqVP9ce5yZW10WgheKd2ua1yPIwd0miMWBsG19UmiQ==
+"@types/ramda@0.27.63":
+  version "0.27.63"
+  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.27.63.tgz#a5cd903e229e0aa603395adf4da58c9298b1dd4a"
+  integrity sha512-gG8P2Y54L1O0Q4fz+y93BJZ6//p1kyvej1hFFsmPk4A/bnB6twY/5SYYmavxlhby5uB5GPYVrrREH9BTaocAjw==
   dependencies:
     ts-toolbelt "^6.15.1"
 
@@ -5471,11 +5471,6 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
-
-typescript@4.5.2:
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.2.tgz#8ac1fba9f52256fdb06fb89e4122fa6a346c2998"
-  integrity sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==
 
 typescript@4.5.4:
   version "4.5.4"
