@@ -88,7 +88,7 @@ const processDatabase = async ({
       await rmfr(schemaConfig.modelFolder, { glob: true });
     }
     if (!fs.existsSync(schemaConfig.modelFolder)) {
-      fs.mkdirSync(schemaConfig.modelFolder);
+      fs.mkdirSync(schemaConfig.modelFolder, { recursive: true });
     }
 
     const schema = await extractSchema(
