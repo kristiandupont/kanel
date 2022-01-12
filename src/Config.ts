@@ -55,7 +55,7 @@ export type SchemaConfig = {
 } & Settings;
 
 type Config = {
-  connection?: ConnectionConfig;
+  connection?: string | ConnectionConfig;
   schemas: SchemaConfig[];
 } & Settings;
 
