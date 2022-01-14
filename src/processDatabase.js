@@ -70,12 +70,16 @@ const processDatabase = async ({
   };
   const modelProcessChain = [...defaultHooks, ...modelHooks];
   const typeProcessChain = [...defaultHooks, ...typeHooks];
-
-  logger.log(
-    `Connecting to ${chalk.greenBright(connection.database)} on ${
-      connection.host
-    }`
-  );
+  
+  if (typeof connection === 'string') {
+    logger.log(`Connecting to ${chalk.greenBright(connection)}`);
+  } else {
+    logger.log(
+      `Connecting to ${chalk.greenBright(connection.database)} on ${
+        connection.host
+      }`
+    );
+  }
 
   const schemaFolderMap = map(
     (s) => path.resolve(s.modelFolder),
