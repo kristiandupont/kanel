@@ -70,7 +70,7 @@ const processDatabase = async ({
   };
   const modelProcessChain = [...defaultHooks, ...modelHooks];
   const typeProcessChain = [...defaultHooks, ...typeHooks];
-  
+
   if (typeof connection === 'string') {
     logger.log(`Connecting to ${chalk.greenBright(connection)}`);
   } else {
