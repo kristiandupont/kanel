@@ -69,7 +69,7 @@
     "@types/jest": "27.4.0",
     "@types/node": "16.11.15",
     "@types/ramda": "0.27.63",
-    "eslint": "8.5.0",
+    "eslint": "8.6.0",
     "jest": "27.4.7",
     "np": "7.6.0",
     "prettier": "2.5.1",
