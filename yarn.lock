@@ -899,10 +899,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@kristiandupont/eslint-config@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@kristiandupont/eslint-config/-/eslint-config-1.2.1.tgz#3c59cb33ae362e938789e57a4e31d7c7a1a9e32d"
-  integrity sha512-wUsaNWrE9575k+9hr+W3IOmKw5kh1TTXVBolFwEY1DbznJC0zlM320LiCOSbbTMwXMyy1v+8HsagstnMhfr5Kw==
+"@kristiandupont/eslint-config@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@kristiandupont/eslint-config/-/eslint-config-1.2.2.tgz#73d3e8120455b43379b7a8b8a1de46bced3abe86"
+  integrity sha512-nL6ysa3J4cMvgQkOP/8OauNtgW9Xn7Nz34luX+eOzamiKmtgvWIUlzZmv6DKswJu8uA6+PsmMweANRD9Uk58Kw==
   dependencies:
     "@babel/eslint-parser" "^7.14.7"
     "@typescript-eslint/eslint-plugin" "^5.0.0"
