@@ -64,7 +64,7 @@
     "rmfr": "^2.0.0"
   },
   "devDependencies": {
-    "@kristiandupont/eslint-config": "1.2.2",
+    "@kristiandupont/eslint-config": "1.2.3",
     "@kristiandupont/recase": "1.1.1",
     "@types/jest": "27.4.0",
     "@types/node": "16.11.21",
