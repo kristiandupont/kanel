@@ -31,7 +31,7 @@ async function main() {
         alias: 'c',
         type: 'path::String',
         description:
-          'Use this configuration, overriding .schemalintrc.* config options if present',
+          'Use this configuration, overriding .kanel.* config options if present',
       },
     ],
   });
