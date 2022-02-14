@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import chalk from 'chalk';
-// @ts-ignore
 import optionator from 'optionator';
 import path from 'path';
 

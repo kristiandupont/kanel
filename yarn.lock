@@ -2470,10 +2470,10 @@ external-editor@^3.0.3:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
-extract-pg-schema@^3.1.4:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-3.1.4.tgz#54163c73596fca374845d40b833fe650f5c82c03"
-  integrity sha512-8ZqXp50ra16btQRQEC3AUlkp0W8lD2DF3kzFUOeUkXNrwQkBPTmjmbxZJtPyQR7OFroi7cZvz56EcGnHUZ9BnQ==
+extract-pg-schema@^3.1.5:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-3.1.5.tgz#3bfe59a72fd1b473a9e98f8fd98a34a2af720c2f"
+  integrity sha512-W5pLrQA/jocDCzRZ96bHmIPcMa62QspRYUJNKk+5KW4fwCtdECvqCoYOImHBLA4+KAOl4HzL+JudZvOEWSMjMg==
   dependencies:
     "@types/pg" "^8.0.0"
     jsonpath "^1.0.2"
