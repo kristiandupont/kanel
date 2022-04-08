@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@kristiandupont/eslint-config": "1.2.5",
-    "@kristiandupont/recase": "1.1.1",
+    "@kristiandupont/recase": "1.1.2",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.26",
     "@types/ramda": "0.28.7",
