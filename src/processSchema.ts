@@ -1,43 +1,32 @@
+import { Schema, Type } from 'extract-pg-schema';
 import path from 'path';
 import { pipe, pluck, reject } from 'ramda';
 
+import { Hook, Nominators, SchemaConfig, TypeMap } from './Config';
 import generateCompositeTypeFile from './generateCompositeTypeFile';
 import generateIndexFile from './generateIndexFile';
 import generateModelFile from './generateModelFile';
 import generateTypeFile from './generateTypeFile';
 import getSupportedTypes from './getSupportedTypes';
 import { isMatch } from './Matcher';
+import { Model } from './Model';
 import writeFile from './writeFile';
 
-/**
- * @typedef { import('./Model').TableModel } TableModel
- * @typedef { import('./Model').ViewModel } ViewModel
- */
-
-const applyHooks = (chain, src, lines) => {
+const applyHooks = <T>(chain: Hook<T>[], src: T, lines: string[]): string[] => {
   const boundChain = chain.map((f) => (l) => f(l, src));
   // @ts-ignore
   return pipe(...boundChain)(lines);
 };
 
-/**
- * @param {import('./Config').SchemaConfig} schemaConfig
- * @param {import('extract-pg-schema').Schema} schema
- * @param {import('./Config').TypeMap} typeMap
- * @param {import('./Config').Nominators} nominators
- * @param {(import("./Config").Hook<import('./Model').Model>)[]} modelProcessChain
- * @param {(import("./Config").Hook<import("extract-pg-schema").Type>)[]} typeProcessChain
- * @param {{[schameName: string]: string}} schemaFolderMap
- */
 const processSchema = async (
-  schemaConfig,
-  schema,
-  typeMap,
-  nominators,
-  modelProcessChain,
-  typeProcessChain,
-  schemaFolderMap,
-  makeIdType
+  schemaConfig: SchemaConfig,
+  schema: Schema,
+  typeMap: TypeMap,
+  nominators: Nominators,
+  modelProcessChain: Hook<Model>[],
+  typeProcessChain: Hook<Type>[],
+  schemaFolderMap: { [schemaName: string]: string },
+  makeIdType: (innerType: string, modelName: string) => string
 ) => {
   const { tables, views, types } = schema;
 
@@ -55,11 +44,11 @@ const processSchema = async (
   });
 
   const models = [
-    ...tables.map((t) => /** @type {TableModel} */ ({ ...t, type: 'table' })),
-    ...views.map((t) => /** @type {ViewModel} */ ({ ...t, type: 'view' })),
+    ...tables.map((t) => ({ ...t, type: 'table' } as const)),
+    ...views.map((t) => ({ ...t, type: 'view' } as const)),
   ];
 
-  const rejectIgnored = reject((m) =>
+  const rejectIgnored = reject((m: { name: string }) =>
     (schemaConfig.ignore || []).some((matcher) => isMatch(m.name, matcher))
   );
   const includedModels = rejectIgnored(models);
@@ -114,7 +103,11 @@ const processSchema = async (
     userTypes,
     nominators
   );
-  const wetIndexFileLines = applyHooks(modelProcessChain, {}, indexFileLines);
+  const wetIndexFileLines = applyHooks(
+    modelProcessChain,
+    {} as Model,
+    indexFileLines
+  );
   writeFile({
     fullPath: path.join(schemaConfig.modelFolder, 'index.ts'),
     lines: wetIndexFileLines,
