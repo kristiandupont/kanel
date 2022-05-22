@@ -20,19 +20,11 @@ jest.mock('path', () => {
 describe('processDatabase', () => {
   it('should process the dvd rental example according to the snapshot', async () => {
     await processDatabase({
-      connection: {
-        host: 'localhost',
-        user: 'postgres',
-        password: 'postgres',
-        database: 'dvdrental',
-        charset: 'utf8',
-        port: 54321,
-      },
+      connection: {},
 
       preDeleteModelFolder: false,
 
       customTypeMap: {
-        // There is no such package, this is just an example. See Film.ts to see the result.
         tsvector: {
           name: 'TsVector',
           module: 'ts-vector',
