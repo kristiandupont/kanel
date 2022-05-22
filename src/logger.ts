@@ -27,10 +27,7 @@ export const quiet = createLogger(LEVELS.quiet, 'log', true);
 export const warn = createLogger(LEVELS.warn, 'warn');
 export const error = createLogger(LEVELS.error, 'error');
 
-/**
- * @param {{ level: keyof LEVELS | 0 | 1 | 2 | 3 }} config
- *  */
-export function logger(config) {
+export function logger(config: { level: keyof typeof LEVELS | 0 | 1 | 2 | 3 }) {
   switch (typeof config.level) {
     case 'string': {
       options.level = LEVELS[config.level.toLowerCase()];

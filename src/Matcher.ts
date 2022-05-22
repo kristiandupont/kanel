@@ -1,8 +1,8 @@
 type Matcher = string | RegExp | ((str: string) => boolean);
 
-const isString = (str: any): str is string => typeof str === 'string';
-const isRegExp = (str: any): str is RegExp => str instanceof RegExp;
-const isFunction = (str: any): str is (str: string) => boolean =>
+const isString = (str: unknown): str is string => typeof str === 'string';
+const isRegExp = (str: unknown): str is RegExp => str instanceof RegExp;
+const isPredicate = (str: unknown): str is (str: string) => boolean =>
   typeof str === 'function';
 
 export const isMatch = (str: string, matcher: Matcher): boolean => {
@@ -14,7 +14,7 @@ export const isMatch = (str: string, matcher: Matcher): boolean => {
     return matcher.test(str);
   }
 
-  if (isFunction(matcher)) {
+  if (isPredicate(matcher)) {
     return matcher(str);
   }
 
