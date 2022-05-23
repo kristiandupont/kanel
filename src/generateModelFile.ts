@@ -1,25 +1,14 @@
+import { Column, Reference } from 'extract-pg-schema';
 import path from 'path';
 import { filter, forEach, map, pipe, reject, uniq } from 'ramda';
 
+import { Nominators, TypeMap } from './Config';
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
+import { TableModel, ViewModel } from './Model';
 
-/**
- * @typedef { import('extract-pg-schema').TableOrView } TableOrView
- * @typedef { import('extract-pg-schema').Type } Type
- * @typedef { import('./Model').TableModel } TableModel
- * @typedef { import('./Model').ViewModel } ViewModel
- * @typedef { import('./Config').Nominators } Nominators
- * @typedef { import('./Config').TypeMap } TypeMap
- */
-
-/**
- * @param {TableModel | ViewModel} model
- * @param {{ typeMap: TypeMap, userTypes: (string | any)[], schemaName: string, nominators: Nominators, externalTypesFolder?: string, schemaFolderMap: {[schemaName: string]: string}, makeIdType: (innerType: string, modelName: string) => string }} p1
- * @returns {string[]}
- */
 const generateModelFile = (
-  model,
+  model: TableModel | ViewModel,
   {
     typeMap,
     userTypes,
@@ -28,8 +17,16 @@ const generateModelFile = (
     externalTypesFolder,
     schemaFolderMap,
     makeIdType,
+  }: {
+    typeMap: TypeMap;
+    userTypes: (string | any)[];
+    schemaName: string;
+    nominators: Nominators;
+    externalTypesFolder?: string;
+    schemaFolderMap: { [schemaName: string]: string };
+    makeIdType: (innerType: string, modelName: string) => string;
   }
-) => {
+): string[] => {
   const fileNominator = nominators.fileNominator;
   const makeIdName = (name) =>
     nominators.idNominator(nominators.modelNominator(name), name);
@@ -39,13 +36,10 @@ const generateModelFile = (
 
   const importGenerator = new ImportGenerator(schemaFolderMap[schemaName]);
   const referencedIdTypes = pipe(
-    // @ts-ignore
-    filter((p) => Boolean(p.reference)),
+    filter((p: Column) => Boolean(p.reference)),
     map((p) => p.reference),
-    reject((p) => p.schema === schemaName && p.table === model.name),
-    // @ts-ignore
+    reject((p: Reference) => p.schema === schemaName && p.table === model.name),
     uniq
-    // @ts-ignore
   )(model.columns);
   referencedIdTypes.forEach((i) => {
     const givenName = nominators.modelNominator(i.table);
@@ -65,7 +59,7 @@ const generateModelFile = (
   );
   const appliedUserTypes = uniq(
     map(
-      (p) => p.type,
+      (p: Column | { type: string }) => p.type,
       filter((p) => userTypes.indexOf(p.type) !== -1, cols)
     )
   );
@@ -80,7 +74,7 @@ const generateModelFile = (
   });
 
   const overriddenTypes = map(
-    (p) => p.tags.type,
+    (p: Column) => p.tags.type as string,
     filter((p) => Boolean(p.tags.type), model.columns)
   );
   forEach((importedType) => {
@@ -168,10 +162,9 @@ const generateModelFile = (
   if (hasIdentifier) {
     const [{ type, tags }] = primaryColumns;
 
-    /** @type {string} */
-    // @ts-ignore
-    const innerType =
-      tags.type || typeMap[type] || nominators.typeNominator(type);
+    const innerType = (tags.type ||
+      typeMap[type] ||
+      nominators.typeNominator(type)) as string;
 
     lines.push(
       `export type ${makeIdName(model.name)} = ${makeIdType(
