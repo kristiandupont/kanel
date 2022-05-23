@@ -5,25 +5,22 @@ import path from 'path';
 import { identity, indexBy, isEmpty, map } from 'ramda';
 import rmfr from 'rmfr';
 
-import { nameIdentity } from './Config';
+import Config, { Hook, nameIdentity, SchemaConfig } from './Config';
 import defaultTypeMap from './defaultTypeMap';
 import { logger } from './logger';
 import processSchema from './processSchema';
 
-const labelAsGenerated = (lines) => [
+const labelAsGenerated: Hook<unknown> = (lines) => [
   '// @generated',
   "// Automatically generated. Don't change this file manually.",
   '',
   ...lines,
 ];
 
-const addEmptyLineAtEnd = (lines) => [...lines, ''];
+const addEmptyLineAtEnd: Hook<unknown> = (lines) => [...lines, ''];
 
 const defaultHooks = [labelAsGenerated, addEmptyLineAtEnd];
 
-/**
- * @param {import('./Config').default} config
- */
 const processDatabase = async ({
   connection,
   preDeleteModelFolder = false,
@@ -49,9 +46,9 @@ const processDatabase = async ({
   schemas,
 
   ...unknownProps
-}) => {
+}: Config) => {
   if (!isEmpty(unknownProps)) {
-    console.warn(
+    logger.warn(
       `Unknown configuration properties: ${Object.keys(unknownProps).join(
         ', '
       )}`
@@ -82,9 +79,9 @@ const processDatabase = async ({
   }
 
   const schemaFolderMap = map(
-    (s) => path.resolve(s.modelFolder),
+    (s: SchemaConfig) => path.resolve(s.modelFolder),
     indexBy((s) => s.name, schemas)
-  );
+  ) as Record<string, string>;
 
   for (const schemaConfig of schemas) {
     if (preDeleteModelFolder) {
