@@ -12,7 +12,11 @@ import { isMatch } from './Matcher';
 import { Model } from './Model';
 import writeFile from './writeFile';
 
-const applyHooks = <T>(chain: Hook<T>[], src: T, lines: string[]): string[] => {
+const applyHooks = <T>(
+  chain: Hook<T>[],
+  src: T | undefined,
+  lines: string[]
+): string[] => {
   const boundChain = chain.map((f) => (l) => f(l, src));
   // @ts-ignore
   return pipe(...boundChain)(lines);
@@ -56,8 +60,8 @@ const processSchema = async (
   const userTypes = pluck('name', types);
   const tableOrViewTypes = pluck('name', includedModels);
 
-  compositeTypes.forEach((m) => {
-    const modelFileLines = generateCompositeTypeFile(m, {
+  compositeTypes.forEach((t) => {
+    const typeFileLines = generateCompositeTypeFile(t, {
       typeMap,
       userTypes,
       tableOrViewTypes,
@@ -66,14 +70,14 @@ const processSchema = async (
       externalTypesFolder: schemaConfig.externalTypesFolder,
       schemaFolderMap,
     });
-    const wetModelFileLines = applyHooks(modelProcessChain, m, modelFileLines);
+    const wetTypeFileLines = applyHooks(typeProcessChain, t, typeFileLines);
     const filename = `${nominators.fileNominator(
-      nominators.modelNominator(m.name),
-      m.name
+      nominators.typeNominator(t.name),
+      t.name
     )}.ts`;
     writeFile({
       fullPath: path.join(schemaConfig.modelFolder, filename),
-      lines: wetModelFileLines,
+      lines: wetTypeFileLines,
     });
   });
 
@@ -105,7 +109,7 @@ const processSchema = async (
   );
   const wetIndexFileLines = applyHooks(
     modelProcessChain,
-    {} as Model,
+    undefined,
     indexFileLines
   );
   writeFile({
