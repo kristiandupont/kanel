@@ -5,6 +5,7 @@ import { filter, forEach, map, uniq } from 'ramda';
 import { GivenName, Nominators, TypeMap } from './Config';
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
+import { logger } from './logger';
 
 const generateCompositeTypeFile = (
   compositeType: CompositeType,
@@ -95,11 +96,9 @@ const generateCompositeTypeFile = (
   }
 
   const properties = compositeType.attributes.map((a) => {
-    /** @type {string} */
-    // @ts-ignore
     let rawType = a.tags.type || typeMap[a.type];
     if (!rawType) {
-      console.warn(`Unrecognized type: '${a.type}'`);
+      logger.warn(`Unrecognized type: '${a.type}'`);
       if (tableOrViewTypes.indexOf(a.type) !== -1) {
         rawType = nominators.modelNominator(a.type);
       } else {
