@@ -1,11 +1,11 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`processDatabase should process the dvd rental example according to the snapshot 1`] = `
-Array [
-  Array [
-    Object {
+exports[`processDatabase > should process the dvd rental example according to the snapshot 1`] = `
+[
+  [
+    {
       "fullPath": "/models/mpaa_rating.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -15,10 +15,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/actor.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -55,10 +55,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/address.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -113,10 +113,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/category.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -147,10 +147,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/city.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -189,10 +189,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/country.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -223,10 +223,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/customer.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -295,10 +295,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/film.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -383,10 +383,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/film_actor.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -423,10 +423,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/film_category.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -457,10 +457,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/inventory.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -501,10 +501,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/language.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -535,10 +535,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/payment.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -590,10 +590,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/rental.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -656,10 +656,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/store.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -699,10 +699,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/actor_info.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -719,10 +719,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/customer_list.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -749,10 +749,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/nicer_but_slower_film_list.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -779,10 +779,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/sales_by_film_category.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -795,10 +795,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/sales_by_store.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -813,10 +813,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/staff_list.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",
@@ -841,10 +841,10 @@ Array [
       ],
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "fullPath": "/models/index.ts",
-      "lines": Array [
+      "lines": [
         "// @generated",
         "// Automatically generated. Don't change this file manually.",
         "",

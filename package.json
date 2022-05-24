@@ -34,7 +34,7 @@
     "run-example": "node build/cli -c ./example/.kanelrc",
     "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
     "stop-example-db": "docker stop dvd-rental",
-    "test": "yarn jest",
+    "test": "vitest run",
     "version": "yarn build"
   },
   "prettier": {
@@ -66,15 +66,13 @@
   "devDependencies": {
     "@kristiandupont/eslint-config": "1.2.6",
     "@kristiandupont/recase": "1.1.2",
-    "@types/jest": "27.5.1",
     "@types/node": "16.11.36",
     "@types/ramda": "0.28.13",
     "eslint": "8.16.0",
-    "jest": "28.1.0",
     "np": "7.6.1",
     "prettier": "2.6.2",
-    "ts-jest": "28.0.2",
-    "typescript": "4.6.4"
+    "typescript": "4.6.4",
+    "vitest": "^0.12.9"
   },
   "np": {}
 }

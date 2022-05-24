@@ -1,15 +1,17 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import dvdRental from './mocks/dvdrental.json';
 import processDatabase from './processDatabase';
 import writeFile from './writeFile';
 
-jest.mock('extract-pg-schema', () => ({
+vi.mock('extract-pg-schema', () => ({
   extractSchema: () => dvdRental,
 }));
 
-jest.mock('./writeFile');
-jest.mock('fs');
-jest.mock('path', () => {
-  const originalModule = jest.requireActual('path');
+vi.mock('./writeFile');
+vi.mock('fs');
+vi.mock('path', async () => {
+  const originalModule = (await vi.importActual('path')) as any;
   return {
     __esModule: false,
     ...originalModule,
