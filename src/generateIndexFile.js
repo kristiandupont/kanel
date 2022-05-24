@@ -3,7 +3,7 @@ import { filter, map, reject } from 'ramda';
 /**
  * @param {import('extract-pg-schema').TableOrView[]} models
  * @param {string[]} userTypes
- * @param {import('./generateModelFile').Nominators} nominators
+ * @param {import('./Config').Nominators} nominators
  * @returns {string[]}
  */
 function generateIndexFile(models, userTypes, nominators) {
