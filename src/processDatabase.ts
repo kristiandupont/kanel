@@ -84,14 +84,6 @@ const processDatabase = async ({
   ) as Record<string, string>;
 
   for (const schemaConfig of schemas) {
-    if (preDeleteModelFolder) {
-      logger.log(` - Clearing old files in ${schemaConfig.modelFolder}`);
-      await rmfr(schemaConfig.modelFolder, { glob: true });
-    }
-    if (!fs.existsSync(schemaConfig.modelFolder)) {
-      fs.mkdirSync(schemaConfig.modelFolder, { recursive: true });
-    }
-
     const schema = await extractSchema(
       schemaConfig.name,
       connection,
@@ -99,6 +91,14 @@ const processDatabase = async ({
         ? schemaConfig.resolveViews
         : resolveViews
     );
+
+    if (preDeleteModelFolder) {
+      logger.log(` - Clearing old files in ${schemaConfig.modelFolder}`);
+      await rmfr(schemaConfig.modelFolder, { glob: true });
+    }
+    if (!fs.existsSync(schemaConfig.modelFolder)) {
+      fs.mkdirSync(schemaConfig.modelFolder, { recursive: true });
+    }
 
     await processSchema(
       schemaConfig,
