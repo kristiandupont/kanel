@@ -5,6 +5,7 @@ import { filter, forEach, map, pipe, reject, uniq } from 'ramda';
 import { Nominators, TypeMap } from './Config';
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
+import { logger } from './logger';
 import { TableModel, ViewModel } from './Model';
 
 const generateModelFile = (
@@ -115,7 +116,7 @@ const generateModelFile = (
       rawType = rawType.name;
     }
     if (!rawType) {
-      console.warn(`Unrecognized type: '${c.type}'`);
+      logger.warn(`Unrecognized type for ${model.name}.${c.name}: '${c.type}'`);
       rawType = nominators.typeNominator(c.type);
     }
     const typeName = c.nullable ? `${rawType} | null` : rawType;
