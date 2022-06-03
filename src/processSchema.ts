@@ -1,4 +1,4 @@
-import { Schema, Type } from 'extract-pg-schema';
+import { Column, Schema, Type } from 'extract-pg-schema';
 import path from 'path';
 import { pipe, pluck, reject } from 'ramda';
 
@@ -9,7 +9,7 @@ import generateModelFile from './generateModelFile';
 import generateTypeFile from './generateTypeFile';
 import getSupportedTypes from './getSupportedTypes';
 import { isMatch } from './Matcher';
-import { Model } from './Model';
+import { Model, TableModel, ViewModel } from './Model';
 import writeFile from './writeFile';
 
 const applyHooks = <T>(
@@ -26,12 +26,17 @@ const processSchema = async (
   schemaConfig: SchemaConfig,
   schema: Schema,
   typeMap: TypeMap,
+  modelCommentGenerator: (model: TableModel | ViewModel) => string[],
+  propertyCommentGenerator: (
+    column: Column,
+    model: TableModel | ViewModel
+  ) => string[],
   nominators: Nominators,
   modelProcessChain: Hook<Model>[],
   typeProcessChain: Hook<Type>[],
   schemaFolderMap: { [schemaName: string]: string },
   makeIdType: (innerType: string, modelName: string) => string
-) => {
+): Promise<void> => {
   const { tables, views, types } = schema;
 
   const { compositeTypes, enumTypes } = getSupportedTypes(types);
@@ -83,6 +88,8 @@ const processSchema = async (
 
   includedModels.forEach((m) => {
     const modelFileLines = generateModelFile(m, {
+      modelCommentGenerator,
+      propertyCommentGenerator,
       typeMap,
       userTypes,
       nominators,

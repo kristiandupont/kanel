@@ -8,7 +8,7 @@ type ImportSet = {
 class ImportGenerator {
   srcPath: string;
 
-  constructor(srcPath) {
+  constructor(srcPath: string) {
     this.srcPath = srcPath;
   }
 
@@ -19,7 +19,7 @@ class ImportGenerator {
     isDefault: boolean,
     absolutePath: string,
     isAbsolute: boolean
-  ) {
+  ): void {
     let importPath = absolutePath;
 
     if (!isAbsolute) {

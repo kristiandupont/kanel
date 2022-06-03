@@ -10,7 +10,7 @@ const writeFile = ({
 }: {
   fullPath: string;
   lines: string[];
-}) => {
+}): void => {
   const relativePath = path.relative(process.cwd(), fullPath);
   logger.log(` - ${relativePath}`);
 

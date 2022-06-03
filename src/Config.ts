@@ -1,8 +1,8 @@
-import { Type } from 'extract-pg-schema';
+import { Column, Type } from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
 
 import Matcher from './Matcher';
-import { Model } from './Model';
+import { Model, TableModel, ViewModel } from './Model';
 
 type BuiltinType = string;
 type ImportedType = {
@@ -17,6 +17,12 @@ export type TypeDefinition = BuiltinType | ImportedType;
 export type TypeMap = { [index: string]: TypeDefinition };
 
 export type Hook<T> = (lines: string[], src?: T) => string[];
+
+export type ModelAdjective =
+  | 'interface'
+  | 'initializer'
+  | 'mutator'
+  | 'selector';
 
 // In order to keep a little bit of track with the naming pipeline,
 // we tag names that have already been processed by a primary nominator
@@ -45,6 +51,12 @@ type Settings = {
   makeIdType?: (innerType: string, modelName: string) => string;
 
   modelHooks?: Hook<Model>[];
+  modelCommentGenerator?: (model: TableModel | ViewModel) => string[];
+  propertyCommentGenerator?: (
+    column: Column,
+    model: TableModel | ViewModel,
+    modelAdjective: ModelAdjective
+  ) => string[];
   typeHooks?: Hook<Type>[];
   resolveViews?: boolean;
 } & Nominators;

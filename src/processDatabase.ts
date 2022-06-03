@@ -1,13 +1,19 @@
 import chalk from 'chalk';
-import { extractSchema } from 'extract-pg-schema';
+import { Column, extractSchema } from 'extract-pg-schema';
 import fs from 'fs';
 import path from 'path';
 import { identity, indexBy, isEmpty, map } from 'ramda';
 import rmfr from 'rmfr';
 
-import Config, { Hook, nameIdentity, SchemaConfig } from './Config';
+import Config, {
+  Hook,
+  ModelAdjective,
+  nameIdentity,
+  SchemaConfig,
+} from './Config';
 import defaultTypeMap from './defaultTypeMap';
 import { logger } from './logger';
+import { TableModel, ViewModel } from './Model';
 import processSchema from './processSchema';
 
 const labelAsGenerated: Hook<unknown> = (lines) => [
@@ -21,6 +27,28 @@ const addEmptyLineAtEnd: Hook<unknown> = (lines) => [...lines, ''];
 
 const defaultHooks = [labelAsGenerated, addEmptyLineAtEnd];
 
+const defaultPropertyCommentGenerator = (
+  column: Column,
+  _model: TableModel | ViewModel,
+  modelAdjective: ModelAdjective
+) => {
+  const commentLines: string[] = column.comment ? [column.comment] : [];
+
+  if (modelAdjective === 'initializer') {
+    if (column.defaultValue) {
+      commentLines.push(`Default value: ${column.defaultValue}`);
+    }
+  }
+
+  column.indices.forEach((index) => {
+    const commentLine = index.isPrimary
+      ? `Primary key. Index: ${index.name}`
+      : `Index: ${index.name}`;
+    commentLines.push(commentLine);
+  });
+  return commentLines;
+};
+
 const processDatabase = async ({
   connection,
   preDeleteModelFolder = false,
@@ -28,13 +56,16 @@ const processDatabase = async ({
 
   modelHooks = [],
   modelNominator = nameIdentity,
+  modelCommentGenerator = (model: TableModel | ViewModel) =>
+    model.comment ? [model.comment] : [],
   propertyNominator = (propertyName) =>
     propertyName.indexOf(' ') !== -1 ? `'${propertyName}'` : propertyName,
+  propertyCommentGenerator = defaultPropertyCommentGenerator,
   initializerNominator = (modelName) => `${modelName}Initializer`,
   idNominator = (modelName) => `${modelName}Id`,
 
   makeIdType = (innerType, modelName) =>
-    `${innerType} & { " __flavor"?: '${modelName}' };`,
+    `${innerType} & { " __flavor"?: '${modelName}' }`,
 
   typeHooks = [],
   typeNominator = nameIdentity,
@@ -46,7 +77,7 @@ const processDatabase = async ({
   schemas,
 
   ...unknownProps
-}: Config) => {
+}: Config): Promise<void> => {
   if (!isEmpty(unknownProps)) {
     logger.warn(
       `Unknown configuration properties: ${Object.keys(unknownProps).join(
@@ -84,6 +115,7 @@ const processDatabase = async ({
   ) as Record<string, string>;
 
   for (const schemaConfig of schemas) {
+    logger.log('Processing schema: ' + chalk.greenBright(schemaConfig.name));
     const schema = await extractSchema(
       schemaConfig.name,
       connection,
@@ -104,6 +136,8 @@ const processDatabase = async ({
       schemaConfig,
       schema,
       typeMap,
+      modelCommentGenerator,
+      propertyCommentGenerator,
       nominators,
       modelProcessChain,
       typeProcessChain,
