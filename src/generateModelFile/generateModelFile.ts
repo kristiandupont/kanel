@@ -101,6 +101,22 @@ const generateModelFile = (
         ),
         isAbsolute: false,
       };
+    } else if (c.tags.type) {
+      if (typeof c.tags.type === 'boolean') {
+        throw new Error(
+          '@type tag must include the actual type: "@type:string"'
+        );
+      }
+      rawType = c.tags.type;
+      typeImport = {
+        name: c.tags.type,
+        isDefault: true,
+        absolutePath: path.join(
+          externalTypesFolder,
+          nominators.fileNominator(c.tags.type, c.tags.type)
+        ),
+        isAbsolute: false,
+      };
     } else if (
       c.reference &&
       (c.reference.schema !== schemaName || c.reference.table !== model.name)
