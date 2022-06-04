@@ -2,7 +2,13 @@ import { Column, Schema, Type } from 'extract-pg-schema';
 import path from 'path';
 import { pipe, pluck, reject } from 'ramda';
 
-import { Hook, Nominators, SchemaConfig, TypeMap } from './Config';
+import {
+  Hook,
+  ModelAdjective,
+  Nominators,
+  SchemaConfig,
+  TypeMap,
+} from './Config';
 import generateCompositeTypeFile from './generateCompositeTypeFile';
 import generateIndexFile from './generateIndexFile';
 import generateModelFile from './generateModelFile';
@@ -29,7 +35,8 @@ const processSchema = async (
   modelCommentGenerator: (model: TableModel | ViewModel) => string[],
   propertyCommentGenerator: (
     column: Column,
-    model: TableModel | ViewModel
+    model: TableModel | ViewModel,
+    modelAdjective: ModelAdjective
   ) => string[],
   nominators: Nominators,
   modelProcessChain: Hook<Model>[],
