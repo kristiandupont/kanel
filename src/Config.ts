@@ -19,7 +19,7 @@ export type TypeMap = { [index: string]: TypeDefinition };
 export type Hook<T> = (lines: string[], src?: T) => string[];
 
 export type ModelAdjective =
-  | 'interface'
+  | 'definition'
   | 'initializer'
   | 'mutator'
   | 'selector';
@@ -48,6 +48,7 @@ type Settings = {
   ignore?: Matcher[];
   preDeleteModelFolder?: boolean;
   customTypeMap?: TypeMap;
+
   makeIdType?: (innerType: string, modelName: string) => string;
 
   modelHooks?: Hook<Model>[];
