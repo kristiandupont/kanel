@@ -70,15 +70,19 @@ function generateIndexFile(models, userTypes, nominators) {
     ),
     '}',
     '',
-    'type ModelId =',
-    ...map(
-      (model) =>
-        `  | ${nominators.idNominator(
-          nominators.modelNominator(model.name),
-          model.name
-        )}`,
-      modelsWithIdColumn
-    ),
+    ...(modelsWithIdColumn.length === 0
+      ? []
+      : [
+          'type ModelId =',
+          ...map(
+            (model) =>
+              `  | ${nominators.idNominator(
+                nominators.modelNominator(model.name),
+                model.name
+              )}`,
+            modelsWithIdColumn
+          ),
+        ]),
     '',
     'interface ModelIdTypeMap {',
     ...map(
@@ -122,7 +126,7 @@ function generateIndexFile(models, userTypes, nominators) {
     '',
     '  Model,',
     '  ModelTypeMap,',
-    '  ModelId,',
+    ...(modelsWithIdColumn.length === 0 ? [] : ['  ModelId,']),
     '  ModelIdTypeMap,',
     '  Initializer,',
     '  InitializerTypeMap',
