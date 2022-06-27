@@ -35,7 +35,9 @@
     "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
     "stop-example-db": "docker stop dvd-rental",
     "test": "vitest run",
-    "version": "yarn build"
+    "version": "yarn build",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs"
   },
   "prettier": {
     "singleQuote": true,
@@ -57,6 +59,7 @@
   },
   "dependencies": {
     "chalk": "4.1.2",
+    "cli-progress": "^3.11.1",
     "extract-pg-schema": "^3.1.7",
     "optionator": "^0.9.1",
     "pg": "^8.6.0",
@@ -72,7 +75,9 @@
     "np": "7.6.1",
     "prettier": "2.6.2",
     "typescript": "4.6.4",
-    "vitest": "^0.12.9"
+    "vitepress": "^1.0.0-alpha.2",
+    "vitest": "^0.12.9",
+    "vue": "^3.2.37"
   },
   "np": {}
 }

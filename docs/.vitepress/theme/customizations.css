@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;1,900&display=swap');
+
+h1.logo {
+  height: 140px; line-height: 1; 
+  font-size: 150px; font-weight: bold; letter-spacing: -6px;
+  font-family: 'Montserrat', sans-serif;
+  font-style: italic;
+  background: linear-gradient(55deg, rgba(57,79,83,1) 0%, rgba(14,189,224,1) 100%); 
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 0px 7px rgba(53, 110, 122, 0.9));
+}
+
+html.dark h1.logo {
+  background: linear-gradient(55deg, rgb(79, 147, 161) 0%, rgb(149, 237, 255) 100%); 
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 0px 7px rgba(58, 155, 175, 0.9));
+}
+
+h2.payoff {
+  border: none;
+  margin-top: 0;
+  margin-bottom: 30px;
+  padding-top: 0;
+
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+
+  background: rgb(247,78,0);
+  background: linear-gradient(55deg, rgb(176, 1, 1) 0%, rgb(255, 225, 0)100%); 
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 0px 3px rgba(185, 99, 1, 0.9));
+}
+
+html.dark h2.payoff {
+  background: linear-gradient(55deg, rgba(247,78,0,1) 0%, rgba(255,226,0,1) 100%); 
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 0px 3px rgba(255, 136, 0, 0.9));
+}
