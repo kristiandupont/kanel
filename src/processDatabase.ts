@@ -7,8 +7,7 @@ import rmfr from 'rmfr';
 
 import Config, {
   Hook,
-  ModelAdjective,
-  nameIdentity,
+  ModelAgentNoun,
   SchemaConfig,
 } from './Config';
 import defaultTypeMap from './defaultTypeMap';
@@ -30,11 +29,11 @@ const defaultHooks = [labelAsGenerated, addEmptyLineAtEnd];
 const defaultPropertyCommentGenerator = (
   column: Column,
   _model: TableModel | ViewModel,
-  modelAdjective: ModelAdjective
+  modelAgentNoun: ModelAgentNoun
 ) => {
   const commentLines: string[] = column.comment ? [column.comment] : [];
 
-  if (modelAdjective === 'initializer') {
+  if (modelAgentNoun === 'initializer') {
     if (column.defaultValue) {
       commentLines.push(`Default value: ${column.defaultValue}`);
     }

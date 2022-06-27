@@ -2,7 +2,7 @@ import { Column, Type } from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
 
 import Matcher from './Matcher';
-import { Model, TableModel, ViewModel } from './Model';
+import { Model } from './Model';
 
 type BuiltinType = string;
 type ImportedType = {
@@ -14,33 +14,31 @@ type ImportedType = {
 
 export type TypeDefinition = BuiltinType | ImportedType;
 
-export type TypeMap = { [index: string]: TypeDefinition };
+export type TypeMap = Record<string, TypeDefinition>;
 
 export type Hook<T> = (lines: string[], src?: T) => string[];
 
-export type ModelAdjective =
-  | 'definition'
-  | 'initializer'
-  | 'mutator'
-  | 'selector';
+export type ModelDeclarationType = 'interface' | 'zod-schema';
 
-// In order to keep a little bit of track with the naming pipeline,
-// we tag names that have already been processed by a primary nominator
-// (i.e. modelNominator or typeNominator), and make sure that those
-// are the ones passed into the secondary nominators that create
-// things like initializer and file names.
-export type GivenName = string & { __brand?: 'given-name' };
+export type ModelAgentNoun = 'definition' | 'initializer' | 'mutator';
 
-// Pass-through for defaults.
-export const nameIdentity = (name: string): GivenName => name as GivenName;
+export type TypeDefinitionType = Type['type'];
 
 export type Nominators = {
-  modelNominator?: (modelName: string) => GivenName;
-  propertyNominator?: (propertyName: string, model: Model) => string;
-  initializerNominator?: (givenName: GivenName, modelName: string) => string;
-  idNominator?: (givenName: GivenName, modelName: string) => string;
-  typeNominator?: (typeName: string) => GivenName;
-  fileNominator?: (givenName: GivenName, originalName: string) => string;
+  modelNominator?: (
+    modelName: string,
+    model: Model,
+    modelDeclarationType: ModelDeclarationType,
+    modelAgentNoun: ModelAgentNoun
+  ) => string;
+  propertyNominator?: (
+    propertyName: string,
+    column: Column,
+    model: Model
+  ) => string;
+  idNominator?: (modelName: string) => string;
+  typeDefinitionNominator?: (typeName: string) => string;
+  fileNominator?: (modelName: string, model: Model) => string;
 };
 
 type Settings = {
@@ -49,15 +47,24 @@ type Settings = {
   preDeleteModelFolder?: boolean;
   customTypeMap?: TypeMap;
 
+  generateIdTypes?: boolean;
+  generateZodSchemas?: boolean | ((model: Model) => boolean);
+
   makeIdType?: (innerType: string, modelName: string) => string;
 
   modelHooks?: Hook<Model>[];
-  modelCommentGenerator?: (model: TableModel | ViewModel) => string[];
+
+  modelCommentGenerator?: (
+    model: Model,
+    modelAgentNoun: ModelAgentNoun
+  ) => string[];
+
   propertyCommentGenerator?: (
     column: Column,
-    model: TableModel | ViewModel,
-    modelAdjective: ModelAdjective
+    model: Model,
+    modelAgentNoun: ModelAgentNoun
   ) => string[];
+
   typeHooks?: Hook<Type>[];
   resolveViews?: boolean;
 } & Nominators;

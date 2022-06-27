@@ -2,7 +2,7 @@ import { Attribute, CompositeType } from 'extract-pg-schema';
 import path from 'path';
 import { filter, forEach, map, uniq } from 'ramda';
 
-import { GivenName, Nominators, TypeMap } from './Config';
+import { Nominators, TypeMap } from './Config';
 import generateInterface from './generateInterface';
 import ImportGenerator from './importGenerator';
 import { logger } from './logger';
@@ -42,7 +42,7 @@ const generateCompositeTypeFile = (
     )
   );
   appliedUserTypes.forEach((t) => {
-    const givenName = nominators.typeNominator(t);
+    const givenName = nominators.typeDefinitionNominator(t);
     importGenerator.addImport(
       givenName,
       true,
@@ -62,7 +62,7 @@ const generateCompositeTypeFile = (
     )
   );
   appliedTableOrViewTypes.forEach((t) => {
-    const givenName = nominators.modelNominator(t);
+    const givenName = nominators.modelNominator(t, );
     importGenerator.addImport(
       givenName,
       true,

@@ -4,7 +4,7 @@ import { pipe, pluck, reject } from 'ramda';
 
 import {
   Hook,
-  ModelAdjective,
+  ModelAgentNoun,
   Nominators,
   SchemaConfig,
   TypeMap,
@@ -36,7 +36,7 @@ const processSchema = async (
   propertyCommentGenerator: (
     column: Column,
     model: TableModel | ViewModel,
-    modelAdjective: ModelAdjective
+    modelAgentNoun: ModelAgentNoun
   ) => string[],
   nominators: Nominators,
   modelProcessChain: Hook<Model>[],

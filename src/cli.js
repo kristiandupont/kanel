@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import chalk from 'chalk';
 import optionator from 'optionator';
 import path from 'path';
@@ -32,6 +31,19 @@ async function main() {
         description:
           'Use this configuration, overriding .kanelrc.js config options if present',
       },
+      {
+        option: 'database',
+        alias: 'd',
+        description:
+          'Database connection string. Will override the connection field in the config file if present',
+      },
+      {
+        option: 'output',
+        alias: 'o',
+        type: 'path::String',
+        description:
+          'Output directory. Will override the output field in the config file if present',
+      },
     ],
   });
 
@@ -45,12 +57,12 @@ async function main() {
   }
 
   if (options.help) {
-    console.log(o.generateHelp());
+    console.info(o.generateHelp());
     process.exit(0);
   }
 
   if (options.version) {
-    console.log(version);
+    console.info(version);
     process.exit(0);
   }
 

@@ -2,7 +2,7 @@ import { Column } from 'extract-pg-schema';
 import path from 'path';
 import { filter } from 'ramda';
 
-import { ModelAdjective, Nominators, TypeMap } from '../Config';
+import { ModelAgentNoun, Nominators, TypeMap } from '../Config';
 import { logger } from '../logger';
 import { TableModel, ViewModel } from '../Model';
 import ModelFileGenerationSetup, {
@@ -22,12 +22,13 @@ const generateModelFile = (
     externalTypesFolder,
     schemaFolderMap,
     makeIdType,
+    generateZodSchemas,
   }: {
     modelCommentGenerator: (model: TableModel | ViewModel) => string[];
     propertyCommentGenerator: (
       column: Column,
       model: TableModel | ViewModel,
-      modelAdjective: ModelAdjective
+      modelAgentNoun: ModelAgentNoun
     ) => string[];
     typeMap: TypeMap;
     userTypes: (string | any)[];
@@ -36,6 +37,7 @@ const generateModelFile = (
     externalTypesFolder?: string;
     schemaFolderMap: { [schemaName: string]: string };
     makeIdType: (innerType: string, modelName: string) => string;
+    generateZodSchemas: boolean;
   }
 ): string[] => {
   const setup: ModelFileGenerationSetup = {
@@ -128,14 +130,14 @@ const generateModelFile = (
     }
     if (!rawType) {
       logger.warn(`Unrecognized type for ${model.name}.${c.name}: '${c.type}'`);
-      rawType = nominators.typeNominator(c.type);
+      rawType = nominators.typeDefinitionNominator(c.type);
     }
 
     const typeName = c.nullable ? `${rawType} | null` : rawType;
 
     return {
       c,
-      name: nominators.propertyNominator(c.name, model),
+      name: nominators.propertyNominator(c.name, c, model),
       typeImport,
       typeName: typeName,
       isArray: false,
@@ -159,6 +161,22 @@ const generateModelFile = (
       isOptional: false,
     })),
   });
+
+  if (generateZodSchemas) {
+    setup.declarations.push({
+      declarationType: 'zodSchema',
+      name: zodSchemaNominator(p.c, model, 'definition'),
+      properties: props.map((p) => ({
+        name: p.name,
+        typeImport: p.typeImport,
+        typeName: p.typeName,
+        isArray: p.isArray,
+        isNullable: p.c.nullable,
+        isOptional: false,
+        isBuiltin: true,
+      })),
+    });
+  }
 
   const generateInitializer = !model.tags['fixed'] && model.type === 'table';
   if (generateInitializer) {
