@@ -284,7 +284,7 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@kristiandupont/eslint-config@^1.2.7":
+"@kristiandupont/eslint-config@1.2.7":
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/@kristiandupont/eslint-config/-/eslint-config-1.2.7.tgz#05879017b041e00b7186953f9a75d29f33bb5046"
   integrity sha512-UmRAD17xDSfZ27UGVXCFIHPSgA/B9FHnr+eiziEPqlBPjqvD1Wk7O7aAkdLhaa3vnc7QuTtMmavVzSPwa9HKBw==
