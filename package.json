@@ -64,7 +64,7 @@
     "rmfr": "^2.0.0"
   },
   "devDependencies": {
-    "@kristiandupont/eslint-config": "^1.2.7",
+    "@kristiandupont/eslint-config": "1.2.7",
     "@kristiandupont/recase": "1.1.2",
     "@types/node": "16.11.43",
     "@types/ramda": "0.28.14",
