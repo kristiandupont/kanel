@@ -3,7 +3,7 @@ import optionator from 'optionator';
 import path from 'path';
 
 import { logger } from './logger';
-import processDatabase from './processDatabase';
+import processDatabase from './processDb';
 // @ts-ignore
 const { version } = require('../package.json');
 
@@ -34,6 +34,7 @@ async function main() {
       {
         option: 'database',
         alias: 'd',
+        type: 'string',
         description:
           'Database connection string. Will override the connection field in the config file if present',
       },

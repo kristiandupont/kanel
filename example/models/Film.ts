@@ -17,7 +17,7 @@ export default interface Film {
 
   description: string | null;
 
-  release_year: number | null;
+  release_year: Year | null;
 
   /** Index: idx_fk_language_id */
   language_id: LanguageId;
@@ -52,7 +52,7 @@ export interface FilmInitializer {
 
   description?: string | null;
 
-  release_year?: number | null;
+  release_year?: Year | null;
 
   /** Index: idx_fk_language_id */
   language_id: LanguageId;
