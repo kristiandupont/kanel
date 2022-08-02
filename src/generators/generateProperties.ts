@@ -20,7 +20,8 @@ import {
   InterfacePropertyDeclaration,
   TypeDeclaration,
 } from '../declaration-types';
-import { PropertyMetadata } from '../metadata';
+import Details from '../Details';
+import { PropertyMetadata, TypeMetadata } from '../metadata';
 import TypeImport from '../TypeImport';
 import CompositeDetails from './CompositeDetails';
 
@@ -35,6 +36,7 @@ type GeneratePropertiesConfig = {
     p: PropertyDetails,
     d: CompositeDetails
   ) => PropertyMetadata;
+  getMetadata: (details: Details) => TypeMetadata;
   allowOptional: boolean;
   typeMap: TypeMap;
 };
@@ -64,17 +66,16 @@ const resolveType = (
   d: TableDetails | ViewDetails | MaterializedViewDetails | CompositeDetails,
   typeMap: TypeMap,
   schemas: Record<string, Schema>,
+  getMetadata: (details: Details) => TypeMetadata,
   generateIdentifierType?: (
     c: TableColumn,
     d: TableDetails
   ) => TypeImport & TypeDeclaration
 ): string | TypeImport => {
-  let result: string | TypeImport | undefined;
-
   // 1) Check for a @type tag.
-  result = resolveTypeFromComment(c.comment);
-  if (result) {
-    return result;
+  const typeFromComment = resolveTypeFromComment(c.comment);
+  if (typeFromComment) {
+    return typeFromComment;
   }
 
   // 2) If there is a reference, resolve the type from the target
@@ -106,6 +107,7 @@ const resolveType = (
         target,
         typeMap,
         schemas,
+        getMetadata,
         generateIdentifierType
       );
     }
@@ -139,21 +141,27 @@ const resolveType = (
     } else if (c.type.kind === 'domain') {
       target = schemas[schemaName].domains.find((t) => t.name === typeName);
     } else if (c.type.kind === 'range') {
-      target = schemas[schemaName].domains.find((t) => t.name === typeName);
+      target = schemas[schemaName].ranges.find((t) => t.name === typeName);
     }
 
     if (target) {
-      result = resolveTypeFromComment(target.comment);
-      if (result) {
-        return result;
+      const typeFromComment = resolveTypeFromComment(target.comment);
+      if (typeFromComment) {
+        return typeFromComment;
       }
 
-      // return importType(target);
-      return target.name;
+      const { name, path } = getMetadata(target);
+      return {
+        name,
+        absolutePath: path,
+        isAbsolute: false,
+        isDefault: true,
+      };
     }
   }
 
   // 6) If not found, set to unknown and print a warning.
+  console.warn(`Could not resolve type for ${c.type.fullName}`);
   return 'unknown';
 };
 
@@ -172,7 +180,8 @@ const generateProperties = <D extends CompositeDetails>(
       const isOptional = p.isNullable || p.defaultValue;
 
       const t =
-        typeOverride ?? resolveType(p, undefined, config.typeMap, schemas);
+        typeOverride ??
+        resolveType(p, details, config.typeMap, schemas, config.getMetadata);
 
       let typeName: string;
       let typeImports: TypeImport[] = [];

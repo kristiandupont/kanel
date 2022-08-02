@@ -6,6 +6,7 @@ import {
   TypeDeclaration,
 } from '../declaration-types';
 import Details from '../Details';
+import escapeName from '../escapeName';
 import { TypeMetadata } from '../metadata';
 import Output, { Path } from './Output';
 
@@ -36,11 +37,13 @@ const makeMapper =
         declarationType: 'generic',
         comment,
         lines: [
-          'enum ${name} {',
-          ...enumDetails.values.map((value) => `  '${value}' = '${value}',`),
+          `enum ${name} {`,
+          ...enumDetails.values.map(
+            (value) => `  ${escapeName(value)} = '${value}',`
+          ),
           '};',
           '',
-          'export default ${name};',
+          `export default ${name};`,
         ],
       };
       return { path, declaration };
@@ -50,7 +53,7 @@ const makeMapper =
 const makeEnumsGenerator =
   (config: GenerateEnumsConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const declarations = schema.enums.map(makeMapper(config));
+    const declarations = schema.enums?.map(makeMapper(config)) ?? [];
     return declarations.reduce((acc, { path, declaration }) => {
       const existing = acc[path];
       if (existing) {

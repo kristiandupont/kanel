@@ -25,7 +25,7 @@ export type InterfacePropertyDeclaration = {
 export type InterfaceDeclaration = DeclarationBase & {
   declarationType: 'interface';
   name: string;
-  extends?: string;
+  base?: string;
   properties: InterfacePropertyDeclaration[];
   exportAs: 'named' | 'default';
 };

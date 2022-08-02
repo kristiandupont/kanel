@@ -46,7 +46,7 @@ const makeMapper =
 const makeRangesGenerator =
   (config: GenerateRangesConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const declarations = schema.ranges.map(makeMapper(config));
+    const declarations = schema.ranges?.map(makeMapper(config)) ?? [];
     return declarations.reduce((acc, { path, declaration }) => {
       const existing = acc[path];
       if (existing) {

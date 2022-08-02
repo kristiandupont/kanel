@@ -47,7 +47,7 @@ const makeMapper =
 const makeDomainsGenerator =
   (config: GenerateDomainsConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const declarations = schema.domains.map(makeMapper(config));
+    const declarations = schema.domains?.map(makeMapper(config)) ?? [];
     return declarations.reduce((acc, { path, declaration }) => {
       const existing = acc[path];
       if (existing) {

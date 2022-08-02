@@ -39,6 +39,7 @@ const makeMapper =
         allowOptional: false,
         getPropertyMetadata: config.getPropertyMetadata,
         typeMap: config.typeMap,
+        getMetadata: config.getMetadata,
       },
       details,
       config.schemas
@@ -57,7 +58,8 @@ const makeMapper =
 const makeCompositeGenerator =
   (kind: Kind, config: GenerateCompositeConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const declarations = schema[kind].map(makeMapper(config));
+    const declarations: { path: string; declaration: Declaration }[] =
+      schema[`${kind}s`]?.map(makeMapper(config) as any) ?? [];
     return declarations.reduce((acc, { path, declaration }) => {
       const existing = acc[path];
       if (existing) {
