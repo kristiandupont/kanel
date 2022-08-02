@@ -60,7 +60,7 @@
   "dependencies": {
     "chalk": "4.1.2",
     "cli-progress": "^3.11.1",
-    "extract-pg-schema": "^4.0.0",
+    "extract-pg-schema": "^4.0.1",
     "optionator": "^0.9.1",
     "pg": "^8.6.0",
     "ramda": "^0.28.0",

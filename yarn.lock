@@ -1831,10 +1831,10 @@ external-editor@^3.0.3:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
-extract-pg-schema@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-4.0.0.tgz#f5175803d9703eff2007a2ec55dbec2a3d494ad5"
-  integrity sha512-Asr25pGH33tu4MQp8gCs4SA6tYy6HanvJNoDbMLl4IIGJrHRQnjexK6wpPYUQnHnmTMMDDx6NV26s+/e7HXWng==
+extract-pg-schema@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-4.0.1.tgz#bb9ce76ecbf40043244f16b9e90c519fea2295d5"
+  integrity sha512-gUJmwWbCIZOR2pAyL7v1Pxo5OcvBjF9St5ruJp1ARWqm3ooWbv9feaL0is+12Ag6RLzhxC25VBd09dsvM/I1NQ==
   dependencies:
     jsonpath "^1.0.2"
     knex "2.1.0"
