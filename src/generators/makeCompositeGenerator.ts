@@ -15,7 +15,8 @@ type GenerateCompositeConfig = {
   getMetadata: (details: CompositeDetails) => TypeMetadata;
   getPropertyMetadata: (
     property: CompositeProperty,
-    details: CompositeDetails
+    details: CompositeDetails,
+    generateFor: 'selector' | 'initializer' | 'mutator'
   ) => PropertyMetadata;
   generateIdentifierType?: (c: TableColumn, d: TableDetails) => TypeDeclaration;
   typeMap: TypeMap;
@@ -28,9 +29,20 @@ const makeMapper =
     const declarations: Declaration[] = [];
     const { name, comment, path } = config.getMetadata(details);
 
+    if (details.kind === 'table' && config.generateIdentifierType) {
+      const { columns } = details;
+      const identifierColumns = columns.filter(
+        (c) => c.isPrimaryKey && !c.reference
+      );
+
+      identifierColumns.forEach((c) =>
+        declarations.push(config.generateIdentifierType(c, details))
+      );
+    }
+
     const selectorProperties = generateProperties(
       {
-        allowOptional: false,
+        generateFor: 'selector',
         getPropertyMetadata: config.getPropertyMetadata,
         typeMap: config.typeMap,
         getMetadata: config.getMetadata,
@@ -49,15 +61,48 @@ const makeMapper =
     };
     declarations.push(selectorDeclaration);
 
-    if (details.kind === 'table' && config.generateIdentifierType) {
-      const { columns } = details;
-      const identifierColumns = columns.filter(
-        (c) => c.isPrimaryKey && !c.reference
+    if (details.kind === 'table') {
+      const initializerProperties = generateProperties(
+        {
+          generateFor: 'initializer',
+          getPropertyMetadata: config.getPropertyMetadata,
+          typeMap: config.typeMap,
+          getMetadata: config.getMetadata,
+          generateIdentifierType: config.generateIdentifierType,
+        },
+        details,
+        config.schemas
       );
 
-      identifierColumns.forEach((c) =>
-        declarations.push(config.generateIdentifierType(c, details))
+      const initializerDeclaration: InterfaceDeclaration = {
+        declarationType: 'interface',
+        name: `${name}Initializer`,
+        comment: [`Initializer for ${name}`],
+        exportAs: 'named',
+        properties: initializerProperties,
+      };
+      declarations.push(initializerDeclaration);
+
+      const mutatorProperties = generateProperties(
+        {
+          generateFor: 'mutator',
+          getPropertyMetadata: config.getPropertyMetadata,
+          typeMap: config.typeMap,
+          getMetadata: config.getMetadata,
+          generateIdentifierType: config.generateIdentifierType,
+        },
+        details,
+        config.schemas
       );
+
+      const mutatorDeclaration: InterfaceDeclaration = {
+        declarationType: 'interface',
+        name: `${name}Mutator`,
+        comment: [`Mutator for ${name}`],
+        exportAs: 'named',
+        properties: mutatorProperties,
+      };
+      declarations.push(mutatorDeclaration);
     }
 
     return declarations.map((declaration) => ({ path, declaration }));

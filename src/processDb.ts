@@ -32,7 +32,8 @@ type Config = {
   getMetadata?: (details: Details) => TypeMetadata;
   getPropertyMetadata?: (
     property: CompositeProperty,
-    details: CompositeDetails
+    details: CompositeDetails,
+    generateFor: 'selector' | 'initializer' | 'mutator'
   ) => PropertyMetadata;
   generateIdentifierType?: (c: TableColumn, d: TableDetails) => TypeDeclaration;
 
@@ -51,10 +52,16 @@ const defaultGetMetadata = (details: Details): TypeMetadata => ({
 
 const defaultGetPropertyMetadata = (
   property: CompositeProperty,
-  _details: CompositeDetails
+  _details: CompositeDetails,
+  generateFor: 'selector' | 'initializer' | 'mutator'
 ): PropertyMetadata => ({
   name: property.name,
-  comment: property.comment ? [property.comment] : [],
+  comment: [
+    ...(property.comment ? [property.comment] : []),
+    ...(generateFor === 'initializer' && property.defaultValue
+      ? [`Default: ${property.defaultValue}`]
+      : []),
+  ],
 });
 
 const makeDefaultGenerateIdentifierType =

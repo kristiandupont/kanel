@@ -14,14 +14,15 @@ import resolveType from './resolveType';
 type GeneratePropertiesConfig = {
   getPropertyMetadata: (
     property: CompositeProperty,
-    details: CompositeDetails
+    details: CompositeDetails,
+    generateFor: 'selector' | 'initializer' | 'mutator'
   ) => PropertyMetadata;
   getMetadata: (details: Details) => TypeMetadata;
   generateIdentifierType:
     | ((c: TableColumn, d: TableDetails) => TypeDeclaration)
     | undefined;
-  allowOptional: boolean;
   typeMap: TypeMap;
+  generateFor: 'selector' | 'initializer' | 'mutator';
 };
 
 const generateProperties = <D extends CompositeDetails>(
@@ -35,8 +36,8 @@ const generateProperties = <D extends CompositeDetails>(
   const result: InterfacePropertyDeclaration[] = ps.map(
     (p: CompositeProperty): InterfacePropertyDeclaration => {
       const { name, comment, typeOverride, optionalOverride } =
-        config.getPropertyMetadata(p, details);
-      const isOptional = p.isNullable || p.defaultValue;
+        config.getPropertyMetadata(p, details, config.generateFor);
+      const canBeOptional = p.isNullable || p.defaultValue;
 
       const t =
         typeOverride ??
@@ -59,13 +60,26 @@ const generateProperties = <D extends CompositeDetails>(
         typeImports = [t];
       }
 
+      let isOptional: boolean;
+
+      if (optionalOverride !== undefined) {
+        isOptional = optionalOverride;
+      } else {
+        if (config.generateFor === 'selector') {
+          isOptional = false;
+        } else if (config.generateFor === 'initializer') {
+          isOptional = canBeOptional;
+        } else if (config.generateFor === 'mutator') {
+          isOptional = true;
+        }
+      }
+
       return {
         name,
         comment,
         dimensions: p.isArray ? 1 : 0,
         isNullable: p.isNullable,
-        isOptional:
-          optionalOverride ?? config.allowOptional ? isOptional : false,
+        isOptional,
         typeName,
         typeImports,
       };
