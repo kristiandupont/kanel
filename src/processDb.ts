@@ -5,12 +5,12 @@ import {
   Schema,
   TableColumn,
   TableDetails,
-  ViewColumn,act-pg-schema';
+} from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
 
 import { TypeMap } from './Config';
-import { Declaration, TypeDeclaration } from './declaration-types';
-import defrom './defaultTypeMap';
+import { TypeDeclaration } from './declaration-types';
+import defaultTypeMap from './defaultTypeMap';
 import Details from './Details';
 import {
   CompositeDetails,
@@ -24,8 +24,8 @@ import Output from './generators/Output';
 import resolveType from './generators/resolveType';
 import { PropertyMetadata, TypeMetadata } from './metadata';
 import render from './render';
-import TypeImport from './TypeImport';
 
+type Config = {
   connection: string | ConnectionConfig;
   schemas?: string[];
   typeFilter?: (pgType: PgType) => boolean;
@@ -34,10 +34,7 @@ import TypeImport from './TypeImport';
     property: CompositeProperty,
     details: CompositeDetails
   ) => PropertyMetadata;
-  generateIdentifierType?: (
-    c: TableColumn,
-    d: TableDetails
-  ) => TypeDeclaration;
+  generateIdentifierType?: (c: TableColumn, d: TableDetails) => TypeDeclaration;
 
   preDeleteModelFolder?: boolean;
   customTypeMap?: TypeMap;
@@ -60,21 +57,31 @@ const defaultGetPropertyMetadata = (
   comment: property.comment ? [property.comment] : [],
 });
 
-const makeDefaultGenerateIdentifierType = (getMetadata: (details: Details) => TypeMetadata, schemas: Record<string, Schema>, typeMap: TypeMap) => (
-  c: TableColumn,
-  d: TableDetails
-): TypeDeclaration => {
-  const name = toPascalCase(d.name) + toPascalCase(c.name);
-  const innerType = resolveType(c, d, typeMap, schemas, getMetadata, undefined);
+const makeDefaultGenerateIdentifierType =
+  (
+    getMetadata: (details: Details) => TypeMetadata,
+    schemas: Record<string, Schema>,
+    typeMap: TypeMap
+  ) =>
+  (c: TableColumn, d: TableDetails): TypeDeclaration => {
+    const name = toPascalCase(d.name) + toPascalCase(c.name);
+    const innerType = resolveType(
+      c,
+      d,
+      typeMap,
+      schemas,
+      getMetadata,
+      undefined
+    );
 
-  return {
-    declarationType: 'typeDeclaration',
-    name,
-    exportAs: 'named',
-    typeDefinition: [`${innerType} & { __brand: '${name}' }`],
-    comment: [`Identifier type for ${d.name}`],
+    return {
+      declarationType: 'typeDeclaration',
+      name,
+      exportAs: 'named',
+      typeDefinition: [`${innerType} & { __brand: '${name}' }`],
+      comment: [`Identifier type for ${d.name}`],
+    };
   };
-};
 
 const processDatabase = async (config: Config): Promise<void> => {
   const schemas = await extractSchemas(config.connection, {
@@ -91,8 +98,8 @@ const processDatabase = async (config: Config): Promise<void> => {
   const getPropertyMetadata =
     config.getPropertyMetadata ?? defaultGetPropertyMetadata;
   const generateIdentifierType =
-    config.generateIdentifierType ?? makeDefaultGenerateIdentifierType(getMetadata, schemas, typeMap);
-
+    config.generateIdentifierType ??
+    makeDefaultGenerateIdentifierType(getMetadata, schemas, typeMap);
 
   const tableGenerator = makeCompositeGenerator('table', {
     getMetadata,
