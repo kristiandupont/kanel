@@ -1,62 +1,80 @@
 import { recase } from '@kristiandupont/recase';
 import {
-  CompositeTypeAttribute,
   extractSchemas,
-  MaterializedViewColumn,
   PgType,
+  Schema,
   TableColumn,
-  ViewColumn,
-} from 'extract-pg-schema';
+  TableDetails,
+  ViewColumn,act-pg-schema';
 import { ConnectionConfig } from 'pg';
 
 import { TypeMap } from './Config';
-import defaultTypeMap from './defaultTypeMap';
+import { Declaration, TypeDeclaration } from './declaration-types';
+import defrom './defaultTypeMap';
 import Details from './Details';
-import CompositeDetails from './generators/CompositeDetails';
+import {
+  CompositeDetails,
+  CompositeProperty,
+} from './generators/composite-types';
 import makeCompositeGenerator from './generators/makeCompositeGenerator';
 import makeDomainsGenerator from './generators/makeDomainsGenerator';
 import makeEnumsGenerator from './generators/makeEnumsGenerator';
 import makeRangesGenerator from './generators/makeRangesGenerator';
 import Output from './generators/Output';
+import resolveType from './generators/resolveType';
 import { PropertyMetadata, TypeMetadata } from './metadata';
 import render from './render';
+import TypeImport from './TypeImport';
 
-type Config = {
   connection: string | ConnectionConfig;
   schemas?: string[];
   typeFilter?: (pgType: PgType) => boolean;
   getMetadata?: (details: Details) => TypeMetadata;
-  getPropertyMetadata: (
-    property:
-      | TableColumn
-      | ViewColumn
-      | MaterializedViewColumn
-      | CompositeTypeAttribute,
+  getPropertyMetadata?: (
+    property: CompositeProperty,
     details: CompositeDetails
   ) => PropertyMetadata;
+  generateIdentifierType?: (
+    c: TableColumn,
+    d: TableDetails
+  ) => TypeDeclaration;
+
   preDeleteModelFolder?: boolean;
-  customTypeMap?: Record<string, string>;
+  customTypeMap?: TypeMap;
   resolveViews?: boolean;
 };
 
 const toPascalCase = recase('snake', 'pascal');
+
 const defaultGetMetadata = (details: Details): TypeMetadata => ({
   name: toPascalCase(details.name),
   comment: details.comment ? [details.comment] : undefined,
-  path: `/models/${toPascalCase(details.name)}`,
+  path: `/models/${details.schemaName}/${toPascalCase(details.name)}`,
 });
 
 const defaultGetPropertyMetadata = (
-  property:
-    | TableColumn
-    | ViewColumn
-    | MaterializedViewColumn
-    | CompositeTypeAttribute,
+  property: CompositeProperty,
   _details: CompositeDetails
 ): PropertyMetadata => ({
   name: property.name,
   comment: property.comment ? [property.comment] : [],
 });
+
+const makeDefaultGenerateIdentifierType = (getMetadata: (details: Details) => TypeMetadata, schemas: Record<string, Schema>, typeMap: TypeMap) => (
+  c: TableColumn,
+  d: TableDetails
+): TypeDeclaration => {
+  const name = toPascalCase(d.name) + toPascalCase(c.name);
+  const innerType = resolveType(c, d, typeMap, schemas, getMetadata, undefined);
+
+  return {
+    declarationType: 'typeDeclaration',
+    name,
+    exportAs: 'named',
+    typeDefinition: [`${innerType} & { __brand: '${name}' }`],
+    comment: [`Identifier type for ${d.name}`],
+  };
+};
 
 const processDatabase = async (config: Config): Promise<void> => {
   const schemas = await extractSchemas(config.connection, {
@@ -64,33 +82,34 @@ const processDatabase = async (config: Config): Promise<void> => {
     typeFilter: config.typeFilter,
   });
 
-  const getMetadata = config.getMetadata ?? defaultGetMetadata;
-  const getPropertyMetadata =
-    config.getPropertyMetadata ?? defaultGetPropertyMetadata;
-
   const typeMap: TypeMap = {
     ...defaultTypeMap,
     ...config.customTypeMap,
   };
 
+  const getMetadata = config.getMetadata ?? defaultGetMetadata;
+  const getPropertyMetadata =
+    config.getPropertyMetadata ?? defaultGetPropertyMetadata;
+  const generateIdentifierType =
+    config.generateIdentifierType ?? makeDefaultGenerateIdentifierType(getMetadata, schemas, typeMap);
+
+
   const tableGenerator = makeCompositeGenerator('table', {
     getMetadata,
     getPropertyMetadata,
-    style: 'interface',
+    generateIdentifierType,
     typeMap,
     schemas,
   });
   const viewGenerator = makeCompositeGenerator('view', {
     getMetadata,
     getPropertyMetadata,
-    style: 'interface',
     typeMap,
     schemas,
   });
   const materializedViewGenerator = makeCompositeGenerator('materializedView', {
     getMetadata,
     getPropertyMetadata,
-    style: 'interface',
     typeMap,
     schemas,
   });
@@ -109,7 +128,6 @@ const processDatabase = async (config: Config): Promise<void> => {
   const compositeTypeGenerator = makeCompositeGenerator('compositeType', {
     getMetadata,
     getPropertyMetadata,
-    style: 'interface',
     typeMap,
     schemas,
   });
@@ -126,7 +144,7 @@ const processDatabase = async (config: Config): Promise<void> => {
   });
 
   Object.keys(output).forEach((key) => {
-    const file = render(output[key].declarations, '/models');
+    const file = render(output[key].declarations, `/models/${key}`);
     console.log('---', key, '---');
     console.log(file);
   });

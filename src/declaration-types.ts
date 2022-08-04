@@ -1,6 +1,6 @@
 import TypeImport from './TypeImport';
 
-type DeclarationBase = {
+export type DeclarationBase = {
   comment?: string[];
   typeImports?: TypeImport[];
 };
