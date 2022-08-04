@@ -88,7 +88,34 @@ const resolveType = (
     }
   }
 
-  // 3) if the column is a primary key, use the generated type for it, if we do that
+  // 3) If this is a view with a source (i.e. the table that it's based on),
+  // get the type from the source.
+  if ((c as ViewColumn | MaterializedViewColumn).source) {
+    const source = (c as ViewColumn | MaterializedViewColumn).source;
+    const target = schemas[source.schema].tables.find(
+      (t) => t.name === source.table
+    );
+    if (!target) {
+      console.warn('Could not resolve source', source);
+    }
+
+    const column = (
+      target.columns as Array<TableColumn | ViewColumn | MaterializedViewColumn>
+    ).find((c) => c.name === source.column);
+
+    if (column) {
+      return resolveType(
+        column,
+        target,
+        typeMap,
+        schemas,
+        getMetadata,
+        generateIdentifierType
+      );
+    }
+  }
+
+  // 4) if the column is a primary key, use the generated type for it, if we do that
   if (generateIdentifierType && (c as TableColumn).isPrimaryKey) {
     const { path } = getMetadata(d);
     const { name, exportAs } = generateIdentifierType(
@@ -104,12 +131,12 @@ const resolveType = (
     };
   }
 
-  // 4) If there is a typemap type, use that
+  // 5) If there is a typemap type, use that
   if (c.type.fullName in typeMap) {
     return typeMap[c.type.fullName];
   }
 
-  // 5) If the type is a composite, reference that.
+  // 6) If the type is a composite, enum, range or domain, reference that.
   if (['composite', 'enum', 'domain', 'range'].includes(c.type.kind)) {
     const [schemaName, typeName] = c.type.fullName.split('.');
     let target: Details | undefined;
@@ -141,7 +168,7 @@ const resolveType = (
     }
   }
 
-  // 6) If not found, set to unknown and print a warning.
+  // 7) If not found, set to unknown and print a warning.
   console.warn(`Could not resolve type for ${c.type.fullName}`);
   return 'unknown';
 };

@@ -25,7 +25,8 @@ type GenerateCompositeConfig = {
 const makeMapper =
   <D extends CompositeDetails>(config: GenerateCompositeConfig) =>
   (details: D): { path: Path; declaration: Declaration }[] => {
-    const { name, comment, path: selectorPath } = config.getMetadata(details);
+    const declarations: Declaration[] = [];
+    const { name, comment, path } = config.getMetadata(details);
 
     const selectorProperties = generateProperties(
       {
@@ -46,29 +47,20 @@ const makeMapper =
       exportAs: 'default',
       properties: selectorProperties,
     };
+    declarations.push(selectorDeclaration);
 
-    let identifierDeclarations: { declaration: Declaration; path: string }[] =
-      [];
     if (details.kind === 'table' && config.generateIdentifierType) {
       const { columns } = details;
       const identifierColumns = columns.filter(
         (c) => c.isPrimaryKey && !c.reference
       );
 
-      identifierDeclarations = identifierColumns.map((c) => {
-        const declaration = config.generateIdentifierType(c, details);
-
-        return {
-          declaration,
-          path: selectorPath,
-        };
-      });
+      identifierColumns.forEach((c) =>
+        declarations.push(config.generateIdentifierType(c, details))
+      );
     }
 
-    return [
-      ...identifierDeclarations,
-      { path: selectorPath, declaration: selectorDeclaration },
-    ];
+    return declarations.map((declaration) => ({ path, declaration }));
   };
 
 const makeCompositeGenerator =

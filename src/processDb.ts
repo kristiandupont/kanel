@@ -71,7 +71,7 @@ const makeDefaultGenerateIdentifierType =
       typeMap,
       schemas,
       getMetadata,
-      undefined
+      undefined // Explicitly disable identifier generation so we get the inner type here
     );
 
     return {
@@ -111,12 +111,14 @@ const processDatabase = async (config: Config): Promise<void> => {
   const viewGenerator = makeCompositeGenerator('view', {
     getMetadata,
     getPropertyMetadata,
+    generateIdentifierType,
     typeMap,
     schemas,
   });
   const materializedViewGenerator = makeCompositeGenerator('materializedView', {
     getMetadata,
     getPropertyMetadata,
+    generateIdentifierType,
     typeMap,
     schemas,
   });
@@ -135,6 +137,7 @@ const processDatabase = async (config: Config): Promise<void> => {
   const compositeTypeGenerator = makeCompositeGenerator('compositeType', {
     getMetadata,
     getPropertyMetadata,
+    generateIdentifierType,
     typeMap,
     schemas,
   });
