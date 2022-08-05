@@ -1,12 +1,12 @@
 import { Kind, Schema, TableColumn, TableDetails } from 'extract-pg-schema';
 
-import { TypeMap } from '../Config';
 import {
   Declaration,
   InterfaceDeclaration,
   TypeDeclaration,
 } from '../declaration-types';
 import { PropertyMetadata, TypeMetadata } from '../metadata';
+import TypeMap from '../TypeMap';
 import { CompositeDetails, CompositeProperty } from './composite-types';
 import generateProperties from './generateProperties';
 import Output, { Path } from './Output';

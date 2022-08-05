@@ -1,10 +1,11 @@
 import { DomainDetails, Schema } from 'extract-pg-schema';
 
-import { TypeDefinition, TypeMap } from '../Config';
 import { Declaration, TypeDeclaration } from '../declaration-types';
 import Details from '../Details';
 import { TypeMetadata } from '../metadata';
+import { TypeDefinition } from '../TypeDefinition';
 import TypeImport from '../TypeImport';
+import TypeMap from '../TypeMap';
 import Output, { Path } from './Output';
 
 type GenerateDomainsConfig = {

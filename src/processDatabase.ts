@@ -1,94 +1,19 @@
-import { recase } from '@kristiandupont/recase';
-import {
-  extractSchemas,
-  PgType,
-  Schema,
-  TableColumn,
-  TableDetails,
-} from 'extract-pg-schema';
-import { ConnectionConfig } from 'pg';
+import { extractSchemas } from 'extract-pg-schema';
 
-import { TypeMap } from './Config';
-import { TypeDeclaration } from './declaration-types';
-import defaultTypeMap from './defaultTypeMap';
-import Details from './Details';
+import Config from './Config';
 import {
-  CompositeDetails,
-  CompositeProperty,
-} from './generators/composite-types';
+  defaultGetMetadata,
+  defaultGetPropertyMetadata,
+  makeDefaultGenerateIdentifierType,
+} from './default-metadata-generators';
+import defaultTypeMap from './defaultTypeMap';
 import makeCompositeGenerator from './generators/makeCompositeGenerator';
 import makeDomainsGenerator from './generators/makeDomainsGenerator';
 import makeEnumsGenerator from './generators/makeEnumsGenerator';
 import makeRangesGenerator from './generators/makeRangesGenerator';
 import Output from './generators/Output';
-import resolveType from './generators/resolveType';
-import { PropertyMetadata, TypeMetadata } from './metadata';
 import render from './render';
-
-type Config = {
-  connection: string | ConnectionConfig;
-  schemas?: string[];
-  typeFilter?: (pgType: PgType) => boolean;
-  getMetadata?: (details: Details) => TypeMetadata;
-  getPropertyMetadata?: (
-    property: CompositeProperty,
-    details: CompositeDetails,
-    generateFor: 'selector' | 'initializer' | 'mutator'
-  ) => PropertyMetadata;
-  generateIdentifierType?: (c: TableColumn, d: TableDetails) => TypeDeclaration;
-
-  preDeleteModelFolder?: boolean;
-  customTypeMap?: TypeMap;
-  resolveViews?: boolean;
-};
-
-const toPascalCase = recase('snake', 'pascal');
-
-const defaultGetMetadata = (details: Details): TypeMetadata => ({
-  name: toPascalCase(details.name),
-  comment: details.comment ? [details.comment] : undefined,
-  path: `/models/${details.schemaName}/${toPascalCase(details.name)}`,
-});
-
-const defaultGetPropertyMetadata = (
-  property: CompositeProperty,
-  _details: CompositeDetails,
-  generateFor: 'selector' | 'initializer' | 'mutator'
-): PropertyMetadata => ({
-  name: property.name,
-  comment: [
-    ...(property.comment ? [property.comment] : []),
-    ...(generateFor === 'initializer' && property.defaultValue
-      ? [`Default: ${property.defaultValue}`]
-      : []),
-  ],
-});
-
-const makeDefaultGenerateIdentifierType =
-  (
-    getMetadata: (details: Details) => TypeMetadata,
-    schemas: Record<string, Schema>,
-    typeMap: TypeMap
-  ) =>
-  (c: TableColumn, d: TableDetails): TypeDeclaration => {
-    const name = toPascalCase(d.name) + toPascalCase(c.name);
-    const innerType = resolveType(
-      c,
-      d,
-      typeMap,
-      schemas,
-      getMetadata,
-      undefined // Explicitly disable identifier generation so we get the inner type here
-    );
-
-    return {
-      declarationType: 'typeDeclaration',
-      name,
-      exportAs: 'named',
-      typeDefinition: [`${innerType} & { __brand: '${name}' }`],
-      comment: [`Identifier type for ${d.name}`],
-    };
-  };
+import TypeMap from './TypeMap';
 
 const processDatabase = async (config: Config): Promise<void> => {
   const schemas = await extractSchemas(config.connection, {

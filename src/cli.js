@@ -3,7 +3,7 @@ import optionator from 'optionator';
 import path from 'path';
 
 import { logger } from './logger';
-import processDatabase from './processDb';
+import processDatabase from './processDatabase';
 // @ts-ignore
 const { version } = require('../package.json');
 

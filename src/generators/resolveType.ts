@@ -10,11 +10,11 @@ import {
 } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
-import { TypeMap } from '../Config';
 import { TypeDeclaration } from '../declaration-types';
 import Details from '../Details';
 import { TypeMetadata } from '../metadata';
 import TypeImport from '../TypeImport';
+import TypeMap from '../TypeMap';
 import { CompositeDetails, CompositeProperty } from './composite-types';
 
 const resolveTypeFromComment = (

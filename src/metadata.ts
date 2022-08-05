@@ -10,5 +10,6 @@ export type PropertyMetadata = {
   name: string;
   comment: string[] | undefined;
   typeOverride?: TypeImport | string;
+  nullableOverride?: boolean;
   optionalOverride?: boolean;
 };

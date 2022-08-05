@@ -1,6 +1,5 @@
 import { Schema, TableColumn, TableDetails } from 'extract-pg-schema';
 
-import { TypeMap } from '../Config';
 import {
   InterfacePropertyDeclaration,
   TypeDeclaration,
@@ -8,6 +7,7 @@ import {
 import Details from '../Details';
 import { PropertyMetadata, TypeMetadata } from '../metadata';
 import TypeImport from '../TypeImport';
+import TypeMap from '../TypeMap';
 import { CompositeDetails, CompositeProperty } from './composite-types';
 import resolveType from './resolveType';
 
@@ -35,8 +35,13 @@ const generateProperties = <D extends CompositeDetails>(
 
   const result: InterfacePropertyDeclaration[] = ps.map(
     (p: CompositeProperty): InterfacePropertyDeclaration => {
-      const { name, comment, typeOverride, optionalOverride } =
-        config.getPropertyMetadata(p, details, config.generateFor);
+      const {
+        name,
+        comment,
+        typeOverride,
+        nullableOverride,
+        optionalOverride,
+      } = config.getPropertyMetadata(p, details, config.generateFor);
       const canBeOptional = p.isNullable || p.defaultValue;
 
       const t =
@@ -74,11 +79,13 @@ const generateProperties = <D extends CompositeDetails>(
         }
       }
 
+      const isNullable = nullableOverride ?? p.isNullable;
+
       return {
         name,
         comment,
         dimensions: p.isArray ? 1 : 0,
-        isNullable: p.isNullable,
+        isNullable,
         isOptional,
         typeName,
         typeImports,

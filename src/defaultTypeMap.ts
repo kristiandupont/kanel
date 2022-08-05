@@ -1,4 +1,4 @@
-import { TypeMap } from './Config';
+import TypeMap from './TypeMap';
 
 const defaultTypeMap: TypeMap = {
   'pg_catalog.int2': 'number',
