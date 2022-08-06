@@ -14,12 +14,21 @@ import TypeMap from './TypeMap';
 
 const toPascalCase = recase('snake', 'pascal');
 
-export const defaultGetMetadata = (details: Details): TypeMetadata => {
+export const defaultGetMetadata = (
+  details: Details,
+  generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+): TypeMetadata => {
   const { comment: strippedComment } = tryParse(details.comment);
-  const relationComment = `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
+  const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
+
+  const relationComment = isAgentNoun
+    ? `Represents the ${generateFor} for the ${details.kind} ${details.schemaName}.${details.name}`
+    : `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
+
+  const suffix = isAgentNoun ? `_${generateFor}` : '';
 
   return {
-    name: toPascalCase(details.name),
+    name: toPascalCase(details.name + suffix),
     comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
     path: `/models/${details.schemaName}/${toPascalCase(details.name)}`,
   };
@@ -45,7 +54,10 @@ export const defaultGetPropertyMetadata = (
 
 export const makeDefaultGenerateIdentifierType =
   (
-    getMetadata: (details: Details) => TypeMetadata,
+    getMetadata: (
+      details: Details,
+      generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+    ) => TypeMetadata,
     schemas: Record<string, Schema>,
     typeMap: TypeMap
   ) =>
@@ -68,3 +80,20 @@ export const makeDefaultGenerateIdentifierType =
       comment: [`Identifier type for ${d.schemaName}.${d.name}`],
     };
   };
+
+export const defaultPropertySortFunction = (
+  a: CompositeProperty,
+  b: CompositeProperty
+): number => {
+  if ((a as TableColumn).isPrimaryKey && !(b as TableColumn).isPrimaryKey) {
+    return -1;
+  } else if (
+    !(a as TableColumn).isPrimaryKey &&
+    (b as TableColumn).isPrimaryKey
+  ) {
+    return 1;
+  } else {
+    // return a.name.localeCompare(b.name);
+    return a.ordinalPosition - b.ordinalPosition;
+  }
+};

@@ -9,14 +9,17 @@ import TypeMap from '../TypeMap';
 import Output, { Path } from './Output';
 
 type GenerateRangesConfig = {
-  getMetadata: (details: Details) => TypeMetadata;
+  getMetadata: (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ) => TypeMetadata;
   typeMap: TypeMap;
 };
 
 const makeMapper =
   (config: GenerateRangesConfig) =>
   (rangeDetails: RangeDetails): { path: Path; declaration: Declaration } => {
-    const { name, comment, path } = config.getMetadata(rangeDetails);
+    const { name, comment, path } = config.getMetadata(rangeDetails, undefined);
 
     let rType: string;
     const typeImports: TypeImport[] = [];

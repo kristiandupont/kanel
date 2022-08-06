@@ -14,13 +14,17 @@ type Config = {
   connection: string | ConnectionConfig;
   schemas?: string[];
   typeFilter?: (pgType: PgType) => boolean;
-  getMetadata?: (details: Details) => TypeMetadata;
+  getMetadata?: (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ) => TypeMetadata;
   getPropertyMetadata?: (
     property: CompositeProperty,
     details: CompositeDetails,
     generateFor: 'selector' | 'initializer' | 'mutator'
   ) => PropertyMetadata;
   generateIdentifierType?: (c: TableColumn, d: TableDetails) => TypeDeclaration;
+  propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
 
   preDeleteModelFolder?: boolean;
   customTypeMap?: TypeMap;

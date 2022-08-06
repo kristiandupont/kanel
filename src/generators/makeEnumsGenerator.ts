@@ -11,14 +11,17 @@ import { TypeMetadata } from '../metadata';
 import Output, { Path } from './Output';
 
 type GenerateEnumsConfig = {
-  getMetadata: (details: Details) => TypeMetadata;
+  getMetadata: (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ) => TypeMetadata;
   style: 'type' | 'enum';
 };
 
 const makeMapper =
   (config: GenerateEnumsConfig) =>
   (enumDetails: EnumDetails): { path: Path; declaration: Declaration } => {
-    const { name, comment, path } = config.getMetadata(enumDetails);
+    const { name, comment, path } = config.getMetadata(enumDetails, undefined);
 
     if (config.style === 'type') {
       const declaration: TypeDeclaration = {

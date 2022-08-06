@@ -9,14 +9,20 @@ import TypeMap from '../TypeMap';
 import Output, { Path } from './Output';
 
 type GenerateDomainsConfig = {
-  getMetadata: (details: Details) => TypeMetadata;
+  getMetadata: (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ) => TypeMetadata;
   typeMap: TypeMap;
 };
 
 const makeMapper =
   (config: GenerateDomainsConfig) =>
   (domainDetails: DomainDetails): { path: Path; declaration: Declaration } => {
-    const { name, comment, path } = config.getMetadata(domainDetails);
+    const { name, comment, path } = config.getMetadata(
+      domainDetails,
+      undefined
+    );
 
     let typeDefinition: string[] = [];
     const typeImports: TypeImport[] = [];

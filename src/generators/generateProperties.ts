@@ -1,4 +1,5 @@
 import { Schema, TableColumn, TableDetails } from 'extract-pg-schema';
+import * as R from 'ramda';
 
 import {
   InterfacePropertyDeclaration,
@@ -17,12 +18,16 @@ type GeneratePropertiesConfig = {
     details: CompositeDetails,
     generateFor: 'selector' | 'initializer' | 'mutator'
   ) => PropertyMetadata;
-  getMetadata: (details: Details) => TypeMetadata;
+  getMetadata: (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ) => TypeMetadata;
   generateIdentifierType:
     | ((c: TableColumn, d: TableDetails) => TypeDeclaration)
     | undefined;
   typeMap: TypeMap;
   generateFor: 'selector' | 'initializer' | 'mutator';
+  propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
 };
 
 const generateProperties = <D extends CompositeDetails>(
@@ -33,7 +38,11 @@ const generateProperties = <D extends CompositeDetails>(
   const ps =
     details.kind === 'compositeType' ? details.attributes : details.columns;
 
-  const result: InterfacePropertyDeclaration[] = ps.map(
+  const sortedPs = config.propertySortFunction
+    ? R.sort(config.propertySortFunction, ps)
+    : ps;
+
+  const result: InterfacePropertyDeclaration[] = sortedPs.map(
     (p: CompositeProperty): InterfacePropertyDeclaration => {
       const {
         name,

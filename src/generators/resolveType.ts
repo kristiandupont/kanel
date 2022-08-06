@@ -42,7 +42,10 @@ const resolveType = (
   d: CompositeDetails,
   typeMap: TypeMap,
   schemas: Record<string, Schema>,
-  getMetadata: (details: Details) => TypeMetadata,
+  getMetadata: (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ) => TypeMetadata,
   generateIdentifierType:
     | ((c: TableColumn, d: TableDetails) => TypeDeclaration)
     | undefined
@@ -117,7 +120,7 @@ const resolveType = (
 
   // 4) if the column is a primary key, use the generated type for it, if we do that
   if (generateIdentifierType && (c as TableColumn).isPrimaryKey) {
-    const { path } = getMetadata(d);
+    const { path } = getMetadata(d, 'selector');
     const { name, exportAs } = generateIdentifierType(
       c as TableColumn,
       d as TableDetails
@@ -158,7 +161,7 @@ const resolveType = (
         return typeFromComment;
       }
 
-      const { name, path } = getMetadata(target);
+      const { name, path } = getMetadata(target, 'selector');
       return {
         name,
         absolutePath: path,

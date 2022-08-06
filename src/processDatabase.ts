@@ -4,6 +4,7 @@ import Config from './Config';
 import {
   defaultGetMetadata,
   defaultGetPropertyMetadata,
+  defaultPropertySortFunction,
   makeDefaultGenerateIdentifierType,
 } from './default-metadata-generators';
 import defaultTypeMap from './defaultTypeMap';
@@ -33,10 +34,13 @@ const processDatabase = async (config: Config): Promise<void> => {
     config.generateIdentifierType ??
     makeDefaultGenerateIdentifierType(getMetadata, schemas, typeMap);
 
+  const propertySortFunction =
+    config.propertySortFunction ?? defaultPropertySortFunction;
   const tableGenerator = makeCompositeGenerator('table', {
     getMetadata,
     getPropertyMetadata,
     generateIdentifierType,
+    propertySortFunction,
     typeMap,
     schemas,
   });
@@ -44,6 +48,7 @@ const processDatabase = async (config: Config): Promise<void> => {
     getMetadata,
     getPropertyMetadata,
     generateIdentifierType,
+    propertySortFunction,
     typeMap,
     schemas,
   });
@@ -51,6 +56,7 @@ const processDatabase = async (config: Config): Promise<void> => {
     getMetadata,
     getPropertyMetadata,
     generateIdentifierType,
+    propertySortFunction,
     typeMap,
     schemas,
   });
@@ -70,6 +76,7 @@ const processDatabase = async (config: Config): Promise<void> => {
     getMetadata,
     getPropertyMetadata,
     generateIdentifierType,
+    propertySortFunction,
     typeMap,
     schemas,
   });
