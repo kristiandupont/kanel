@@ -16,10 +16,20 @@ import Output from './generators/Output';
 import render from './render';
 import TypeMap from './TypeMap';
 
-const processDatabase = async (config: Config): Promise<void> => {
+type Progress = {
+  onProgressStart?: (total: number) => void;
+  onProgress?: () => void;
+  onProgressEnd?: () => void;
+};
+
+const processDatabase = async (
+  config: Config,
+  progress?: Progress
+): Promise<void> => {
   const schemas = await extractSchemas(config.connection, {
     schemas: config.schemas,
     typeFilter: config.typeFilter,
+    ...progress,
   });
 
   const typeMap: TypeMap = {
@@ -33,9 +43,9 @@ const processDatabase = async (config: Config): Promise<void> => {
   const generateIdentifierType =
     config.generateIdentifierType ??
     makeDefaultGenerateIdentifierType(getMetadata, schemas, typeMap);
-
   const propertySortFunction =
     config.propertySortFunction ?? defaultPropertySortFunction;
+
   const tableGenerator = makeCompositeGenerator('table', {
     getMetadata,
     getPropertyMetadata,

@@ -1199,10 +1199,10 @@ cli-cursor@^3.1.0:
   dependencies:
     restore-cursor "^3.1.0"
 
-cli-progress@^3.11.1:
-  version "3.11.1"
-  resolved "https://registry.yarnpkg.com/cli-progress/-/cli-progress-3.11.1.tgz#02afb11be9a123f2a302931beb087eafe3a0d971"
-  integrity sha512-TTMA2LHrYaZeNMcgZGO10oYqj9hvd03pltNtVbu4ddeyDTHlYV7gWxsFiuvaQlgwMBFCv1TukcjiODWFlb16tQ==
+cli-progress@^3.11.2:
+  version "3.11.2"
+  resolved "https://registry.yarnpkg.com/cli-progress/-/cli-progress-3.11.2.tgz#f8c89bd157e74f3f2c43bcfb3505670b4d48fc77"
+  integrity sha512-lCPoS6ncgX4+rJu5bS3F/iCz17kZ9MPZ6dpuTtI0KXKABkhyXIdYB3Inby1OpaGti3YlI3EeEkM9AuWpelJrVA==
   dependencies:
     string-width "^4.2.3"
 
@@ -1831,10 +1831,10 @@ external-editor@^3.0.3:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
-extract-pg-schema@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-4.0.1.tgz#bb9ce76ecbf40043244f16b9e90c519fea2295d5"
-  integrity sha512-gUJmwWbCIZOR2pAyL7v1Pxo5OcvBjF9St5ruJp1ARWqm3ooWbv9feaL0is+12Ag6RLzhxC25VBd09dsvM/I1NQ==
+extract-pg-schema@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/extract-pg-schema/-/extract-pg-schema-4.0.2.tgz#c7943e90ff100180c11bfe61228d2362f6969550"
+  integrity sha512-w8YzH3XE00AOAHkfsAzZBm09P6krrmH7gwfVLdbVX2bbNsuoITerZSQL1FZjSbl672eIiqY/HU5hf/MXemuL2w==
   dependencies:
     jsonpath "^1.0.2"
     knex "2.1.0"

@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import cliProgress from 'cli-progress';
 import optionator from 'optionator';
 import path from 'path';
 
@@ -76,8 +77,17 @@ async function main() {
 
   logger.log(chalk.greenBright('Kanel'));
 
+  const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  const onProgressStart = (total) => bar.start(total, 0);
+  const onProgress = () => bar.increment();
+  const onProgressEnd = () => bar.stop();
+
   try {
-    await processDatabase(config);
+    await processDatabase(config, {
+      onProgressStart,
+      onProgress,
+      onProgressEnd,
+    });
     process.exit(0);
   } catch (error) {
     logger.error(error);
