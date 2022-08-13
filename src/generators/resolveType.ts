@@ -26,10 +26,10 @@ const resolveTypeFromComment = (
       // If it's just a string, assume system type. No import necessary
       return tags.type;
     } else if (Array.isArray(tags.type)) {
-      const [name, absolutePath, isAbsoluteString, isDefaultString] = tags.type;
+      const [name, path, isAbsoluteString, isDefaultString] = tags.type;
       return {
         name,
-        absolutePath,
+        path,
         isAbsolute: isAbsoluteString === 'true',
         isDefault: isDefaultString === 'true',
       };
@@ -128,7 +128,7 @@ const resolveType = (
 
     return {
       name,
-      absolutePath: path,
+      path,
       isAbsolute: false,
       isDefault: exportAs === 'default',
     };
@@ -164,7 +164,7 @@ const resolveType = (
       const { name, path } = getMetadata(target, 'selector');
       return {
         name,
-        absolutePath: path,
+        path,
         isAbsolute: false,
         isDefault: true,
       };

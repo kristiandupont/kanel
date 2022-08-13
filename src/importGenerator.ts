@@ -1,5 +1,7 @@
 import path from 'path';
 
+import TypeImport from './TypeImport';
+
 type ImportSet = {
   default?: string;
   named: Set<string>;
@@ -14,12 +16,12 @@ class ImportGenerator {
 
   importMap: { [index: string]: ImportSet } = {};
 
-  addImport(
-    name: string,
-    isDefault: boolean,
-    absolutePath: string,
-    isAbsolute: boolean
-  ): void {
+  addImport({
+    name,
+    isDefault,
+    path: absolutePath,
+    isAbsolute,
+  }: TypeImport): void {
     let importPath = absolutePath;
 
     if (!isAbsolute) {

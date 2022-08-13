@@ -1,7 +1,7 @@
 type TypeImport = {
   name: string;
   isDefault: boolean;
-  absolutePath: string;
+  path: string;
   isAbsolute: boolean;
 };
 

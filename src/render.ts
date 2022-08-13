@@ -62,12 +62,7 @@ const processDeclaration = (
         );
         if (property.typeImports) {
           property.typeImports.forEach((typeImport) =>
-            importGenerator.addImport(
-              typeImport.name,
-              typeImport.isDefault,
-              typeImport.absolutePath,
-              typeImport.isAbsolute
-            )
+            importGenerator.addImport(typeImport)
           );
         }
       });
@@ -79,12 +74,7 @@ const processDeclaration = (
       declarationLines.push(...declaration.lines);
       if (declaration.typeImports) {
         declaration.typeImports.forEach((typeImport) =>
-          importGenerator.addImport(
-            typeImport.name,
-            typeImport.isDefault,
-            typeImport.absolutePath,
-            typeImport.isAbsolute
-          )
+          importGenerator.addImport(typeImport)
         );
       }
       break;
