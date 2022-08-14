@@ -1,5 +1,6 @@
 import { recase } from '@kristiandupont/recase';
 import { Schema, TableColumn, TableDetails } from 'extract-pg-schema';
+import { join } from 'path';
 import { tryParse } from 'tagged-comment-parser';
 
 import { TypeDeclaration } from './declaration-types';
@@ -14,25 +15,27 @@ import TypeMap from './TypeMap';
 
 const toPascalCase = recase('snake', 'pascal');
 
-export const defaultGetMetadata = (
-  details: Details,
-  generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-): TypeMetadata => {
-  const { comment: strippedComment } = tryParse(details.comment);
-  const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
+export const makeDefaultGetMetadata =
+  (outputFolder: string) =>
+  (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ): TypeMetadata => {
+    const { comment: strippedComment } = tryParse(details.comment);
+    const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
 
-  const relationComment = isAgentNoun
-    ? `Represents the ${generateFor} for the ${details.kind} ${details.schemaName}.${details.name}`
-    : `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
+    const relationComment = isAgentNoun
+      ? `Represents the ${generateFor} for the ${details.kind} ${details.schemaName}.${details.name}`
+      : `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
 
-  const suffix = isAgentNoun ? `_${generateFor}` : '';
+    const suffix = isAgentNoun ? `_${generateFor}` : '';
 
-  return {
-    name: toPascalCase(details.name + suffix),
-    comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
-    path: `/models/${details.schemaName}/${toPascalCase(details.name)}`,
+    return {
+      name: toPascalCase(details.name + suffix),
+      comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
+      path: join(outputFolder, details.schemaName, toPascalCase(details.name)),
+    };
   };
-};
 
 export const defaultGetPropertyMetadata = (
   property: CompositeProperty,
@@ -69,7 +72,7 @@ export const makeDefaultGenerateIdentifierType =
       typeMap,
       schemas,
       getMetadata,
-      undefined // Explicitly disable identifier generation so we get the inner type here
+      undefined // Explicitly disable identifier resolution so we get the actual inner type here
     );
 
     return {

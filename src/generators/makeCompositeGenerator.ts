@@ -1,4 +1,5 @@
 import { Kind, Schema, TableColumn, TableDetails } from 'extract-pg-schema';
+import { tryParse } from 'tagged-comment-parser';
 
 import {
   Declaration,
@@ -30,6 +31,15 @@ type GenerateCompositeConfig = {
 const makeMapper =
   <D extends CompositeDetails>(config: GenerateCompositeConfig) =>
   (details: D): { path: Path; declaration: Declaration }[] => {
+    if (details.kind === 'compositeType') {
+      // If a composite type has a @type tag in the comment,
+      // we will use that type instead of a generated one.
+      const { tags } = tryParse(details.comment);
+      if (tags?.type) {
+        return [];
+      }
+    }
+
     const declarations: Declaration[] = [];
     const {
       name: selectorName,
@@ -125,6 +135,8 @@ const makeMapper =
     return declarations.map((declaration) => ({ path, declaration }));
   };
 
+// "Composite" in this case means tables, views, materialized views and composite types.
+// I.e. anything that has "properties" and will be turned into an interface in Typescript.
 const makeCompositeGenerator =
   (kind: Kind, config: GenerateCompositeConfig) =>
   (schema: Schema, outputAcc: Output): Output => {

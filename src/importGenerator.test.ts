@@ -4,7 +4,7 @@ import ImportGenerator from './importGenerator';
 
 describe('ImportGenerator', () => {
   it('should generate an import statement', () => {
-    const ig = new ImportGenerator('/src');
+    const ig = new ImportGenerator('/src/some-module');
 
     ig.addImport({
       name: 'func',
@@ -18,7 +18,7 @@ describe('ImportGenerator', () => {
   });
 
   it('should support various cases', () => {
-    const ig = new ImportGenerator('/package/src');
+    const ig = new ImportGenerator('/package/src/some-module');
 
     ig.addImport({
       name: 'defaultFunc',
@@ -90,7 +90,7 @@ describe('ImportGenerator', () => {
   });
 
   it('should ignore duplicates', () => {
-    const ig = new ImportGenerator('./');
+    const ig = new ImportGenerator('./some-module');
 
     ig.addImport({
       name: 'def',
@@ -131,7 +131,7 @@ describe('ImportGenerator', () => {
   });
 
   it('should complain about multiple (different) default imports', () => {
-    const ig = new ImportGenerator('./');
+    const ig = new ImportGenerator('./some-module');
 
     ig.addImport({
       name: 'def',
@@ -151,7 +151,7 @@ describe('ImportGenerator', () => {
   });
 
   it('should support aboslute imports', () => {
-    const ig = new ImportGenerator('./');
+    const ig = new ImportGenerator('./some-module');
 
     ig.addImport({
       name: 'path',
@@ -179,29 +179,29 @@ describe('ImportGenerator', () => {
     ]);
   });
 
-  // it('should not import items from the same file', () => {
-  //   const ig = new ImportGenerator('./pkg');
+  it('should not import items from the same file', () => {
+    const ig = new ImportGenerator('./src/some-module');
 
-  //   ig.addImport({
-  //     name: 'path',
-  //     isDefault: true,
-  //     path: 'path',
-  //     isAbsolute: true,
-  //   });
-  //   ig.addImport({
-  //     name: 'someDefaultImport',
-  //     isDefault: true,
-  //     path: './pkg',
-  //     isAbsolute: false,
-  //   });
-  //   ig.addImport({
-  //     name: 'someNamedImport',
-  //     isDefault: false,
-  //     path: './pkg',
-  //     isAbsolute: false,
-  //   });
+    ig.addImport({
+      name: 'path',
+      isDefault: true,
+      path: 'path',
+      isAbsolute: true,
+    });
+    ig.addImport({
+      name: 'someDefaultImport',
+      isDefault: true,
+      path: './src/some-module',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'someNamedImport',
+      isDefault: false,
+      path: './src/some-module',
+      isAbsolute: false,
+    });
 
-  //   const generatedLines = ig.generateLines();
-  //   expect(generatedLines).toEqual(["import path from 'path';"]);
-  // });
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual(["import path from 'path';"]);
+  });
 });

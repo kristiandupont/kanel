@@ -1,4 +1,5 @@
 import { EnumDetails, Schema } from 'extract-pg-schema';
+import { tryParse } from 'tagged-comment-parser';
 
 import {
   Declaration,
@@ -20,7 +21,16 @@ type GenerateEnumsConfig = {
 
 const makeMapper =
   (config: GenerateEnumsConfig) =>
-  (enumDetails: EnumDetails): { path: Path; declaration: Declaration } => {
+  (
+    enumDetails: EnumDetails
+  ): { path: Path; declaration: Declaration } | undefined => {
+    // If an enum has a @type tag in the comment,
+    // we will use that type instead of a generated one.
+    const { tags } = tryParse(enumDetails.comment);
+    if (tags?.type) {
+      return undefined;
+    }
+
     const { name, comment, path } = config.getMetadata(enumDetails, undefined);
 
     if (config.style === 'type') {
@@ -57,7 +67,9 @@ const makeEnumsGenerator =
   (config: GenerateEnumsConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
     const declarations = schema.enums?.map(makeMapper(config)) ?? [];
-    return declarations.reduce((acc, { path, declaration }) => {
+    return declarations.reduce((acc, elem) => {
+      if (elem === undefined) return acc;
+      const { path, declaration } = elem;
       const existing = acc[path];
       if (existing) {
         existing.declarations.push(declaration);

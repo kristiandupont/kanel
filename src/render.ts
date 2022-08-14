@@ -57,7 +57,7 @@ const processDeclaration = (
           `  ${escapeName(property.name)}${property.isOptional ? '?' : ''}: ${
             property.typeName
           }${'[]'.repeat(property.dimensions)}${
-            property.isNullable ? ' | null' : ''
+            property.isNullable ? ' | null' : ''
           };`
         );
         if (property.typeImports) {
@@ -88,8 +88,8 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (declarations: Declaration[], srcFolder: string): string[] => {
-  const importGenerator = new ImportGenerator(srcFolder);
+const render = (declarations: Declaration[], outputPath: string): string[] => {
+  const importGenerator = new ImportGenerator(outputPath);
   const lines: string[] = [];
 
   declarations.forEach((declaration, index) => {

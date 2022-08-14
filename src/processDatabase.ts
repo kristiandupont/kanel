@@ -1,11 +1,11 @@
-import { extractSchemas } from 'extract-pg-schema';
+import { extractSchemas, Schema } from 'extract-pg-schema';
 
-import Config from './Config';
+import Config, { Hook } from './Config';
 import {
-  defaultGetMetadata,
   defaultGetPropertyMetadata,
   defaultPropertySortFunction,
   makeDefaultGenerateIdentifierType,
+  makeDefaultGetMetadata,
 } from './default-metadata-generators';
 import defaultTypeMap from './defaultTypeMap';
 import makeCompositeGenerator from './generators/makeCompositeGenerator';
@@ -15,11 +15,20 @@ import makeRangesGenerator from './generators/makeRangesGenerator';
 import Output from './generators/Output';
 import render from './render';
 import TypeMap from './TypeMap';
+import writeFile from './writeFile';
 
 type Progress = {
   onProgressStart?: (total: number) => void;
   onProgress?: () => void;
   onProgressEnd?: () => void;
+};
+
+const markAsGenerated = (
+  _schemas: Record<string, Schema>,
+  outputAcc: Output,
+  _config: Config
+): Output => {
+  return outputAcc;
 };
 
 const processDatabase = async (
@@ -37,7 +46,8 @@ const processDatabase = async (
     ...config.customTypeMap,
   };
 
-  const getMetadata = config.getMetadata ?? defaultGetMetadata;
+  const getMetadata =
+    config.getMetadata ?? makeDefaultGetMetadata(config.outputPath);
   const getPropertyMetadata =
     config.getPropertyMetadata ?? defaultGetPropertyMetadata;
   const generateIdentifierType =
@@ -46,30 +56,24 @@ const processDatabase = async (
   const propertySortFunction =
     config.propertySortFunction ?? defaultPropertySortFunction;
 
-  const tableGenerator = makeCompositeGenerator('table', {
+  const compositeConfig = {
     getMetadata,
     getPropertyMetadata,
     generateIdentifierType,
     propertySortFunction,
     typeMap,
     schemas,
-  });
-  const viewGenerator = makeCompositeGenerator('view', {
-    getMetadata,
-    getPropertyMetadata,
-    generateIdentifierType,
-    propertySortFunction,
-    typeMap,
-    schemas,
-  });
-  const materializedViewGenerator = makeCompositeGenerator('materializedView', {
-    getMetadata,
-    getPropertyMetadata,
-    generateIdentifierType,
-    propertySortFunction,
-    typeMap,
-    schemas,
-  });
+  };
+  const tableGenerator = makeCompositeGenerator('table', compositeConfig);
+  const viewGenerator = makeCompositeGenerator('view', compositeConfig);
+  const materializedViewGenerator = makeCompositeGenerator(
+    'materializedView',
+    compositeConfig
+  );
+  const compositeTypeGenerator = makeCompositeGenerator(
+    'compositeType',
+    compositeConfig
+  );
   const enumGenerator = makeEnumsGenerator({
     getMetadata,
     style: 'enum',
@@ -81,14 +85,6 @@ const processDatabase = async (
   const domainGenerator = makeDomainsGenerator({
     getMetadata,
     typeMap,
-  });
-  const compositeTypeGenerator = makeCompositeGenerator('compositeType', {
-    getMetadata,
-    getPropertyMetadata,
-    generateIdentifierType,
-    propertySortFunction,
-    typeMap,
-    schemas,
   });
 
   let output: Output = {};
@@ -102,10 +98,12 @@ const processDatabase = async (
     output = compositeTypeGenerator(schema, output);
   });
 
-  Object.keys(output).forEach((key) => {
-    const file = render(output[key].declarations, `/models/${key}`);
-    console.log('---', key, '---');
-    console.log(file);
+  const hooks: Hook[] = [markAsGenerated, ...(config.hooks ?? [])];
+  hooks.forEach((hook) => (output = hook(schemas, output, config)));
+
+  Object.keys(output).forEach((path) => {
+    const lines = render(output[path].declarations, path);
+    writeFile({ fullPath: `${path}.ts`, lines });
   });
 };
 

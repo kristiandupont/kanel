@@ -1,4 +1,5 @@
 import { RangeDetails, Schema } from 'extract-pg-schema';
+import { tryParse } from 'tagged-comment-parser';
 
 import { Declaration, TypeDeclaration } from '../declaration-types';
 import Details from '../Details';
@@ -18,7 +19,16 @@ type GenerateRangesConfig = {
 
 const makeMapper =
   (config: GenerateRangesConfig) =>
-  (rangeDetails: RangeDetails): { path: Path; declaration: Declaration } => {
+  (
+    rangeDetails: RangeDetails
+  ): { path: Path; declaration: Declaration } | undefined => {
+    // If a range has a @type tag in the comment,
+    // we will use that type instead of a generated one.
+    const { tags } = tryParse(rangeDetails.comment);
+    if (tags?.type) {
+      return undefined;
+    }
+
     const { name, comment, path } = config.getMetadata(rangeDetails, undefined);
 
     let rType: string;
@@ -51,7 +61,9 @@ const makeRangesGenerator =
   (config: GenerateRangesConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
     const declarations = schema.ranges?.map(makeMapper(config)) ?? [];
-    return declarations.reduce((acc, { path, declaration }) => {
+    return declarations.reduce((acc, elem) => {
+      if (elem === undefined) return acc;
+      const { path, declaration } = elem;
       const existing = acc[path];
       if (existing) {
         existing.declarations.push(declaration);
