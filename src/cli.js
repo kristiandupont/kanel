@@ -3,7 +3,6 @@ import cliProgress from 'cli-progress';
 import optionator from 'optionator';
 import path from 'path';
 
-import { logger } from './logger';
 import processDatabase from './processDatabase';
 // @ts-ignore
 const { version } = require('../package.json');
@@ -54,7 +53,7 @@ async function main() {
   try {
     options = o.parseArgv(process.argv);
   } catch (error) {
-    logger.error(error.message);
+    console.error(error.message);
     process.exit(1);
   }
 
@@ -71,11 +70,7 @@ async function main() {
   const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
   const config = require(configFile);
 
-  if (config.logLevel !== undefined) {
-    logger({ level: config.logLevel });
-  }
-
-  logger.log(chalk.greenBright('Kanel'));
+  console.info(chalk.greenBright('Kanel'));
 
   const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
   const onProgressStart = (total) => bar.start(total, 0);
@@ -90,7 +85,7 @@ async function main() {
     });
     process.exit(0);
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     process.exit(1);
   }
 }
