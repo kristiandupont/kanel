@@ -53,7 +53,7 @@ And the following supporting types:
 
 ```typescript
 export type UpdateAction =
-  | 'NO ACTION',
+  | 'NO ACTION',
   | 'RESTRICT',
   | 'CASCADE',
   | 'SET NULL',
@@ -90,9 +90,9 @@ Most of the properties should be self-explanatory, but the following might requi
 
 When `kind` is `'view'`, you get almost the same as for tables:
 
-* `columns: ViewColumn[];`
-* `definition: string;`
-* `informationSchemaValue: InformationSchemaView;`
+- `columns: ViewColumn[];`
+- `definition: string;`
+- `informationSchemaValue: InformationSchemaView;`
 
 The `definition` field contains the sql code that defines the view. The columns are defined like this:
 
@@ -136,14 +136,14 @@ export interface ViewColumn {
 When `kind` is `'materializedView'`, the result is pretty much the same as for the previous two. One important difference is that since materialized views aren't an SQL standard, there is no official information schema value for it. However, extract-pg-schema attempts to recreate the values which you can access in the `fakeInformationSchemaValue` field.
 
 So the contents are:
-* `columns: MaterializedViewColumn[];`
-* `definition: string;`
-* `fakeInformationSchemaValue: InformationSchemaView;`
+
+- `columns: MaterializedViewColumn[];`
+- `definition: string;`
+- `fakeInformationSchemaValue: InformationSchemaView;`
 
 ### Composite Type
 
 When `kind` is `compositeType`, the result is similar to tables, views and materialized views. This is because composite types are much like tables in their definition.
-
 
 ## Output
 

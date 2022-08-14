@@ -1,5 +1,7 @@
-<h1 class="logo">kanel</h1>
-<h2 class="payoff">Source of truth: PostgreSQL</h2>
+<div>
+  <h1 class="logo">kanel</h1>
+  <h2 class="payoff">Source of truth: PostgreSQL</h2>
+</div>
 
 Turn your Postgres schema into Typescript types that look like this:
 
