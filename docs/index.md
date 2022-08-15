@@ -5,32 +5,7 @@
 
 Turn your Postgres schema into Typescript types that look like this:
 
-```typescript
-// @generated
-// Automatically generated. Don't change this file manually.
-
-import { AddressId } from './Address';
-
-export type CustomerId = number & { ' __flavor'?: 'customer' };
-
-export default interface Customer {
-  /** Primary key. Index: customer_pkey */
-  customer_id: CustomerId;
-
-  active: boolean;
-
-  create_date: Date;
-
-  /** Index: idx_fk_address_id */
-  address_id: AddressId;
-}
-```
-
-..or [Zod](https://zod.dev/) schemas like this:
-
-```typescript
-// ...
-```
+<<< @/../example/models/City.ts
 
 It does this by inspecting a live PostgreSQL database,
 sort of like a reverse object/relations mapper.
