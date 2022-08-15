@@ -11,11 +11,37 @@ import Output from './generators/Output';
 import { PropertyMetadata, TypeMetadata } from './metadata';
 import TypeMap from './TypeMap';
 
-export type Hook = (
-  schemas: Record<string, Schema>,
+export type InstantiatedConfig = {
+  schemas: Record<string, Schema>;
+  typeMap: TypeMap;
+
+  getMetadata: (
+    details: Details,
+    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  ) => TypeMetadata;
+  getPropertyMetadata: (
+    property: CompositeProperty,
+    details: CompositeDetails,
+    generateFor: 'selector' | 'initializer' | 'mutator'
+  ) => PropertyMetadata;
+  generateIdentifierType: (c: TableColumn, d: TableDetails) => TypeDeclaration;
+  propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
+
+  outputPath: string;
+  preDeleteOutputFolder: boolean;
+  resolveViews: boolean;
+}
+
+export type PreRenderHook = (
   outputAcc: Output,
-  config: Config
+  instantiatedConfig: InstantiatedConfig
 ) => Output;
+
+export type PostRenderHook = (
+  path: string,
+  lines: string[],
+  instantiatedConfig: InstantiatedConfig
+) => string[];
 
 type Config = {
   connection: string | ConnectionConfig;
@@ -38,7 +64,8 @@ type Config = {
   customTypeMap?: TypeMap;
   resolveViews?: boolean;
 
-  hooks?: Hook[];
+  preRenderHooks?: PreRenderHook[];
+  postRenderHooks?: PostRenderHook[];
 };
 
 export default Config;

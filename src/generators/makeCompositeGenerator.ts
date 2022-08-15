@@ -1,35 +1,14 @@
-import { Kind, Schema, TableColumn, TableDetails } from 'extract-pg-schema';
+import { Kind, Schema } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
-import {
-  Declaration,
-  InterfaceDeclaration,
-  TypeDeclaration,
-} from '../declaration-types';
-import { PropertyMetadata, TypeMetadata } from '../metadata';
-import TypeMap from '../TypeMap';
-import { CompositeDetails, CompositeProperty } from './composite-types';
+import { InstantiatedConfig } from '../Config';
+import { Declaration, InterfaceDeclaration } from '../declaration-types';
+import { CompositeDetails } from './composite-types';
 import generateProperties from './generateProperties';
 import Output, { Path } from './Output';
 
-type GenerateCompositeConfig = {
-  getMetadata: (
-    details: CompositeDetails,
-    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-  ) => TypeMetadata;
-  getPropertyMetadata: (
-    property: CompositeProperty,
-    details: CompositeDetails,
-    generateFor: 'selector' | 'initializer' | 'mutator'
-  ) => PropertyMetadata;
-  generateIdentifierType?: (c: TableColumn, d: TableDetails) => TypeDeclaration;
-  propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
-  typeMap: TypeMap;
-  schemas: Record<string, Schema>;
-};
-
 const makeMapper =
-  <D extends CompositeDetails>(config: GenerateCompositeConfig) =>
+  <D extends CompositeDetails>(config: InstantiatedConfig) =>
   (details: D): { path: Path; declaration: Declaration }[] => {
     if (details.kind === 'compositeType') {
       // If a composite type has a @type tag in the comment,
@@ -138,7 +117,7 @@ const makeMapper =
 // "Composite" in this case means tables, views, materialized views and composite types.
 // I.e. anything that has "properties" and will be turned into an interface in Typescript.
 const makeCompositeGenerator =
-  (kind: Kind, config: GenerateCompositeConfig) =>
+  (kind: Kind, config: InstantiatedConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
     const mapper = makeMapper(config);
     const declarations: { path: string; declaration: Declaration }[] =

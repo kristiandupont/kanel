@@ -172,7 +172,9 @@ const resolveType = (
   }
 
   // 7) If not found, set to unknown and print a warning.
-  console.warn(`Could not resolve type for ${c.type.fullName}`);
+  console.warn(
+    `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`
+  );
   return 'unknown';
 };
 
