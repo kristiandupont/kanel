@@ -1,6 +1,6 @@
 const { join } = require('path');
 const { recase } = require('@kristiandupont/recase');
-const { tryParse } = require('tagged-comment-parser')
+const { tryParse } = require('tagged-comment-parser')
 
 const toPascalCase = recase('snake', 'pascal');
 const outputPath = './example/models';

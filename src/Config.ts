@@ -30,7 +30,7 @@ export type InstantiatedConfig = {
   outputPath: string;
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
-}
+};
 
 export type PreRenderHook = (
   outputAcc: Output,
@@ -43,6 +43,7 @@ export type PostRenderHook = (
   instantiatedConfig: InstantiatedConfig
 ) => string[];
 
+// #region Config
 type Config = {
   connection: string | ConnectionConfig;
   schemas?: string[];
@@ -67,5 +68,6 @@ type Config = {
   preRenderHooks?: PreRenderHook[];
   postRenderHooks?: PostRenderHook[];
 };
+// #endregion
 
 export default Config;

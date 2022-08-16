@@ -1,12 +1,15 @@
 # getMetadata
 
-```
-getMetadata?: (details: Details) => TypeMetadata;
+```typescript
+getMetadata?: (
+  details: Details,
+  generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+) => TypeMetadata;
 ```
 
 This function will give Kanel the information it needs to create types from database items. There is a default implementation provided in [default-metadata-generators.ts](https://github.com/kristiandupont/kanel/blob/master/src/default-metadata-generators.ts) which you can either use as is, as inspiration or you can write your own and call the default as a fallback if you want most cases to work like the default but with a few changes.
 
-## Input
+## details
 
 The `details` parameter describes the item that is being processed. It always has the following properties:
 
@@ -144,6 +147,12 @@ So the contents are:
 ### Composite Type
 
 When `kind` is `compositeType`, the result is similar to tables, views and materialized views. This is because composite types are much like tables in their definition.
+
+## generateFor
+
+When generating metadata for a type that has properties (table, view, materialized view or composite type), this value will be set to either `selector`, `initializer` or `mutator`.
+
+For any table etc., Kanel can generate a selector which is the "primary" type that will be returned from a `select *` statement. Initializers are used when inserting a new row -- which basically means that columns that are nullable or have default values are marked as optional as you can initialize such a row without specifying said property. Finally, mutators are what you use in `update` statements, where any property is optional.
 
 ## Output
 
