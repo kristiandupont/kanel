@@ -7,7 +7,7 @@
     <meta name="description" content="Just playing around.">
     <link rel="stylesheet" href="/assets/style.22e7ce3c.css">
     <link rel="modulepreload" href="/assets/app.eafd5cec.js">
-    <link rel="modulepreload" href="/assets/index.md.d04a18b8.lean.js">
+    <link rel="modulepreload" href="/assets/index.md.36158170.lean.js">
     
     <script id="check-dark-light">(()=>{const e=localStorage.getItem("vitepress-theme-appearance"),a=window.matchMedia("(prefers-color-scheme: dark)").matches;(!e||e==="auto"?a:e==="dark")&&document.documentElement.classList.add("dark")})();</script>
   </head>
@@ -22,40 +22,56 @@
 <span class="line"></span>
 <span class="line"><span style="color:#676E95;font-style:italic;">/** Represents the table public.city */</span></span>
 <span class="line"><span style="color:#89DDFF;font-style:italic;">export</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;font-style:italic;">default</span><span style="color:#A6ACCD;"> </span><span style="color:#C792EA;">interface</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">City</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">{</span></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.int4 */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">city_id</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CityId</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.varchar */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">city</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">string</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.int2 */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">country_id</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CountryId</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.timestamp */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">last_update</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">Date</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"><span style="color:#89DDFF;">}</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#676E95;font-style:italic;">/** Represents the initializer for the table public.city */</span></span>
 <span class="line"><span style="color:#89DDFF;font-style:italic;">export</span><span style="color:#A6ACCD;"> </span><span style="color:#C792EA;">interface</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CityInitializer</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">{</span></span>
-<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Default value: nextval(&#39;city_city_id_seq&#39;::regclass) */</span></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/**</span></span>
+<span class="line"><span style="color:#676E95;font-style:italic;">   * Database type: pg_catalog.int4</span></span>
+<span class="line"><span style="color:#676E95;font-style:italic;">   * Default value: nextval(&#39;city_city_id_seq&#39;::regclass)</span></span>
+<span class="line"><span style="color:#676E95;font-style:italic;">   */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">city_id</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CityId</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.varchar */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">city</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">string</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.int2 */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">country_id</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CountryId</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Default value: now() */</span></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/**</span></span>
+<span class="line"><span style="color:#676E95;font-style:italic;">   * Database type: pg_catalog.timestamp</span></span>
+<span class="line"><span style="color:#676E95;font-style:italic;">   * Default value: now()</span></span>
+<span class="line"><span style="color:#676E95;font-style:italic;">   */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">last_update</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">Date</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"><span style="color:#89DDFF;">}</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#676E95;font-style:italic;">/** Represents the mutator for the table public.city */</span></span>
 <span class="line"><span style="color:#89DDFF;font-style:italic;">export</span><span style="color:#A6ACCD;"> </span><span style="color:#C792EA;">interface</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CityMutator</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">{</span></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.int4 */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">city_id</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CityId</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.varchar */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">city</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">string</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.int2 */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">country_id</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">CountryId</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#676E95;font-style:italic;">/** Database type: pg_catalog.timestamp */</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">last_update</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">Date</span><span style="color:#89DDFF;">;</span></span>
 <span class="line"><span style="color:#89DDFF;">}</span></span>
 <span class="line"></span></code></pre></div><p>It does this by inspecting a live PostgreSQL database, sort of like a reverse object/relations mapper.</p><p>You check the generated code into your repository and work with it using <a href="https://knexjs.org/" target="_blank" rel="noreferrer">Knex.js</a> or similar.</p><p>The idea is introduced in <a href="https://medium.com/@kristiandupont/generating-typescript-types-from-postgres-48661868ef84" target="_blank" rel="noreferrer">this blog post</a>.</p><hr><p>Copyright © 2018 <a href="https://www.kristiandupont.com" target="_blank" rel="noreferrer">Kristian Dupont</a>, licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noreferrer">MIT License</a></p><p><img src="https://images.unsplash.com/photo-1530991472021-ce0e43475f6e?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzB8fGNpbm5hbW9ufGVufDB8fDB8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=900&amp;q=60" alt="Cinnamon"></p></div></div></main><!--[--><!--]--><footer class="VPDocFooter" data-v-e8c58d34 data-v-07504af8><!----><div class="prev-next" data-v-07504af8><div class="pager" data-v-07504af8><!----></div><div class="pager" data-v-07504af8><a class="pager-link next" href="/getting-started.html" data-v-07504af8><span class="desc" data-v-07504af8>Next page</span><span class="title" data-v-07504af8>Getting Started</span></a></div></div></footer><!--[--><!--]--></div></div></div></div></div><!----><!--[--><!--]--></div></div>
-    <script>__VP_HASH_MAP__ = JSON.parse("{\"configuring.md\":\"0c5515d9\",\"generateidentifiertype.md\":\"34acd72e\",\"getmetadata.md\":\"ed06cf42\",\"getpropertymetadata.md\":\"c04bc4c2\",\"getting-started.md\":\"9662fed7\",\"index.md\":\"d04a18b8\",\"workflow.md\":\"feb72649\"}")</script>
+    <script>__VP_HASH_MAP__ = JSON.parse("{\"configuring.md\":\"a4c1b886\",\"generateidentifiertype.md\":\"34acd72e\",\"getmetadata.md\":\"ed06cf42\",\"getpropertymetadata.md\":\"f5081117\",\"getting-started.md\":\"9662fed7\",\"index.md\":\"36158170\",\"migration.md\":\"2fd16e43\",\"workflow.md\":\"feb72649\"}")</script>
     <script type="module" async src="/assets/app.eafd5cec.js"></script>
     
   </body>
