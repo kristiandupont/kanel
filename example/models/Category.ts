@@ -6,29 +6,42 @@ export type CategoryId = number & { __flavor?: 'CategoryId' };
 
 /** Represents the table public.category */
 export default interface Category {
+  /** Database type: pg_catalog.int4 */
   category_id: CategoryId;
 
+  /** Database type: pg_catalog.varchar */
   name: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.category */
 export interface CategoryInitializer {
-  /** Default value: nextval('category_category_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('category_category_id_seq'::regclass)
+   */
   category_id?: CategoryId;
 
+  /** Database type: pg_catalog.varchar */
   name: string;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.category */
 export interface CategoryMutator {
+  /** Database type: pg_catalog.int4 */
   category_id?: CategoryId;
 
+  /** Database type: pg_catalog.varchar */
   name?: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

@@ -6,19 +6,27 @@ import MpaaRating from './MpaaRating';
 
 /** Represents the view public.film_list */
 export default interface FilmList {
+  /** Database type: pg_catalog.int4 */
   fid: FilmId;
 
+  /** Database type: pg_catalog.varchar */
   title: string;
 
+  /** Database type: pg_catalog.text */
   description: string;
 
+  /** Database type: pg_catalog.varchar */
   category: string;
 
+  /** Database type: pg_catalog.numeric */
   price: string;
 
+  /** Database type: pg_catalog.int2 */
   length: number;
 
+  /** Database type: public.mpaa_rating */
   rating: MpaaRating;
 
+  /** Database type: pg_catalog.text */
   actors: string;
 }

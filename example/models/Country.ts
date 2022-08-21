@@ -6,29 +6,42 @@ export type CountryId = number & { __flavor?: 'CountryId' };
 
 /** Represents the table public.country */
 export default interface Country {
+  /** Database type: pg_catalog.int4 */
   country_id: CountryId;
 
+  /** Database type: pg_catalog.varchar */
   country: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.country */
 export interface CountryInitializer {
-  /** Default value: nextval('country_country_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('country_country_id_seq'::regclass)
+   */
   country_id?: CountryId;
 
+  /** Database type: pg_catalog.varchar */
   country: string;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.country */
 export interface CountryMutator {
+  /** Database type: pg_catalog.int4 */
   country_id?: CountryId;
 
+  /** Database type: pg_catalog.varchar */
   country?: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

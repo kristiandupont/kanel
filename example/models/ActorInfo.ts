@@ -5,11 +5,15 @@ import { ActorId } from './Actor';
 
 /** Represents the view public.actor_info */
 export default interface ActorInfo {
+  /** Database type: pg_catalog.int4 */
   actor_id: ActorId;
 
+  /** Database type: pg_catalog.varchar */
   first_name: string;
 
+  /** Database type: pg_catalog.varchar */
   last_name: string;
 
+  /** Database type: pg_catalog.text */
   film_info: string;
 }

@@ -9,35 +9,51 @@ export type StoreId = number & { __flavor?: 'StoreId' };
 
 /** Represents the table public.store */
 export default interface Store {
+  /** Database type: pg_catalog.int4 */
   store_id: StoreId;
 
+  /** Database type: pg_catalog.int2 */
   manager_staff_id: StaffId;
 
+  /** Database type: pg_catalog.int2 */
   address_id: AddressId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.store */
 export interface StoreInitializer {
-  /** Default value: nextval('store_store_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('store_store_id_seq'::regclass)
+   */
   store_id?: StoreId;
 
+  /** Database type: pg_catalog.int2 */
   manager_staff_id: StaffId;
 
+  /** Database type: pg_catalog.int2 */
   address_id: AddressId;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.store */
 export interface StoreMutator {
+  /** Database type: pg_catalog.int4 */
   store_id?: StoreId;
 
+  /** Database type: pg_catalog.int2 */
   manager_staff_id?: StaffId;
 
+  /** Database type: pg_catalog.int2 */
   address_id?: AddressId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

@@ -3,7 +3,9 @@
 
 /** Represents the view public.sales_by_film_category */
 export default interface SalesByFilmCategory {
+  /** Database type: pg_catalog.varchar */
   category: string;
 
+  /** Database type: pg_catalog.numeric */
   total_sales: string;
 }

@@ -6,28 +6,39 @@ import { CategoryId } from './Category';
 
 /** Represents the table public.film_category */
 export default interface FilmCategory {
+  /** Database type: pg_catalog.int2 */
   film_id: FilmId;
 
+  /** Database type: pg_catalog.int2 */
   category_id: CategoryId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.film_category */
 export interface FilmCategoryInitializer {
+  /** Database type: pg_catalog.int2 */
   film_id: FilmId;
 
+  /** Database type: pg_catalog.int2 */
   category_id: CategoryId;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.film_category */
 export interface FilmCategoryMutator {
+  /** Database type: pg_catalog.int2 */
   film_id?: FilmId;
 
+  /** Database type: pg_catalog.int2 */
   category_id?: CategoryId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

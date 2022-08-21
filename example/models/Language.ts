@@ -6,29 +6,42 @@ export type LanguageId = number & { __flavor?: 'LanguageId' };
 
 /** Represents the table public.language */
 export default interface Language {
+  /** Database type: pg_catalog.int4 */
   language_id: LanguageId;
 
+  /** Database type: pg_catalog.bpchar */
   name: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.language */
 export interface LanguageInitializer {
-  /** Default value: nextval('language_language_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('language_language_id_seq'::regclass)
+   */
   language_id?: LanguageId;
 
+  /** Database type: pg_catalog.bpchar */
   name: string;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.language */
 export interface LanguageMutator {
+  /** Database type: pg_catalog.int4 */
   language_id?: LanguageId;
 
+  /** Database type: pg_catalog.bpchar */
   name?: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

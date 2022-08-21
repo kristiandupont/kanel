@@ -6,35 +6,51 @@ export type ActorId = number & { __flavor?: 'ActorId' };
 
 /** Represents the table public.actor */
 export default interface Actor {
+  /** Database type: pg_catalog.int4 */
   actor_id: ActorId;
 
+  /** Database type: pg_catalog.varchar */
   first_name: string;
 
+  /** Database type: pg_catalog.varchar */
   last_name: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.actor */
 export interface ActorInitializer {
-  /** Default value: nextval('actor_actor_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('actor_actor_id_seq'::regclass)
+   */
   actor_id?: ActorId;
 
+  /** Database type: pg_catalog.varchar */
   first_name: string;
 
+  /** Database type: pg_catalog.varchar */
   last_name: string;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.actor */
 export interface ActorMutator {
+  /** Database type: pg_catalog.int4 */
   actor_id?: ActorId;
 
+  /** Database type: pg_catalog.varchar */
   first_name?: string;
 
+  /** Database type: pg_catalog.varchar */
   last_name?: string;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

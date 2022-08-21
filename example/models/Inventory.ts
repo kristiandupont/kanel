@@ -8,35 +8,51 @@ export type InventoryId = number & { __flavor?: 'InventoryId' };
 
 /** Represents the table public.inventory */
 export default interface Inventory {
+  /** Database type: pg_catalog.int4 */
   inventory_id: InventoryId;
 
+  /** Database type: pg_catalog.int2 */
   film_id: FilmId;
 
+  /** Database type: pg_catalog.int2 */
   store_id: number;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.inventory */
 export interface InventoryInitializer {
-  /** Default value: nextval('inventory_inventory_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('inventory_inventory_id_seq'::regclass)
+   */
   inventory_id?: InventoryId;
 
+  /** Database type: pg_catalog.int2 */
   film_id: FilmId;
 
+  /** Database type: pg_catalog.int2 */
   store_id: number;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.inventory */
 export interface InventoryMutator {
+  /** Database type: pg_catalog.int4 */
   inventory_id?: InventoryId;
 
+  /** Database type: pg_catalog.int2 */
   film_id?: FilmId;
 
+  /** Database type: pg_catalog.int2 */
   store_id?: number;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

@@ -10,46 +10,66 @@ export type PaymentId = number & { __flavor?: 'PaymentId' };
 
 /** Represents the table public.payment */
 export default interface Payment {
+  /** Database type: pg_catalog.int4 */
   payment_id: PaymentId;
 
+  /** Database type: pg_catalog.int2 */
   customer_id: CustomerId;
 
+  /** Database type: pg_catalog.int2 */
   staff_id: StaffId;
 
+  /** Database type: pg_catalog.int4 */
   rental_id: RentalId;
 
+  /** Database type: pg_catalog.numeric */
   amount: string;
 
+  /** Database type: pg_catalog.timestamp */
   payment_date: Date;
 }
 
 /** Represents the initializer for the table public.payment */
 export interface PaymentInitializer {
-  /** Default value: nextval('payment_payment_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('payment_payment_id_seq'::regclass)
+   */
   payment_id?: PaymentId;
 
+  /** Database type: pg_catalog.int2 */
   customer_id: CustomerId;
 
+  /** Database type: pg_catalog.int2 */
   staff_id: StaffId;
 
+  /** Database type: pg_catalog.int4 */
   rental_id: RentalId;
 
+  /** Database type: pg_catalog.numeric */
   amount: string;
 
+  /** Database type: pg_catalog.timestamp */
   payment_date: Date;
 }
 
 /** Represents the mutator for the table public.payment */
 export interface PaymentMutator {
+  /** Database type: pg_catalog.int4 */
   payment_id?: PaymentId;
 
+  /** Database type: pg_catalog.int2 */
   customer_id?: CustomerId;
 
+  /** Database type: pg_catalog.int2 */
   staff_id?: StaffId;
 
+  /** Database type: pg_catalog.int4 */
   rental_id?: RentalId;
 
+  /** Database type: pg_catalog.numeric */
   amount?: string;
 
+  /** Database type: pg_catalog.timestamp */
   payment_date?: Date;
 }

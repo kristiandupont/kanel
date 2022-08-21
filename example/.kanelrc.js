@@ -37,18 +37,33 @@ module.exports = {
     };
   },
 
+  getPropertyMetadata: (property, _details, generateFor) => {
+    const { comment: strippedComment } = tryParse(property.comment);
+
+    return {
+      name: property.name,
+      comment: [
+        `Database type: ${property.expandedType}`,
+        ...(generateFor === 'initializer' && property.defaultValue
+          ? [`Default value: ${property.defaultValue}`]
+          : []),
+        ...(strippedComment ? [strippedComment] : []),
+      ]
+    }
+  },
+
+
+  // This implementation will generate flavored instead of branded types.
+  // See: https://spin.atomicobject.com/2018/01/15/typescript-flexible-nominal-typing/
   generateIdentifierType: (c, d) => {
     // Id columns are already prepended with the table name, so we don't need to add it here
     const name = toPascalCase(c.name);
 
-    // Identifiers in the example database are all int4's.
-    const innerType = 'number'; 
-    
     return {
       declarationType: 'typeDeclaration',
       name,
       exportAs: 'named',
-      typeDefinition: [`${innerType} & { __flavor?: '${name}' }`],
+      typeDefinition: [`number & { __flavor?: '${name}' }`],
       comment: [`Identifier type for ${d.name}`],
     };
   },

@@ -8,35 +8,51 @@ export type CityId = number & { __flavor?: 'CityId' };
 
 /** Represents the table public.city */
 export default interface City {
+  /** Database type: pg_catalog.int4 */
   city_id: CityId;
 
+  /** Database type: pg_catalog.varchar */
   city: string;
 
+  /** Database type: pg_catalog.int2 */
   country_id: CountryId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.city */
 export interface CityInitializer {
-  /** Default value: nextval('city_city_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('city_city_id_seq'::regclass)
+   */
   city_id?: CityId;
 
+  /** Database type: pg_catalog.varchar */
   city: string;
 
+  /** Database type: pg_catalog.int2 */
   country_id: CountryId;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.city */
 export interface CityMutator {
+  /** Database type: pg_catalog.int4 */
   city_id?: CityId;
 
+  /** Database type: pg_catalog.varchar */
   city?: string;
 
+  /** Database type: pg_catalog.int2 */
   country_id?: CountryId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }

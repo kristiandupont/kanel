@@ -10,53 +10,78 @@ export type RentalId = number & { __flavor?: 'RentalId' };
 
 /** Represents the table public.rental */
 export default interface Rental {
+  /** Database type: pg_catalog.int4 */
   rental_id: RentalId;
 
+  /** Database type: pg_catalog.timestamp */
   rental_date: Date;
 
+  /** Database type: pg_catalog.int4 */
   inventory_id: InventoryId;
 
+  /** Database type: pg_catalog.int2 */
   customer_id: CustomerId;
 
+  /** Database type: pg_catalog.timestamp */
   return_date: Date | null;
 
+  /** Database type: pg_catalog.int2 */
   staff_id: StaffId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update: Date;
 }
 
 /** Represents the initializer for the table public.rental */
 export interface RentalInitializer {
-  /** Default value: nextval('rental_rental_id_seq'::regclass) */
+  /**
+   * Database type: pg_catalog.int4
+   * Default value: nextval('rental_rental_id_seq'::regclass)
+   */
   rental_id?: RentalId;
 
+  /** Database type: pg_catalog.timestamp */
   rental_date: Date;
 
+  /** Database type: pg_catalog.int4 */
   inventory_id: InventoryId;
 
+  /** Database type: pg_catalog.int2 */
   customer_id: CustomerId;
 
+  /** Database type: pg_catalog.timestamp */
   return_date?: Date | null;
 
+  /** Database type: pg_catalog.int2 */
   staff_id: StaffId;
 
-  /** Default value: now() */
+  /**
+   * Database type: pg_catalog.timestamp
+   * Default value: now()
+   */
   last_update?: Date;
 }
 
 /** Represents the mutator for the table public.rental */
 export interface RentalMutator {
+  /** Database type: pg_catalog.int4 */
   rental_id?: RentalId;
 
+  /** Database type: pg_catalog.timestamp */
   rental_date?: Date;
 
+  /** Database type: pg_catalog.int4 */
   inventory_id?: InventoryId;
 
+  /** Database type: pg_catalog.int2 */
   customer_id?: CustomerId;
 
+  /** Database type: pg_catalog.timestamp */
   return_date?: Date | null;
 
+  /** Database type: pg_catalog.int2 */
   staff_id?: StaffId;
 
+  /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }
