@@ -73,16 +73,14 @@ async function main() {
   console.info(chalk.greenBright('Kanel'));
 
   const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-  const onProgressStart = (total) => bar.start(total, 0);
-  const onProgress = () => bar.increment();
-  const onProgressEnd = () => bar.stop();
+  const progress = {
+    onProgressStart: (total) => bar.start(total, 0),
+    onProgress: () => bar.increment(),
+    onProgressEnd: () => bar.stop(),
+  };
 
   try {
-    await processDatabase(config, {
-      onProgressStart,
-      onProgress,
-      onProgressEnd,
-    });
+    await processDatabase(config, progress);
     process.exit(0);
   } catch (error) {
     console.error(error);
