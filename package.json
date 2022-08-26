@@ -44,19 +44,6 @@
     "trailingComma": "es5",
     "endOfLine": "auto"
   },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "testEnvironment": "node",
-    "testMatch": [
-      "<rootDir>/src/**/*.test.(js|ts)"
-    ],
-    "transform": {
-      "^.+\\.(ts|js)$": "ts-jest"
-    }
-  },
   "dependencies": {
     "chalk": "4.1.2",
     "cli-progress": "^3.11.2",
