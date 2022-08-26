@@ -6,6 +6,11 @@ import {
   describe as viDescribe,
 } from 'vitest';
 
+// This reason for this weird wrapper around the vitest functions is to enable
+// "test hooks": https://kristiandupont.medium.com/test-hooks-be89b760d2db.
+// I am hoping they will look into it (https://github.com/vitest-dev/vitest/discussions/1364),
+// but for now, this is a workaround.
+
 export { expect, it, test } from 'vitest';
 
 export let describe: (name: string, fn: () => void) => void;

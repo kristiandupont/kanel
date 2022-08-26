@@ -2,6 +2,10 @@ const { join } = require('path');
 const { recase } = require('@kristiandupont/recase');
 const { tryParse } = require('tagged-comment-parser')
 
+// NOTE: we're importing it directly from the build folder here, but you would
+// import it something like this: const { generateIndexFile } = require('kanel');
+const generateIndexFile = require('../build/hooks/generateIndexFile').default;
+
 const toPascalCase = recase('snake', 'pascal');
 const outputPath = './example/models';
 
@@ -67,6 +71,8 @@ module.exports = {
       comment: [`Identifier type for ${d.name}`],
     };
   },
+
+  preRenderHooks: [generateIndexFile],
 
   customTypeMap: {
     // A text search vector could be stored as a set of strings. See Film.ts for an example.
