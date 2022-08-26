@@ -44,7 +44,7 @@ export type PostRenderHook = (
 ) => string[];
 
 // #region Config
-type Config = {
+export type Config = {
   connection: string | ConnectionConfig;
   schemas?: string[];
   typeFilter?: (pgType: PgType) => boolean;
@@ -69,5 +69,3 @@ type Config = {
   postRenderHooks?: PostRenderHook[];
 };
 // #endregion
-
-export default Config;

@@ -1,6 +1,7 @@
 import { extractSchemas } from 'extract-pg-schema';
 
-import Config, {
+import {
+  Config,
   InstantiatedConfig,
   PostRenderHook,
   PreRenderHook,
