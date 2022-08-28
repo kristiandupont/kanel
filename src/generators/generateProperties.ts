@@ -1,39 +1,15 @@
-import { Schema, TableColumn, TableDetails } from 'extract-pg-schema';
 import * as R from 'ramda';
 
-import {
-  InterfacePropertyDeclaration,
-  TypeDeclaration,
-} from '../declaration-types';
-import Details from '../Details';
-import { PropertyMetadata, TypeMetadata } from '../metadata';
+import { InstantiatedConfig } from '../config-types';
+import { InterfacePropertyDeclaration } from '../declaration-types';
 import TypeImport from '../TypeImport';
-import TypeMap from '../TypeMap';
 import { CompositeDetails, CompositeProperty } from './composite-types';
 import resolveType from './resolveType';
 
-type GeneratePropertiesConfig = {
-  getPropertyMetadata: (
-    property: CompositeProperty,
-    details: CompositeDetails,
-    generateFor: 'selector' | 'initializer' | 'mutator'
-  ) => PropertyMetadata;
-  getMetadata: (
-    details: Details,
-    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-  ) => TypeMetadata;
-  generateIdentifierType:
-    | ((c: TableColumn, d: TableDetails) => TypeDeclaration)
-    | undefined;
-  typeMap: TypeMap;
-  generateFor: 'selector' | 'initializer' | 'mutator';
-  propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
-};
-
 const generateProperties = <D extends CompositeDetails>(
-  config: GeneratePropertiesConfig,
   details: D,
-  schemas: Record<string, Schema>
+  generateFor: 'selector' | 'initializer' | 'mutator',
+  config: InstantiatedConfig
 ): InterfacePropertyDeclaration[] => {
   const ps =
     details.kind === 'compositeType' ? details.attributes : details.columns;
@@ -50,19 +26,10 @@ const generateProperties = <D extends CompositeDetails>(
         typeOverride,
         nullableOverride,
         optionalOverride,
-      } = config.getPropertyMetadata(p, details, config.generateFor);
+      } = config.getPropertyMetadata(p, details, generateFor, config);
       const canBeOptional = p.isNullable || p.defaultValue;
 
-      const t =
-        typeOverride ??
-        resolveType(
-          p,
-          details,
-          config.typeMap,
-          schemas,
-          config.getMetadata,
-          config.generateIdentifierType
-        );
+      const t = typeOverride ?? resolveType(p, details, config);
 
       let typeName: string;
       let typeImports: TypeImport[] = [];
@@ -79,11 +46,11 @@ const generateProperties = <D extends CompositeDetails>(
       if (optionalOverride !== undefined) {
         isOptional = optionalOverride;
       } else {
-        if (config.generateFor === 'selector') {
+        if (generateFor === 'selector') {
           isOptional = false;
-        } else if (config.generateFor === 'initializer') {
+        } else if (generateFor === 'initializer') {
           isOptional = canBeOptional;
-        } else if (config.generateFor === 'mutator') {
+        } else if (generateFor === 'mutator') {
           isOptional = true;
         }
       }

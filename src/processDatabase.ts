@@ -5,12 +5,12 @@ import {
   InstantiatedConfig,
   PostRenderHook,
   PreRenderHook,
-} from './Config';
+} from './config-types';
 import {
+  defaultGenerateIdentifierType,
+  defaultGetMetadata,
   defaultGetPropertyMetadata,
   defaultPropertySortFunction,
-  makeDefaultGenerateIdentifierType,
-  makeDefaultGetMetadata,
 } from './default-metadata-generators';
 import defaultTypeMap from './defaultTypeMap';
 import makeCompositeGenerator from './generators/makeCompositeGenerator';
@@ -55,13 +55,11 @@ const processDatabase = async (
     ...config.customTypeMap,
   };
 
-  const getMetadata =
-    config.getMetadata ?? makeDefaultGetMetadata(config.outputPath);
+  const getMetadata = config.getMetadata ?? defaultGetMetadata;
   const getPropertyMetadata =
     config.getPropertyMetadata ?? defaultGetPropertyMetadata;
   const generateIdentifierType =
-    config.generateIdentifierType ??
-    makeDefaultGenerateIdentifierType(getMetadata, schemas, typeMap);
+    config.generateIdentifierType ?? defaultGenerateIdentifierType;
   const propertySortFunction =
     config.propertySortFunction ?? defaultPropertySortFunction;
 
@@ -87,18 +85,9 @@ const processDatabase = async (
     'compositeType',
     instantiatedConfig
   );
-  const enumGenerator = makeEnumsGenerator({
-    getMetadata,
-    style: 'enum',
-  });
-  const rangeGenerator = makeRangesGenerator({
-    getMetadata,
-    typeMap,
-  });
-  const domainGenerator = makeDomainsGenerator({
-    getMetadata,
-    typeMap,
-  });
+  const enumGenerator = makeEnumsGenerator('enum', instantiatedConfig);
+  const rangeGenerator = makeRangesGenerator(instantiatedConfig);
+  const domainGenerator = makeDomainsGenerator(instantiatedConfig);
 
   let output: Output = {};
   Object.values(schemas).forEach((schema) => {

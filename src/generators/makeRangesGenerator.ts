@@ -1,24 +1,14 @@
 import { RangeDetails, Schema } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
+import { InstantiatedConfig } from '../config-types';
 import { Declaration, TypeDeclaration } from '../declaration-types';
-import Details from '../Details';
-import { TypeMetadata } from '../metadata';
 import { TypeDefinition } from '../TypeDefinition';
 import TypeImport from '../TypeImport';
-import TypeMap from '../TypeMap';
 import Output, { Path } from './Output';
 
-type GenerateRangesConfig = {
-  getMetadata: (
-    details: Details,
-    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-  ) => TypeMetadata;
-  typeMap: TypeMap;
-};
-
 const makeMapper =
-  (config: GenerateRangesConfig) =>
+  (config: InstantiatedConfig) =>
   (
     rangeDetails: RangeDetails
   ): { path: Path; declaration: Declaration } | undefined => {
@@ -29,7 +19,11 @@ const makeMapper =
       return undefined;
     }
 
-    const { name, comment, path } = config.getMetadata(rangeDetails, undefined);
+    const { name, comment, path } = config.getMetadata(
+      rangeDetails,
+      undefined,
+      config
+    );
 
     let rType: string;
     const typeImports: TypeImport[] = [];
@@ -52,13 +46,13 @@ const makeMapper =
       name,
       comment,
       exportAs: 'default',
-      typeDefinition: [`[${rType}, ${rType}] as const`],
+      typeDefinition: [`[lowerBound: ${rType}, upperBound: ${rType}]`],
     };
     return { path, declaration };
   };
 
 const makeRangesGenerator =
-  (config: GenerateRangesConfig) =>
+  (config: InstantiatedConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
     const declarations = schema.ranges?.map(makeMapper(config)) ?? [];
     return declarations.reduce((acc, elem) => {

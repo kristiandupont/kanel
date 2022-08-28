@@ -2,7 +2,6 @@ import {
   ColumnReference,
   MaterializedViewColumn,
   MaterializedViewDetails,
-  Schema,
   TableColumn,
   TableDetails,
   ViewColumn,
@@ -10,11 +9,9 @@ import {
 } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
-import { TypeDeclaration } from '../declaration-types';
+import { InstantiatedConfig } from '../config-types';
 import Details from '../Details';
-import { TypeMetadata } from '../metadata';
 import TypeImport from '../TypeImport';
-import TypeMap from '../TypeMap';
 import { CompositeDetails, CompositeProperty } from './composite-types';
 
 const resolveTypeFromComment = (
@@ -40,15 +37,7 @@ const resolveTypeFromComment = (
 const resolveType = (
   c: CompositeProperty,
   d: CompositeDetails,
-  typeMap: TypeMap,
-  schemas: Record<string, Schema>,
-  getMetadata: (
-    details: Details,
-    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-  ) => TypeMetadata,
-  generateIdentifierType:
-    | ((c: TableColumn, d: TableDetails) => TypeDeclaration)
-    | undefined
+  config: InstantiatedConfig
 ): string | TypeImport => {
   // 1) Check for a @type tag.
   const typeFromComment = resolveTypeFromComment(c.comment);
@@ -59,16 +48,17 @@ const resolveType = (
   // 2) If there is a reference, resolve the type from the target
   if ((c as any).reference) {
     const reference: ColumnReference = (c as any).reference;
-    let target: TableDetails | ViewDetails | MaterializedViewDetails = schemas[
-      reference.schemaName
-    ].tables.find((t) => t.name === reference.tableName);
+    let target: TableDetails | ViewDetails | MaterializedViewDetails =
+      config.schemas[reference.schemaName].tables.find(
+        (t) => t.name === reference.tableName
+      );
     if (!target) {
-      target = schemas[reference.schemaName].views.find(
+      target = config.schemas[reference.schemaName].views.find(
         (v) => v.name === reference.tableName
       );
     }
     if (!target) {
-      target = schemas[reference.schemaName].materializedViews.find(
+      target = config.schemas[reference.schemaName].materializedViews.find(
         (v) => v.name === reference.tableName
       );
     }
@@ -80,14 +70,7 @@ const resolveType = (
       target.columns as Array<TableColumn | ViewColumn | MaterializedViewColumn>
     ).find((c) => c.name === reference.columnName);
     if (column) {
-      return resolveType(
-        column,
-        target,
-        typeMap,
-        schemas,
-        getMetadata,
-        generateIdentifierType
-      );
+      return resolveType(column, target, config);
     }
   }
 
@@ -95,7 +78,7 @@ const resolveType = (
   // get the type from the source.
   if ((c as ViewColumn | MaterializedViewColumn).source) {
     const source = (c as ViewColumn | MaterializedViewColumn).source;
-    const target = schemas[source.schema].tables.find(
+    const target = config.schemas[source.schema].tables.find(
       (t) => t.name === source.table
     );
     if (!target) {
@@ -107,23 +90,17 @@ const resolveType = (
     ).find((c) => c.name === source.column);
 
     if (column) {
-      return resolveType(
-        column,
-        target,
-        typeMap,
-        schemas,
-        getMetadata,
-        generateIdentifierType
-      );
+      return resolveType(column, target, config);
     }
   }
 
   // 4) if the column is a primary key, use the generated type for it, if we do that
-  if (generateIdentifierType && (c as TableColumn).isPrimaryKey) {
-    const { path } = getMetadata(d, 'selector');
-    const { name, exportAs } = generateIdentifierType(
+  if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
+    const { path } = config.getMetadata(d, 'selector', config);
+    const { name, exportAs } = config.generateIdentifierType(
       c as TableColumn,
-      d as TableDetails
+      d as TableDetails,
+      config
     );
 
     return {
@@ -135,8 +112,8 @@ const resolveType = (
   }
 
   // 5) If there is a typemap type, use that
-  if (c.type.fullName in typeMap) {
-    return typeMap[c.type.fullName];
+  if (c.type.fullName in config.typeMap) {
+    return config.typeMap[c.type.fullName];
   }
 
   // 6) If the type is a composite, enum, range or domain, reference that.
@@ -144,15 +121,21 @@ const resolveType = (
     const [schemaName, typeName] = c.type.fullName.split('.');
     let target: Details | undefined;
     if (c.type.kind === 'composite') {
-      target = schemas[schemaName].compositeTypes.find(
+      target = config.schemas[schemaName].compositeTypes.find(
         (t) => t.name === typeName
       );
     } else if (c.type.kind === 'enum') {
-      target = schemas[schemaName].enums.find((t) => t.name === typeName);
+      target = config.schemas[schemaName].enums.find(
+        (t) => t.name === typeName
+      );
     } else if (c.type.kind === 'domain') {
-      target = schemas[schemaName].domains.find((t) => t.name === typeName);
+      target = config.schemas[schemaName].domains.find(
+        (t) => t.name === typeName
+      );
     } else if (c.type.kind === 'range') {
-      target = schemas[schemaName].ranges.find((t) => t.name === typeName);
+      target = config.schemas[schemaName].ranges.find(
+        (t) => t.name === typeName
+      );
     }
 
     if (target) {
@@ -161,7 +144,7 @@ const resolveType = (
         return typeFromComment;
       }
 
-      const { name, path } = getMetadata(target, 'selector');
+      const { name, path } = config.getMetadata(target, 'selector', config);
       return {
         name,
         path,

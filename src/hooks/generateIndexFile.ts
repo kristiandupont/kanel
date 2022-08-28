@@ -1,6 +1,6 @@
 import { join, relative } from 'path';
 
-import { PreRenderHook } from '../Config';
+import { PreRenderHook } from '../config-types';
 import Details from '../Details';
 import { FileContents } from '../generators/Output';
 
@@ -19,18 +19,21 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
 
     const { path, name: selectorName } = instantiatedConfig.getMetadata(
       d,
-      'selector'
+      'selector',
+      instantiatedConfig
     );
     const importPath = relative(instantiatedConfig.outputPath, path);
 
     if (d.kind === 'table') {
       const { name: initializerName } = instantiatedConfig.getMetadata(
         d,
-        'initializer'
+        'initializer',
+        instantiatedConfig
       );
       const { name: mutatorName } = instantiatedConfig.getMetadata(
         d,
-        'mutator'
+        'mutator',
+        instantiatedConfig
       );
       result = `export { default as ${selectorName}, ${initializerName}, ${mutatorName} } from './${importPath}';`;
     } else {

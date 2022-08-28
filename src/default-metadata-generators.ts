@@ -1,47 +1,50 @@
 import { recase } from '@kristiandupont/recase';
-import { Schema, TableColumn, TableDetails } from 'extract-pg-schema';
+import { TableColumn } from 'extract-pg-schema';
 import { join } from 'path';
 import { tryParse } from 'tagged-comment-parser';
 
-import { TypeDeclaration } from './declaration-types';
-import Details from './Details';
-import {
-  CompositeDetails,
-  CompositeProperty,
-} from './generators/composite-types';
+import { InstantiatedConfig } from './config-types';
+import { CompositeProperty } from './generators/composite-types';
 import resolveType from './generators/resolveType';
-import { PropertyMetadata, TypeMetadata } from './metadata';
-import TypeMap from './TypeMap';
+import {
+  GenerateIdentifierType,
+  GetMetadata,
+  GetPropertyMetadata,
+} from './metadata-types';
 
-const toPascalCase = recase('snake', 'pascal');
+const toPascalCase = recase(null, 'pascal');
 
-export const makeDefaultGetMetadata =
-  (outputFolder: string) =>
-  (
-    details: Details,
-    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-  ): TypeMetadata => {
-    const { comment: strippedComment } = tryParse(details.comment);
-    const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
+export const defaultGetMetadata: GetMetadata = (
+  details,
+  generateFor,
+  instantiatedConfig
+) => {
+  const { comment: strippedComment } = tryParse(details.comment);
+  const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
 
-    const relationComment = isAgentNoun
-      ? `Represents the ${generateFor} for the ${details.kind} ${details.schemaName}.${details.name}`
-      : `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
+  const relationComment = isAgentNoun
+    ? `Represents the ${generateFor} for the ${details.kind} ${details.schemaName}.${details.name}`
+    : `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
 
-    const suffix = isAgentNoun ? `_${generateFor}` : '';
+  const suffix = isAgentNoun ? `_${generateFor}` : '';
 
-    return {
-      name: toPascalCase(details.name + suffix),
-      comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
-      path: join(outputFolder, details.schemaName, toPascalCase(details.name)),
-    };
+  return {
+    name: toPascalCase(details.name + suffix),
+    comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
+    path: join(
+      instantiatedConfig.outputPath,
+      details.schemaName,
+      toPascalCase(details.name)
+    ),
   };
+};
 
-export const defaultGetPropertyMetadata = (
-  property: CompositeProperty,
-  _details: CompositeDetails,
-  generateFor: 'selector' | 'initializer' | 'mutator'
-): PropertyMetadata => {
+export const defaultGetPropertyMetadata: GetPropertyMetadata = (
+  property,
+  _details,
+  generateFor,
+  _instantiatedConfig
+) => {
   const { comment: strippedComment } = tryParse(property.comment);
 
   return {
@@ -55,34 +58,26 @@ export const defaultGetPropertyMetadata = (
   };
 };
 
-export const makeDefaultGenerateIdentifierType =
-  (
-    getMetadata: (
-      details: Details,
-      generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-    ) => TypeMetadata,
-    schemas: Record<string, Schema>,
-    typeMap: TypeMap
-  ) =>
-  (c: TableColumn, d: TableDetails): TypeDeclaration => {
-    const name = toPascalCase(d.name) + toPascalCase(c.name);
-    const innerType = resolveType(
-      c,
-      d,
-      typeMap,
-      schemas,
-      getMetadata,
-      undefined // Explicitly disable identifier resolution so we get the actual inner type here
-    );
+export const defaultGenerateIdentifierType: GenerateIdentifierType = (
+  column,
+  details,
+  config: InstantiatedConfig
+) => {
+  const name = toPascalCase(details.name) + toPascalCase(column.name);
+  const innerType = resolveType(column, details, {
+    ...config,
+    // Explicitly disable identifier resolution so we get the actual inner type here
+    generateIdentifierType: undefined,
+  });
 
-    return {
-      declarationType: 'typeDeclaration',
-      name,
-      exportAs: 'named',
-      typeDefinition: [`${innerType} & { __brand: '${name}' }`],
-      comment: [`Identifier type for ${d.schemaName}.${d.name}`],
-    };
+  return {
+    declarationType: 'typeDeclaration',
+    name,
+    exportAs: 'named',
+    typeDefinition: [`${innerType} & { __brand: '${name}' }`],
+    comment: [`Identifier type for ${details.schemaName}.${details.name}`],
   };
+};
 
 export const defaultPropertySortFunction = (
   a: CompositeProperty,

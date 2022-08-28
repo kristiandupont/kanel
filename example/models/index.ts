@@ -25,4 +25,3 @@ export { default as NicerButSlowerFilmList } from './NicerButSlowerFilmList';
 export { default as SalesByFilmCategory } from './SalesByFilmCategory';
 export { default as SalesByStore } from './SalesByStore';
 export { default as StaffList } from './StaffList';
-

@@ -1,26 +1,19 @@
 import { EnumDetails, Schema } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
+import { InstantiatedConfig } from '../config-types';
 import {
   Declaration,
   GenericDeclaration,
   TypeDeclaration,
 } from '../declaration-types';
-import Details from '../Details';
 import escapeName from '../escapeName';
-import { TypeMetadata } from '../metadata';
 import Output, { Path } from './Output';
 
-type GenerateEnumsConfig = {
-  getMetadata: (
-    details: Details,
-    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-  ) => TypeMetadata;
-  style: 'type' | 'enum';
-};
+type EnumStyle = 'enum' | 'type';
 
 const makeMapper =
-  (config: GenerateEnumsConfig) =>
+  (style: EnumStyle, config: InstantiatedConfig) =>
   (
     enumDetails: EnumDetails
   ): { path: Path; declaration: Declaration } | undefined => {
@@ -31,9 +24,13 @@ const makeMapper =
       return undefined;
     }
 
-    const { name, comment, path } = config.getMetadata(enumDetails, undefined);
+    const { name, comment, path } = config.getMetadata(
+      enumDetails,
+      undefined,
+      config
+    );
 
-    if (config.style === 'type') {
+    if (style === 'type') {
       const declaration: TypeDeclaration = {
         declarationType: 'typeDeclaration',
         name,
@@ -64,9 +61,9 @@ const makeMapper =
   };
 
 const makeEnumsGenerator =
-  (config: GenerateEnumsConfig) =>
+  (style: EnumStyle, config: InstantiatedConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const declarations = schema.enums?.map(makeMapper(config)) ?? [];
+    const declarations = schema.enums?.map(makeMapper(style, config)) ?? [];
     return declarations.reduce((acc, elem) => {
       if (elem === undefined) return acc;
       const { path, declaration } = elem;

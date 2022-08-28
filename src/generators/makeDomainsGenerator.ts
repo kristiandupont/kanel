@@ -1,24 +1,14 @@
 import { DomainDetails, Schema } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
+import { InstantiatedConfig } from '../config-types';
 import { Declaration, TypeDeclaration } from '../declaration-types';
-import Details from '../Details';
-import { TypeMetadata } from '../metadata';
 import { TypeDefinition } from '../TypeDefinition';
 import TypeImport from '../TypeImport';
-import TypeMap from '../TypeMap';
 import Output, { Path } from './Output';
 
-type GenerateDomainsConfig = {
-  getMetadata: (
-    details: Details,
-    generateFor: 'selector' | 'initializer' | 'mutator' | undefined
-  ) => TypeMetadata;
-  typeMap: TypeMap;
-};
-
 const makeMapper =
-  (config: GenerateDomainsConfig) =>
+  (config: InstantiatedConfig) =>
   (
     domainDetails: DomainDetails
   ): { path: Path; declaration: Declaration } | undefined => {
@@ -31,7 +21,8 @@ const makeMapper =
 
     const { name, comment, path } = config.getMetadata(
       domainDetails,
-      undefined
+      undefined,
+      config
     );
 
     let typeDefinition: string[] = [];
@@ -62,7 +53,7 @@ const makeMapper =
   };
 
 const makeDomainsGenerator =
-  (config: GenerateDomainsConfig) =>
+  (config: InstantiatedConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
     const declarations = schema.domains?.map(makeMapper(config)) ?? [];
     return declarations.reduce((acc, elem) => {

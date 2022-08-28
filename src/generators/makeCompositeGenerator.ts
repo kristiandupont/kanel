@@ -1,7 +1,7 @@
 import { Kind, Schema } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
-import { InstantiatedConfig } from '../Config';
+import { InstantiatedConfig } from '../config-types';
 import { Declaration, InterfaceDeclaration } from '../declaration-types';
 import { CompositeDetails } from './composite-types';
 import generateProperties from './generateProperties';
@@ -24,7 +24,7 @@ const makeMapper =
       name: selectorName,
       comment: selectorComment,
       path,
-    } = config.getMetadata(details, 'selector');
+    } = config.getMetadata(details, 'selector', config);
 
     if (details.kind === 'table' && config.generateIdentifierType) {
       const { columns } = details;
@@ -33,22 +33,11 @@ const makeMapper =
       );
 
       identifierColumns.forEach((c) =>
-        declarations.push(config.generateIdentifierType(c, details))
+        declarations.push(config.generateIdentifierType(c, details, config))
       );
     }
 
-    const selectorProperties = generateProperties(
-      {
-        generateFor: 'selector',
-        getPropertyMetadata: config.getPropertyMetadata,
-        typeMap: config.typeMap,
-        getMetadata: config.getMetadata,
-        generateIdentifierType: config.generateIdentifierType,
-        propertySortFunction: config.propertySortFunction,
-      },
-      details,
-      config.schemas
-    );
+    const selectorProperties = generateProperties(details, 'selector', config);
 
     const selectorDeclaration: InterfaceDeclaration = {
       declarationType: 'interface',
@@ -61,18 +50,11 @@ const makeMapper =
 
     if (details.kind === 'table') {
       const { name: initializerName, comment: initializerComment } =
-        config.getMetadata(details, 'initializer');
+        config.getMetadata(details, 'initializer', config);
       const initializerProperties = generateProperties(
-        {
-          generateFor: 'initializer',
-          getPropertyMetadata: config.getPropertyMetadata,
-          typeMap: config.typeMap,
-          getMetadata: config.getMetadata,
-          generateIdentifierType: config.generateIdentifierType,
-          propertySortFunction: config.propertySortFunction,
-        },
         details,
-        config.schemas
+        'initializer',
+        config
       );
 
       const initializerDeclaration: InterfaceDeclaration = {
@@ -86,20 +68,10 @@ const makeMapper =
 
       const { name: mutatorName, comment: mutatorComment } = config.getMetadata(
         details,
-        'mutator'
+        'mutator',
+        config
       );
-      const mutatorProperties = generateProperties(
-        {
-          generateFor: 'mutator',
-          getPropertyMetadata: config.getPropertyMetadata,
-          typeMap: config.typeMap,
-          getMetadata: config.getMetadata,
-          generateIdentifierType: config.generateIdentifierType,
-          propertySortFunction: config.propertySortFunction,
-        },
-        details,
-        config.schemas
-      );
+      const mutatorProperties = generateProperties(details, 'mutator', config);
 
       const mutatorDeclaration: InterfaceDeclaration = {
         declarationType: 'interface',
