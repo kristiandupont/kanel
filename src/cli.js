@@ -8,6 +8,8 @@ import processDatabase from './processDatabase';
 const { version } = require('../package.json');
 
 async function main() {
+  console.info(chalk.greenBright('Kanel'));
+
   const o = optionator({
     prepend: 'Usage: kanel [options]',
     append: `Version ${version}`,
@@ -67,10 +69,29 @@ async function main() {
     process.exit(0);
   }
 
-  const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
-  const config = require(configFile);
+  /** @type {import('./config-types').Config} */
+  let config;
+  try {
+    const configFile = path.join(
+      process.cwd(),
+      options.config || '.kanelrc.js'
+    );
+    config = require(configFile);
+  } catch (error) {
+    if (options.config) {
+      console.error('Could not open ' + options.config);
+      process.exit(1);
+    }
+    config = { connection: 'Missing connection string' };
+  }
 
-  console.info(chalk.greenBright('Kanel'));
+  if (options.database) {
+    config.connection = options.database;
+  }
+
+  if (options.output) {
+    config.outputPath = options.output;
+  }
 
   const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
   const progress = {

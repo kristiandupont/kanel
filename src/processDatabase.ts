@@ -1,4 +1,5 @@
 import { extractSchemas } from 'extract-pg-schema';
+import rmfr from 'rmfr';
 
 import {
   Config,
@@ -29,7 +30,7 @@ type Progress = {
 };
 
 const markAsGenerated = (
-  path: string,
+  _path: string,
   lines: string[],
   _instantiatedConfig: InstantiatedConfig
 ): string[] => [
@@ -123,7 +124,9 @@ const processDatabase = async (
     )
   );
 
-  if (config.preDeleteOutputFolder) {
+  if (instantiatedConfig.preDeleteOutputFolder) {
+    console.info(` - Clearing old files in ${instantiatedConfig.outputPath}`);
+    await rmfr(instantiatedConfig.outputPath, { glob: true });
   }
 
   filesToWrite.forEach(writeFile);
