@@ -8,6 +8,7 @@ export default {
         items: [
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'How to work with Kanel', link: '/workflow' },
+          { text: 'Migrating from V2', link: '/migration' },
         ],
       },
       {
@@ -23,6 +24,8 @@ export default {
           },
           { text: 'getPropertyMetadata', link: '/getPropertyMetadata' },
           { text: 'generateIdentifierType', link: '/generateIdentifierType' },
+          { text: 'preRenderHooks', link: '/preRenderHooks' },
+          { text: 'postRenderHooks', link: '/postRenderHooks' },
         ],
       },
     ],

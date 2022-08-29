@@ -33,8 +33,8 @@ module.exports = {
   outputPath: './src/schemas',
 
   customTypeMap: {
-    tsvector: 'string',
-    bpchar: 'string',
+    'pg_catalog.tsvector': 'string',
+    'pg_catalog.bpchar': 'string',
   },
 };
 ```

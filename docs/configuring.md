@@ -4,6 +4,10 @@ Here is a semi-complex example `.kanelrc.js` configuration file, taken from the 
 
 <<< @/../example/.kanelrc.js
 
+## Migrating from v2
+
+The update to version 3 introduced several breaking changes. If you are doing this migration, check out the [guide](./migration.md) for help.
+
 ---
 
 # The Config type
@@ -60,6 +64,10 @@ If you set `resolveViews` to true, Kanel will attempt to give you better types f
 
 The `preRenderHooks` property can be set if you want to supply one or more hooks that will run before the render step. At this point, Kanel has gathered a record of file paths and corresponding `Declaration` arrays. A declaration is an abstract bit of Typescript like an interface or type definition.
 
+See the [preRenderHooks](./preRenderHooks.md) section for more info.
+
 ## postRenderHooks
 
 If you need to do something more brute-force like, you might prefer to create one or more `postRenderHooks`, which will be called with a filename and an array of strings which are the raw contents, just before the file is written.
+
+See the [postRenderHooks](./postRenderHooks.md) section for more info.

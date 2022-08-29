@@ -24,6 +24,7 @@ module.exports = {
   resolveViews: true,
   preDeleteOutputFolder: true,
 
+  // Add a comment about the entity that the type represents above each type.
   getMetadata: (details, generateFor) => {
     const { comment: strippedComment } = tryParse(details.comment);
     const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
@@ -41,6 +42,7 @@ module.exports = {
     };
   },
 
+  // Add a comment that says what the type of the column/attribute is in the database.
   getPropertyMetadata: (property, _details, generateFor) => {
     const { comment: strippedComment } = tryParse(property.comment);
 
@@ -60,7 +62,7 @@ module.exports = {
   // This implementation will generate flavored instead of branded types.
   // See: https://spin.atomicobject.com/2018/01/15/typescript-flexible-nominal-typing/
   generateIdentifierType: (c, d) => {
-    // Id columns are already prepended with the table name, so we don't need to add it here
+    // Id columns are already prefixed with the table name, so we don't need to add it here
     const name = toPascalCase(c.name);
 
     return {
@@ -72,6 +74,7 @@ module.exports = {
     };
   },
 
+  // Generate an index file with exports of everything
   preRenderHooks: [generateIndexFile],
 
   customTypeMap: {
