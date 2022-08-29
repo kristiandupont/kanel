@@ -1,1 +1,0 @@
-import{_ as e,c as a,o as s,a as t}from"./app.eafd5cec.js";const f=JSON.parse('{"title":"generateIdentifierType","description":"","frontmatter":{},"headers":[],"relativePath":"generateIdentifierType.md"}'),n={name:"generateIdentifierType.md"},p=t("",3),r=[p];function o(l,c,i,d,y,_){return s(),a("div",null,r)}var C=e(n,[["render",o]]);export{f as __pageData,C as default};

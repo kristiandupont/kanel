@@ -53,4 +53,4 @@ export type Config = {
   preRenderHooks?: PreRenderHook[];
   postRenderHooks?: PostRenderHook[];
 };
-// #endregion
+// #endregion Config

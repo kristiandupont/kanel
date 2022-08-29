@@ -88,9 +88,17 @@ async function main() {
   if (options.database) {
     config.connection = options.database;
   }
+  if (!config.connection) {
+    console.error('No database specified, in config file or command line');
+    process.exit(1);
+  }
 
   if (options.output) {
     config.outputPath = options.output;
+  }
+  if (!config.outputPath) {
+    console.error('No output path specified, in config file or command line');
+    process.exit(1);
   }
 
   const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);

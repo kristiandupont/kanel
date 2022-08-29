@@ -20,6 +20,7 @@ $ npm i -D kanel
 ```javascript
 const path = require('path');
 
+/** @type {import('kanel').Config} */
 module.exports = {
   connection: {
     host: 'localhost',
@@ -29,19 +30,12 @@ module.exports = {
   },
 
   preDeleteModelFolder: true,
+  outputPath: './src/schemas',
 
   customTypeMap: {
     tsvector: 'string',
     bpchar: 'string',
   },
-
-  schemas: [
-    {
-      name: 'public',
-      ignore: ['knex_migrations', 'knex_migrations_lock'],
-      modelFolder: path.join(__dirname, 'src', 'models'),
-    },
-  ],
 };
 ```
 

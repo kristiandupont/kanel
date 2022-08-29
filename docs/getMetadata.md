@@ -3,7 +3,8 @@
 ```typescript
 getMetadata?: (
   details: Details,
-  generateFor: 'selector' | 'initializer' | 'mutator' | undefined
+  generateFor: 'selector' | 'initializer' | 'mutator' | undefined,
+  config: InstantiatedConfig
 ) => TypeMetadata;
 ```
 

@@ -1,0 +1,1 @@
+import{_ as e,c as t,o,a}from"./app.7974c71d.js";const f=JSON.parse('{"title":"Migrating from v2","description":"","frontmatter":{},"headers":[],"relativePath":"migration.md"}'),r={name:"migration.md"},n=a("",7),i=[n];function s(c,d,l,p,m,h){return o(),t("div",null,i)}const g=e(r,[["render",s]]);export{f as __pageData,g as default};

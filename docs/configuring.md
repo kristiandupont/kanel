@@ -8,9 +8,9 @@ Here is a semi-complex example `.kanelrc.js` configuration file, taken from the 
 
 # The Config type
 
-The configuration type is defined in the [Config.ts](../src/Config.ts) file:
+The configuration type is defined in the [Config.ts](../src/config-types.ts) file:
 
-<<< @/../src/Config.ts#Config
+<<< @/../src/config-types.ts#Config
 
 ## connection
 

@@ -4,7 +4,8 @@
 getPropertyMetadata: (
   property: CompositeProperty,
   details: CompositeDetails,
-  generateFor: 'selector' | 'initializer' | 'mutator'
+  generateFor: 'selector' | 'initializer' | 'mutator',
+  config: InstantiatedConfig
 ) => PropertyMetadata;
 ```
 

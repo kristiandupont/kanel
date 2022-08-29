@@ -3,7 +3,6 @@ import { TableColumn } from 'extract-pg-schema';
 import { join } from 'path';
 import { tryParse } from 'tagged-comment-parser';
 
-import { InstantiatedConfig } from './config-types';
 import { CompositeProperty } from './generators/composite-types';
 import resolveType from './generators/resolveType';
 import {
@@ -14,6 +13,7 @@ import {
 
 const toPascalCase = recase(null, 'pascal');
 
+// #region defaultGetMetadata
 export const defaultGetMetadata: GetMetadata = (
   details,
   generateFor,
@@ -38,7 +38,9 @@ export const defaultGetMetadata: GetMetadata = (
     ),
   };
 };
+// #endregion defaultGetMetadata
 
+// #region defaultGetPropertyMetadata
 export const defaultGetPropertyMetadata: GetPropertyMetadata = (
   property,
   _details,
@@ -57,11 +59,13 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
     ],
   };
 };
+// #endregion defaultGetPropertyMetadata
 
+// #region defaultGenerateIdentifierType
 export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   column,
   details,
-  config: InstantiatedConfig
+  config
 ) => {
   const name = toPascalCase(details.name) + toPascalCase(column.name);
   const innerType = resolveType(column, details, {
@@ -78,7 +82,9 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
     comment: [`Identifier type for ${details.schemaName}.${details.name}`],
   };
 };
+// #endregion defaultGenerateIdentifierType
 
+// #region defaultPropertySortFunction
 export const defaultPropertySortFunction = (
   a: CompositeProperty,
   b: CompositeProperty
@@ -95,3 +101,4 @@ export const defaultPropertySortFunction = (
     return a.ordinalPosition - b.ordinalPosition;
   }
 };
+// #endregion defaultPropertySortFunction
