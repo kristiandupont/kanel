@@ -3,9 +3,9 @@ import { tryParse } from 'tagged-comment-parser';
 
 import { InstantiatedConfig } from '../config-types';
 import { Declaration, TypeDeclaration } from '../declaration-types';
+import Output, { Path } from '../Output';
 import { TypeDefinition } from '../TypeDefinition';
 import TypeImport from '../TypeImport';
-import Output, { Path } from './Output';
 
 const makeMapper =
   (config: InstantiatedConfig) =>

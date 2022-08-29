@@ -2,7 +2,7 @@ import { join, relative } from 'path';
 
 import { PreRenderHook } from '../config-types';
 import Details from '../Details';
-import { FileContents } from '../generators/Output';
+import { FileContents } from '../Output';
 
 const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
   const allEntities: Details[] = Object.values(

@@ -2,12 +2,12 @@ import { PgType, Schema } from 'extract-pg-schema';
 import { ConnectionConfig } from 'pg';
 
 import { CompositeProperty } from './generators/composite-types';
-import Output from './generators/Output';
 import {
   GenerateIdentifierType,
   GetMetadata,
   GetPropertyMetadata,
 } from './metadata-types';
+import Output from './Output';
 import TypeMap from './TypeMap';
 
 export type InstantiatedConfig = {

@@ -3,9 +3,9 @@ import { tryParse } from 'tagged-comment-parser';
 
 import { InstantiatedConfig } from '../config-types';
 import { Declaration, InterfaceDeclaration } from '../declaration-types';
+import Output, { Path } from '../Output';
 import { CompositeDetails } from './composite-types';
 import generateProperties from './generateProperties';
-import Output, { Path } from './Output';
 
 const makeMapper =
   <D extends CompositeDetails>(config: InstantiatedConfig) =>

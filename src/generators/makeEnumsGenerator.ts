@@ -8,7 +8,7 @@ import {
   TypeDeclaration,
 } from '../declaration-types';
 import escapeName from '../escapeName';
-import Output, { Path } from './Output';
+import Output, { Path } from '../Output';
 
 type EnumStyle = 'enum' | 'type';
 
