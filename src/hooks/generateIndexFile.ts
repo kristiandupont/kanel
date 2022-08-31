@@ -25,17 +25,40 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
     const importPath = relative(instantiatedConfig.outputPath, path);
 
     if (d.kind === 'table') {
+      const additionalImports = [];
+
       const { name: initializerName } = instantiatedConfig.getMetadata(
         d,
         'initializer',
         instantiatedConfig
       );
+      additionalImports.push(initializerName);
+
       const { name: mutatorName } = instantiatedConfig.getMetadata(
         d,
         'mutator',
         instantiatedConfig
       );
-      result = `export { default as ${selectorName}, ${initializerName}, ${mutatorName} } from './${importPath}';`;
+      additionalImports.push(mutatorName);
+
+      if (instantiatedConfig.generateIdentifierType) {
+        const identifierColumns = d.columns.filter(
+          (c) => c.isPrimaryKey && !c.reference
+        );
+
+        identifierColumns.forEach((c) => {
+          const { name } = instantiatedConfig.generateIdentifierType(
+            c,
+            d,
+            instantiatedConfig
+          );
+          additionalImports.push(name);
+        });
+      }
+
+      result = `export { default as ${selectorName}, ${additionalImports.join(
+        ', '
+      )} } from './${importPath}';`;
     } else {
       result = `export { default as ${selectorName} } from './${importPath}';`;
     }
