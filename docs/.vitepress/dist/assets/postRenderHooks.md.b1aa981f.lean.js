@@ -1,0 +1,1 @@
+import{_ as s,c as n,o as a,a as e}from"./app.fc61449c.js";const h=JSON.parse('{"title":"postRenderHooks","description":"","frontmatter":{},"headers":[],"relativePath":"postRenderHooks.md"}'),o={name:"postRenderHooks.md"},t=e("",6),p=[t];function l(r,c,i,d,y,C){return a(),n("div",null,p)}const D=s(o,[["render",l]]);export{h as __pageData,D as default};
