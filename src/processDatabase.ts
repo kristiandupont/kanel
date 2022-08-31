@@ -1,116 +1,107 @@
-import chalk from 'chalk';
-import { extractSchema } from 'extract-pg-schema';
-import fs from 'fs';
-import path from 'path';
-import { identity, indexBy, isEmpty, map } from 'ramda';
+import { extractSchemas } from 'extract-pg-schema';
 import rmfr from 'rmfr';
 
-import Config, { Hook, nameIdentity, SchemaConfig } from './Config';
+import { Config, InstantiatedConfig, PreRenderHook } from './config-types';
+import {
+  defaultGenerateIdentifierType,
+  defaultGetMetadata,
+  defaultGetPropertyMetadata,
+  defaultPropertySortFunction,
+} from './default-metadata-generators';
 import defaultTypeMap from './defaultTypeMap';
-import { logger } from './logger';
-import processSchema from './processSchema';
+import makeCompositeGenerator from './generators/makeCompositeGenerator';
+import makeDomainsGenerator from './generators/makeDomainsGenerator';
+import makeEnumsGenerator from './generators/makeEnumsGenerator';
+import makeRangesGenerator from './generators/makeRangesGenerator';
+import markAsGenerated from './hooks/markAsGenerated';
+import Output from './Output';
+import render from './render';
+import TypeMap from './TypeMap';
+import writeFile from './writeFile';
 
-const labelAsGenerated: Hook<unknown> = (lines) => [
-  '// @generated',
-  "// Automatically generated. Don't change this file manually.",
-  '',
-  ...lines,
-];
+type Progress = {
+  onProgressStart?: (total: number) => void;
+  onProgress?: () => void;
+  onProgressEnd?: () => void;
+};
 
-const addEmptyLineAtEnd: Hook<unknown> = (lines) => [...lines, ''];
+const processDatabase = async (
+  config: Config,
+  progress?: Progress
+): Promise<void> => {
+  const schemas = await extractSchemas(config.connection, {
+    schemas: config.schemas,
+    typeFilter: config.typeFilter,
+    ...progress,
+  });
 
-const defaultHooks = [labelAsGenerated, addEmptyLineAtEnd];
-
-const processDatabase = async ({
-  connection,
-  preDeleteModelFolder = false,
-  customTypeMap = {},
-
-  modelHooks = [],
-  modelNominator = nameIdentity,
-  propertyNominator = (propertyName) =>
-    propertyName.indexOf(' ') !== -1 ? `'${propertyName}'` : propertyName,
-  initializerNominator = (modelName) => `${modelName}Initializer`,
-  idNominator = (modelName) => `${modelName}Id`,
-
-  makeIdType = (innerType, modelName) =>
-    `${innerType} & { " __flavor"?: '${modelName}' };`,
-
-  typeHooks = [],
-  typeNominator = nameIdentity,
-
-  fileNominator = identity,
-
-  resolveViews = false,
-
-  schemas,
-
-  ...unknownProps
-}: Config) => {
-  if (!isEmpty(unknownProps)) {
-    logger.warn(
-      `Unknown configuration properties: ${Object.keys(unknownProps).join(
-        ', '
-      )}`
-    );
-  }
-
-  const typeMap = { ...defaultTypeMap, ...customTypeMap };
-  /** @type {import('./Config').Nominators} */
-  const nominators = {
-    modelNominator,
-    propertyNominator,
-    initializerNominator,
-    idNominator,
-    typeNominator,
-    fileNominator,
+  const typeMap: TypeMap = {
+    ...defaultTypeMap,
+    ...config.customTypeMap,
   };
-  const modelProcessChain = [...defaultHooks, ...modelHooks];
-  const typeProcessChain = [...defaultHooks, ...typeHooks];
 
-  if (typeof connection === 'string') {
-    logger.log(`Connecting to ${chalk.greenBright(connection)}`);
-  } else {
-    logger.log(
-      `Connecting to ${chalk.greenBright(connection.database)} on ${
-        connection.host
-      }`
-    );
+  const getMetadata = config.getMetadata ?? defaultGetMetadata;
+  const getPropertyMetadata =
+    config.getPropertyMetadata ?? defaultGetPropertyMetadata;
+  const generateIdentifierType =
+    config.generateIdentifierType ?? defaultGenerateIdentifierType;
+  const propertySortFunction =
+    config.propertySortFunction ?? defaultPropertySortFunction;
+
+  const instantiatedConfig: InstantiatedConfig = {
+    getMetadata,
+    getPropertyMetadata,
+    generateIdentifierType,
+    propertySortFunction,
+    typeMap,
+    schemas,
+    outputPath: config.outputPath ?? '.',
+    preDeleteOutputFolder: config.preDeleteOutputFolder ?? false,
+    resolveViews: config.resolveViews ?? true,
+  };
+
+  const generators = [
+    makeCompositeGenerator('table', instantiatedConfig),
+    makeCompositeGenerator('view', instantiatedConfig),
+    makeCompositeGenerator('materializedView', instantiatedConfig),
+    makeCompositeGenerator('compositeType', instantiatedConfig),
+    makeEnumsGenerator('enum', instantiatedConfig),
+    makeRangesGenerator(instantiatedConfig),
+    makeDomainsGenerator(instantiatedConfig),
+  ];
+
+  let output: Output = {};
+  Object.values(schemas).forEach((schema) => {
+    generators.forEach((generator) => {
+      output = generator(schema, output);
+    });
+  });
+
+  const preRenderHooks: PreRenderHook[] = config.preRenderHooks ?? [];
+  preRenderHooks.forEach((hook) => (output = hook(output, instantiatedConfig)));
+
+  let filesToWrite = Object.keys(output).map((path) => {
+    const lines = render(output[path].declarations, path);
+    return { fullPath: `${path}.ts`, lines };
+  });
+
+  const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
+  filesToWrite = filesToWrite.map(({ fullPath, lines }) =>
+    postRenderHooks.reduce(
+      (acc, hook) => ({
+        fullPath,
+        lines: hook(fullPath, acc.lines, instantiatedConfig),
+      }),
+      { fullPath, lines }
+    )
+  );
+
+  if (instantiatedConfig.preDeleteOutputFolder) {
+    console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
+    await rmfr(instantiatedConfig.outputPath, { glob: true });
   }
 
-  const schemaFolderMap = map(
-    (s: SchemaConfig) => path.resolve(s.modelFolder),
-    indexBy((s) => s.name, schemas)
-  ) as Record<string, string>;
-
-  for (const schemaConfig of schemas) {
-    const schema = await extractSchema(
-      schemaConfig.name,
-      connection,
-      schemaConfig.resolveViews !== undefined
-        ? schemaConfig.resolveViews
-        : resolveViews
-    );
-
-    if (preDeleteModelFolder) {
-      logger.log(` - Clearing old files in ${schemaConfig.modelFolder}`);
-      await rmfr(schemaConfig.modelFolder, { glob: true });
-    }
-    if (!fs.existsSync(schemaConfig.modelFolder)) {
-      fs.mkdirSync(schemaConfig.modelFolder, { recursive: true });
-    }
-
-    await processSchema(
-      schemaConfig,
-      schema,
-      typeMap,
-      nominators,
-      modelProcessChain,
-      typeProcessChain,
-      schemaFolderMap,
-      makeIdType
-    );
-  }
+  filesToWrite.forEach(writeFile);
 };
 
 export default processDatabase;

@@ -1,14 +1,15 @@
-/* eslint-disable no-console */
 import chalk from 'chalk';
+import cliProgress from 'cli-progress';
 import optionator from 'optionator';
 import path from 'path';
 
-import { logger } from './logger';
 import processDatabase from './processDatabase';
 // @ts-ignore
 const { version } = require('../package.json');
 
 async function main() {
+  console.info(chalk.greenBright('Kanel'));
+
   const o = optionator({
     prepend: 'Usage: kanel [options]',
     append: `Version ${version}`,
@@ -30,7 +31,21 @@ async function main() {
         alias: 'c',
         type: 'path::String',
         description:
-          'Use this configuration, overriding .kanel.* config options if present',
+          'Use this configuration, overriding .kanelrc.js config options if present',
+      },
+      {
+        option: 'database',
+        alias: 'd',
+        type: 'string',
+        description:
+          'Database connection string. Will override the connection field in the config file if present',
+      },
+      {
+        option: 'output',
+        alias: 'o',
+        type: 'path::String',
+        description:
+          'Output directory. Will override the output field in the config file if present',
       },
     ],
   });
@@ -40,34 +55,64 @@ async function main() {
   try {
     options = o.parseArgv(process.argv);
   } catch (error) {
-    logger.error(error.message);
+    console.error(error.message);
     process.exit(1);
   }
 
   if (options.help) {
-    console.log(o.generateHelp());
+    console.info(o.generateHelp());
     process.exit(0);
   }
 
   if (options.version) {
-    console.log(version);
+    console.info(version);
     process.exit(0);
   }
 
-  const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
-  const config = require(configFile);
-
-  if (config.logLevel !== undefined) {
-    logger({ level: config.logLevel });
+  /** @type {import('./config-types').Config} */
+  let config;
+  try {
+    const configFile = path.join(
+      process.cwd(),
+      options.config || '.kanelrc.js'
+    );
+    config = require(configFile);
+  } catch (error) {
+    if (options.config) {
+      console.error('Could not open ' + options.config);
+      process.exit(1);
+    }
+    config = { connection: 'Missing connection string' };
   }
 
-  logger.log(chalk.greenBright('Kanel'));
+  if (options.database) {
+    config.connection = options.database;
+  }
+  if (!config.connection) {
+    console.error('No database specified, in config file or command line');
+    process.exit(1);
+  }
+
+  if (options.output) {
+    config.outputPath = options.output;
+  }
+  if (!config.outputPath) {
+    console.error('No output path specified, in config file or command line');
+    process.exit(1);
+  }
+
+  const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  const progress = {
+    onProgressStart: (total) => bar.start(total, 0),
+    onProgress: () => bar.increment(),
+    onProgressEnd: () => bar.stop(),
+  };
 
   try {
-    await processDatabase(config);
+    await processDatabase(config, progress);
     process.exit(0);
   } catch (error) {
-    logger.error(error);
+    console.error(error);
     process.exit(1);
   }
 }

@@ -4,30 +4,80 @@ import ImportGenerator from './importGenerator';
 
 describe('ImportGenerator', () => {
   it('should generate an import statement', () => {
-    const ig = new ImportGenerator('/src');
+    const ig = new ImportGenerator('/src/some-module');
 
-    ig.addImport('func', true, '/src/lib/func', false);
+    ig.addImport({
+      name: 'func',
+      isDefault: true,
+      path: '/src/lib/func',
+      isAbsolute: false,
+    });
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual(["import func from './lib/func';"]);
   });
 
   it('should support various cases', () => {
-    const ig = new ImportGenerator('/package/src');
+    const ig = new ImportGenerator('/package/src/some-module');
 
-    ig.addImport('defaultFunc', true, '/package/src/lib/defaultFunc', false);
+    ig.addImport({
+      name: 'defaultFunc',
+      isDefault: true,
+      path: '/package/src/lib/defaultFunc',
+      isAbsolute: false,
+    });
 
-    ig.addImport('namedFunc1', false, '/package/src/lib/namedFunc', false);
-    ig.addImport('namedFunc2', false, '/package/src/lib/namedFunc', false);
+    ig.addImport({
+      name: 'namedFunc1',
+      isDefault: false,
+      path: '/package/src/lib/namedFunc',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'namedFunc2',
+      isDefault: false,
+      path: '/package/src/lib/namedFunc',
+      isAbsolute: false,
+    });
 
-    ig.addImport('pck', true, '/package/package.json', false);
+    ig.addImport({
+      name: 'pck',
+      isDefault: true,
+      path: '/package/package.json',
+      isAbsolute: false,
+    });
 
-    ig.addImport('sister', true, '/package/sister-src/sister', false);
+    ig.addImport({
+      name: 'sister',
+      isDefault: true,
+      path: '/package/sister-src/sister',
+      isAbsolute: false,
+    });
 
-    ig.addImport('defComb', true, '/package/src/comb', false);
-    ig.addImport('defNamed1', false, '/package/src/comb', false);
-    ig.addImport('defNamed2', false, '/package/src/comb', false);
-    ig.addImport('defNamed3', false, '/package/src/comb', false);
+    ig.addImport({
+      name: 'defComb',
+      isDefault: true,
+      path: '/package/src/comb',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'defNamed1',
+      isDefault: false,
+      path: '/package/src/comb',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'defNamed2',
+      isDefault: false,
+      path: '/package/src/comb',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'defNamed3',
+      isDefault: false,
+      path: '/package/src/comb',
+      isAbsolute: false,
+    });
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
@@ -40,14 +90,39 @@ describe('ImportGenerator', () => {
   });
 
   it('should ignore duplicates', () => {
-    const ig = new ImportGenerator('./');
+    const ig = new ImportGenerator('./some-module');
 
-    ig.addImport('def', true, './pkg', false);
-    ig.addImport('def', true, './pkg', false);
+    ig.addImport({
+      name: 'def',
+      isDefault: true,
+      path: './pkg',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'def',
+      isDefault: true,
+      path: './pkg',
+      isAbsolute: false,
+    });
 
-    ig.addImport('named1', false, './pkg', false);
-    ig.addImport('named2', false, './pkg', false);
-    ig.addImport('named1', false, './pkg', false);
+    ig.addImport({
+      name: 'named1',
+      isDefault: false,
+      path: './pkg',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'named2',
+      isDefault: false,
+      path: './pkg',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'named1',
+      isDefault: false,
+      path: './pkg',
+      isAbsolute: false,
+    });
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
@@ -56,26 +131,77 @@ describe('ImportGenerator', () => {
   });
 
   it('should complain about multiple (different) default imports', () => {
-    const ig = new ImportGenerator('./');
+    const ig = new ImportGenerator('./some-module');
 
-    ig.addImport('def', true, './pkg', false);
+    ig.addImport({
+      name: 'def',
+      isDefault: true,
+      path: './pkg',
+      isAbsolute: false,
+    });
 
-    expect(() => ig.addImport('def2', true, './pkg', false)).toThrow(
-      "Multiple default imports attempted: def and def2 from './pkg'"
-    );
+    expect(() =>
+      ig.addImport({
+        name: 'def2',
+        isDefault: true,
+        path: './pkg',
+        isAbsolute: false,
+      })
+    ).toThrow("Multiple default imports attempted: def and def2 from './pkg'");
   });
 
   it('should support aboslute imports', () => {
-    const ig = new ImportGenerator('./');
+    const ig = new ImportGenerator('./some-module');
 
-    ig.addImport('path', true, 'path', true);
-    ig.addImport('existsSync', false, 'fs', true);
-    ig.addImport('mkDirSync', false, 'fs', true);
+    ig.addImport({
+      name: 'path',
+      isDefault: true,
+      path: 'path',
+      isAbsolute: true,
+    });
+    ig.addImport({
+      name: 'existsSync',
+      isDefault: false,
+      path: 'fs',
+      isAbsolute: true,
+    });
+    ig.addImport({
+      name: 'mkDirSync',
+      isDefault: false,
+      path: 'fs',
+      isAbsolute: true,
+    });
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
       "import path from 'path';",
       "import { existsSync, mkDirSync } from 'fs';",
     ]);
+  });
+
+  it('should not import items from the same file', () => {
+    const ig = new ImportGenerator('./src/some-module');
+
+    ig.addImport({
+      name: 'path',
+      isDefault: true,
+      path: 'path',
+      isAbsolute: true,
+    });
+    ig.addImport({
+      name: 'someDefaultImport',
+      isDefault: true,
+      path: './src/some-module',
+      isAbsolute: false,
+    });
+    ig.addImport({
+      name: 'someNamedImport',
+      isDefault: false,
+      path: './src/some-module',
+      isAbsolute: false,
+    });
+
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual(["import path from 'path';"]);
   });
 });
