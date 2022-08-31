@@ -36,8 +36,8 @@
     "stop-example-db": "docker stop dvd-rental",
     "test": "vitest run",
     "version": "yarn build",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs"
+    "docs:dev": "vitepress dev docs-src",
+    "docs:build": "vitepress build docs-src"
   },
   "prettier": {
     "singleQuote": true,

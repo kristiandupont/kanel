@@ -1,6 +1,8 @@
 export default {
   title: 'Kanel',
   description: 'Just playing around.',
+  base: '/kanel/',
+  outDir: '../docs/',
   themeConfig: {
     sidebar: [
       {
