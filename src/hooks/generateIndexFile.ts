@@ -56,11 +56,11 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
         });
       }
 
-      result = `export { default as ${selectorName}, ${additionalImports.join(
+      result = `export type { default as ${selectorName}, ${additionalImports.join(
         ', '
       )} } from './${importPath}';`;
     } else {
-      result = `export { default as ${selectorName} } from './${importPath}';`;
+      result = `export type { default as ${selectorName} } from './${importPath}';`;
     }
 
     return result;
