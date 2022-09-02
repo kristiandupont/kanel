@@ -4,6 +4,23 @@ Version 3 introduces significant changes in how Kanel is configured and unless y
 
 You can see the new type for the configuration object in [Config.ts](../src/Config.ts).
 
+## index.ts
+
+Kanel no longer generates an `index.ts` file per default. There is a hook provided called `generateIndexFile` which you can use if you want it. Note even with this, it no longer creates the composed id types etc., which I believe I was the only one using anyway.
+
+In `.kanelrc.js`:
+
+```javascript
+const { generateIndexFile } = require('kanel');
+
+module.exports = {
+  connection: '...',
+
+  // Generate an index file with exports of everything
+  preRenderHooks: [generateIndexFile],
+};
+```
+
 ## Nominators
 
 The nominators have been replaced by `getMetadata`, `getPropertyMetadata` and `generateIdentifierType`. These functions can be configured to return a custom name, comment and other things to customize your output.
