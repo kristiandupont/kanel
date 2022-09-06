@@ -59,6 +59,8 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
       result = `export type { default as ${selectorName}, ${additionalImports.join(
         ', '
       )} } from './${importPath}';`;
+    } else if (d.kind === 'enum') {
+      result = `export { default as ${selectorName} } from './${importPath}';`;
     } else {
       result = `export type { default as ${selectorName} } from './${importPath}';`;
     }
