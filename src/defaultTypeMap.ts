@@ -11,6 +11,7 @@ const defaultTypeMap: TypeMap = {
   'pg_catalog.json': 'unknown',
   'pg_catalog.jsonb': 'unknown',
   'pg_catalog.char': 'string',
+  'pg_catalog.bpchar': 'string',
   'pg_catalog.varchar': 'string',
   'pg_catalog.text': 'string',
   'pg_catalog.uuid': 'string',
