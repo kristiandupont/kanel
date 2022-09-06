@@ -1,0 +1,22 @@
+{
+  "name": "@kanel/knex",
+  "version": "1.0.0",
+  "description": "Knex extension for Kanel",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "author": "Kristian Dupont",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "lint": "yarn eslint . -f visualstudio --report-unused-disable-directives --ext .js,.ts",
+    "test": "vitest run",
+    "version": "yarn build"
+  },
+  "dependencies": {
+    "kanel": "file:../../",
+    "knex": "^2.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.2"
+  }
+}

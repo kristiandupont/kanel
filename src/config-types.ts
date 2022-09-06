@@ -10,7 +10,10 @@ import {
 import Output from './Output';
 import TypeMap from './TypeMap';
 
+type Awaitable<T> = T | PromiseLike<T>;
+
 export type InstantiatedConfig = {
+  connection: string | ConnectionConfig;
   schemas: Record<string, Schema>;
   typeMap: TypeMap;
 
@@ -27,13 +30,13 @@ export type InstantiatedConfig = {
 export type PreRenderHook = (
   outputAcc: Output,
   instantiatedConfig: InstantiatedConfig
-) => Output;
+) => Awaitable<Output>;
 
 export type PostRenderHook = (
   path: string,
   lines: string[],
   instantiatedConfig: InstantiatedConfig
-) => string[];
+) => Awaitable<string[]>;
 
 // #region Config
 export type Config = {

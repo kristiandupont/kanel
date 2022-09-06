@@ -9,7 +9,7 @@ A pre-render hook has the following signature:
 export type PreRenderHook = (
   outputAcc: Output,
   instantiatedConfig: InstantiatedConfig
-) => Output;
+) => Awaitable<Output>;
 ```
 
 The `outputAcc` (short for accumulated output) will contain the output as it looks when calling this hook. The hook should return the _entire_ output as it should appear after processing.

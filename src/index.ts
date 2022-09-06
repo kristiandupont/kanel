@@ -1,8 +1,11 @@
 export * from './config-types';
 export * from './declaration-types';
 export * from './default-metadata-generators';
+export { default as Details } from './Details';
+export { default as escapeName } from './escapeName';
 export * from './hooks';
 export * from './metadata-types';
 export * from './Output';
 export { default as processDatabase } from './processDatabase';
+export { default as TypeImport } from './TypeImport';
 export { default as writeFile } from './writeFile';
