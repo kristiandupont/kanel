@@ -13,6 +13,7 @@ import TypeMap from './TypeMap';
 type Awaitable<T> = T | PromiseLike<T>;
 
 export type InstantiatedConfig = {
+  connection: string | ConnectionConfig;
   schemas: Record<string, Schema>;
   typeMap: TypeMap;
 

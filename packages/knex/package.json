@@ -13,7 +13,8 @@
     "version": "yarn build"
   },
   "dependencies": {
-    "kanel": "file:../../"
+    "kanel": "file:../../",
+    "knex": "^2.3.0"
   },
   "devDependencies": {
     "typescript": "^4.8.2"

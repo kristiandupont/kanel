@@ -55,6 +55,7 @@ const processDatabase = async (
     propertySortFunction,
     typeMap,
     schemas,
+    connection: config.connection,
     outputPath: config.outputPath ?? '.',
     preDeleteOutputFolder: config.preDeleteOutputFolder ?? false,
     resolveViews: config.resolveViews ?? true,
@@ -78,7 +79,9 @@ const processDatabase = async (
   });
 
   const preRenderHooks: PreRenderHook[] = config.preRenderHooks ?? [];
-  preRenderHooks.forEach((hook) => (output = hook(output, instantiatedConfig)));
+  for (const hook of preRenderHooks) {
+    output = await hook(output, instantiatedConfig);
+  }
 
   let filesToWrite = Object.keys(output).map((path) => {
     const lines = render(output[path].declarations, path);
@@ -86,15 +89,14 @@ const processDatabase = async (
   });
 
   const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
-  filesToWrite = filesToWrite.map(({ fullPath, lines }) =>
-    postRenderHooks.reduce(
-      (acc, hook) => ({
-        fullPath,
-        lines: hook(fullPath, acc.lines, instantiatedConfig),
-      }),
-      { fullPath, lines }
-    )
-  );
+  for (const hook of postRenderHooks) {
+    filesToWrite = await Promise.all(
+      filesToWrite.map(async (file) => {
+        const lines = await hook(file.fullPath, file.lines, instantiatedConfig);
+        return { ...file, lines };
+      })
+    );
+  }
 
   if (instantiatedConfig.preDeleteOutputFolder) {
     console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
