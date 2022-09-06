@@ -10,7 +10,7 @@ export type PostRenderHook = (
   path: string,
   lines: string[],
   instantiatedConfig: InstantiatedConfig
-) => string[];
+) => Awaitable<string[]>;
 ```
 
 For every file that is about to be written, this function will be called. The `lines` parameter is the raw strings that will comprise the file. You should return the entire array of lines that you want the file to contain.
