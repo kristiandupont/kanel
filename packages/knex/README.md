@@ -49,4 +49,16 @@ const combineFilters =
 
 However, you might want to check that your code is in sync with the database in terms of migrations, so that the types that your code was compiled with match what the database looks like.
 
-The `generateMigrationCheck` pre-render hook will create a file for you that contains a function called `validateMigration`. This function will check the live database for the `knex_migration` table and check if it
+The `generateMigrationCheck` pre-render hook will create a file for you that contains a function called `validateMigration`. This function will check the live database for the `knex_migration` table and check if it matches what was there when the code was generated.
+
+To use it, add it to your `.kanelrc.js` file:
+
+```javascript
+const { generatMigrationCheck } = require('@kanel/knex');
+
+module.exports = {
+  // ... your config here.
+
+  preRenderHooks: [generateMigrationCheck],
+};
+```
