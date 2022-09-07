@@ -11,7 +11,7 @@ It will create a file in your output folder called `knex-tables.ts` which will c
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generateKnexTablesModule } = require('@kanel/knex');
+const { generateKnexTablesModule } = require('kanel-knex');
 
 module.exports = {
   // ... your config here.
@@ -20,14 +20,14 @@ module.exports = {
 };
 ```
 
-## type filter
+## Type Filter
 
 If you are using Knex for migrations, you will have two tables in your database called `knex_migrations` and `knex_migrations_lock`, which you probably don't care about and don't want types for. The `knexTypeFilter` will remove those for you.
 
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { knexTypeFilter } = require('@kanel/knex');
+const { knexTypeFilter } = require('kanel-knex');
 
 module.exports = {
   // ... your config here.
@@ -45,7 +45,7 @@ const combineFilters =
     filters.every((f) => f(t));
 ```
 
-## migration check
+## Migration Check
 
 However, you might want to check that your code is in sync with the database in terms of migrations, so that the types that your code was compiled with match what the database looks like.
 
@@ -54,7 +54,7 @@ The `generateMigrationCheck` pre-render hook will create a file for you that con
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generatMigrationCheck } = require('@kanel/knex');
+const { generatMigrationCheck } = require('kanel-knex');
 
 module.exports = {
   // ... your config here.
