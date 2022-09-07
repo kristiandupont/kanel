@@ -1,6 +1,6 @@
 {
   "name": "kanel-knex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": [
     "postgresql",
     "schema",
