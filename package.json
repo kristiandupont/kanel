@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@kristiandupont/eslint-config": "1.3.1",
-    "@types/node": "16.11.57",
+    "@types/node": "16.11.58",
     "@types/ramda": "0.28.13",
     "eslint": "8.23.1",
     "np": "7.6.1",
