@@ -2,9 +2,8 @@ const { join } = require('path');
 const { recase } = require('@kristiandupont/recase');
 const { tryParse } = require('tagged-comment-parser')
 
-// NOTE: we're importing it directly from the build folder here, but you would
-// import it something like this: const { generateIndexFile } = require('kanel');
-const generateIndexFile = require('../build/hooks/generateIndexFile').default;
+const { generateIndexFile } = require('kanel');
+// const generateZodSchemas = require('../packages/kanel-zod/build/generateZodSchemas').default;
 
 const toPascalCase = recase('snake', 'pascal');
 const outputPath = './example/models';
@@ -75,6 +74,7 @@ module.exports = {
   },
 
   // Generate an index file with exports of everything
+  // preRenderHooks: [generateIndexFile, generateZodSchemas],
   preRenderHooks: [generateIndexFile],
 
   customTypeMap: {
