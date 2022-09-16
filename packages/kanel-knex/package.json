@@ -24,7 +24,8 @@
   "types": "build/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "echo TODO..."
   },
   "dependencies": {
     "knex": "^2.3.0"

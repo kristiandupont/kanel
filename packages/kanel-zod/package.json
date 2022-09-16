@@ -24,7 +24,8 @@
   "types": "build/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "echo TODO..."
   },
   "devDependencies": {
     "extract-pg-schema": "^4.1.0",
