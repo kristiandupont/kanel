@@ -1,6 +1,6 @@
 {
-  "name": "kanel-knex",
-  "version": "1.0.1",
+  "name": "kanel-zod",
+  "version": "1.0.0",
   "keywords": [
     "postgresql",
     "schema",
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/kristiandupont/kanel.git"
   },
-  "description": "Knex extension for Kanel",
+  "description": "Zod extension for Kanel",
   "homepage": "https://kristiandupont.github.io/kanel",
   "author": {
     "name": "Kristian Dupont",
@@ -24,17 +24,11 @@
   "types": "build/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "lint": "yarn eslint . -f visualstudio --report-unused-disable-directives --ext .js,.ts"
-  },
-  "dependencies": {
-    "knex": "^2.3.0"
+    "build": "tsc"
   },
   "devDependencies": {
-    "@kristiandupont/eslint-config": "^1.3.1",
-    "eslint": "^8.23.0",
     "extract-pg-schema": "^4.1.0",
-    "kanel": "file:../../",
+    "kanel": "*",
     "typescript": "^4.8.2"
   }
 }

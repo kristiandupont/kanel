@@ -79,7 +79,7 @@ async function main() {
     config = require(configFile);
   } catch (error) {
     if (options.config) {
-      console.error('Could not open ' + options.config);
+      console.error('Could not open ' + options.config, ': ', error);
       process.exit(1);
     }
     config = { connection: 'Missing connection string' };

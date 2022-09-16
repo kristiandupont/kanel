@@ -1,5 +1,5 @@
-import knex from 'knex';
 import type { GenericDeclaration, PreRenderHook, TypeImport } from 'kanel';
+import knex from 'knex';
 import { join } from 'path';
 
 const generateMigrationCheck: PreRenderHook = async (

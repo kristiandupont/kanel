@@ -1,0 +1,55 @@
+{
+  "name": "kanel",
+  "version": "3.0.4",
+  "keywords": [
+    "postgresql",
+    "schema",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kristiandupont/kanel.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kristiandupont/kanel/issues"
+  },
+  "homepage": "https://kristiandupont.github.io/kanel",
+  "author": {
+    "name": "Kristian Dupont",
+    "url": "http://www.kristiandupont.com"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "bin": {
+    "kanel": "./bin/kanel"
+  },
+  "files": [
+    "build/",
+    "bin/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "version": "yarn build"
+  },
+  "dependencies": {
+    "@kristiandupont/recase": "1.1.2",
+    "chalk": "4.1.2",
+    "cli-progress": "^3.11.2",
+    "extract-pg-schema": "^4.1.0",
+    "optionator": "^0.9.1",
+    "pg": "^8.6.0",
+    "ramda": "^0.28.0",
+    "rmfr": "^2.0.0",
+    "tagged-comment-parser": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "16.11.57",
+    "@types/ramda": "0.28.13",
+    "np": "7.6.1",
+    "typescript": "4.8.2",
+    "vitest": "0.23.1"
+  },
+  "np": {}
+}
