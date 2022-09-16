@@ -2,7 +2,7 @@
 
 Version 3 introduces significant changes in how Kanel is configured and unless you ran it with an absolute minimum of customization, you will need to make some adjustments.
 
-You can see the new type for the configuration object in [Config.ts](../src/Config.ts).
+You can see the new type for the configuration object in [Config.ts](../packages/kanel/src/Config.ts).
 
 ## index.ts
 

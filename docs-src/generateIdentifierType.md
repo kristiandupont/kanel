@@ -14,4 +14,4 @@ The default implementation creates a _branded_ type which is a [Typescript trick
 
 It looks like this:
 
-<<< @/../src/default-metadata-generators.ts#defaultGenerateIdentifierType
+<<< @/../packages/kanel/src/default-metadata-generators.ts#defaultGenerateIdentifierType
