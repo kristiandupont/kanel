@@ -12,9 +12,9 @@ The update to version 3 introduced several breaking changes. If you are doing th
 
 # The Config type
 
-The configuration type is defined in the [Config.ts](../src/config-types.ts) file:
+The configuration type is defined in the [Config.ts](../packages/kanel/src/config-types.ts) file:
 
-<<< @/../src/config-types.ts#Config
+<<< @/../packages/kanel/src/config-types.ts#Config
 
 ## connection
 

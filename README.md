@@ -9,21 +9,21 @@ This is for people who don't like ORM's but who do like intellisense and type ch
 
 See the documentation [here](https://kristiandupont.github.io/kanel)
 
-_Note_: If you are migrating from v2, there are significant breaking changes. There is a [breakdown](https://kristiandupont.github.io/kanel/migration.html) in the documentation.
-
 Introduction to the idea is outlined [here](https://medium.com/@kristiandupont/generating-typescript-types-from-postgres-48661868ef84).
+
+_Note_: If you are migrating from v2, there are significant breaking changes. There is a [breakdown](https://kristiandupont.github.io/kanel/migration.html) in the documentation.
 
 ## Usage
 
 Install with:
 
-```
+```bash
 $ npm i -D kanel
 ```
 
 To run, make sure you are in a folder that has a `.kanelrc.js` configuration file and that your database is running, and type:
 
-```
+```bash
 $ npx kanel
 ```
 

@@ -19,6 +19,6 @@ Any declaration can contain a number of comment lines and a number of type impor
 
 To understand declarations better, look at the [declaration-types.ts](../packages/kanel/src/declaration-types.ts) file:
 
-<<< @/../src/declaration-types.ts
+<<< @/../packages/kanel/src/declaration-types.ts
 
 The function receives the instantiated configuration (i.e. the settings as well as the extracted schemas) in case you need any information from there.

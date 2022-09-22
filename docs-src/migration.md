@@ -6,7 +6,9 @@ You can see the new type for the configuration object in [Config.ts](../packages
 
 ## index.ts
 
-Kanel no longer generates an `index.ts` file per default. There is a hook provided called `generateIndexFile` which you can use if you want it. Note even with this, it no longer creates the composed id types etc., which I believe I was the only one using anyway.
+Kanel no longer generates an `index.ts` file per default. There is a hook provided called `generateIndexFile` which you can use if you want it.
+
+**Note:** even with this, it no longer creates the composed id types etc., which I believe I was the only one using anyway.
 
 In `.kanelrc.js`:
 

@@ -2,6 +2,12 @@
 
 This packages extends [Kanel](https://github.com/kristiandupont/kanel) with some [Knex](https://knexjs.org) specific features.
 
+Assuming you already have Kanel installed, add this with
+
+```bash
+$ npm i -D kanel-knex
+```
+
 ## knex-tables
 
 Knex supports "implicit" type detection with a declared `knex/types/tables` module. This package can generate that for you. It's a pre-render hook called `generateKnexTablesModule`.
