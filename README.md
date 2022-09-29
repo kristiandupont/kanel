@@ -1,7 +1,5 @@
-![Kanel Logo](./logo-bright.png)
-
-<!-- ![Kanel Logo](./logo-bright.png#gh-light-mode-only) -->
-<!-- ![Kanel Logo](./logo-dark.png#gh-dark-mode-only) -->
+![Kanel Logo](./logo-bright.png#gh-light-mode-only)
+![Kanel Logo](./logo-dark.png#gh-dark-mode-only)
 
 Generate Typescript types from a live Postgres database.
 
