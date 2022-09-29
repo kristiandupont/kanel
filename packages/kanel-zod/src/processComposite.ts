@@ -45,7 +45,6 @@ const processComposite = (
           console.error(`Unknown type: ${x}`);
         }
       } else {
-        console.log('=== =>', p.type.fullName, x);
         zodType = 'z.unknown()';
       }
       return `  ${escapeName(p.name)}: ${zodType},`;
