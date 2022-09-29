@@ -30,13 +30,13 @@ export default {
           { text: 'postRenderHooks', link: '/postRenderHooks' },
         ],
       },
-      {
-        text: 'Extensions',
-        items: [
-          { text: 'kanel-knex', link: '/kanel-knex' },
-          { text: 'kanel-zod', link: '/kanel-zod' },
-        ],
-      },
+      // {
+      //   text: 'Extensions',
+      //   items: [
+      //     { text: 'kanel-knex', link: '/kanel-knex' },
+      //     { text: 'kanel-zod', link: '/kanel-zod' },
+      //   ],
+      // },
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/kristiandupont/kanel' },
