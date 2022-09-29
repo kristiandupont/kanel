@@ -16,7 +16,9 @@
     "url": "http://www.kristiandupont.com"
   },
   "workspaces": [
-    "packages/*"
+    "packages/kanel",
+    "packages/kanel-knex",
+    "packages/kanel-zod"
   ],
   "scripts": {
     "run-example": "kanel -c ./example/.kanelrc",
