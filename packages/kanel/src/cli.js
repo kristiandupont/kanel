@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import cliProgress from 'cli-progress';
 import optionator from 'optionator';
 import path from 'path';
+import fs from 'fs';
 
 import processDatabase from './processDatabase';
 // @ts-ignore
@@ -71,17 +72,15 @@ async function main() {
 
   /** @type {import('./config-types').Config} */
   let config;
-  try {
-    const configFile = path.join(
-      process.cwd(),
-      options.config || '.kanelrc.js'
-    );
-    config = require(configFile);
-  } catch (error) {
-    if (options.config) {
+  const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
+  if (fs.existsSync(configFile)) {
+    try {
+      config = require(configFile);
+    } catch (error) {
       console.error('Could not open ' + options.config, ': ', error);
       process.exit(1);
     }
+  } else {
     config = { connection: 'Missing connection string' };
   }
 
