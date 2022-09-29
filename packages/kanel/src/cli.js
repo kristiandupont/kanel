@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import cliProgress from 'cli-progress';
+import fs from 'fs';
 import optionator from 'optionator';
 import path from 'path';
-import fs from 'fs';
 
 import processDatabase from './processDatabase';
 // @ts-ignore
