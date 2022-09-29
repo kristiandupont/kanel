@@ -31,8 +31,8 @@
     "knex": "^2.3.0"
   },
   "devDependencies": {
-    "extract-pg-schema": "^4.1.0",
+    "extract-pg-schema": "4.1.0",
     "kanel": "*",
-    "typescript": "^4.8.2"
+    "typescript": "4.8.4"
   }
 }

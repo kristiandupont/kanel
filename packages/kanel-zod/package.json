@@ -28,7 +28,7 @@
     "test": "echo TODO..."
   },
   "devDependencies": {
-    "extract-pg-schema": "^4.1.0",
+    "extract-pg-schema": "4.1.0",
     "kanel": "*",
     "typescript": "4.8.4"
   }
