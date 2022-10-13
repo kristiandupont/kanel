@@ -10,3 +10,4 @@ export { default as processDatabase } from './processDatabase';
 export { default as TypeImport } from './TypeImport';
 export { default as TypeMap } from './TypeMap';
 export { default as writeFile } from './writeFile';
+export { default as resolveType } from './generators/resolveType';
