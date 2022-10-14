@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/node": "16.11.65",
-    "@types/ramda": "0.28.15",
+    "@types/ramda": "0.28.16",
     "np": "7.6.2",
     "typescript": "4.8.4",
     "vitest": "0.24.1"
