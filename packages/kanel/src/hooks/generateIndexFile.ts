@@ -1,4 +1,4 @@
-import { join, relative } from 'path';
+import { join, relative, sep } from 'path';
 
 import { PreRenderHook } from '../config-types';
 import Details from '../Details';
@@ -22,7 +22,12 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
       'selector',
       instantiatedConfig
     );
-    const importPath = relative(instantiatedConfig.outputPath, path);
+    let importPath = relative(instantiatedConfig.outputPath, path);
+
+    // We never want Windows-style paths in our source. Fix it if necessary.
+    if (sep === '\\') {
+      importPath = importPath.replace(/\\/g, '/');
+    }
 
     if (d.kind === 'table') {
       const additionalImports = [];
