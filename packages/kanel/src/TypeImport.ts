@@ -3,6 +3,7 @@ type TypeImport = {
   isDefault: boolean;
   path: string;
   isAbsolute: boolean;
+  importAsType: boolean;
 };
 
 export default TypeImport;

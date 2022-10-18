@@ -73,7 +73,11 @@ async function main() {
   /** @type {import('./config-types').Config} */
   let config;
   const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
-  if (fs.existsSync(configFile)) {
+  if (
+    fs.existsSync(configFile) ||
+    fs.existsSync(configFile + '.js') ||
+    fs.existsSync(configFile + '.json')
+  ) {
     try {
       config = require(configFile);
     } catch (error) {
@@ -81,7 +85,11 @@ async function main() {
       process.exit(1);
     }
   } else {
-    config = { connection: 'Missing connection string' };
+    if (options.config) {
+      console.error('Could not open ' + options.config);
+      process.exit(1);
+    }
+    config = { connection: undefined };
   }
 
   if (options.database) {

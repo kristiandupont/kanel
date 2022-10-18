@@ -23,12 +23,19 @@ const resolveTypeFromComment = (
       // If it's just a string, assume system type. No import necessary
       return tags.type;
     } else if (Array.isArray(tags.type)) {
-      const [name, path, isAbsoluteString, isDefaultString] = tags.type;
+      const [
+        name,
+        path,
+        isAbsoluteString,
+        isDefaultString,
+        importAsTypeString,
+      ] = tags.type;
       return {
         name,
         path,
         isAbsolute: isAbsoluteString === 'true',
         isDefault: isDefaultString === 'true',
+        importAsType: importAsTypeString === 'true',
       };
     }
   }
@@ -108,6 +115,7 @@ const resolveType = (
       path,
       isAbsolute: false,
       isDefault: exportAs === 'default',
+      importAsType: true,
     };
   }
 
@@ -150,6 +158,7 @@ const resolveType = (
         path,
         isAbsolute: false,
         isDefault: true,
+        importAsType: true,
       };
     }
   }

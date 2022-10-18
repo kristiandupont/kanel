@@ -11,6 +11,7 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: '/src/lib/func',
       isAbsolute: false,
+      importAsType: false,
     });
 
     const generatedLines = ig.generateLines();
@@ -25,6 +26,7 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: '/package/src/lib/defaultFunc',
       isAbsolute: false,
+      importAsType: false,
     });
 
     ig.addImport({
@@ -32,12 +34,14 @@ describe('ImportGenerator', () => {
       isDefault: false,
       path: '/package/src/lib/namedFunc',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'namedFunc2',
       isDefault: false,
       path: '/package/src/lib/namedFunc',
       isAbsolute: false,
+      importAsType: false,
     });
 
     ig.addImport({
@@ -45,6 +49,7 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: '/package/package.json',
       isAbsolute: false,
+      importAsType: false,
     });
 
     ig.addImport({
@@ -52,6 +57,7 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: '/package/sister-src/sister',
       isAbsolute: false,
+      importAsType: false,
     });
 
     ig.addImport({
@@ -59,24 +65,28 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: '/package/src/comb',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'defNamed1',
       isDefault: false,
       path: '/package/src/comb',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'defNamed2',
       isDefault: false,
       path: '/package/src/comb',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'defNamed3',
       isDefault: false,
       path: '/package/src/comb',
       isAbsolute: false,
+      importAsType: false,
     });
 
     const generatedLines = ig.generateLines();
@@ -97,12 +107,14 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: './pkg',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'def',
       isDefault: true,
       path: './pkg',
       isAbsolute: false,
+      importAsType: false,
     });
 
     ig.addImport({
@@ -110,18 +122,21 @@ describe('ImportGenerator', () => {
       isDefault: false,
       path: './pkg',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'named2',
       isDefault: false,
       path: './pkg',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'named1',
       isDefault: false,
       path: './pkg',
       isAbsolute: false,
+      importAsType: false,
     });
 
     const generatedLines = ig.generateLines();
@@ -138,6 +153,7 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: './pkg',
       isAbsolute: false,
+      importAsType: false,
     });
 
     expect(() =>
@@ -146,6 +162,7 @@ describe('ImportGenerator', () => {
         isDefault: true,
         path: './pkg',
         isAbsolute: false,
+        importAsType: false,
       })
     ).toThrow("Multiple default imports attempted: def and def2 from './pkg'");
   });
@@ -158,18 +175,21 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: 'path',
       isAbsolute: true,
+      importAsType: false,
     });
     ig.addImport({
       name: 'existsSync',
       isDefault: false,
       path: 'fs',
       isAbsolute: true,
+      importAsType: false,
     });
     ig.addImport({
       name: 'mkDirSync',
       isDefault: false,
       path: 'fs',
       isAbsolute: true,
+      importAsType: false,
     });
 
     const generatedLines = ig.generateLines();
@@ -187,21 +207,103 @@ describe('ImportGenerator', () => {
       isDefault: true,
       path: 'path',
       isAbsolute: true,
+      importAsType: false,
     });
     ig.addImport({
       name: 'someDefaultImport',
       isDefault: true,
       path: './src/some-module',
       isAbsolute: false,
+      importAsType: false,
     });
     ig.addImport({
       name: 'someNamedImport',
       isDefault: false,
       path: './src/some-module',
       isAbsolute: false,
+      importAsType: false,
     });
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual(["import path from 'path';"]);
+  });
+
+  it('should support type-only imports', () => {
+    const ig = new ImportGenerator('./some-module');
+
+    ig.addImport({
+      name: 'Member',
+      isDefault: true,
+      path: 'member',
+      isAbsolute: true,
+      importAsType: true,
+    });
+    ig.addImport({
+      name: 'AccountId',
+      isDefault: false,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: true,
+    });
+    ig.addImport({
+      name: 'AccountInitializer',
+      isDefault: false,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: true,
+    });
+
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual([
+      "import type Member from 'member';",
+      "import type { AccountId, AccountInitializer } from 'account';",
+    ]);
+  });
+
+  it('should support combinations of type-only and non-type-only imports', () => {
+    const ig = new ImportGenerator('./some-module');
+
+    ig.addImport({
+      name: 'Member',
+      isDefault: true,
+      path: 'member',
+      isAbsolute: true,
+      importAsType: true,
+    });
+    ig.addImport({
+      name: 'AccountId',
+      isDefault: false,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: true,
+    });
+    ig.addImport({
+      name: 'AccountInitializer',
+      isDefault: false,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: true,
+    });
+    ig.addImport({
+      name: 'Account',
+      isDefault: true,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: false,
+    });
+    ig.addImport({
+      name: 'AccountType',
+      isDefault: false,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: false,
+    });
+
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual([
+      "import type Member from 'member';",
+      "import Account, { AccountType } from 'account';",
+      "import type { AccountId, AccountInitializer } from 'account';",
+    ]);
   });
 });
