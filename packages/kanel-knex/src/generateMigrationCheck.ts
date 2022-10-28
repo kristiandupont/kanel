@@ -23,6 +23,7 @@ const generateMigrationCheck: PreRenderHook = async (
       isDefault: false,
       path: 'knex',
       isAbsolute: true,
+      importAsType: false,
     },
   ];
 
