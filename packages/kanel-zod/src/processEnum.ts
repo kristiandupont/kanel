@@ -20,6 +20,7 @@ const processEnum = (
     isDefault: false,
     path: 'zod',
     isAbsolute: true,
+    importAsType: false,
   };
 
   const declaration: GenericDeclaration = {

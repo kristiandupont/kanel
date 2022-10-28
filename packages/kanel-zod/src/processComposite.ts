@@ -31,6 +31,7 @@ const processComposite = (
       isDefault: false,
       path: 'zod',
       isAbsolute: true,
+      importAsType: false,
     },
   ];
 
