@@ -22,6 +22,7 @@ const getTypeImports = (
       isDefault: true,
       path: selector.path,
       isAbsolute: false,
+      importAsType: true,
     },
   ];
 
@@ -37,6 +38,7 @@ const getTypeImports = (
       isDefault: false,
       path: initializer.path,
       isAbsolute: false,
+      importAsType: true,
     });
 
     const mutator = instantiatedConfig.getMetadata(
@@ -49,6 +51,7 @@ const getTypeImports = (
       isDefault: false,
       path: mutator.path,
       isAbsolute: false,
+      importAsType: true,
     });
   }
 
@@ -119,6 +122,7 @@ const generateKnexTablesModule: PreRenderHook = (
         isAbsolute: true,
         path: 'knex',
         isDefault: false,
+        importAsType: false,
       },
     ]
   );
