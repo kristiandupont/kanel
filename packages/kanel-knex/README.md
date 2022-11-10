@@ -51,6 +51,16 @@ const combineFilters =
     filters.every((f) => f(t));
 ```
 
+You can then use this:
+
+```javascript
+module.exports = {
+  // ... your config here.
+
+  typeFilter: combineFilters(knexTypeFilter, someOtherFilter /* ... */),
+};
+```
+
 ## Migration Check
 
 However, you might want to check that your code is in sync with the database in terms of migrations, so that the types that your code was compiled with match what the database looks like.
@@ -60,7 +70,7 @@ The `generateMigrationCheck` pre-render hook will create a file for you that con
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generatMigrationCheck } = require('kanel-knex');
+const { generateMigrationCheck } = require('kanel-knex');
 
 module.exports = {
   // ... your config here.
