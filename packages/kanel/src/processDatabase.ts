@@ -67,7 +67,7 @@ const processDatabase = async (
     makeCompositeGenerator('view', instantiatedConfig),
     makeCompositeGenerator('materializedView', instantiatedConfig),
     makeCompositeGenerator('compositeType', instantiatedConfig),
-    makeEnumsGenerator('enum', instantiatedConfig),
+    makeEnumsGenerator(instantiatedConfig),
     makeRangesGenerator(instantiatedConfig),
     makeDomainsGenerator(instantiatedConfig),
   ];
