@@ -38,6 +38,26 @@ If you really want to customize the behavior of Kanel, you can provide values fo
 
 The `propertySortFunction` can be supplied if you want to customize how the properties in types should be sorted. The default behavior is to put primary keys at the top and otherwise follow the ordinal order as is specified in the database.
 
+## enumStyle
+
+The `enumStyle` can be either `type` or `enum`. Postgres enums will then be turned into either string unions or Typescript enums.
+
+This, if you have an enum `Fruit` consisting of the values `apples`, `oranges` and `bananas`, you will get this type with `enumStyle === 'type'`:
+
+```typescript
+type Fruit = 'apples' | 'oranges' | 'bananas';
+```
+
+..or, with `enumStyle === 'enum'`:
+
+```typescript
+enum Fruit {
+  apples = 'apples',
+  oranges = 'oranges',
+  bananas = 'bananas',
+}
+```
+
 ## outputPath
 
 The `outputPath` specifies the root for the output files. The default implementation of `getMetadata` will place files in `${outputPath}/${schemaName}/${typeName}.ts`.
