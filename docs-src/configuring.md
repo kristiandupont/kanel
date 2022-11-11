@@ -40,7 +40,7 @@ The `propertySortFunction` can be supplied if you want to customize how the prop
 
 ## enumStyle
 
-The `enumStyle` can be either `type` or `enum`. Postgres enums will then be turned into either string unions or Typescript enums.
+The `enumStyle` can be either `type` or `enum` (default). Postgres enums will then be turned into either string unions or Typescript enums.
 
 This, if you have an enum `Fruit` consisting of the values `apples`, `oranges` and `bananas`, you will get this type with `enumStyle === 'type'`:
 
