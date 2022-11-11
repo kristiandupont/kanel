@@ -22,6 +22,8 @@ export type InstantiatedConfig = {
   generateIdentifierType: GenerateIdentifierType;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 
+  enumStyle: 'enum' | 'type';
+
   outputPath: string;
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
@@ -47,6 +49,8 @@ export type Config = {
   getPropertyMetadata?: GetPropertyMetadata;
   generateIdentifierType?: GenerateIdentifierType;
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
+
+  enumStyle?: 'enum' | 'type';
 
   outputPath?: string;
   preDeleteOutputFolder?: boolean;

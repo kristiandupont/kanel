@@ -53,6 +53,7 @@ const processDatabase = async (
     getPropertyMetadata,
     generateIdentifierType,
     propertySortFunction,
+    enumStyle: config.enumStyle ?? 'enum',
     typeMap,
     schemas,
     connection: config.connection,

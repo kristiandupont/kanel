@@ -61,9 +61,10 @@ const makeMapper =
   };
 
 const makeEnumsGenerator =
-  (style: EnumStyle, config: InstantiatedConfig) =>
+  (config: InstantiatedConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const declarations = schema.enums?.map(makeMapper(style, config)) ?? [];
+    const declarations =
+      schema.enums?.map(makeMapper(config.enumStyle, config)) ?? [];
     return declarations.reduce((acc, elem) => {
       if (elem === undefined) return acc;
       const { path, declaration } = elem;
