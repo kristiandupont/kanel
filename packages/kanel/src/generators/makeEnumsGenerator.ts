@@ -38,7 +38,7 @@ const makeMapper =
         exportAs: 'default',
         typeDefinition: [
           '', // Start definition on new line
-          ...enumDetails.values.map((value) => `   | '${value}'`),
+          ...enumDetails.values.map((value) => `| '${value}'`),
         ],
       };
       return { path, declaration };

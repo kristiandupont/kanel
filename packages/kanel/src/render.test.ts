@@ -21,6 +21,25 @@ describe('processGenerationSetup', () => {
     ]);
   });
 
+  it('should work with multi-line type definitions', () => {
+    const declarations: Declaration[] = [
+      {
+        declarationType: 'typeDeclaration' as const,
+        name: 'MyUnion',
+        exportAs: 'named',
+        comment: [],
+        typeDefinition: ['', "| 'apples'", "| 'oranges'", "| 'bananas'"],
+      },
+    ];
+    const lines = render(declarations, './');
+    expect(lines).toEqual([
+      `export type MyUnion = `,
+      `  | 'apples'`,
+      `  | 'oranges'`,
+      `  | 'bananas';`,
+    ]);
+  });
+
   it('should process an interface', () => {
     const declarations: Declaration[] = [
       {

@@ -6,7 +6,7 @@ const processComments = (
   comments: string[] | undefined,
   indentation: number
 ): string[] => {
-  if (!comments) {
+  if (!comments || comments.length === 0) {
     return [];
   }
 
@@ -32,11 +32,29 @@ const processDeclaration = (
     case 'typeDeclaration': {
       const { exportAs, name, typeDefinition } = declaration;
       declarationLines.push(...processComments(declaration.comment, 0));
-      const t = `type ${name} = ${typeDefinition};`;
       if (exportAs === 'default') {
-        declarationLines.push(...[t, '', `export default ${name};`]);
+        if (typeDefinition.length === 1) {
+          declarationLines.push(`type ${name} = ${typeDefinition[0]};`);
+        } else {
+          const [head, ...tail] = typeDefinition;
+          const tailLines = tail.map((l, i) =>
+            i === tail.length - 1 ? `  ${l};` : `  ${l}`
+          );
+          declarationLines.push(...[`type ${name} = ${head}`, ...tailLines]);
+        }
+        declarationLines.push('', `export default ${name};`);
       } else {
-        declarationLines.push(`export ${t}`);
+        if (typeDefinition.length === 1) {
+          declarationLines.push(`export type ${name} = ${typeDefinition[0]};`);
+        } else {
+          const [head, ...tail] = typeDefinition;
+          const tailLines = tail.map((l, i) =>
+            i === tail.length - 1 ? `  ${l};` : `  ${l}`
+          );
+          declarationLines.push(
+            ...[`export type ${name} = ${head}`, ...tailLines]
+          );
+        }
       }
       break;
     }
