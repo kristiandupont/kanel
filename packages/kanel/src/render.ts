@@ -90,11 +90,6 @@ const processDeclaration = (
     case 'generic': {
       declarationLines.push(...processComments(declaration.comment, 0));
       declarationLines.push(...declaration.lines);
-      if (declaration.typeImports) {
-        declaration.typeImports.forEach((typeImport) =>
-          importGenerator.addImport(typeImport)
-        );
-      }
       break;
     }
     default: {
@@ -103,6 +98,13 @@ const processDeclaration = (
       );
     }
   }
+
+  if (declaration.typeImports) {
+    declaration.typeImports.forEach((typeImport) =>
+      importGenerator.addImport(typeImport)
+    );
+  }
+
   return declarationLines;
 };
 
