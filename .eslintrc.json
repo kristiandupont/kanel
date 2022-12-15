@@ -1,3 +1,6 @@
 {
-  "extends": ["@kristiandupont"]
+  "extends": ["@kristiandupont"],
+  "rules": {
+    "@typescript-eslint/prefer-nullish-coalescing": "off"
+  }
 }
