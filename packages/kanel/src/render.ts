@@ -13,7 +13,7 @@ const processComments = (
   const i = ' '.repeat(indentation);
   if (comments.length === 1) {
     return [`${i}/** ${comments[0]} */`];
-  } else if (comments.length > 1) {
+  } else {
     const lines: string[] = [];
     lines.push(`${i}/**`);
     comments.forEach((comment) => lines.push(`${i} * ${comment}`));

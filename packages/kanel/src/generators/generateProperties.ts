@@ -15,7 +15,7 @@ const generateProperties = <D extends CompositeDetails>(
     details.kind === 'compositeType' ? details.attributes : details.columns;
 
   const sortedPs = config.propertySortFunction
-    ? R.sort(config.propertySortFunction, ps)
+    ? R.sort(config.propertySortFunction, ps as any)
     : ps;
 
   const result: InterfacePropertyDeclaration[] = sortedPs.map(
@@ -27,7 +27,8 @@ const generateProperties = <D extends CompositeDetails>(
         nullableOverride,
         optionalOverride,
       } = config.getPropertyMetadata(p, details, generateFor, config);
-      const canBeOptional = p.isNullable || p.defaultValue || p.isIdentity;
+      const canBeOptional: boolean =
+        (p.isNullable ?? p.defaultValue) || p.isIdentity;
 
       const t = typeOverride ?? resolveType(p, details, config);
 
@@ -52,10 +53,12 @@ const generateProperties = <D extends CompositeDetails>(
           isOptional = canBeOptional;
         } else if (generateFor === 'mutator') {
           isOptional = true;
+        } else {
+          throw new Error(`Unexpected generateFor value: ${generateFor}`);
         }
       }
 
-      const isNullable = nullableOverride ?? p.isNullable;
+      const isNullable = Boolean(nullableOverride ?? p.isNullable);
 
       return {
         name,
