@@ -1,6 +1,6 @@
 export default {
   title: 'Kanel',
-  description: 'Just playing around.',
+  description: 'Source of Truth: PostgreSQL',
   base: '/kanel/',
   outDir: '../docs/',
   themeConfig: {
