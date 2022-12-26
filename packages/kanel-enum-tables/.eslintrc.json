@@ -1,0 +1,11 @@
+{
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "parserOptions": {
+        "createDefaultProgram": true,
+        "project": "./tsconfig.json"
+      }
+    }
+  ]
+}
