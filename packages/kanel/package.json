@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/ramda": "0.28.20",
-    "np": "7.6.2"
+    "np": "7.6.3"
   },
   "np": {}
 }
