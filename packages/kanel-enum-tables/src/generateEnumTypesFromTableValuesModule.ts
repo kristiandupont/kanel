@@ -77,7 +77,10 @@ const generateEnumTypesFromTableValuesModule: PreRenderHook = async (
       .orderBy(primaryKeyColumn.name);
 
     const newDeclarations = declarations.map((declaration) => {
-      if (declaration.name === primaryKeyTypeDeclaration.name) {
+      if (
+        declaration.declarationType === 'typeDeclaration' &&
+        declaration.name === primaryKeyTypeDeclaration.name
+      ) {
         if (instantiatedConfig.enumStyle === 'type') {
           const newDeclaration: TypeDeclaration = {
             ...declaration,
@@ -105,8 +108,9 @@ const generateEnumTypesFromTableValuesModule: PreRenderHook = async (
           return newDeclaration;
         }
       } else if (
-        declaration.name === initializerMetadata.name ||
-        declaration.name === mutatorMetadata.name
+        declaration.declarationType === 'interface' &&
+        (declaration.name === initializerMetadata.name ||
+          declaration.name === mutatorMetadata.name)
       ) {
         const newDeclaration: InterfaceDeclaration = {
           ...declaration,
