@@ -78,10 +78,11 @@ async function main() {
     fs.existsSync(configFile + '.js') ||
     fs.existsSync(configFile + '.json')
   ) {
+    console.info(`Using config file: ${configFile}`);
     try {
       config = require(configFile);
     } catch (error) {
-      console.error('Could not open ' + options.config, ': ', error);
+      console.error('Could not open config file:', error);
       process.exit(1);
     }
   } else {
