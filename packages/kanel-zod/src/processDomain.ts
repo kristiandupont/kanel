@@ -9,7 +9,7 @@ const processDomain = (
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig
 ): GenericDeclaration | undefined => {
-  const { name } = config.getZodSchemaMetadata(d, config, instantiatedConfig);
+  const { name } = config.getZodSchemaMetadata(d, instantiatedConfig);
   let tsType = instantiatedConfig.typeMap[d.innerType];
   if (typeof tsType !== 'string') {
     tsType = 'unknown';

@@ -8,7 +8,7 @@ const processEnum = (
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig
 ): GenericDeclaration => {
-  const { name } = config.getZodSchemaMetadata(e, config, instantiatedConfig);
+  const { name } = config.getZodSchemaMetadata(e, instantiatedConfig);
   const lines: string[] = [
     `export const ${name} = z.enum([`,
     ...e.values.map((v) => `  '${v}',`),

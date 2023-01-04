@@ -9,7 +9,7 @@ const processRange = (
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig
 ): GenericDeclaration | undefined => {
-  const { name } = config.getZodSchemaMetadata(r, config, instantiatedConfig);
+  const { name } = config.getZodSchemaMetadata(r, instantiatedConfig);
   let tsType = instantiatedConfig.typeMap[r.innerType];
   if (typeof tsType !== 'string') {
     tsType = 'unknown';

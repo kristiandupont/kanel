@@ -15,9 +15,10 @@ import zodTypeMap from './zodTypeMap';
 const processComposite = (
   c: CompositeDetails,
   config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
+  nonCompositeTypeImports: Record<string, TypeImport>
 ): GenericDeclaration => {
-  const { name } = config.getZodSchemaMetadata(c, config, instantiatedConfig);
+  const { name } = config.getZodSchemaMetadata(c, instantiatedConfig);
   let properties: CompositeProperty[];
   if (c.kind === 'compositeType') {
     properties = c.attributes;
@@ -39,14 +40,22 @@ const processComposite = (
     `export const ${name} = z.object({`,
     ...properties.map((p) => {
       const x = instantiatedConfig.typeMap[p.type.fullName];
-      let zodType: string;
+      let zodType: string = 'z.unknown()';
       if (typeof x === 'string') {
         zodType = zodTypeMap[x];
         if (!zodType) {
-          console.error(`Unknown type: ${x}`);
+          console.error(`kanel-zod: Unknown type for ${name}.${p.name}: ${x}`);
         }
       } else {
-        zodType = 'z.unknown()';
+        if (p.type.fullName in nonCompositeTypeImports) {
+          const x = nonCompositeTypeImports[p.type.fullName];
+          typeImports.push(x);
+          zodType = x.name;
+        } else {
+          console.error(
+            `kanel-zod: Unknown type for ${name}.${p.name}: ${p.type.fullName}`
+          );
+        }
       }
       return `  ${escapeName(p.name)}: ${zodType},`;
     }),

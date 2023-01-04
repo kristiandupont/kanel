@@ -1,12 +1,11 @@
 import { recase } from '@kristiandupont/recase';
-import { Declaration, Output, Path, PreRenderHook } from 'kanel';
+import { Declaration, Output, Path, PreRenderHook, TypeImport } from 'kanel';
 
 import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
 import processComposite from './processComposite';
 import processDomain from './processDomain';
 import processEnum from './processEnum';
 import processRange from './processRange';
-import zodTypeMap from './zodTypeMap';
 
 const createOrAppendFileContents = (
   outputAcc: Output,
@@ -25,13 +24,17 @@ export const makeGenerateZodSchemas =
   async (outputAcc, instantiatedConfig) => {
     let output = { ...outputAcc };
 
+    const nonCompositeTypeImports: Record<string, TypeImport> = {};
+
+    // First, process the non-composite types. These may be imported by
+    // the composited ones so we will generate them first and store them
+    // in the nonCompositeTypeImports map.
     for (const schemaName of Object.keys(instantiatedConfig.schemas)) {
       const schema = instantiatedConfig.schemas[schemaName];
 
       schema.enums.forEach((enumDetails) => {
-        const { path } = config.getZodSchemaMetadata(
+        const { name, path } = config.getZodSchemaMetadata(
           enumDetails,
-          config,
           instantiatedConfig
         );
         const declaration = processEnum(
@@ -42,12 +45,20 @@ export const makeGenerateZodSchemas =
         output[path] = {
           declarations: [...output[path].declarations, declaration],
         };
+        nonCompositeTypeImports[
+          `${enumDetails.schemaName}.${enumDetails.name}`
+        ] = {
+          name,
+          path,
+          isDefault: false,
+          isAbsolute: false,
+          importAsType: false,
+        };
       });
 
       schema.ranges.forEach((rangeDetails) => {
-        const { path } = config.getZodSchemaMetadata(
+        const { name, path } = config.getZodSchemaMetadata(
           rangeDetails,
-          config,
           instantiatedConfig
         );
         const declaration = processRange(
@@ -58,12 +69,20 @@ export const makeGenerateZodSchemas =
         output[path] = {
           declarations: [...output[path].declarations, declaration],
         };
+        nonCompositeTypeImports[
+          `${rangeDetails.schemaName}.${rangeDetails.name}`
+        ] = {
+          name,
+          path,
+          isDefault: false,
+          isAbsolute: false,
+          importAsType: false,
+        };
       });
 
       schema.domains.forEach((domainDetails) => {
-        const { path } = config.getZodSchemaMetadata(
+        const { name, path } = config.getZodSchemaMetadata(
           domainDetails,
-          config,
           instantiatedConfig
         );
         const declaration = processDomain(
@@ -74,8 +93,21 @@ export const makeGenerateZodSchemas =
         output[path] = {
           declarations: [...output[path].declarations, declaration],
         };
+        nonCompositeTypeImports[
+          `${domainDetails.schemaName}.${domainDetails.name}`
+        ] = {
+          name,
+          path,
+          isDefault: false,
+          isAbsolute: false,
+          importAsType: false,
+        };
       });
+    }
 
+    // Now, process the composites
+    for (const schemaName of Object.keys(instantiatedConfig.schemas)) {
+      const schema = instantiatedConfig.schemas[schemaName];
       [
         ...schema.tables,
         ...schema.views,
@@ -84,13 +116,13 @@ export const makeGenerateZodSchemas =
       ].forEach((compositeDetails) => {
         const { path } = config.getZodSchemaMetadata(
           compositeDetails,
-          config,
           instantiatedConfig
         );
         const declaration = processComposite(
           compositeDetails,
           config,
-          instantiatedConfig
+          instantiatedConfig,
+          nonCompositeTypeImports
         );
         output = createOrAppendFileContents(output, path, declaration);
       });
@@ -102,8 +134,7 @@ export const makeGenerateZodSchemas =
 const toCamelCase = recase(null, 'camel');
 
 const generateZodSchemas = makeGenerateZodSchemas({
-  zodTypeMap,
-  getZodSchemaMetadata: (d, _config, instantiatedConfig) => {
+  getZodSchemaMetadata: (d, instantiatedConfig) => {
     const generateFor = [
       'table',
       'view',
