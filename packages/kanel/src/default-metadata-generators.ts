@@ -73,12 +73,21 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
     // Explicitly disable identifier resolution so we get the actual inner type here
     generateIdentifierType: undefined,
   });
+  const imports = [];
 
+  let type = innerType;
+  if (typeof innerType === 'object') {
+    // Handle non-primitives
+    type = innerType.name;
+    imports.push(innerType);
+  }
+  
   return {
     declarationType: 'typeDeclaration',
     name,
     exportAs: 'named',
-    typeDefinition: [`${innerType} & { __brand: '${name}' }`],
+    typeDefinition: [`${type} & { __brand: '${name}' }`],
+    typeImports: imports,
     comment: [`Identifier type for ${details.schemaName}.${details.name}`],
   };
 };
