@@ -28,7 +28,7 @@ const generateProperties = <D extends CompositeDetails>(
         optionalOverride,
       } = config.getPropertyMetadata(p, details, generateFor, config);
       const canBeOptional: boolean =
-        (p.isNullable ?? p.defaultValue) || p.isIdentity;
+        p.isNullable || p.defaultValue || p.isIdentity;
 
       const t = typeOverride ?? resolveType(p, details, config);
 
