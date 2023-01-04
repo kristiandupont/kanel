@@ -34,7 +34,7 @@ export default {
         text: 'Extensions',
         items: [
           { text: 'kanel-knex', link: '/kanel-knex' },
-          // { text: 'kanel-zod', link: '/kanel-zod' },
+          { text: 'kanel-zod', link: '/kanel-zod' },
         ],
       },
     ],
