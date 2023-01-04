@@ -3,6 +3,7 @@
 
 import type { AddressId } from './Address';
 import bytea from 'bytea';
+import { z } from 'zod';
 
 /** Identifier type for staff */
 export type StaffId = number & { __flavor?: 'StaffId' };
@@ -123,3 +124,18 @@ export interface StaffMutator {
   /** Database type: pg_catalog.bytea */
   picture?: bytea | null;
 }
+
+/** Zod schema for staff */
+export const staff = z.object({
+  staff_id: z.number(),
+  first_name: z.string(),
+  last_name: z.string(),
+  address_id: z.number(),
+  email: z.string(),
+  store_id: z.number(),
+  active: z.boolean(),
+  username: z.string(),
+  password: z.string(),
+  last_update: z.date(),
+  picture: z.unknown(),
+});

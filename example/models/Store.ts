@@ -3,6 +3,7 @@
 
 import type { StaffId } from './Staff';
 import type { AddressId } from './Address';
+import { z } from 'zod';
 
 /** Identifier type for store */
 export type StoreId = number & { __flavor?: 'StoreId' };
@@ -57,3 +58,11 @@ export interface StoreMutator {
   /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }
+
+/** Zod schema for store */
+export const store = z.object({
+  store_id: z.number(),
+  manager_staff_id: z.number(),
+  address_id: z.number(),
+  last_update: z.date(),
+});

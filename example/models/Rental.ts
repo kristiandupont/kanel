@@ -4,6 +4,7 @@
 import type { InventoryId } from './Inventory';
 import type { CustomerId } from './Customer';
 import type { StaffId } from './Staff';
+import { z } from 'zod';
 
 /** Identifier type for rental */
 export type RentalId = number & { __flavor?: 'RentalId' };
@@ -85,3 +86,14 @@ export interface RentalMutator {
   /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }
+
+/** Zod schema for rental */
+export const rental = z.object({
+  rental_id: z.number(),
+  rental_date: z.date(),
+  inventory_id: z.number(),
+  customer_id: z.number(),
+  return_date: z.date(),
+  staff_id: z.number(),
+  last_update: z.date(),
+});

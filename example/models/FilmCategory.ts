@@ -3,6 +3,7 @@
 
 import type { FilmId } from './Film';
 import type { CategoryId } from './Category';
+import { z } from 'zod';
 
 /** Represents the table public.film_category */
 export default interface FilmCategory {
@@ -42,3 +43,10 @@ export interface FilmCategoryMutator {
   /** Database type: pg_catalog.timestamp */
   last_update?: Date;
 }
+
+/** Zod schema for film_category */
+export const filmCategory = z.object({
+  film_id: z.number(),
+  category_id: z.number(),
+  last_update: z.date(),
+});

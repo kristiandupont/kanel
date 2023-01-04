@@ -3,7 +3,7 @@ const { recase } = require('@kristiandupont/recase');
 const { tryParse } = require('tagged-comment-parser')
 
 const { generateIndexFile } = require('kanel');
-// const generateZodSchemas = require('../packages/kanel-zod/build/generateZodSchemas').default;
+const { generateZodSchemas } = require('kanel-zod');
 
 const toPascalCase = recase('snake', 'pascal');
 const outputPath = './example/models';
@@ -74,8 +74,7 @@ module.exports = {
   },
 
   // Generate an index file with exports of everything
-  // preRenderHooks: [generateIndexFile, generateZodSchemas],
-  preRenderHooks: [generateIndexFile],
+  preRenderHooks: [generateIndexFile, generateZodSchemas],
 
   customTypeMap: {
     // A text search vector could be stored as a set of strings. See Film.ts for an example.

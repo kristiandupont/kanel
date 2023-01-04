@@ -4,6 +4,7 @@
 import type { CustomerId } from './Customer';
 import type { StaffId } from './Staff';
 import type { RentalId } from './Rental';
+import { z } from 'zod';
 
 /** Identifier type for payment */
 export type PaymentId = number & { __flavor?: 'PaymentId' };
@@ -73,3 +74,13 @@ export interface PaymentMutator {
   /** Database type: pg_catalog.timestamp */
   payment_date?: Date;
 }
+
+/** Zod schema for payment */
+export const payment = z.object({
+  payment_id: z.number(),
+  customer_id: z.number(),
+  staff_id: z.number(),
+  rental_id: z.number(),
+  amount: z.string(),
+  payment_date: z.date(),
+});
