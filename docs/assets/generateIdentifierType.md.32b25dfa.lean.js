@@ -1,0 +1,1 @@
+import{_ as s,c as n,o as a,a as l}from"./app.15c1b51c.js";const A=JSON.parse('{"title":"generateIdentifierType","description":"","frontmatter":{},"headers":[],"relativePath":"generateIdentifierType.md"}'),e={name:"generateIdentifierType.md"},p=l("",6),o=[p];function t(c,r,y,D,F,i){return a(),n("div",null,o)}const d=s(e,[["render",t]]);export{A as __pageData,d as default};

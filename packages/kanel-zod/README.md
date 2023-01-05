@@ -1,6 +1,17 @@
 # Zod extension for Kanel
 
-This packages extends [Kanel](https://github.com/kristiandupont/kanel) with some [Zod](https://github.com/colinhacks/zod) specific features.
+Generate [Zod](https://github.com/colinhacks/zod) schemas directly from your Postgres database.
+This packages extends [Kanel](https://github.com/kristiandupont/kanel) with some Zod specific features.
+
+```typescript
+/** Zod schema for actor */
+export const actor = z.object({
+  actor_id: z.number(),
+  first_name: z.string(),
+  last_name: z.string(),
+  last_update: z.date(),
+});
+```
 
 Assuming you already have Kanel installed, add this with
 
