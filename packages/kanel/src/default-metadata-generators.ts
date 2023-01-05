@@ -81,7 +81,7 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
     type = innerType.name;
     imports.push(innerType);
   }
-  
+
   return {
     declarationType: 'typeDeclaration',
     name,
