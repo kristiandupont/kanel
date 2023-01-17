@@ -306,4 +306,29 @@ describe('ImportGenerator', () => {
       "import type { AccountId, AccountInitializer } from 'account';",
     ]);
   });
+
+  // This is necessary because of https://github.com/tc39/proposal-type-annotations/issues/16
+  it('should combine default and named type-only imports correctly', () => {
+    const ig = new ImportGenerator('./some-module');
+
+    ig.addImport({
+      name: 'Account',
+      isDefault: true,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: true,
+    });
+    ig.addImport({
+      name: 'AccountId',
+      isDefault: false,
+      path: 'account',
+      isAbsolute: true,
+      importAsType: true,
+    });
+
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual([
+      "import type { default as Account, AccountId } from 'account';",
+    ]);
+  });
 });

@@ -125,9 +125,21 @@ class ImportGenerator {
     defaultImport: string | undefined,
     namedImports: Array<string>
   ): any {
+    const importDefaultAsNamed =
+      importAsType && defaultImport && namedImports.length > 0;
+
+    const appliedDefaultImport = importDefaultAsNamed
+      ? undefined
+      : defaultImport;
+    const appliedNamedImports = importDefaultAsNamed
+      ? [`default as ${defaultImport}`, ...namedImports]
+      : namedImports;
+
     const allImports = [
-      ...(defaultImport ? [defaultImport] : []),
-      ...(namedImports.length > 0 ? [`{ ${namedImports.join(', ')} }`] : []),
+      ...(appliedDefaultImport ? [appliedDefaultImport] : []),
+      ...(appliedNamedImports.length > 0
+        ? [`{ ${appliedNamedImports.join(', ')} }`]
+        : []),
     ].join(', ');
 
     return `import ${
