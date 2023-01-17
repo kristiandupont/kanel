@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@kristiandupont/dev-deps": "^1.1.0",
-    "vitepress": "1.0.0-alpha.35",
+    "vitepress": "1.0.0-alpha.36",
     "vue": "3.2.45"
   },
   "prettier": {
