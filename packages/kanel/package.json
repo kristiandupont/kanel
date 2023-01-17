@@ -45,7 +45,7 @@
     "tagged-comment-parser": "^1.2.0"
   },
   "devDependencies": {
-    "@types/ramda": "0.28.20",
+    "@types/ramda": "0.28.21",
     "np": "7.6.3"
   },
   "np": {}
