@@ -65,8 +65,8 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
         ', '
       )} } from './${importPath}';`;
     } else if (d.kind === 'enum') {
-      const prefix = instantiatedConfig.enumStyle === 'type' ? 'type ' : ''
-      result = `export ${ prefix }{ default as ${selectorName} } from './${importPath}';`;
+      const prefix = instantiatedConfig.enumStyle === 'type' ? 'type ' : '';
+      result = `export ${prefix}{ default as ${selectorName} } from './${importPath}';`;
     } else {
       result = `export type { default as ${selectorName} } from './${importPath}';`;
     }
