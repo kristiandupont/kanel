@@ -39,7 +39,7 @@ const makeMapper =
         `export { ${name} };`,
         '',
         `type UnionType = keyof typeof ${name};`,
-        `export default ${style === 'enum' ? name : 'UnionType'};`
+        `export default ${style === 'enum' ? name : 'UnionType'};`,
       ],
     };
 
