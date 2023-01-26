@@ -5,7 +5,6 @@ import { InstantiatedConfig } from '../config-types';
 import {
   Declaration,
   GenericDeclaration,
-  TypeDeclaration,
 } from '../declaration-types';
 import escapeName from '../escapeName';
 import Output, { Path } from '../Output';
@@ -30,34 +29,29 @@ const makeMapper =
       config
     );
 
-    if (style === 'type') {
-      const declaration: TypeDeclaration = {
-        declarationType: 'typeDeclaration',
-        name,
-        comment,
-        exportAs: 'default',
-        typeDefinition: [
-          '', // Start definition on new line
-          ...enumDetails.values.map((value) => `| '${value}'`),
-        ],
-      };
-      return { path, declaration };
-    } else {
-      const declaration: GenericDeclaration = {
-        declarationType: 'generic',
-        comment,
-        lines: [
-          `enum ${name} {`,
-          ...enumDetails.values.map(
-            (value) => `  ${escapeName(value)} = '${value}',`
-          ),
-          '};',
-          '',
-          `export default ${name};`,
-        ],
-      };
-      return { path, declaration };
-    }
+    const declaration: GenericDeclaration = {
+      declarationType: 'generic',
+      comment,
+      lines: [
+        `enum ${name} {`,
+        ...enumDetails.values.map(
+          (value) => `  ${escapeName(value)} = '${value}',`
+        ),
+        '};',
+        '',
+        `export { ${name} };`,
+        '',
+        ...style === 'enum'
+          ? [ `export default ${name};` ]
+          : [
+              `type UnionType = keyof typeof ${name};`,
+              `export default UnionType;`,
+            ]
+      ],
+    };
+
+    return { path, declaration }
+
   };
 
 const makeEnumsGenerator =
