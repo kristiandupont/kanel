@@ -1,6 +1,6 @@
 {
   "name": "kanel",
-  "version": "3.1.5",
+  "version": "3.1.6",
   "keywords": [
     "postgresql",
     "schema",
@@ -45,7 +45,7 @@
     "tagged-comment-parser": "^1.2.0"
   },
   "devDependencies": {
-    "@types/ramda": "0.28.21",
+    "@types/ramda": "0.28.22",
     "np": "7.6.3"
   },
   "np": {}
