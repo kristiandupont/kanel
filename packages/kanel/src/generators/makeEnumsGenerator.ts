@@ -2,10 +2,7 @@ import { EnumDetails, Schema } from 'extract-pg-schema';
 import { tryParse } from 'tagged-comment-parser';
 
 import { InstantiatedConfig } from '../config-types';
-import {
-  Declaration,
-  GenericDeclaration,
-} from '../declaration-types';
+import { Declaration, GenericDeclaration } from '../declaration-types';
 import escapeName from '../escapeName';
 import Output, { Path } from '../Output';
 
@@ -41,17 +38,12 @@ const makeMapper =
         '',
         `export { ${name} };`,
         '',
-        ...style === 'enum'
-          ? [ `export default ${name};` ]
-          : [
-              `type UnionType = keyof typeof ${name};`,
-              `export default UnionType;`,
-            ]
+        `type UnionType = keyof typeof ${name};`,
+        `export default ${style === 'enum' ? name : "UnionType"};`
       ],
     };
 
     return { path, declaration }
-
   };
 
 const makeEnumsGenerator =
