@@ -21,6 +21,12 @@ const defaultTypeMap: TypeMap = {
   'pg_catalog.timetz': 'Date',
   'pg_catalog.timestamp': 'Date',
   'pg_catalog.timestamptz': 'Date',
+  'pg_catalog.int4range': '[number, number]',
+  'pg_catalog.int8range': '[string, string]',
+  'pg_catalog.numrange': '[string, string]',
+  'pg_catalog.tsrange': '[Date, Date]',
+  'pg_catalog.tstzrange': '[Date, Date]',
+  'pg_catalog.daterange': '[Date, Date]',
 };
 
 export default defaultTypeMap;
