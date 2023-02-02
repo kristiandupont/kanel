@@ -1,1 +1,0 @@
-import{_ as s,c as a,o as n,a as t}from"./app.42cdcd84.js";const h=JSON.parse('{"title":"postRenderHooks","description":"","frontmatter":{},"headers":[],"relativePath":"postRenderHooks.md"}'),e={name:"postRenderHooks.md"},o=t("",6),l=[o];function p(r,i,c,y,C,d){return n(),a("div",null,l)}const D=s(e,[["render",p]]);export{h as __pageData,D as default};
