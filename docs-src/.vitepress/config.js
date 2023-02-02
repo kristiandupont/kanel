@@ -10,6 +10,7 @@ export default {
         items: [
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'How to work with Kanel', link: '/workflow' },
+          { text: 'Data Types', link: '/dataTypes' },
           { text: 'Migrating from V2', link: '/migration' },
         ],
       },
