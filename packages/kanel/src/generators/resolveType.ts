@@ -100,6 +100,8 @@ const resolveType = (
     }
     if (!target) {
       console.warn('Could not resolve source', source);
+      // return to prevent error: cannot read property of undefined (reading columns)
+      return 'unknown';
     }
 
     const column = (
