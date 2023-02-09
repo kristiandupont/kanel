@@ -85,9 +85,19 @@ const resolveType = (
   // get the type from the source.
   if ((c as ViewColumn | MaterializedViewColumn).source) {
     const source = (c as ViewColumn | MaterializedViewColumn).source;
-    const target = config.schemas[source.schema].tables.find(
+    let target = config.schemas[source.schema].tables.find(
       (t) => t.name === source.table
     );
+    if (!target) {
+      target = config.schemas[source.schema].views.find(
+        (v) => v.name === source.table
+      );
+    }
+    if (!target) {
+      target = config.schemas[source.schemaName].materializedViews.find(
+        (v) => v.name === source.table
+      );
+    }
     if (!target) {
       console.warn('Could not resolve source', source);
     }
