@@ -3,10 +3,10 @@ import TypeMap from './TypeMap';
 const defaultTypeMap: TypeMap = {
   'pg_catalog.int2': 'number',
   'pg_catalog.int4': 'number',
-  'pg_catalog.int8': 'string',
+  'pg_catalog.int8': 'number',
   'pg_catalog.float4': 'number',
-  'pg_catalog.float8': 'string',
-  'pg_catalog.numeric': 'string',
+  'pg_catalog.float8': 'number',
+  'pg_catalog.numeric': 'number',
   'pg_catalog.bool': 'boolean',
   'pg_catalog.json': 'unknown',
   'pg_catalog.jsonb': 'unknown',
