@@ -54,7 +54,7 @@ You should return a value of this type:
 export type PropertyMetadata = {
   name: string;
   comment: string[] | undefined;
-  typeOverride?: TypeImport | string;
+  typeOverride?: TypeDefinition;
   nullableOverride?: boolean;
   optionalOverride?: boolean;
 };

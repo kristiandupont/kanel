@@ -7,7 +7,7 @@ import {
   CompositeDetails,
   CompositeProperty,
 } from './generators/composite-types';
-import TypeImport from './TypeImport';
+import TypeDefinition from './TypeDefinition';
 
 export type TypeMetadata = {
   name: string;
@@ -24,7 +24,7 @@ export type GetMetadata = (
 export type PropertyMetadata = {
   name: string;
   comment: string[] | undefined;
-  typeOverride?: TypeImport | string;
+  typeOverride?: TypeDefinition;
   nullableOverride?: boolean;
   optionalOverride?: boolean;
 };

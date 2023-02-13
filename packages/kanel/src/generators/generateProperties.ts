@@ -39,7 +39,7 @@ const generateProperties = <D extends CompositeDetails>(
         typeName = t;
       } else {
         typeName = t.name;
-        typeImports = [t];
+        typeImports = t.typeImports;
       }
 
       let isOptional: boolean;

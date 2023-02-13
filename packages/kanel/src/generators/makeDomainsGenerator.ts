@@ -4,7 +4,7 @@ import { tryParse } from 'tagged-comment-parser';
 import { InstantiatedConfig } from '../config-types';
 import { Declaration, TypeDeclaration } from '../declaration-types';
 import Output, { Path } from '../Output';
-import { TypeDefinition } from '../TypeDefinition';
+import TypeDefinition from '../TypeDefinition';
 import TypeImport from '../TypeImport';
 
 const makeMapper =
@@ -38,7 +38,7 @@ const makeMapper =
       typeDefinition = [mapped];
     } else {
       typeDefinition = [mapped.name];
-      typeImports.push(mapped);
+      typeImports.push(...mapped.typeImports);
     }
 
     const declaration: TypeDeclaration = {

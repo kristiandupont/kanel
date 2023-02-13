@@ -11,12 +11,12 @@ import { tryParse } from 'tagged-comment-parser';
 
 import { InstantiatedConfig } from '../config-types';
 import Details from '../Details';
-import TypeImport from '../TypeImport';
+import TypeDefinition from '../TypeDefinition';
 import { CompositeDetails, CompositeProperty } from './composite-types';
 
 const resolveTypeFromComment = (
   comment: string | undefined
-): string | TypeImport | undefined => {
+): TypeDefinition | undefined => {
   const { tags } = tryParse(comment);
   if (tags?.type) {
     if (typeof tags.type === 'string') {
@@ -32,10 +32,15 @@ const resolveTypeFromComment = (
       ] = tags.type;
       return {
         name,
-        path,
-        isAbsolute: isAbsoluteString === 'true',
-        isDefault: isDefaultString === 'true',
-        importAsType: importAsTypeString === 'true',
+        typeImports: [
+          {
+            name,
+            path,
+            isAbsolute: isAbsoluteString === 'true',
+            isDefault: isDefaultString === 'true',
+            importAsType: importAsTypeString === 'true',
+          },
+        ],
       };
     }
   }
@@ -45,7 +50,7 @@ const resolveType = (
   c: CompositeProperty,
   d: CompositeDetails,
   config: InstantiatedConfig
-): string | TypeImport => {
+): TypeDefinition => {
   // 1) Check for a @type tag.
   const typeFromComment = resolveTypeFromComment(c.comment);
   if (typeFromComment) {
@@ -123,10 +128,15 @@ const resolveType = (
 
     return {
       name,
-      path,
-      isAbsolute: false,
-      isDefault: exportAs === 'default',
-      importAsType: true,
+      typeImports: [
+        {
+          name,
+          path,
+          isAbsolute: false,
+          isDefault: exportAs === 'default',
+          importAsType: true,
+        },
+      ],
     };
   }
 
@@ -166,10 +176,15 @@ const resolveType = (
       const { name, path } = config.getMetadata(target, 'selector', config);
       return {
         name,
-        path,
-        isAbsolute: false,
-        isDefault: true,
-        importAsType: true,
+        typeImports: [
+          {
+            name,
+            path,
+            isAbsolute: false,
+            isDefault: true,
+            importAsType: true,
+          },
+        ],
       };
     }
   }
