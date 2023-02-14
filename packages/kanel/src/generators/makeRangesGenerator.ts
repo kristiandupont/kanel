@@ -47,6 +47,7 @@ const makeMapper =
       comment,
       exportAs: 'default',
       typeDefinition: [`[lowerBound: ${rType}, upperBound: ${rType}]`],
+      typeImports,
     };
     return { path, declaration };
   };
