@@ -82,7 +82,7 @@ module.exports = {
 
     // The bytea package (https://www.npmjs.com/package/postgres-bytea) could be used for byte arrays.
     // See Staff.ts for an example.
-    'pg_catalog.bytea': { name: 'bytea', path: 'bytea', isAbsolute: true, isDefault: true },
+    'pg_catalog.bytea': { name: 'bytea', typeImports: [{ name: 'bytea', path: 'bytea', isAbsolute: true, isDefault: true }] },
 
     // Columns with the following types would probably just be strings in TypeScript.
     'pg_catalog.bpchar': 'string',
