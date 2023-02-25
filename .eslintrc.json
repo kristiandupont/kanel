@@ -1,4 +1,5 @@
 {
+  "root": true,
   "extends": ["@kristiandupont"],
   "rules": {
     "@typescript-eslint/prefer-nullish-coalescing": "off"
