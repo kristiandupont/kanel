@@ -1,6 +1,6 @@
 import { Declaration } from './declaration-types';
 import escapeName from './escapeName';
-import ImportGenerator from './importGenerator';
+import ImportGenerator from './ImportGenerator';
 
 const processComments = (
   comments: string[] | undefined,
@@ -40,7 +40,7 @@ const processDeclaration = (
           const tailLines = tail.map((l, i) =>
             i === tail.length - 1 ? `  ${l};` : `  ${l}`
           );
-          declarationLines.push(...[`type ${name} = ${head}`, ...tailLines]);
+          declarationLines.push(`type ${name} = ${head}`, ...tailLines);
         }
         declarationLines.push('', `export default ${name};`);
       } else {
@@ -51,17 +51,15 @@ const processDeclaration = (
           const tailLines = tail.map((l, i) =>
             i === tail.length - 1 ? `  ${l};` : `  ${l}`
           );
-          declarationLines.push(
-            ...[`export type ${name} = ${head}`, ...tailLines]
-          );
+          declarationLines.push(`export type ${name} = ${head}`, ...tailLines);
         }
       }
       break;
     }
     case 'interface': {
       const { exportAs, name, base, properties, comment } = declaration;
-      declarationLines.push(...(processComments(comment, 0) || []));
       declarationLines.push(
+        ...(processComments(comment, 0) || []),
         `export${exportAs === 'default' ? ' default' : ''} interface ${name}${
           base ? ` extends ${base}` : ''
         } {`
@@ -88,8 +86,10 @@ const processDeclaration = (
       break;
     }
     case 'generic': {
-      declarationLines.push(...processComments(declaration.comment, 0));
-      declarationLines.push(...declaration.lines);
+      declarationLines.push(
+        ...processComments(declaration.comment, 0),
+        ...declaration.lines
+      );
       break;
     }
     default: {
@@ -122,7 +122,7 @@ const render = (declarations: Declaration[], outputPath: string): string[] => {
   });
 
   const importLines = importGenerator.generateLines();
-  if (importLines.length) {
+  if (importLines.length > 0) {
     importLines.push('');
   }
 

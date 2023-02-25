@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import ImportGenerator from './importGenerator';
+import ImportGenerator from './ImportGenerator';
 
 describe('ImportGenerator', () => {
   it('should generate an import statement', () => {
