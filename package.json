@@ -32,7 +32,7 @@
     "kanel": "*"
   },
   "devDependencies": {
-    "@kristiandupont/dev-deps": "^1.1.0",
+    "@kristiandupont/dev-deps": "^1.2.0",
     "vitepress": "1.0.0-alpha.47",
     "vue": "3.2.47"
   },

@@ -44,18 +44,29 @@ const generateProperties = <D extends CompositeDetails>(
 
       let isOptional: boolean;
 
-      if (optionalOverride !== undefined) {
-        isOptional = optionalOverride;
-      } else {
-        if (generateFor === 'selector') {
-          isOptional = false;
-        } else if (generateFor === 'initializer') {
-          isOptional = canBeOptional;
-        } else if (generateFor === 'mutator') {
-          isOptional = true;
-        } else {
-          throw new Error(`Unexpected generateFor value: ${generateFor}`);
+      if (optionalOverride === undefined) {
+        switch (generateFor) {
+          case 'selector': {
+            isOptional = false;
+
+            break;
+          }
+          case 'initializer': {
+            isOptional = canBeOptional;
+
+            break;
+          }
+          case 'mutator': {
+            isOptional = true;
+
+            break;
+          }
+          default: {
+            throw new Error(`Unexpected generateFor value: ${generateFor}`);
+          }
         }
+      } else {
+        isOptional = optionalOverride;
       }
 
       const isNullable = Boolean(nullableOverride ?? p.isNullable);

@@ -19,12 +19,8 @@ const processComposite = (
   nonCompositeTypeImports: Record<string, TypeImport>
 ): GenericDeclaration => {
   const { name } = config.getZodSchemaMetadata(c, instantiatedConfig);
-  let properties: CompositeProperty[];
-  if (c.kind === 'compositeType') {
-    properties = c.attributes;
-  } else {
-    properties = c.columns;
-  }
+  const properties: CompositeProperty[] =
+    c.kind === 'compositeType' ? c.attributes : c.columns;
 
   const typeImports: TypeImport[] = [
     {
@@ -40,7 +36,7 @@ const processComposite = (
     `export const ${name} = z.object({`,
     ...properties.map((p) => {
       const x = instantiatedConfig.typeMap[p.type.fullName];
-      let zodType: string = 'z.unknown()';
+      let zodType = 'z.unknown()';
       if (typeof x === 'string') {
         zodType = zodTypeMap[x];
         if (!zodType) {

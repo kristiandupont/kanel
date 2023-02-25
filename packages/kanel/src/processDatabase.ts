@@ -104,7 +104,7 @@ const processDatabase = async (
     await rmfr(instantiatedConfig.outputPath, { glob: true });
   }
 
-  filesToWrite.forEach(writeFile);
+  filesToWrite.forEach((file) => writeFile(file));
 };
 
 export default processDatabase;

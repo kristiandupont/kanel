@@ -22,7 +22,7 @@ const writeFile = ({
   }
 
   const content = lines.join(os.EOL);
-  fs.writeFileSync(fullPath, content, 'utf-8');
+  fs.writeFileSync(fullPath, content, 'utf8');
 };
 
 export default writeFile;

@@ -9,8 +9,8 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
     instantiatedConfig.schemas
   ).reduce((acc, elem) => {
     const entitiesInSchema = Object.values(elem)
-      .filter(Array.isArray)
-      .reduce((acc2: Details[], elem2: Details[]) => [...acc2, ...elem2], []);
+      .filter((e) => Array.isArray(e))
+      .flat();
     return [...acc, ...entitiesInSchema];
   }, []);
 

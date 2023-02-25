@@ -83,40 +83,30 @@ class ImportGenerator {
   }
 
   generateLines(): string[] {
-    return Object.keys(this.importMap)
-      .map((relativePath) => {
-        const {
-          default: defaultImport,
-          defaultAsType: defaultAsTypeImport,
-          named,
-          namedAsType,
-        } = this.importMap[relativePath];
+    return Object.keys(this.importMap).flatMap((relativePath) => {
+      const {
+        default: defaultImport,
+        defaultAsType: defaultAsTypeImport,
+        named,
+        namedAsType,
+      } = this.importMap[relativePath];
 
-        const lines: string[] = [];
+      const lines: string[] = [];
 
-        if (defaultImport || named.size > 0) {
-          lines.push(
-            this.generateLine(
-              relativePath,
-              false,
-              defaultImport,
-              Array.from(named)
-            )
-          );
-        }
-        if (defaultAsTypeImport || namedAsType.size > 0) {
-          lines.push(
-            this.generateLine(
-              relativePath,
-              true,
-              defaultAsTypeImport,
-              Array.from(namedAsType)
-            )
-          );
-        }
-        return lines;
-      })
-      .flat();
+      if (defaultImport || named.size > 0) {
+        lines.push(
+          this.generateLine(relativePath, false, defaultImport, [...named])
+        );
+      }
+      if (defaultAsTypeImport || namedAsType.size > 0) {
+        lines.push(
+          this.generateLine(relativePath, true, defaultAsTypeImport, [
+            ...namedAsType,
+          ])
+        );
+      }
+      return lines;
+    });
   }
 
   private generateLine(

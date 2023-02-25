@@ -1,3 +1,6 @@
+/* eslint-disable unicorn/prefer-module */
+/* eslint-disable unicorn/no-process-exit */
+
 import chalk from 'chalk';
 import cliProgress from 'cli-progress';
 import fs from 'fs';
@@ -125,4 +128,5 @@ async function main() {
   }
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 main();

@@ -30,8 +30,8 @@ const processDeclaration = (
 
   switch (declaration.declarationType) {
     case 'typeDeclaration': {
-      const { exportAs, name, typeDefinition } = declaration;
-      declarationLines.push(...processComments(declaration.comment, 0));
+      const { exportAs, name, typeDefinition, comment } = declaration;
+      declarationLines.push(...processComments(comment, 0));
       if (exportAs === 'default') {
         if (typeDefinition.length === 1) {
           declarationLines.push(`type ${name} = ${typeDefinition[0]};`);
@@ -68,8 +68,8 @@ const processDeclaration = (
         if (index > 0) {
           declarationLines.push('');
         }
-        declarationLines.push(...(processComments(property.comment, 2) || []));
         declarationLines.push(
+          ...(processComments(property.comment, 2) || []),
           `  ${escapeName(property.name)}${property.isOptional ? '?' : ''}: ${
             property.typeName
           }${'[]'.repeat(property.dimensions)}${

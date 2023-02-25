@@ -149,22 +149,36 @@ const resolveType = (
   if (['composite', 'enum', 'domain', 'range'].includes(c.type.kind)) {
     const [schemaName, typeName] = c.type.fullName.split('.');
     let target: Details | undefined;
-    if (c.type.kind === 'composite') {
-      target = config.schemas[schemaName].compositeTypes.find(
-        (t) => t.name === typeName
-      );
-    } else if (c.type.kind === 'enum') {
-      target = config.schemas[schemaName].enums.find(
-        (t) => t.name === typeName
-      );
-    } else if (c.type.kind === 'domain') {
-      target = config.schemas[schemaName].domains.find(
-        (t) => t.name === typeName
-      );
-    } else if (c.type.kind === 'range') {
-      target = config.schemas[schemaName].ranges.find(
-        (t) => t.name === typeName
-      );
+    switch (c.type.kind) {
+      case 'composite': {
+        target = config.schemas[schemaName].compositeTypes.find(
+          (t) => t.name === typeName
+        );
+
+        break;
+      }
+      case 'enum': {
+        target = config.schemas[schemaName].enums.find(
+          (t) => t.name === typeName
+        );
+
+        break;
+      }
+      case 'domain': {
+        target = config.schemas[schemaName].domains.find(
+          (t) => t.name === typeName
+        );
+
+        break;
+      }
+      case 'range': {
+        target = config.schemas[schemaName].ranges.find(
+          (t) => t.name === typeName
+        );
+
+        break;
+      }
+      // No default
     }
 
     if (target) {
