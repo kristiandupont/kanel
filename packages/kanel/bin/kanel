@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-require('../build/cli.js');
+
+// eslint-disable-next-line unicorn/prefer-module
+require('../build/cli');

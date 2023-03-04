@@ -1,17 +1,17 @@
-/* eslint-disable unicorn/prefer-module */
-/* eslint-disable unicorn/no-process-exit */
-
 import chalk from 'chalk';
 import cliProgress from 'cli-progress';
 import fs from 'fs';
 import optionator from 'optionator';
 import path from 'path';
 
-import processDatabase from './processDatabase';
-// @ts-ignore
-const { version } = require('../package.json');
+import { Config } from '../config-types';
+import processDatabase from '../processDatabase';
 
-async function main() {
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version } = require('../../package.json');
+
+export async function main(): Promise<void> {
   console.info(chalk.greenBright('Kanel'));
 
   const o = optionator({
@@ -40,7 +40,7 @@ async function main() {
       {
         option: 'database',
         alias: 'd',
-        type: 'string',
+        type: 'String',
         description:
           'Database connection string. Will override the connection field in the config file if present',
       },
@@ -73,8 +73,7 @@ async function main() {
     process.exit(0);
   }
 
-  /** @type {import('./config-types').Config} */
-  let config;
+  let config: Config;
   const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
   if (
     fs.existsSync(configFile) ||
@@ -127,6 +126,3 @@ async function main() {
     process.exit(1);
   }
 }
-
-// eslint-disable-next-line unicorn/prefer-top-level-await
-main();
