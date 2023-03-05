@@ -87,7 +87,6 @@ const generateEnumTypesFromTableValuesModule: PreRenderHook = async (
             typeDefinition: [
               '', // Start definition on new line
               ...rows.map((row) => `| '${row.name}'`),
-              `& { __flavor?: '${declaration.name}' }`,
             ],
           };
 
