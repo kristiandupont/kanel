@@ -16,10 +16,9 @@ const generateEnumTypesFromTableValuesModule: PreRenderHook = async (
   const db = knex({ client: 'postgres', connection });
 
   // Get all the tables in all the schemas
-  const allTables = Object.values(instantiatedConfig.schemas)
-    .map(({ tables }) => tables)
-    .flat();
-
+  const allTables = Object.values(instantiatedConfig.schemas).flatMap(
+    ({ tables }) => tables
+  );
   // ..and find the ones that have an "@enum" comment.
   const enumTables = allTables.filter(
     (table) => table.comment !== null && table.comment.indexOf('@enum') !== -1
