@@ -1,0 +1,1 @@
+import{_ as s,c as a,o as n,N as e}from"./chunks/framework.64701fe8.js";const C=JSON.parse('{"title":"Zod extension for Kanel","description":"","frontmatter":{},"headers":[],"relativePath":"kanel-zod.md"}'),o={name:"kanel-zod.md"},l=e("",10),p=[l];function t(r,c,i,y,D,F){return n(),a("div",null,p)}const d=s(o,[["render",t]]);export{C as __pageData,d as default};

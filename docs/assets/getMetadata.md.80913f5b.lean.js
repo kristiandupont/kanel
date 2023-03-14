@@ -1,0 +1,1 @@
+import{_ as s,c as a,o as n,N as l}from"./chunks/framework.64701fe8.js";const A=JSON.parse('{"title":"getMetadata","description":"","frontmatter":{},"headers":[],"relativePath":"getMetadata.md"}'),e={name:"getMetadata.md"},o=l("",39),p=[o];function t(c,r,i,y,D,F){return n(),a("div",null,p)}const d=s(e,[["render",t]]);export{A as __pageData,d as default};

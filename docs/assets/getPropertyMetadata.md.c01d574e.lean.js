@@ -1,0 +1,1 @@
+import{_ as s,c as a,o as n,N as e}from"./chunks/framework.64701fe8.js";const A=JSON.parse('{"title":"getPropertyMetadata","description":"","frontmatter":{},"headers":[],"relativePath":"getPropertyMetadata.md"}'),o={name:"getPropertyMetadata.md"},l=e("",16),p=[l];function t(r,c,y,i,D,F){return n(),a("div",null,p)}const d=s(o,[["render",t]]);export{A as __pageData,d as default};
