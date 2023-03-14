@@ -31,7 +31,7 @@
     "knex": "^2.4.0"
   },
   "devDependencies": {
-    "extract-pg-schema": "4.1.0",
+    "extract-pg-schema": "^4.1.1",
     "kanel": "*"
   }
 }
