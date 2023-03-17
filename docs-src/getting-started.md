@@ -29,7 +29,7 @@ module.exports = {
     database: 'acme',
   },
 
-  preDeleteModelFolder: true,
+  preDeleteOutputFolder: true,
   outputPath: './src/schemas',
 
   customTypeMap: {
