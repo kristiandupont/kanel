@@ -11,7 +11,7 @@ import{_ as s,c as a,o as n,N as l}from"./chunks/framework.64701fe8.js";const A=
 <span class="line"><span style="color:#A6ACCD;">    </span><span style="color:#F07178;">database</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">&#39;</span><span style="color:#C3E88D;">acme</span><span style="color:#89DDFF;">&#39;</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#89DDFF;">},</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">preDeleteModelFolder</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FF9CAC;">true</span><span style="color:#89DDFF;">,</span></span>
+<span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">preDeleteOutputFolder</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FF9CAC;">true</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">outputPath</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">&#39;</span><span style="color:#C3E88D;">./src/schemas</span><span style="color:#89DDFF;">&#39;</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">customTypeMap</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">{</span></span>
