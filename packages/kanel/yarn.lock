@@ -3445,9 +3445,7 @@ pg@8.7.3:
     pgpass "1.x"
 
 pg@^8.6.0:
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/pg/-/pg-8.6.0.tgz#e222296b0b079b280cce106ea991703335487db2"
-  integrity sha512-qNS9u61lqljTDFvmk/N66EeGq3n6Ujzj0FFyNMGQr6XuEv4tgNTXvJQTfJdcvGit5p5/DWPu+wj920hAJFI+QQ==
+  version "8.10.0"
   dependencies:
     buffer-writer "2.0.0"
     packet-reader "1.0.0"
