@@ -4122,9 +4122,7 @@ tagged-comment-parser@^1.1.1:
   integrity sha512-YU/dkS7zCqrlrvhY/4xDnMWvYsXxwPlndEIzfn7pq29MjnJSiQcMtPZqO6rBBf6F1V47LnctNrsMo2pPIgWv5A==
 
 tagged-comment-parser@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/tagged-comment-parser/-/tagged-comment-parser-1.2.0.tgz#7eafc8227b3f403a02e58ea9c174beb1426cac6e"
-  integrity sha512-1vbvl3I0GZmmlw5+rWJwnrhJ7uKOnS7s3rCYtu4Yquwmxs8HT1ADWPc+73oqQ3MjR5W9mQXLbFxsAQEsNG9IMw==
+  version "1.3.0"
 
 tarn@^3.0.2:
   version "3.0.2"
