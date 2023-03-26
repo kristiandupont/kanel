@@ -48,17 +48,14 @@ const generateProperties = <D extends CompositeDetails>(
         switch (generateFor) {
           case 'selector': {
             isOptional = false;
-
             break;
           }
           case 'initializer': {
             isOptional = canBeOptional;
-
             break;
           }
           case 'mutator': {
             isOptional = true;
-
             break;
           }
           default: {

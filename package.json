@@ -32,13 +32,9 @@
     "kanel": "*"
   },
   "devDependencies": {
-    "@kristiandupont/dev-deps": "^1.2.0",
+    "@kristiandupont/dev-deps": "^1.5.0",
     "vitepress": "1.0.0-alpha.58",
     "vue": "3.2.47"
   },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "es5",
-    "endOfLine": "auto"
-  }
+  "prettier": "@kristiandupont/prettier-config"
 }
