@@ -4122,7 +4122,7 @@ tagged-comment-parser@^1.1.1:
   integrity sha512-YU/dkS7zCqrlrvhY/4xDnMWvYsXxwPlndEIzfn7pq29MjnJSiQcMtPZqO6rBBf6F1V47LnctNrsMo2pPIgWv5A==
 
 tagged-comment-parser@^1.2.0:
-  version "1.3.0"
+  version "1.3.1"
 
 tarn@^3.0.2:
   version "3.0.2"
