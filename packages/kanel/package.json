@@ -40,7 +40,7 @@
     "extract-pg-schema": "^4.1.1",
     "optionator": "^0.9.1",
     "pg": "^8.6.0",
-    "ramda": "^0.28.0",
+    "ramda": "^0.29.0",
     "rmfr": "^2.0.0",
     "tagged-comment-parser": "^1.2.0"
   },
