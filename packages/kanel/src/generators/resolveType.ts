@@ -1,5 +1,4 @@
 import {
-  ColumnReference,
   MaterializedViewColumn,
   MaterializedViewDetails,
   TableColumn,
@@ -57,35 +56,48 @@ const resolveType = (
     return typeFromComment;
   }
 
-  // 2) If there is a reference, resolve the type from the target
-  if ((c as any).reference) {
-    const reference: ColumnReference = (c as any).reference;
-    let target: TableDetails | ViewDetails | MaterializedViewDetails =
-      config.schemas[reference.schemaName].tables.find(
-        (t) => t.name === reference.tableName
-      );
-    if (!target) {
-      target = config.schemas[reference.schemaName].views.find(
-        (v) => v.name === reference.tableName
-      );
-    }
-    if (!target) {
-      target = config.schemas[reference.schemaName].materializedViews.find(
-        (v) => v.name === reference.tableName
-      );
-    }
-    if (!target) {
-      console.warn('Could not resolve reference', reference);
-    }
+  // 2) If there are references, resolve the type from the targets
+  if ((c as any).references && (c as any).references.length > 0) {
+    const referencedTypes = (c as any).references.map((reference) => {
+      let target: TableDetails | ViewDetails | MaterializedViewDetails =
+        config.schemas[reference.schemaName].tables.find(
+          (t) => t.name === reference.tableName
+        );
+      if (!target) {
+        target = config.schemas[reference.schemaName].views.find(
+          (v) => v.name === reference.table
+        );
+      }
+      if (!target) {
+        target = config.schemas[reference.schemaName].materializedViews.find(
+          (v) => v.name === reference.tableName
+        );
+      }
+      if (!target) {
+        console.warn('Could not resolve reference', reference);
+        return 'unknown';
+      }
 
-    const column = (
-      target.columns as Array<TableColumn | ViewColumn | MaterializedViewColumn>
-    ).find((c) => c.name === reference.columnName);
-    if (column) {
-      return resolveType(column, target, config);
-    }
+      const column = (
+        target.columns as Array<
+          TableColumn | ViewColumn | MaterializedViewColumn
+        >
+      ).find((c) => c.name === reference.columnName);
+      if (column) {
+        return resolveType(column, target, config);
+      } else {
+        console.warn('Could not resolve reference', reference);
+        return 'unknown';
+      }
+    });
+
+    return referencedTypes.length === 1
+      ? referencedTypes[0]
+      : {
+          name: referencedTypes.map((t) => t.name).join(' | '),
+          typeImports: referencedTypes.flatMap((t) => t.typeImports),
+        };
   }
-
   // 3) If this is a view with a source (i.e. the table that it's based on),
   // get the type from the source.
   if ((c as ViewColumn | MaterializedViewColumn).source) {
