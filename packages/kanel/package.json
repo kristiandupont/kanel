@@ -39,7 +39,7 @@
     "cli-progress": "^3.11.2",
     "extract-pg-schema": "^4.2.0",
     "optionator": "^0.9.1",
-    "pg": "^8.6.0",
+    "pg": "^8.10.0",
     "ramda": "^0.28.0",
     "rmfr": "^2.0.0",
     "tagged-comment-parser": "^1.2.0"
