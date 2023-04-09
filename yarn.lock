@@ -2731,6 +2731,21 @@ jsonpath@^1.1.1:
     static-eval "2.0.2"
     underscore "1.12.1"
 
+kanel@*:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/kanel/-/kanel-3.2.2.tgz#83f90620bb76a77aa3740d2085fc77e860308a7d"
+  integrity sha512-Pb6rHsl0BgpeuGimEr5HVpIO5Dod3sRGQgGTrQVdI76OAX1Wj8WxxrZbQ00uZt36mQfWeESoLw4wzPAUvoq+4w==
+  dependencies:
+    "@kristiandupont/recase" "1.2.0"
+    chalk "4.1.2"
+    cli-progress "^3.11.2"
+    extract-pg-schema "^4.1.1"
+    optionator "^0.9.1"
+    pg "^8.6.0"
+    ramda "^0.28.0"
+    rmfr "^2.0.0"
+    tagged-comment-parser "^1.2.0"
+
 keyv@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-3.1.0.tgz#ecc228486f69991e49e9476485a5be1e8fc5c4d9"
@@ -3570,7 +3585,7 @@ pg-types@^2.1.0:
     postgres-date "~1.0.4"
     postgres-interval "^1.1.0"
 
-pg@8.10.0:
+pg@8.10.0, pg@^8.10.0:
   version "8.10.0"
   resolved "https://registry.yarnpkg.com/pg/-/pg-8.10.0.tgz#5b8379c9b4a36451d110fc8cd98fc325fe62ad24"
   integrity sha512-ke7o7qSTMb47iwzOSaZMfeR7xToFdkE71ifIipOAAaLIM0DYzfOAXlgFFmYUIE2BcJtvnVlGCID84ZzCegE8CQ==
