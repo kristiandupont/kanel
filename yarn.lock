@@ -1910,21 +1910,6 @@ jsonpath@^1.1.1:
     static-eval "2.0.2"
     underscore "1.12.1"
 
-"kanel@workspace:*":
-  version "3.3.0-beta.1"
-  resolved "https://registry.yarnpkg.com/kanel/-/kanel-3.3.0-beta.1.tgz#3c0a466efb0cf9101efb93837a144d7127e00339"
-  integrity sha512-k+UHFOCuzCD3zZJ6EmAIFONSZxvVIdwMwTpDIraP8BKmNeaZCweKLHosp+FlU0MGETHwTXdq/gsxloJRM3ErWQ==
-  dependencies:
-    "@kristiandupont/recase" "1.2.0"
-    chalk "4.1.2"
-    cli-progress "^3.11.2"
-    extract-pg-schema "^4.2.0"
-    optionator "^0.9.1"
-    pg "^8.10.0"
-    ramda "^0.28.0"
-    rmfr "^2.0.0"
-    tagged-comment-parser "^1.2.0"
-
 kind-of@^6.0.2:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
