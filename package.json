@@ -29,7 +29,7 @@
     "docs:build": "vitepress build docs-src"
   },
   "dependencies": {
-    "kanel": "*"
+    "kanel": "workspace:*"
   },
   "devDependencies": {
     "@kristiandupont/dev-deps": "^1.5.0",
