@@ -3,10 +3,25 @@ const { recase } = require('@kristiandupont/recase');
 const { tryParse } = require('tagged-comment-parser')
 
 const { generateIndexFile } = require('kanel');
-const { generateZodSchemas } = require('kanel-zod');
+const { 
+  makeGenerateZodSchemas, 
+  defaultGetZodSchemaMetadata, 
+  defaultGetZodIdentifierMetadata, 
+  defaultZodTypeMap 
+} = require('kanel-zod');
 
 const toPascalCase = recase('snake', 'pascal');
 const outputPath = './example/models';
+
+const generateZodSchemas = makeGenerateZodSchemas({
+  getZodSchemaMetadata: defaultGetZodSchemaMetadata,
+  getZodIdentifierMetadata: defaultGetZodIdentifierMetadata,
+  zodTypeMap: {
+    ...defaultZodTypeMap,
+    'pg_catalog.tsvector': 'z.set(z.string())',
+    'pg_catalog.bytea': { name:'z.custom<Bytea>(v => v)', typeImports: [{ name: 'Bytea', path: 'bytea', isAbsolute: true, isDefault: false }] }
+  }
+})
 
 /** @type {import('../src/Config').default} */
 module.exports = {

@@ -5,7 +5,7 @@
     "postgresql",
     "schema",
     "typescript",
-    "knex"
+    "zod"
   ],
   "repository": {
     "type": "git",
@@ -30,5 +30,8 @@
   "devDependencies": {
     "extract-pg-schema": "^4.1.1",
     "kanel": "workspace:*"
+  },
+  "dependencies": {
+    "@kristiandupont/recase": "^1.2.0"
   }
 }

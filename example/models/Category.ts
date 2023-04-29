@@ -48,9 +48,22 @@ export interface CategoryMutator {
   last_update?: Date;
 }
 
-/** Zod schema for category */
-export const category = z.object({
-  category_id: z.number(),
+export const categoryId: z.Schema<CategoryId> = z.number() as any;
+
+export const category: z.Schema<Category> = z.object({
+  category_id: categoryId,
   name: z.string(),
   last_update: z.date(),
-});
+}) as any;
+
+export const categoryInitializer: z.Schema<CategoryInitializer> = z.object({
+  category_id: categoryId.optional(),
+  name: z.string(),
+  last_update: z.date().optional(),
+}) as any;
+
+export const categoryMutator: z.Schema<CategoryMutator> = z.object({
+  category_id: categoryId.optional(),
+  name: z.string().optional(),
+  last_update: z.date().optional(),
+}) as any;

@@ -48,9 +48,22 @@ export interface LanguageMutator {
   last_update?: Date;
 }
 
-/** Zod schema for language */
-export const language = z.object({
-  language_id: z.number(),
+export const languageId: z.Schema<LanguageId> = z.number() as any;
+
+export const language: z.Schema<Language> = z.object({
+  language_id: languageId,
   name: z.string(),
   last_update: z.date(),
-});
+}) as any;
+
+export const languageInitializer: z.Schema<LanguageInitializer> = z.object({
+  language_id: languageId.optional(),
+  name: z.string(),
+  last_update: z.date().optional(),
+}) as any;
+
+export const languageMutator: z.Schema<LanguageMutator> = z.object({
+  language_id: languageId.optional(),
+  name: z.string().optional(),
+  last_update: z.date().optional(),
+}) as any;

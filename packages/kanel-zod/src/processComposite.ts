@@ -4,68 +4,104 @@ import {
   InstantiatedConfig,
   TypeImport,
 } from 'kanel';
-import {
-  CompositeDetails,
-  CompositeProperty,
-} from 'kanel/build/generators/composite-types';
+import { CompositeDetails } from 'kanel/build/generators/composite-types';
 
+import generateProperties from './generateProperties';
 import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
-import zodTypeMap from './zodTypeMap';
+import zImport from './zImport';
+
+function makeDeclaration(
+  instantiatedConfig: InstantiatedConfig,
+  c: CompositeDetails,
+  generateFor: 'selector' | 'initializer' | 'mutator',
+  nonCompositeTypeImports: Record<string, TypeImport>,
+  identifierTypeImports: Record<string, TypeImport>,
+  config: GenerateZodSchemasConfig
+) {
+  const { name, comment } = config.getZodSchemaMetadata(
+    c,
+    generateFor,
+    instantiatedConfig
+  );
+
+  const { name: typescriptTypeName } = instantiatedConfig.getMetadata(
+    c,
+    generateFor,
+    instantiatedConfig
+  );
+
+  const properties = generateProperties(
+    c,
+    generateFor,
+    nonCompositeTypeImports,
+    identifierTypeImports,
+    config,
+    instantiatedConfig
+  );
+
+  const typeImports: TypeImport[] = [zImport];
+
+  const lines: string[] = [
+    `export const ${name}: z.Schema<${typescriptTypeName}> = z.object({`,
+    ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
+    '}) as any;',
+  ];
+
+  properties.forEach((p) => {
+    typeImports.push(...p.typeImports);
+  });
+
+  const declaration: GenericDeclaration = {
+    declarationType: 'generic',
+    comment,
+    typeImports,
+    lines,
+  };
+  return declaration;
+}
 
 const processComposite = (
   c: CompositeDetails,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
-  nonCompositeTypeImports: Record<string, TypeImport>
-): GenericDeclaration => {
-  const { name } = config.getZodSchemaMetadata(c, instantiatedConfig);
-  const properties: CompositeProperty[] =
-    c.kind === 'compositeType' ? c.attributes : c.columns;
+  nonCompositeTypeImports: Record<string, TypeImport>,
+  identifierTypeImports: Record<string, TypeImport>
+): GenericDeclaration[] => {
+  const declarations: GenericDeclaration[] = [];
 
-  const typeImports: TypeImport[] = [
-    {
-      name: 'z',
-      isDefault: false,
-      path: 'zod',
-      isAbsolute: true,
-      importAsType: false,
-    },
-  ];
+  const selectorDeclaration: GenericDeclaration = makeDeclaration(
+    instantiatedConfig,
+    c,
+    'selector',
+    nonCompositeTypeImports,
+    identifierTypeImports,
+    config
+  );
+  declarations.push(selectorDeclaration);
 
-  const lines: string[] = [
-    `export const ${name} = z.object({`,
-    ...properties.map((p) => {
-      const x = instantiatedConfig.typeMap[p.type.fullName];
-      let zodType = 'z.unknown()';
-      if (typeof x === 'string') {
-        zodType = zodTypeMap[x];
-        if (!zodType) {
-          console.error(`kanel-zod: Unknown type for ${name}.${p.name}: ${x}`);
-        }
-      } else {
-        if (p.type.fullName in nonCompositeTypeImports) {
-          const x = nonCompositeTypeImports[p.type.fullName];
-          typeImports.push(x);
-          zodType = x.name;
-        } else {
-          console.error(
-            `kanel-zod: Unknown type for ${name}.${p.name}: ${p.type.fullName}`
-          );
-        }
-      }
-      return `  ${escapeName(p.name)}: ${zodType},`;
-    }),
-    '});',
-  ];
+  if (c.kind === 'table') {
+    const initializerDeclaration: GenericDeclaration = makeDeclaration(
+      instantiatedConfig,
+      c,
+      'initializer',
+      nonCompositeTypeImports,
+      identifierTypeImports,
+      config
+    );
+    declarations.push(initializerDeclaration);
 
-  const declaration: GenericDeclaration = {
-    declarationType: 'generic',
-    comment: [`Zod schema for ${c.name}`],
-    typeImports,
-    lines,
-  };
+    const mutatorDeclaration: GenericDeclaration = makeDeclaration(
+      instantiatedConfig,
+      c,
+      'mutator',
+      nonCompositeTypeImports,
+      identifierTypeImports,
+      config
+    );
+    declarations.push(mutatorDeclaration);
+  }
 
-  return declaration;
+  return declarations;
 };
 
 export default processComposite;

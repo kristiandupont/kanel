@@ -3,6 +3,7 @@
 
 import { year } from './Year';
 import type Year from './Year';
+import { languageId } from './Language';
 import type { LanguageId } from './Language';
 import { mpaaRating } from './MpaaRating';
 import type MpaaRating from './MpaaRating';
@@ -155,19 +156,52 @@ export interface FilmMutator {
   fulltext?: Set<string>;
 }
 
-/** Zod schema for film */
-export const film = z.object({
-  film_id: z.number(),
+export const filmId: z.Schema<FilmId> = z.number() as any;
+
+export const film: z.Schema<Film> = z.object({
+  film_id: filmId,
   title: z.string(),
-  description: z.string(),
-  release_year: year,
-  language_id: z.number(),
+  description: z.string().nullable(),
+  release_year: year.nullable(),
+  language_id: languageId,
   rental_duration: z.number(),
   rental_rate: z.string(),
-  length: z.number(),
+  length: z.number().nullable(),
   replacement_cost: z.string(),
-  rating: mpaaRating,
+  rating: mpaaRating.nullable(),
   last_update: z.date(),
-  special_features: z.string(),
-  fulltext: undefined,
-});
+  special_features: z.string().nullable(),
+  fulltext: z.set(z.string()),
+}) as any;
+
+export const filmInitializer: z.Schema<FilmInitializer> = z.object({
+  film_id: filmId.optional(),
+  title: z.string(),
+  description: z.string().optional().nullable(),
+  release_year: year.optional().nullable(),
+  language_id: languageId,
+  rental_duration: z.number().optional(),
+  rental_rate: z.string().optional(),
+  length: z.number().optional().nullable(),
+  replacement_cost: z.string().optional(),
+  rating: mpaaRating.optional().nullable(),
+  last_update: z.date().optional(),
+  special_features: z.string().optional().nullable(),
+  fulltext: z.set(z.string()),
+}) as any;
+
+export const filmMutator: z.Schema<FilmMutator> = z.object({
+  film_id: filmId.optional(),
+  title: z.string().optional(),
+  description: z.string().optional().nullable(),
+  release_year: year.optional().nullable(),
+  language_id: languageId.optional(),
+  rental_duration: z.number().optional(),
+  rental_rate: z.string().optional(),
+  length: z.number().optional().nullable(),
+  replacement_cost: z.string().optional(),
+  rating: mpaaRating.optional().nullable(),
+  last_update: z.date().optional(),
+  special_features: z.string().optional().nullable(),
+  fulltext: z.set(z.string()).optional(),
+}) as any;

@@ -48,9 +48,22 @@ export interface CountryMutator {
   last_update?: Date;
 }
 
-/** Zod schema for country */
-export const country = z.object({
-  country_id: z.number(),
+export const countryId: z.Schema<CountryId> = z.number() as any;
+
+export const country: z.Schema<Country> = z.object({
+  country_id: countryId,
   country: z.string(),
   last_update: z.date(),
-});
+}) as any;
+
+export const countryInitializer: z.Schema<CountryInitializer> = z.object({
+  country_id: countryId.optional(),
+  country: z.string(),
+  last_update: z.date().optional(),
+}) as any;
+
+export const countryMutator: z.Schema<CountryMutator> = z.object({
+  country_id: countryId.optional(),
+  country: z.string().optional(),
+  last_update: z.date().optional(),
+}) as any;

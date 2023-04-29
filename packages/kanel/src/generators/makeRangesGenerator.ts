@@ -4,8 +4,6 @@ import { tryParse } from 'tagged-comment-parser';
 import { InstantiatedConfig } from '../config-types';
 import { Declaration, TypeDeclaration } from '../declaration-types';
 import Output, { Path } from '../Output';
-import TypeDefinition from '../TypeDefinition';
-import TypeImport from '../TypeImport';
 
 const makeMapper =
   (config: InstantiatedConfig) =>
@@ -25,29 +23,30 @@ const makeMapper =
       config
     );
 
-    let rType: string;
-    const typeImports: TypeImport[] = [];
+    // let rType: string;
+    // const typeImports: TypeImport[] = [];
 
-    const mapped: TypeDefinition = config.typeMap[rangeDetails.innerType];
-    if (!mapped) {
-      rType = 'unknown';
-      console.warn(
-        `Range '${name}' has unknown type '${rangeDetails.innerType}'`
-      );
-    } else if (typeof mapped === 'string') {
-      rType = mapped;
-    } else {
-      rType = mapped.name;
-      typeImports.push(...mapped.typeImports);
-    }
+    // const mapped: TypeDefinition = config.typeMap[rangeDetails.innerType];
+    // if (!mapped) {
+    //   rType = 'unknown';
+    //   console.warn(
+    //     `Range '${name}' has unknown type '${rangeDetails.innerType}'`
+    //   );
+    // } else if (typeof mapped === 'string') {
+    //   rType = mapped;
+    // } else {
+    //   rType = mapped.name;
+    //   typeImports.push(...mapped.typeImports);
+    // }
 
     const declaration: TypeDeclaration = {
       declarationType: 'typeDeclaration',
       name,
       comment,
       exportAs: 'default',
-      typeDefinition: [`[lowerBound: ${rType}, upperBound: ${rType}]`],
-      typeImports,
+      // typeDefinition: [`[lowerBound: ${rType}, upperBound: ${rType}]`],
+      typeDefinition: ['string'],
+      typeImports: [],
     };
     return { path, declaration };
   };

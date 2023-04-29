@@ -2,20 +2,27 @@ import { DomainDetails } from 'extract-pg-schema';
 import { GenericDeclaration, InstantiatedConfig, TypeImport } from 'kanel';
 
 import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
-import zodTypeMap from './zodTypeMap';
 
 const processDomain = (
   d: DomainDetails,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig
 ): GenericDeclaration | undefined => {
-  const { name } = config.getZodSchemaMetadata(d, instantiatedConfig);
-  let tsType = instantiatedConfig.typeMap[d.innerType];
-  if (typeof tsType !== 'string') {
-    tsType = 'unknown';
-  }
+  const { name } = config.getZodSchemaMetadata(
+    d,
+    undefined,
+    instantiatedConfig
+  );
+  // let tsType = instantiatedConfig.typeMap[d.innerType];
+  // if (typeof tsType !== 'string') {
+  //   tsType = 'unknown';
+  // }
 
-  const zodType = zodTypeMap[tsType];
+  // const zodType = zodTypeMap[tsType];
+  let zodType = config.zodTypeMap[d.innerType];
+  if (!zodType) {
+    zodType = 'z.unknown()';
+  }
 
   const lines: string[] = [`export const ${name} = ${zodType};`];
 

@@ -12,8 +12,7 @@ export default interface SalesByFilmCategory {
   total_sales: string;
 }
 
-/** Zod schema for sales_by_film_category */
-export const salesByFilmCategory = z.object({
+export const salesByFilmCategory: z.Schema<SalesByFilmCategory> = z.object({
   category: z.string(),
   total_sales: z.string(),
-});
+}) as any;

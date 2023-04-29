@@ -15,9 +15,8 @@ export default interface SalesByStore {
   total_sales: string;
 }
 
-/** Zod schema for sales_by_store */
-export const salesByStore = z.object({
+export const salesByStore: z.Schema<SalesByStore> = z.object({
   store: z.string(),
   manager: z.string(),
   total_sales: z.string(),
-});
+}) as any;
