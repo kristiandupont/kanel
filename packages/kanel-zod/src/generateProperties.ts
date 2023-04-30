@@ -1,8 +1,10 @@
-import { InstantiatedConfig, resolveType, TypeImport } from 'kanel';
 import {
   CompositeDetails,
   CompositeProperty,
-} from 'kanel/build/generators/composite-types';
+  InstantiatedConfig,
+  resolveType,
+  TypeImport,
+} from 'kanel';
 import * as R from 'ramda';
 
 import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
@@ -49,10 +51,6 @@ const generateProperties = <D extends CompositeDetails>(
         const x = identifierTypeImports[t.name];
         typeImports.push(x);
         zodType = x.name;
-      } else if (p.type.fullName in nonCompositeTypeImports) {
-        const x = nonCompositeTypeImports[p.type.fullName];
-        typeImports.push(x);
-        zodType = x.name;
       } else if (p.type.fullName in config.zodTypeMap) {
         const x = config.zodTypeMap[p.type.fullName];
         if (typeof x === 'string') {
@@ -61,6 +59,10 @@ const generateProperties = <D extends CompositeDetails>(
           zodType = x.name;
           typeImports.push(...x.typeImports);
         }
+      } else if (p.type.fullName in nonCompositeTypeImports) {
+        const x = nonCompositeTypeImports[p.type.fullName];
+        typeImports.push(x);
+        zodType = x.name;
       } else {
         console.error(
           `kanel-zod: Unknown type for ${name}.${p.name}: ${p.type.fullName}`
