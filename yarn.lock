@@ -4300,6 +4300,11 @@ tagged-comment-parser@^1.3.1:
   resolved "https://registry.yarnpkg.com/tagged-comment-parser/-/tagged-comment-parser-1.3.1.tgz#57e38cba9fda8cd97998e39620d2ad622e5defeb"
   integrity sha512-ZraIEeZC8FngeuWbj7p/VC78wBDJhPMyoorl25aujiiIHuqi/uKzXPqlt42iUP68/C3ih2XgsxhLKrlyWW+XIg==
 
+tagged-comment-parser@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/tagged-comment-parser/-/tagged-comment-parser-1.3.2.tgz#94759b14f63deb27df69a190aeb252d0a4e32e19"
+  integrity sha512-eZoVkMGxMtxPIlN07LTVsUiRpOHALHu2iQm+MTMyF4gdsHUrAK2JKT/vefvtwPTKL0oX5YuI8RCliCaC8EA+Sw==
+
 tarn@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/tarn/-/tarn-3.0.2.tgz#73b6140fbb881b71559c4f8bfde3d9a4b3d27693"
