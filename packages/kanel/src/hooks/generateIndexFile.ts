@@ -26,7 +26,7 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
 
     // We never want Windows-style paths in our source. Fix it if necessary.
     if (sep === '\\') {
-      importPath = importPath.replace(/\\/g, '/');
+      importPath = importPath.replaceAll('\\', '/');
     }
 
     if (d.kind === 'table') {

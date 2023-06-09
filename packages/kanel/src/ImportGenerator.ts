@@ -37,7 +37,7 @@ class ImportGenerator {
 
       // We never want Windows-style paths in our source. Fix it if necessary.
       if (path.sep === '\\') {
-        relativePath = relativePath.replace(/\\/g, '/');
+        relativePath = relativePath.replaceAll('\\', '/');
       }
 
       if (relativePath[0] !== '.') {
