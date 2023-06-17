@@ -104,9 +104,12 @@ const resolveType = (
     const source = (c as ViewColumn | MaterializedViewColumn).source;
     let target: TableDetails | ViewDetails | MaterializedViewDetails =
       config.schemas[source.schema].tables.find((t) => t.name === source.table);
+
     if (!target) {
       target = config.schemas[source.schema].views.find(
-        (v) => v.name === source.table
+        (v) =>
+          v.name === source.table &&
+          v.name !== (d as ViewDetails).informationSchemaValue.table_name
       );
     }
     if (!target) {
@@ -114,6 +117,24 @@ const resolveType = (
         (v) => v.name === source.table
       );
     }
+    if (!target) {
+      target = config.schemas['public']?.tables?.find(
+        (t) => t.name === source.table
+      );
+    }
+    if (!target) {
+      target = config.schemas['public']?.views?.find(
+        (v) =>
+          v.name === source.table &&
+          v.name !== (d as ViewDetails).informationSchemaValue.table_name
+      );
+    }
+    if (!target) {
+      target = config.schemas['public']?.materializedViews?.find(
+        (v) => v.name === source.table
+      );
+    }
+
     if (!target) {
       console.warn('Could not resolve source', source);
       // return to prevent error: cannot read property of undefined (reading columns)
@@ -163,10 +184,20 @@ const resolveType = (
     let target: Details | undefined;
     switch (c.type.kind) {
       case 'composite': {
-        target = config.schemas[schemaName].compositeTypes.find(
-          (t) => t.name === typeName
-        );
-
+        target =
+          config.schemas[schemaName].compositeTypes.find(
+            (t) => t.name === typeName
+          ) ??
+          config.schemas[schemaName].views?.find((t) => t.name === typeName) ??
+          config.schemas[schemaName].materializedViews?.find(
+            (t) => t.name === typeName
+          ) ??
+          config.schemas[schemaName].tables?.find((t) => t.name === typeName) ??
+          config.schemas['public']?.views?.find((t) => t.name === typeName) ??
+          config.schemas['public']?.materializedViews?.find(
+            (t) => t.name === typeName
+          ) ??
+          config.schemas['public']?.tables?.find((t) => t.name === typeName);
         break;
       }
       case 'enum': {
