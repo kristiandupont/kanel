@@ -1,1 +1,0 @@
-import{_ as s,c as n,o as a,N as o}from"./chunks/framework.64701fe8.js";const A=JSON.parse('{"title":"preRenderHooks","description":"","frontmatter":{},"headers":[],"relativePath":"preRenderHooks.md"}'),p={name:"preRenderHooks.md"},l=o("",9),e=[l];function t(c,r,y,D,F,C){return a(),n("div",null,e)}const d=s(p,[["render",t]]);export{A as __pageData,d as default};

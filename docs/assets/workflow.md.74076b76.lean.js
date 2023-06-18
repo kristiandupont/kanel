@@ -1,1 +1,0 @@
-import{_ as e,c as t,o as a,N as o}from"./chunks/framework.64701fe8.js";const w=JSON.parse('{"title":"How to work with Kanel","description":"","frontmatter":{},"headers":[],"relativePath":"workflow.md"}'),r={name:"workflow.md"},i=o("",8),n=[i];function s(h,l,c,d,u,p){return a(),t("div",null,n)}const f=e(r,[["render",s]]);export{w as __pageData,f as default};

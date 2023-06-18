@@ -1,1 +1,0 @@
-import{_ as s,c as a,o as n,N as t}from"./chunks/framework.64701fe8.js";const h=JSON.parse('{"title":"postRenderHooks","description":"","frontmatter":{},"headers":[],"relativePath":"postRenderHooks.md"}'),o={name:"postRenderHooks.md"},e=t("",6),l=[e];function p(r,i,c,y,C,d){return n(),a("div",null,l)}const D=s(o,[["render",p]]);export{h as __pageData,D as default};
