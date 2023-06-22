@@ -116,7 +116,7 @@ const fakeSchema = {
 
 describe('preprocessData', () => {
   it('should preprocess data', () => {
-    const result = preprocessData(data, fakeSchema);
+    const result = preprocessData(data, fakeSchema, {});
 
     // Should be ordered by dependencies
     expect(result).toEqual([

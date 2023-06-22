@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import os from 'os';
 import { resolve } from 'path';
-import { InstantiatedConfig, Output, PreRenderHook } from 'kanel';
+import { InstantiatedConfig, Output, PreRenderHook, defaultPropertySortFunction } from 'kanel';
 import parse from '@kristiandupont/mdconf';
 import preprocessData from './preprocessData';
 import { RawSeedData } from './SeedData';
@@ -30,6 +30,12 @@ const makeGenerateSeeds =
         string,
         string
       >;
+
+      const defaults = (parsed.defaults || parsed.Defaults || {}) as Record<
+        string,
+        string
+      >;
+
       if (!config.schema) {
         if (Object.keys(instantiatedConfig.schemas).length === 1) {
           config.schema = Object.keys(instantiatedConfig.schemas)[0];
@@ -47,7 +53,8 @@ const makeGenerateSeeds =
 
       const data = preprocessData(
         inputData,
-        instantiatedConfig.schemas[config.schema]
+        instantiatedConfig.schemas[config.schema],
+        defaults
       );
 
       const dstFilePath = resolve(dstPath, file.name.replace('.mdconf', '.js'));
@@ -58,17 +65,10 @@ const makeGenerateSeeds =
         '',
         'const { makeSeeder } = require("kanel-knex");',
         '',
-      ];
-
-      // if (config) {
-      //   lines.push(`const config = ${JSON.stringify(config, null, 2)};`, '');
-      // }
-
-      lines.push(
         `const data = ${JSON.stringify(data, null, 2)};`,
         '',
         'exports.seed = makeSeeder({ data });'
-      );
+      ];
 
       await fs.writeFile(dstFilePath, lines.join(os.EOL));
     }

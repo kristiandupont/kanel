@@ -3,7 +3,7 @@ import { tryParse } from 'tagged-comment-parser';
 
 import SeedData, { ColumnData, RawSeedData, TableData } from './SeedData';
 
-function preprocessData(inputData: RawSeedData, schema: Schema): SeedData {
+function preprocessData(inputData: RawSeedData, schema: Schema, defaults: Record<string, string>): SeedData {
   const dependencies: Record<string, string[]> = {};
   const tables: Record<string, TableData> = {};
 
@@ -14,17 +14,31 @@ function preprocessData(inputData: RawSeedData, schema: Schema): SeedData {
     if (!dbTable) {
       throw new Error(`Table '${tableName}' not found in schema`);
     }
+
+    const requiredColumns = dbTable.columns.filter((c) => !c.isNullable && !c.isIdentity && !c.defaultValue);
+
     const inputRows = inputData[tableName];
     const outputTable: TableData = {
       name: tableName,
       rows: [],
     };
 
+    const defaultRow = {};
+    for (const defaultName of Object.keys(defaults)) {
+      const [table, column] = defaultName.split('.');
+
+      if (table === tableName) {
+        defaultRow[column] = defaults[defaultName];
+      } else if (table === '*' && dbTable.columns.some((c) => c.name === column)) {
+        defaultRow[column] = defaults[defaultName];
+      }
+    }
+
     for (const inputRow of inputRows) {
-      const outputRow: Record<string, ColumnData> = {};
-      const rowNames = Object.keys(inputRow);
-      for (const rowName of rowNames) {
-        const { tags = {}, comment: columnName = '' } = tryParse(rowName);
+      const outputRow: Record<string, ColumnData> = {...defaultRow};
+      const propNames = Object.keys(inputRow);
+      for (const propName of propNames) {
+        const { tags = {}, comment: columnName = '' } = tryParse(propName);
 
         // The "column" might be only a @ref tag, so only add it if it has a name.
         if (columnName) {
@@ -44,10 +58,10 @@ function preprocessData(inputData: RawSeedData, schema: Schema): SeedData {
             dependencies[refTableName].push(tableName);
 
             outputRow[columnName] = {
-              reference: `${refTableName}.${inputRow[rowName]}.${reference.columnName}`,
+              reference: `${refTableName}.${inputRow[propName]}.${reference.columnName}`,
             };
           } else {
-            outputRow[columnName] = inputRow[rowName];
+            outputRow[columnName] = inputRow[propName];
           }
         }
 
@@ -55,8 +69,16 @@ function preprocessData(inputData: RawSeedData, schema: Schema): SeedData {
           if (columnName) {
             outputTable.indexColumn = columnName;
           } else {
-            outputRow['@ref'] = inputRow[rowName];
+            outputRow['@ref'] = inputRow[propName];
           }
+        }
+      }
+
+      for (const requiredColumn of requiredColumns) {
+        if (!outputRow[requiredColumn.name]) {
+          throw new Error(
+            `Required column '${requiredColumn.name}' not found in table '${tableName}'`
+          );
         }
       }
 
