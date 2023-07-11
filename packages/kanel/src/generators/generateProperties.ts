@@ -1,3 +1,11 @@
+import {
+  MaterializedViewColumn,
+  MaterializedViewDetails,
+  TableColumn,
+  TableDetails,
+  ViewColumn,
+  ViewDetails,
+} from 'extract-pg-schema';
 import * as R from 'ramda';
 
 import { InstantiatedConfig } from '../config-types';
@@ -27,6 +35,30 @@ const generateProperties = <D extends CompositeDetails>(
         nullableOverride,
         optionalOverride,
       } = config.getPropertyMetadata(p, details, generateFor, config);
+
+      let columnIsNullable = p.isNullable;
+
+      // If this is a (materialized or not) view column, we need to check
+      // the source table to see if the column is nullable.
+      if ((p as ViewColumn | MaterializedViewColumn).source) {
+        const source = (p as ViewColumn | MaterializedViewColumn).source;
+        const target: TableDetails | ViewDetails | MaterializedViewDetails =
+          config.schemas[source.schema].tables.find(
+            (t) => t.name === source.table
+          );
+
+        if (target) {
+          const column = (
+            target.columns as Array<
+              TableColumn | ViewColumn | MaterializedViewColumn
+            >
+          ).find((c) => c.name === source.column);
+          if (column) {
+            columnIsNullable = column.isNullable;
+          }
+        }
+      }
+
       const canBeOptional: boolean =
         p.isNullable || p.defaultValue || p.isIdentity;
 
@@ -66,7 +98,7 @@ const generateProperties = <D extends CompositeDetails>(
         isOptional = optionalOverride;
       }
 
-      const isNullable = Boolean(nullableOverride ?? p.isNullable);
+      const isNullable = Boolean(nullableOverride ?? columnIsNullable);
 
       return {
         name,

@@ -78,6 +78,7 @@ export async function main(): Promise<void> {
   if (
     fs.existsSync(configFile) ||
     fs.existsSync(configFile + '.js') ||
+    fs.existsSync(configFile + '.cjs') ||
     fs.existsSync(configFile + '.json')
   ) {
     console.info(`Using config file: ${configFile}`);

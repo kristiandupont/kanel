@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import os from 'os';
 import { resolve } from 'path';
-import { InstantiatedConfig, Output, PreRenderHook, defaultPropertySortFunction } from 'kanel';
+import { InstantiatedConfig, Output, PreRenderHook } from 'kanel';
 import parse from '@kristiandupont/mdconf';
 import preprocessData from './preprocessData';
 import { RawSeedData } from './SeedData';
@@ -67,7 +67,7 @@ const makeGenerateSeeds =
         '',
         `const data = ${JSON.stringify(data, null, 2)};`,
         '',
-        'exports.seed = makeSeeder({ data });'
+        'exports.seed = makeSeeder({ data });',
       ];
 
       await fs.writeFile(dstFilePath, lines.join(os.EOL));
