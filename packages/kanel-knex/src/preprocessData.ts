@@ -3,7 +3,11 @@ import { tryParse } from 'tagged-comment-parser';
 
 import SeedData, { ColumnData, RawSeedData, TableData } from './SeedData';
 
-function preprocessData(inputData: RawSeedData, schema: Schema, defaults: Record<string, string>): SeedData {
+function preprocessData(
+  inputData: RawSeedData,
+  schema: Schema,
+  defaults: Record<string, string>
+): SeedData {
   const dependencies: Record<string, string[]> = {};
   const tables: Record<string, TableData> = {};
 
@@ -15,7 +19,9 @@ function preprocessData(inputData: RawSeedData, schema: Schema, defaults: Record
       throw new Error(`Table '${tableName}' not found in schema`);
     }
 
-    const requiredColumns = dbTable.columns.filter((c) => !c.isNullable && !c.isIdentity && !c.defaultValue);
+    const requiredColumns = dbTable.columns.filter(
+      (c) => !c.isNullable && !c.isIdentity && !c.defaultValue
+    );
 
     const inputRows = inputData[tableName];
     const outputTable: TableData = {
@@ -29,13 +35,16 @@ function preprocessData(inputData: RawSeedData, schema: Schema, defaults: Record
 
       if (table === tableName) {
         defaultRow[column] = defaults[defaultName];
-      } else if (table === '*' && dbTable.columns.some((c) => c.name === column)) {
+      } else if (
+        table === '*' &&
+        dbTable.columns.some((c) => c.name === column)
+      ) {
         defaultRow[column] = defaults[defaultName];
       }
     }
 
     for (const inputRow of inputRows) {
-      const outputRow: Record<string, ColumnData> = {...defaultRow};
+      const outputRow: Record<string, ColumnData> = { ...defaultRow };
       const propNames = Object.keys(inputRow);
       for (const propName of propNames) {
         const { tags = {}, comment: columnName = '' } = tryParse(propName);
