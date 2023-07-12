@@ -29,9 +29,6 @@
     "docs:dev": "vitepress dev docs-src",
     "docs:build": "vitepress build docs-src"
   },
-  "dependencies": {
-    "kanel": "workspace:*"
-  },
   "devDependencies": {
     "@kristiandupont/dev-deps": "^2.2.0",
     "vitepress": "1.0.0-beta.2",

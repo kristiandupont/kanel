@@ -31,7 +31,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "version": "yarn build"
+    "version": "npm run build"
   },
   "dependencies": {
     "@kristiandupont/recase": "1.2.0",

@@ -34,6 +34,6 @@
   },
   "devDependencies": {
     "extract-pg-schema": "^4.2.0",
-    "kanel": "workspace:*"
+    "kanel": "*"
   }
 }
