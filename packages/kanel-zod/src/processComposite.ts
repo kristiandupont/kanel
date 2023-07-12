@@ -16,18 +16,18 @@ function makeDeclaration(
   generateFor: 'selector' | 'initializer' | 'mutator',
   nonCompositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
-  config: GenerateZodSchemasConfig
+  config: GenerateZodSchemasConfig,
 ) {
   const { name, comment } = config.getZodSchemaMetadata(
     c,
     generateFor,
-    instantiatedConfig
+    instantiatedConfig,
   );
 
   const { name: typescriptTypeName } = instantiatedConfig.getMetadata(
     c,
     generateFor,
-    instantiatedConfig
+    instantiatedConfig,
   );
 
   const properties = generateProperties(
@@ -36,7 +36,7 @@ function makeDeclaration(
     nonCompositeTypeImports,
     identifierTypeImports,
     config,
-    instantiatedConfig
+    instantiatedConfig,
   );
 
   const typeImports: TypeImport[] = [zImport];
@@ -65,7 +65,7 @@ const processComposite = (
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
   nonCompositeTypeImports: Record<string, TypeImport>,
-  identifierTypeImports: Record<string, TypeImport>
+  identifierTypeImports: Record<string, TypeImport>,
 ): GenericDeclaration[] => {
   const declarations: GenericDeclaration[] = [];
 
@@ -75,7 +75,7 @@ const processComposite = (
     'selector',
     nonCompositeTypeImports,
     identifierTypeImports,
-    config
+    config,
   );
   declarations.push(selectorDeclaration);
 
@@ -86,7 +86,7 @@ const processComposite = (
       'initializer',
       nonCompositeTypeImports,
       identifierTypeImports,
-      config
+      config,
     );
     declarations.push(initializerDeclaration);
 
@@ -96,7 +96,7 @@ const processComposite = (
       'mutator',
       nonCompositeTypeImports,
       identifierTypeImports,
-      config
+      config,
     );
     declarations.push(mutatorDeclaration);
   }

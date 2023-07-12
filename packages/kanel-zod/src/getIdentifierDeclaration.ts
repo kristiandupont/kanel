@@ -11,7 +11,7 @@ const getIdentifierDeclaration = (
   details: TableDetails,
   getZodIdentifierMetadata: GetZodIdentifierMetadata,
   config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ): {
   name: string;
   originalName: string;
@@ -26,20 +26,20 @@ const getIdentifierDeclaration = (
   if (details.kind === 'table' && instantiatedConfig.generateIdentifierType) {
     const { columns } = details;
     const identifierColumns = columns.filter(
-      (c) => c.isPrimaryKey && !c.reference
+      (c) => c.isPrimaryKey && !c.reference,
     );
 
     identifierColumns.forEach((c) => {
       const typescriptDeclaration = instantiatedConfig.generateIdentifierType(
         c,
         details,
-        instantiatedConfig
+        instantiatedConfig,
       );
 
       const { name, comment } = getZodIdentifierMetadata(
         c,
         details,
-        instantiatedConfig
+        instantiatedConfig,
       );
 
       let zodType: string;

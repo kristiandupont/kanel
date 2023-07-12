@@ -21,7 +21,7 @@ const generateProperties = <D extends CompositeDetails>(
   nonCompositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
   config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ): ZodPropertyDeclaration[] => {
   const ps =
     details.kind === 'compositeType' ? details.attributes : details.columns;
@@ -37,7 +37,7 @@ const generateProperties = <D extends CompositeDetails>(
           p,
           details,
           generateFor,
-          instantiatedConfig
+          instantiatedConfig,
         );
       const canBeOptional: boolean =
         p.isNullable || p.defaultValue || p.isIdentity;
@@ -65,7 +65,7 @@ const generateProperties = <D extends CompositeDetails>(
         zodType = x.name;
       } else {
         console.error(
-          `kanel-zod: Unknown type for ${name}.${p.name}: ${p.type.fullName}`
+          `kanel-zod: Unknown type for ${name}.${p.name}: ${p.type.fullName}`,
         );
       }
 
@@ -114,7 +114,7 @@ const generateProperties = <D extends CompositeDetails>(
         value,
         typeImports,
       };
-    }
+    },
   );
   return result;
 };

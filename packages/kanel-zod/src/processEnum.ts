@@ -6,12 +6,12 @@ import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
 const processEnum = (
   e: EnumDetails,
   config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ): GenericDeclaration => {
   const { name } = config.getZodSchemaMetadata(
     e,
     undefined,
-    instantiatedConfig
+    instantiatedConfig,
   );
   const lines: string[] = [
     `export const ${name} = z.enum([`,

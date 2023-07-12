@@ -6,12 +6,12 @@ import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
 const processDomain = (
   d: DomainDetails,
   config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ): GenericDeclaration | undefined => {
   const { name } = config.getZodSchemaMetadata(
     d,
     undefined,
-    instantiatedConfig
+    instantiatedConfig,
   );
   // let tsType = instantiatedConfig.typeMap[d.innerType];
   // if (typeof tsType !== 'string') {

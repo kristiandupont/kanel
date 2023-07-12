@@ -15,7 +15,7 @@ import processRange from './processRange';
 const createOrAppendFileContents = (
   outputAcc: Output,
   path: Path,
-  declaration: Declaration
+  declaration: Declaration,
 ): Output => ({
   ...outputAcc,
   [path]: {
@@ -43,12 +43,12 @@ export const makeGenerateZodSchemas =
         const { name, path } = config.getZodSchemaMetadata(
           enumDetails,
           undefined,
-          instantiatedConfig
+          instantiatedConfig,
         );
         const declaration = processEnum(
           enumDetails,
           config,
-          instantiatedConfig
+          instantiatedConfig,
         );
         output[path] = {
           declarations: [...output[path].declarations, declaration],
@@ -70,12 +70,12 @@ export const makeGenerateZodSchemas =
         const { name, path } = config.getZodSchemaMetadata(
           rangeDetails,
           undefined,
-          instantiatedConfig
+          instantiatedConfig,
         );
         const declaration = processRange(
           rangeDetails,
           config,
-          instantiatedConfig
+          instantiatedConfig,
         );
         output[path] = {
           declarations: [...output[path].declarations, declaration],
@@ -97,12 +97,12 @@ export const makeGenerateZodSchemas =
         const { name, path } = config.getZodSchemaMetadata(
           domainDetails,
           undefined,
-          instantiatedConfig
+          instantiatedConfig,
         );
         const declaration = processDomain(
           domainDetails,
           config,
-          instantiatedConfig
+          instantiatedConfig,
         );
         output[path] = {
           declarations: [...output[path].declarations, declaration],
@@ -127,13 +127,13 @@ export const makeGenerateZodSchemas =
         const { path } = config.getZodSchemaMetadata(
           tableDetails,
           undefined,
-          instantiatedConfig
+          instantiatedConfig,
         );
         const results = getIdentifierDeclaration(
           tableDetails,
           config.getZodIdentifierMetadata,
           config,
-          instantiatedConfig
+          instantiatedConfig,
         );
 
         for (const result of results) {
@@ -165,14 +165,14 @@ export const makeGenerateZodSchemas =
         const { path } = config.getZodSchemaMetadata(
           compositeDetails,
           undefined,
-          instantiatedConfig
+          instantiatedConfig,
         );
         const declarations = processComposite(
           compositeDetails,
           config,
           instantiatedConfig,
           nonCompositeTypeImports,
-          identifierTypeImports
+          identifierTypeImports,
         );
         for (const declaration of declarations) {
           output = createOrAppendFileContents(output, path, declaration);

@@ -6,12 +6,12 @@ import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
 const processRange = (
   r: RangeDetails,
   config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ): GenericDeclaration | undefined => {
   const { name } = config.getZodSchemaMetadata(
     r,
     undefined,
-    instantiatedConfig
+    instantiatedConfig,
   );
 
   const lines: string[] = [`export const ${name} = z.string();`];
