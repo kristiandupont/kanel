@@ -55,8 +55,10 @@ const generateProperties = <D extends CompositeDetails>(
         const x = config.zodTypeMap[p.type.fullName];
         if (typeof x === 'string') {
           zodType = x;
-          for (let i = p.dimensions || 0; i > 0; i--) {
-            zodType = `${zodType}.array()`;
+          if ('dimensions' in p) {
+            for (let i = p.dimensions || 0; i > 0; i--) {
+              zodType = `${zodType}.array()`;
+            }
           }
         } else {
           zodType = x.name;
