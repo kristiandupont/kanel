@@ -27,7 +27,7 @@ type Progress = {
 
 const processDatabase = async (
   config: Config,
-  progress?: Progress
+  progress?: Progress,
 ): Promise<void> => {
   const schemas = await extractSchemas(config.connection, {
     schemas: config.schemas,
@@ -95,7 +95,7 @@ const processDatabase = async (
       filesToWrite.map(async (file) => {
         const lines = await hook(file.fullPath, file.lines, instantiatedConfig);
         return { ...file, lines };
-      })
+      }),
     );
   }
 

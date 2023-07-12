@@ -4,7 +4,7 @@ import ImportGenerator from './ImportGenerator';
 
 const processComments = (
   comments: string[] | undefined,
-  indentation: number
+  indentation: number,
 ): string[] => {
   if (!comments || comments.length === 0) {
     return [];
@@ -24,7 +24,7 @@ const processComments = (
 
 const processDeclaration = (
   declaration: Declaration,
-  importGenerator: ImportGenerator
+  importGenerator: ImportGenerator,
 ) => {
   const declarationLines: string[] = [];
 
@@ -38,7 +38,7 @@ const processDeclaration = (
         } else {
           const [head, ...tail] = typeDefinition;
           const tailLines = tail.map((l, i) =>
-            i === tail.length - 1 ? `  ${l};` : `  ${l}`
+            i === tail.length - 1 ? `  ${l};` : `  ${l}`,
           );
           declarationLines.push(`type ${name} = ${head}`, ...tailLines);
         }
@@ -49,7 +49,7 @@ const processDeclaration = (
         } else {
           const [head, ...tail] = typeDefinition;
           const tailLines = tail.map((l, i) =>
-            i === tail.length - 1 ? `  ${l};` : `  ${l}`
+            i === tail.length - 1 ? `  ${l};` : `  ${l}`,
           );
           declarationLines.push(`export type ${name} = ${head}`, ...tailLines);
         }
@@ -62,7 +62,7 @@ const processDeclaration = (
         ...(processComments(comment, 0) || []),
         `export${exportAs === 'default' ? ' default' : ''} interface ${name}${
           base ? ` extends ${base}` : ''
-        } {`
+        } {`,
       );
       properties.forEach((property, index) => {
         if (index > 0) {
@@ -74,11 +74,11 @@ const processDeclaration = (
             property.typeName
           }${'[]'.repeat(property.dimensions)}${
             property.isNullable ? ' | null' : ''
-          };`
+          };`,
         );
         if (property.typeImports) {
           property.typeImports.forEach((typeImport) =>
-            importGenerator.addImport(typeImport)
+            importGenerator.addImport(typeImport),
           );
         }
       });
@@ -88,20 +88,20 @@ const processDeclaration = (
     case 'generic': {
       declarationLines.push(
         ...processComments(declaration.comment, 0),
-        ...declaration.lines
+        ...declaration.lines,
       );
       break;
     }
     default: {
       throw new Error(
-        `Unknown declaration type: ${(declaration as any).declarationType}`
+        `Unknown declaration type: ${(declaration as any).declarationType}`,
       );
     }
   }
 
   if (declaration.typeImports) {
     declaration.typeImports.forEach((typeImport) =>
-      importGenerator.addImport(typeImport)
+      importGenerator.addImport(typeImport),
     );
   }
 

@@ -17,7 +17,7 @@ const toPascalCase = recase(null, 'pascal');
 export const defaultGetMetadata: GetMetadata = (
   details,
   generateFor,
-  instantiatedConfig
+  instantiatedConfig,
 ) => {
   const { comment: strippedComment } = tryParse(details.comment);
   const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
@@ -34,7 +34,7 @@ export const defaultGetMetadata: GetMetadata = (
     path: join(
       instantiatedConfig.outputPath,
       details.schemaName,
-      toPascalCase(details.name)
+      toPascalCase(details.name),
     ),
   };
 };
@@ -45,7 +45,7 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
   property,
   _details,
   generateFor,
-  _instantiatedConfig
+  _instantiatedConfig,
 ) => {
   const { comment: strippedComment } = tryParse(property.comment);
 
@@ -65,7 +65,7 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
 export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   column,
   details,
-  config
+  config,
 ) => {
   const name = toPascalCase(details.name) + toPascalCase(column.name);
   const innerType = resolveType(column, details, {
@@ -96,7 +96,7 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
 // #region defaultPropertySortFunction
 export const defaultPropertySortFunction = (
   a: CompositeProperty,
-  b: CompositeProperty
+  b: CompositeProperty,
 ): number => {
   if ((a as TableColumn).isPrimaryKey && !(b as TableColumn).isPrimaryKey) {
     return -1;

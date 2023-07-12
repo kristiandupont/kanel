@@ -6,7 +6,7 @@ import SeedData, { ColumnData, RawSeedData, TableData } from './SeedData';
 function preprocessData(
   inputData: RawSeedData,
   schema: Schema,
-  defaults: Record<string, string>
+  defaults: Record<string, string>,
 ): SeedData {
   const dependencies: Record<string, string[]> = {};
   const tables: Record<string, TableData> = {};
@@ -20,7 +20,7 @@ function preprocessData(
     }
 
     const requiredColumns = dbTable.columns.filter(
-      (c) => !c.isNullable && !c.isIdentity && !c.defaultValue
+      (c) => !c.isNullable && !c.isIdentity && !c.defaultValue,
     );
 
     const inputRows = inputData[tableName];
@@ -54,7 +54,7 @@ function preprocessData(
           const dbColumn = dbTable.columns.find((c) => c.name === columnName);
           if (!dbColumn) {
             throw new Error(
-              `Column '${columnName}' not found in table '${tableName}'`
+              `Column '${columnName}' not found in table '${tableName}'`,
             );
           }
 
@@ -86,7 +86,7 @@ function preprocessData(
       for (const requiredColumn of requiredColumns) {
         if (!outputRow[requiredColumn.name]) {
           throw new Error(
-            `Required column '${requiredColumn.name}' not found in table '${tableName}'`
+            `Required column '${requiredColumn.name}' not found in table '${tableName}'`,
           );
         }
       }
@@ -113,7 +113,7 @@ function preprocessData(
   });
 
   const result: SeedData = tablesOrderedByDependency.map(
-    (tableName) => tables[tableName]
+    (tableName) => tables[tableName],
   );
 
   return result;

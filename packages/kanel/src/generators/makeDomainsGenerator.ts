@@ -10,7 +10,7 @@ import TypeImport from '../TypeImport';
 const makeMapper =
   (config: InstantiatedConfig) =>
   (
-    domainDetails: DomainDetails
+    domainDetails: DomainDetails,
   ): { path: Path; declaration: Declaration } | undefined => {
     // If a domain has a @type tag in the comment,
     // we will use that type instead of a generated one.
@@ -22,7 +22,7 @@ const makeMapper =
     const { name, comment, path } = config.getMetadata(
       domainDetails,
       undefined,
-      config
+      config,
     );
 
     let typeDefinition: string[] = [];
@@ -32,7 +32,7 @@ const makeMapper =
     if (!mapped) {
       typeDefinition = ['unknown'];
       console.warn(
-        `Domain '${name}' has unknown type '${domainDetails.innerType}'`
+        `Domain '${name}' has unknown type '${domainDetails.innerType}'`,
       );
     } else if (typeof mapped === 'string') {
       typeDefinition = [mapped];

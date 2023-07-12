@@ -6,7 +6,7 @@ import { FileContents } from '../Output';
 
 const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
   const allEntities: Details[] = Object.values(
-    instantiatedConfig.schemas
+    instantiatedConfig.schemas,
   ).reduce((acc, elem) => {
     const entitiesInSchema = Object.values(elem)
       .filter((e) => Array.isArray(e))
@@ -20,7 +20,7 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
     const { path, name: selectorName } = instantiatedConfig.getMetadata(
       d,
       'selector',
-      instantiatedConfig
+      instantiatedConfig,
     );
     let importPath = relative(instantiatedConfig.outputPath, path);
 
@@ -35,34 +35,34 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
       const { name: initializerName } = instantiatedConfig.getMetadata(
         d,
         'initializer',
-        instantiatedConfig
+        instantiatedConfig,
       );
       additionalImports.push(initializerName);
 
       const { name: mutatorName } = instantiatedConfig.getMetadata(
         d,
         'mutator',
-        instantiatedConfig
+        instantiatedConfig,
       );
       additionalImports.push(mutatorName);
 
       if (instantiatedConfig.generateIdentifierType) {
         const identifierColumns = d.columns.filter(
-          (c) => c.isPrimaryKey && !c.reference
+          (c) => c.isPrimaryKey && !c.reference,
         );
 
         identifierColumns.forEach((c) => {
           const { name } = instantiatedConfig.generateIdentifierType(
             c,
             d,
-            instantiatedConfig
+            instantiatedConfig,
           );
           additionalImports.push(name);
         });
       }
 
       result = `export type { default as ${selectorName}, ${additionalImports.join(
-        ', '
+        ', ',
       )} } from './${importPath}';`;
     } else if (d.kind === 'enum') {
       const prefix = instantiatedConfig.enumStyle === 'type' ? 'type ' : '';

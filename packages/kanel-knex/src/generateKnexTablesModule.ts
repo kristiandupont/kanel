@@ -9,12 +9,12 @@ import { join } from 'path';
 
 const getTypeImports = (
   details: Details,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ): TypeImport[] => {
   const selector = instantiatedConfig.getMetadata(
     details,
     'selector',
-    instantiatedConfig
+    instantiatedConfig,
   );
   const result: TypeImport[] = [
     {
@@ -31,7 +31,7 @@ const getTypeImports = (
     const initializer = instantiatedConfig.getMetadata(
       details,
       'initializer',
-      instantiatedConfig
+      instantiatedConfig,
     );
     result.push({
       name: initializer.name,
@@ -44,7 +44,7 @@ const getTypeImports = (
     const mutator = instantiatedConfig.getMetadata(
       details,
       'mutator',
-      instantiatedConfig
+      instantiatedConfig,
     );
     result.push({
       name: mutator.name,
@@ -60,12 +60,12 @@ const getTypeImports = (
 
 const getLine = (
   details: Details,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ): string => {
   const selector = instantiatedConfig.getMetadata(
     details,
     'selector',
-    instantiatedConfig
+    instantiatedConfig,
   );
   const selectorName = selector.name;
 
@@ -77,14 +77,14 @@ const getLine = (
     const initializer = instantiatedConfig.getMetadata(
       details,
       'initializer',
-      instantiatedConfig
+      instantiatedConfig,
     );
     initializerName = initializer.name;
 
     const mutator = instantiatedConfig.getMetadata(
       details,
       'mutator',
-      instantiatedConfig
+      instantiatedConfig,
     );
     mutatorName = mutator.name;
   }
@@ -94,19 +94,19 @@ const getLine = (
 
 const generateKnexTablesModule: PreRenderHook = (
   outputAcc,
-  instantiatedConfig
+  instantiatedConfig,
 ) => {
   const typeImports = Object.values(instantiatedConfig.schemas).reduce(
     (acc, schema) => {
       const tableTypeImports = schema.tables.map((table) =>
-        getTypeImports(table, instantiatedConfig)
+        getTypeImports(table, instantiatedConfig),
       );
       const viewTypeImports = schema.tables.map((view) =>
-        getTypeImports(view, instantiatedConfig)
+        getTypeImports(view, instantiatedConfig),
       );
       const materializedViewTypeImports = schema.tables.map(
         (materializedView) =>
-          getTypeImports(materializedView, instantiatedConfig)
+          getTypeImports(materializedView, instantiatedConfig),
       );
 
       return [
@@ -124,24 +124,24 @@ const generateKnexTablesModule: PreRenderHook = (
         isDefault: false,
         importAsType: false,
       },
-    ]
+    ],
   );
 
   const declarationLines = Object.values(instantiatedConfig.schemas).reduce(
     (acc, schema) => {
       const tableLines = schema.tables.map((table) =>
-        getLine(table, instantiatedConfig)
+        getLine(table, instantiatedConfig),
       );
       const viewLines = schema.views.map((view) =>
-        getLine(view, instantiatedConfig)
+        getLine(view, instantiatedConfig),
       );
       const materializedViewLines = schema.materializedViews.map(
-        (materializedView) => getLine(materializedView, instantiatedConfig)
+        (materializedView) => getLine(materializedView, instantiatedConfig),
       );
 
       return [...acc, ...tableLines, ...viewLines, ...materializedViewLines];
     },
-    []
+    [],
   );
 
   const lines: string[] = [

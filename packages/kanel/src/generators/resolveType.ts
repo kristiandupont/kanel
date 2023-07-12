@@ -14,7 +14,7 @@ import TypeDefinition from '../TypeDefinition';
 import { CompositeDetails, CompositeProperty } from './composite-types';
 
 const resolveTypeFromComment = (
-  comment: string | undefined
+  comment: string | undefined,
 ): TypeDefinition | undefined => {
   const { tags } = tryParse(comment);
   if (tags?.type) {
@@ -48,7 +48,7 @@ const resolveTypeFromComment = (
 const resolveType = (
   c: CompositeProperty,
   d: CompositeDetails,
-  config: InstantiatedConfig
+  config: InstantiatedConfig,
 ): TypeDefinition => {
   // 1) Check for a @type tag.
   const typeFromComment = resolveTypeFromComment(c.comment);
@@ -61,16 +61,16 @@ const resolveType = (
     const referencedTypes = (c as any).references.map((reference) => {
       let target: TableDetails | ViewDetails | MaterializedViewDetails =
         config.schemas[reference.schemaName].tables.find(
-          (t) => t.name === reference.tableName
+          (t) => t.name === reference.tableName,
         );
       if (!target) {
         target = config.schemas[reference.schemaName].views.find(
-          (v) => v.name === reference.table
+          (v) => v.name === reference.table,
         );
       }
       if (!target) {
         target = config.schemas[reference.schemaName].materializedViews.find(
-          (v) => v.name === reference.tableName
+          (v) => v.name === reference.tableName,
         );
       }
       if (!target) {
@@ -109,29 +109,29 @@ const resolveType = (
       target = config.schemas[source.schema].views.find(
         (v) =>
           v.name === source.table &&
-          v.name !== (d as ViewDetails).informationSchemaValue.table_name
+          v.name !== (d as ViewDetails).informationSchemaValue.table_name,
       );
     }
     if (!target) {
       target = config.schemas[source.schema].materializedViews.find(
-        (v) => v.name === source.table
+        (v) => v.name === source.table,
       );
     }
     if (!target) {
       target = config.schemas['public']?.tables?.find(
-        (t) => t.name === source.table
+        (t) => t.name === source.table,
       );
     }
     if (!target) {
       target = config.schemas['public']?.views?.find(
         (v) =>
           v.name === source.table &&
-          v.name !== (d as ViewDetails).informationSchemaValue.table_name
+          v.name !== (d as ViewDetails).informationSchemaValue.table_name,
       );
     }
     if (!target) {
       target = config.schemas['public']?.materializedViews?.find(
-        (v) => v.name === source.table
+        (v) => v.name === source.table,
       );
     }
 
@@ -156,7 +156,7 @@ const resolveType = (
     const { name, exportAs } = config.generateIdentifierType(
       c as TableColumn,
       d as TableDetails,
-      config
+      config,
     );
 
     return {
@@ -186,37 +186,37 @@ const resolveType = (
       case 'composite': {
         target =
           config.schemas[schemaName].compositeTypes.find(
-            (t) => t.name === typeName
+            (t) => t.name === typeName,
           ) ??
           config.schemas[schemaName].views?.find((t) => t.name === typeName) ??
           config.schemas[schemaName].materializedViews?.find(
-            (t) => t.name === typeName
+            (t) => t.name === typeName,
           ) ??
           config.schemas[schemaName].tables?.find((t) => t.name === typeName) ??
           config.schemas['public']?.views?.find((t) => t.name === typeName) ??
           config.schemas['public']?.materializedViews?.find(
-            (t) => t.name === typeName
+            (t) => t.name === typeName,
           ) ??
           config.schemas['public']?.tables?.find((t) => t.name === typeName);
         break;
       }
       case 'enum': {
         target = config.schemas[schemaName].enums.find(
-          (t) => t.name === typeName
+          (t) => t.name === typeName,
         );
 
         break;
       }
       case 'domain': {
         target = config.schemas[schemaName].domains.find(
-          (t) => t.name === typeName
+          (t) => t.name === typeName,
         );
 
         break;
       }
       case 'range': {
         target = config.schemas[schemaName].ranges.find(
-          (t) => t.name === typeName
+          (t) => t.name === typeName,
         );
 
         break;
@@ -248,7 +248,7 @@ const resolveType = (
 
   // 7) If not found, set to unknown and print a warning.
   console.warn(
-    `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`
+    `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`,
   );
   return 'unknown';
 };

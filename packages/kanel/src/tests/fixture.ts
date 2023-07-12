@@ -35,7 +35,7 @@ const makeHook =
   (
     map: HookMap,
     viFunc: (p: () => Promise<void>, timeout?: number) => void,
-    type: 'before' | 'after'
+    type: 'before' | 'after',
   ) =>
   (fn: (() => Promise<void>) | (() => void), timeout?: number) => {
     if (!map[globalScope]) {

@@ -4,7 +4,7 @@ import { join } from 'path';
 
 const generateMigrationCheck: PreRenderHook = async (
   outputAcc,
-  instantiatedConfig
+  instantiatedConfig,
 ) => {
   const connection = instantiatedConfig.connection;
   const db = knex({ client: 'postgres', connection });
