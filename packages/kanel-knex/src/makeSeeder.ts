@@ -33,7 +33,7 @@ type EntityMap = {
 const addTable = async (
   knex: Knex,
   tableData: TableData,
-  entityMap: EntityMap
+  entityMap: EntityMap,
 ): Promise<TableEntity> => {
   const initializers = tableData.rows.map((row) => {
     const values = mapObject(row, (columnData) => {
@@ -44,17 +44,17 @@ const addTable = async (
         const [tableName, rowRef, columnName] = reference.split('.');
         if (!entityMap[tableName]) {
           throw new Error(
-            `Table '${tableName}' (referenced as '${reference}') not found`
+            `Table '${tableName}' (referenced as '${reference}') not found`,
           );
         }
         if (!entityMap[tableName][rowRef]) {
           throw new Error(
-            `Row '${rowRef}' in table '${tableName}' (referenced as '${reference}') not found`
+            `Row '${rowRef}' in table '${tableName}' (referenced as '${reference}') not found`,
           );
         }
         if (!entityMap[tableName][rowRef][columnName]) {
           throw new Error(
-            `Column '${columnName}' in row '${rowRef}' in table '${tableName}' (referenced as '${reference}') not found`
+            `Column '${columnName}' in row '${rowRef}' in table '${tableName}' (referenced as '${reference}') not found`,
           );
         }
 

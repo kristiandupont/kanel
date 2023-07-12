@@ -17,7 +17,7 @@ import resolveType from './resolveType';
 const generateProperties = <D extends CompositeDetails>(
   details: D,
   generateFor: 'selector' | 'initializer' | 'mutator',
-  config: InstantiatedConfig
+  config: InstantiatedConfig,
 ): InterfacePropertyDeclaration[] => {
   const ps =
     details.kind === 'compositeType' ? details.attributes : details.columns;
@@ -44,7 +44,7 @@ const generateProperties = <D extends CompositeDetails>(
         const source = (p as ViewColumn | MaterializedViewColumn).source;
         const target: TableDetails | ViewDetails | MaterializedViewDetails =
           config.schemas[source.schema].tables.find(
-            (t) => t.name === source.table
+            (t) => t.name === source.table,
           );
 
         if (target) {
@@ -109,7 +109,7 @@ const generateProperties = <D extends CompositeDetails>(
         typeName,
         typeImports,
       };
-    }
+    },
   );
   return result;
 };

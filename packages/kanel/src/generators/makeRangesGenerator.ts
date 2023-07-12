@@ -8,7 +8,7 @@ import Output, { Path } from '../Output';
 const makeMapper =
   (config: InstantiatedConfig) =>
   (
-    rangeDetails: RangeDetails
+    rangeDetails: RangeDetails,
   ): { path: Path; declaration: Declaration } | undefined => {
     // If a range has a @type tag in the comment,
     // we will use that type instead of a generated one.
@@ -20,7 +20,7 @@ const makeMapper =
     const { name, comment, path } = config.getMetadata(
       rangeDetails,
       undefined,
-      config
+      config,
     );
 
     // let rType: string;

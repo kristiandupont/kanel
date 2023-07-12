@@ -12,7 +12,7 @@ export type GenerateZodSchemasConfig = {
 export type GetZodSchemaMetadata = (
   d: Details,
   generateFor: 'selector' | 'initializer' | 'mutator' | undefined,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => { name: string; comment?: string[]; path: Path };
 
 const toCamelCase = recase(null, 'camel');
@@ -20,18 +20,18 @@ const toCamelCase = recase(null, 'camel');
 export type GetZodIdentifierMetadata = (
   column: TableColumn,
   details: TableDetails,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => { name: string; comment?: string[] };
 
 export const defaultGetZodSchemaMetadata: GetZodSchemaMetadata = (
   details,
   generateFor,
-  instantiatedConfig
+  instantiatedConfig,
 ) => {
   const { path, name: typescriptName } = instantiatedConfig.getMetadata(
     details,
     generateFor,
-    instantiatedConfig
+    instantiatedConfig,
   );
   const name = toCamelCase(typescriptName);
   return { path, name };
@@ -40,12 +40,12 @@ export const defaultGetZodSchemaMetadata: GetZodSchemaMetadata = (
 export const defaultGetZodIdentifierMetadata: GetZodIdentifierMetadata = (
   column: TableColumn,
   details: TableDetails,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => {
   const typescriptDeclaration = instantiatedConfig.generateIdentifierType(
     column,
     details,
-    instantiatedConfig
+    instantiatedConfig,
   );
   const name = toCamelCase(typescriptDeclaration.name);
   return { name };

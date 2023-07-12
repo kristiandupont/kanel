@@ -61,14 +61,14 @@ class ImportGenerator {
       if (importAsType) {
         if (importSet.defaultAsType && importSet.defaultAsType !== name) {
           throw new Error(
-            `Multiple default imports attempted: ${importSet.defaultAsType} and ${name} from '${importPath}'`
+            `Multiple default imports attempted: ${importSet.defaultAsType} and ${name} from '${importPath}'`,
           );
         }
         importSet.defaultAsType = name;
       } else {
         if (importSet.default && importSet.default !== name) {
           throw new Error(
-            `Multiple default imports attempted: ${importSet.default} and ${name} from '${importPath}'`
+            `Multiple default imports attempted: ${importSet.default} and ${name} from '${importPath}'`,
           );
         }
         importSet.default = name;
@@ -95,14 +95,14 @@ class ImportGenerator {
 
       if (defaultImport || named.size > 0) {
         lines.push(
-          this.generateLine(relativePath, false, defaultImport, [...named])
+          this.generateLine(relativePath, false, defaultImport, [...named]),
         );
       }
       if (defaultAsTypeImport || namedAsType.size > 0) {
         lines.push(
           this.generateLine(relativePath, true, defaultAsTypeImport, [
             ...namedAsType,
-          ])
+          ]),
         );
       }
       return lines;
@@ -113,7 +113,7 @@ class ImportGenerator {
     relativePath: string,
     importAsType: boolean,
     defaultImport: string | undefined,
-    namedImports: Array<string>
+    namedImports: Array<string>,
   ): any {
     const importDefaultAsNamed =
       importAsType && defaultImport && namedImports.length > 0;

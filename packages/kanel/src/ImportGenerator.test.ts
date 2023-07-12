@@ -163,7 +163,7 @@ describe('ImportGenerator', () => {
         path: './pkg',
         isAbsolute: false,
         importAsType: false,
-      })
+      }),
     ).toThrow("Multiple default imports attempted: def and def2 from './pkg'");
   });
 

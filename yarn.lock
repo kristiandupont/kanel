@@ -696,12 +696,12 @@
     "@jridgewell/sourcemap-codec" "1.4.14"
 
 "@kristiandupont/dev-deps@^2.2.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@kristiandupont/dev-deps/-/dev-deps-2.3.0.tgz#53f64c76f72906283fd63f960c502401cc28d0f3"
-  integrity sha512-sIShi14qysUbgOWluK2S+fdGdXrTAPxp2EFUSrIsXYpTapsOSB/sH9LAUQqnOFi1ICQxXd2Cwjm3woD+YRwddw==
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@kristiandupont/dev-deps/-/dev-deps-2.4.0.tgz#ae80ac9ba1a4e6e05ff7225cd03a96f099ec6c9e"
+  integrity sha512-WIt468R9n6Zn4YTufTjQiuDew2mhorD//DturIzz0CAAQ7vI9fe0VORjz0JcMCmmqE0NgZKK/f2OCVmk8H+ZLg==
   dependencies:
     "@kristiandupont/eslint-config" "^2.4.0"
-    "@kristiandupont/prettier-config" "^1.2.0"
+    "@kristiandupont/prettier-config" "^1.3.0"
     eslint "^8.42.0"
     prettier "^3.0.0"
     typescript "^5.0.0"
@@ -737,12 +737,12 @@
   dependencies:
     marked "^0.6.1"
 
-"@kristiandupont/prettier-config@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@kristiandupont/prettier-config/-/prettier-config-1.2.0.tgz#166462a3d50e56c82809de6dd445231af387e740"
-  integrity sha512-CZWlxI1IF6SGO6Br3uH20aBQ15NQmS0e3uutepr7nKPSGQYHDqGNA5Au42F9LEY3MeDNFcHGeqP22WGt20QpyA==
+"@kristiandupont/prettier-config@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@kristiandupont/prettier-config/-/prettier-config-1.3.0.tgz#25204d3275d763a6523e4724fe4803a45640cafc"
+  integrity sha512-6HEpRfFoEV7bhDhaaNC9wIHDJhmux8J8nhgv5YduBcUcEwo1dpXvtbTQobvrm6ezGivj/FSwbn88jLrefIwpsw==
   dependencies:
-    prettier-plugin-tailwindcss "^0.3.0"
+    prettier-plugin-tailwindcss "^0.4.0"
 
 "@kristiandupont/recase@1.2.0", "@kristiandupont/recase@^1.2.0":
   version "1.2.0"
@@ -2072,9 +2072,9 @@ eastasianwidth@^0.2.0:
   integrity sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==
 
 electron-to-chromium@^1.4.431:
-  version "1.4.455"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.455.tgz#81fe4353ac970eb971c07088c8da8b7f6280ddc9"
-  integrity sha512-8tgdX0Odl24LtmLwxotpJCVjIndN559AvaOtd67u+2mo+IDsgsTF580NB+uuDCqsHw8yFg53l5+imFV9Fw3cbA==
+  version "1.4.457"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.457.tgz#3fdc7b4f97d628ac6b51e8b4b385befb362fe343"
+  integrity sha512-/g3UyNDmDd6ebeWapmAoiyy+Sy2HyJ+/X8KyvNeHfKRFfHaA2W8oF5fxD5F3tjBDcjpwo0iek6YNgxNXDBoEtA==
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -4704,7 +4704,7 @@ postcss@^8.1.10:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-postcss@^8.4.23, postcss@^8.4.24, postcss@^8.4.4:
+postcss@^8.4.23, postcss@^8.4.25, postcss@^8.4.4:
   version "8.4.25"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.25.tgz#4a133f5e379eda7f61e906c3b1aaa9b81292726f"
   integrity sha512-7taJ/8t2av0Z+sQEvNzCkpDynl0tX3uJMCODi6nT3PfASC7dYCWV9aQ+uiCf+KBD4SEFcu+GvJdGdwzQ6OSjCw==
@@ -4757,10 +4757,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier-plugin-tailwindcss@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/prettier-plugin-tailwindcss/-/prettier-plugin-tailwindcss-0.3.0.tgz#8299b307c7f6467f52732265579ed9375be6c818"
-  integrity sha512-009/Xqdy7UmkcTBpwlq7jsViDqXAYSOMLDrHAdTMlVZOrKfM2o9Ci7EMWTMZ7SkKBFTG04UM9F9iM2+4i6boDA==
+prettier-plugin-tailwindcss@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-tailwindcss/-/prettier-plugin-tailwindcss-0.4.0.tgz#b3bd20e28514607c584d4ce515ed09b76cc16dd2"
+  integrity sha512-Rna0sDPETA0KNhMHlN8wxKNgfSa8mTl2hPPAGxnbv6tUcHT6J4RQmQ8TLXyhB7Dm5Von4iHloBxTyClYM6wT0A==
 
 prettier@^3.0.0:
   version "3.0.0"
@@ -5874,12 +5874,12 @@ vite-node@0.33.0:
     vite "^3.0.0 || ^4.0.0"
 
 "vite@^3.0.0 || ^4.0.0", vite@^4.0.1:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.2.tgz#acd47de771c498aec80e4900f30133d9529b278a"
-  integrity sha512-zUcsJN+UvdSyHhYa277UHhiJ3iq4hUBwHavOpsNUGsTgjBeoBlK8eDt+iT09pBq0h9/knhG/SPrZiM7cGmg7NA==
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.3.tgz#dfaf86f4cba3058bf2724e2e2c88254fb0f21a5a"
+  integrity sha512-IMnXQXXWgLi5brBQx/4WzDxdzW0X3pjO4nqFJAuNvwKtxzAmPzFE1wszW3VDpAGQJm3RZkm/brzRdyGsnwgJIA==
   dependencies:
     esbuild "^0.18.10"
-    postcss "^8.4.24"
+    postcss "^8.4.25"
     rollup "^3.25.2"
   optionalDependencies:
     fsevents "~2.3.2"

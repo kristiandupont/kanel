@@ -31,13 +31,13 @@ export type InstantiatedConfig = {
 
 export type PreRenderHook = (
   outputAcc: Output,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => Awaitable<Output>;
 
 export type PostRenderHook = (
   path: string,
   lines: string[],
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => Awaitable<string[]>;
 
 // #region Config

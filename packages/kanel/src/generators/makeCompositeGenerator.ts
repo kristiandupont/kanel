@@ -29,11 +29,11 @@ const makeMapper =
     if (details.kind === 'table' && config.generateIdentifierType) {
       const { columns } = details;
       const identifierColumns = columns.filter(
-        (c) => c.isPrimaryKey && !c.reference
+        (c) => c.isPrimaryKey && !c.reference,
       );
 
       identifierColumns.forEach((c) =>
-        declarations.push(config.generateIdentifierType(c, details, config))
+        declarations.push(config.generateIdentifierType(c, details, config)),
       );
     }
 
@@ -54,7 +54,7 @@ const makeMapper =
       const initializerProperties = generateProperties(
         details,
         'initializer',
-        config
+        config,
       );
 
       const initializerDeclaration: InterfaceDeclaration = {
@@ -69,7 +69,7 @@ const makeMapper =
       const { name: mutatorName, comment: mutatorComment } = config.getMetadata(
         details,
         'mutator',
-        config
+        config,
       );
       const mutatorProperties = generateProperties(details, 'mutator', config);
 

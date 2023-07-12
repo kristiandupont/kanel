@@ -15,7 +15,7 @@ type EnumStyle = 'enum' | 'type';
 const makeMapper =
   (style: EnumStyle, config: InstantiatedConfig) =>
   (
-    enumDetails: EnumDetails
+    enumDetails: EnumDetails,
   ): { path: Path; declaration: Declaration } | undefined => {
     // If an enum has a @type tag in the comment,
     // we will use that type instead of a generated one.
@@ -27,7 +27,7 @@ const makeMapper =
     const { name, comment, path } = config.getMetadata(
       enumDetails,
       undefined,
-      config
+      config,
     );
 
     if (style === 'type') {
@@ -49,7 +49,7 @@ const makeMapper =
         lines: [
           `enum ${name} {`,
           ...enumDetails.values.map(
-            (value) => `  ${escapeName(value)} = '${value}',`
+            (value) => `  ${escapeName(value)} = '${value}',`,
           ),
           '};',
           '',

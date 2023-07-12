@@ -18,7 +18,7 @@ export type TypeMetadata = {
 export type GetMetadata = (
   details: Details,
   generateFor: 'selector' | 'initializer' | 'mutator' | undefined,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => TypeMetadata;
 
 export type PropertyMetadata = {
@@ -33,11 +33,11 @@ export type GetPropertyMetadata = (
   property: CompositeProperty,
   details: CompositeDetails,
   generateFor: 'selector' | 'initializer' | 'mutator',
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => PropertyMetadata;
 
 export type GenerateIdentifierType = (
   column: TableColumn,
   details: TableDetails,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => TypeDeclaration;
