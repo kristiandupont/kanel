@@ -18,7 +18,8 @@
   "workspaces": [
     "packages/kanel",
     "packages/kanel-knex",
-    "packages/kanel-zod"
+    "packages/kanel-zod",
+    "packages/kanel-kysely"
   ],
   "scripts": {
     "run-example": "kanel -c ./example/.kanelrc",

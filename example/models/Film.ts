@@ -170,7 +170,7 @@ export const film: z.Schema<Film> = z.object({
   replacement_cost: z.string(),
   rating: mpaaRating.nullable(),
   last_update: z.date(),
-  special_features: z.string().nullable(),
+  special_features: z.string().array().nullable(),
   fulltext: z.set(z.string()),
 }) as any;
 
@@ -186,7 +186,7 @@ export const filmInitializer: z.Schema<FilmInitializer> = z.object({
   replacement_cost: z.string().optional(),
   rating: mpaaRating.optional().nullable(),
   last_update: z.date().optional(),
-  special_features: z.string().optional().nullable(),
+  special_features: z.string().array().optional().nullable(),
   fulltext: z.set(z.string()),
 }) as any;
 
@@ -202,6 +202,6 @@ export const filmMutator: z.Schema<FilmMutator> = z.object({
   replacement_cost: z.string().optional(),
   rating: mpaaRating.optional().nullable(),
   last_update: z.date().optional(),
-  special_features: z.string().optional().nullable(),
+  special_features: z.string().array().optional().nullable(),
   fulltext: z.set(z.string()).optional(),
 }) as any;

@@ -17,7 +17,7 @@ export default interface StaffList {
   address: string;
 
   /** Database type: pg_catalog.varchar */
-  'zip code': string;
+  'zip code': string | null;
 
   /** Database type: pg_catalog.varchar */
   phone: string;

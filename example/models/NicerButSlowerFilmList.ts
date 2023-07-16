@@ -16,7 +16,7 @@ export default interface NicerButSlowerFilmList {
   title: string;
 
   /** Database type: pg_catalog.text */
-  description: string;
+  description: string | null;
 
   /** Database type: pg_catalog.varchar */
   category: string;
@@ -25,10 +25,10 @@ export default interface NicerButSlowerFilmList {
   price: string;
 
   /** Database type: pg_catalog.int2 */
-  length: number;
+  length: number | null;
 
   /** Database type: public.mpaa_rating */
-  rating: MpaaRating;
+  rating: MpaaRating | null;
 
   /** Database type: pg_catalog.text */
   actors: string;

@@ -33,7 +33,7 @@ export const makeGenerateZodSchemas =
     const identifierTypeImports: Record<string, TypeImport> = {};
 
     // First, process the non-composite types. These may be imported by
-    // the composited ones so we will generate them first and store them
+    // the composed ones so we will generate them first and store them
     // in the nonCompositeTypeImports map.
     for (const schemaName of Object.keys(instantiatedConfig.schemas)) {
       const schema = instantiatedConfig.schemas[schemaName];
