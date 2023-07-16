@@ -36,6 +36,7 @@ export default {
         items: [
           { text: 'kanel-knex', link: '/kanel-knex' },
           { text: 'kanel-zod', link: '/kanel-zod' },
+          { text: 'kanel-kysely', link: '/kanel-kysely' },
         ],
       },
     ],
