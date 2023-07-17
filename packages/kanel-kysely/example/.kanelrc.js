@@ -19,7 +19,7 @@ module.exports = {
   outputPath,
   resolveViews: true,
   preDeleteOutputFolder: true,
-  enumStyle: 'union',
+  enumStyle: 'type',
   preRenderHooks: [makeKyselyHook()],
   // comment the generateIdentifierType function if you want the default behavior, adding branded ids
   generateIdentifierType: (c, d, config) => {
