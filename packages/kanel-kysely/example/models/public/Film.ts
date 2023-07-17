@@ -4,7 +4,7 @@
 import type Year from './Year';
 import type { LanguageId } from './Language';
 import type MpaaRating from './MpaaRating';
-import type { ColumnType } from 'kysely';
+import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 export type FilmId = number;
 
@@ -30,11 +30,15 @@ export default interface FilmTable {
 
   rating: ColumnType<MpaaRating | null, MpaaRating | null, MpaaRating | null>;
 
-  last_update: ColumnType<Date | string, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
 
   special_features: ColumnType<string[] | null, string[] | null, string[] | null>;
 
   fulltext: ColumnType<Set<string>, Set<string>, Set<string> | null>;
 }
 
-export type Film = FilmTable;
+export type Film = Selectable<FilmTable>;
+
+export type NewFilm = Insertable<FilmTable>;
+
+export type FilmUpdate = Updateable<FilmTable>;

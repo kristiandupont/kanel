@@ -3,7 +3,7 @@
 
 import type { FilmId } from './Film';
 import type { CategoryId } from './Category';
-import type { ColumnType } from 'kysely';
+import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 /** Represents the table public.film_category */
 export default interface FilmCategoryTable {
@@ -11,7 +11,11 @@ export default interface FilmCategoryTable {
 
   category_id: ColumnType<CategoryId, CategoryId, CategoryId | null>;
 
-  last_update: ColumnType<Date | string, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
 }
 
-export type FilmCategory = FilmCategoryTable;
+export type FilmCategory = Selectable<FilmCategoryTable>;
+
+export type NewFilmCategory = Insertable<FilmCategoryTable>;
+
+export type FilmCategoryUpdate = Updateable<FilmCategoryTable>;

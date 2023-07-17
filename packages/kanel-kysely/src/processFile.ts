@@ -125,13 +125,58 @@ const processFile = (
   result.push({
     declarationType: 'typeDeclaration',
     name: selectorName,
-    typeDefinition: [`${selectorName}Table`],
+    typeImports: [
+      {
+        name: 'Selectable',
+        isDefault: false,
+        path: 'kysely',
+        isAbsolute: true,
+        importAsType: true,
+      },
+    ],
+    typeDefinition: [`Selectable<${selectorName}Table>`],
     exportAs: 'named',
   });
 
+  if (canInitialize) {
+    result.push({
+      declarationType: 'typeDeclaration',
+      name: `New${selectorName}`,
+      typeImports: [
+        {
+          name: 'Insertable',
+          isDefault: false,
+          path: 'kysely',
+          isAbsolute: true,
+          importAsType: true,
+        },
+      ],
+      typeDefinition: [`Insertable<${selectorName}Table>`],
+      exportAs: 'named',
+    });
+  }
+
+  if (canMutate) {
+    result.push({
+      declarationType: 'typeDeclaration',
+      name: `${selectorName}Update`,
+      typeImports: [
+        {
+          name: 'Updateable',
+          isDefault: false,
+          path: 'kysely',
+          isAbsolute: true,
+          importAsType: true,
+        },
+      ],
+      typeDefinition: [`Updateable<${selectorName}Table>`],
+      exportAs: 'named',
+    });
+  }
+
   const tableImport: TypeImport = {
-    name: selectorName,
-    isDefault: false,
+    name: `${selectorName}Table`,
+    isDefault: true,
     path,
     isAbsolute: false,
     importAsType: true,

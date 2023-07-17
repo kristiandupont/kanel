@@ -4,7 +4,7 @@
 import type { CustomerId } from './Customer';
 import type { StaffId } from './Staff';
 import type { RentalId } from './Rental';
-import type { ColumnType } from 'kysely';
+import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 export type PaymentId = number;
 
@@ -20,7 +20,11 @@ export default interface PaymentTable {
 
   amount: ColumnType<string, string, string | null>;
 
-  payment_date: ColumnType<Date | string, Date | string, Date | string | null>;
+  payment_date: ColumnType<Date, Date | string, Date | string | null>;
 }
 
-export type Payment = PaymentTable;
+export type Payment = Selectable<PaymentTable>;
+
+export type NewPayment = Insertable<PaymentTable>;
+
+export type PaymentUpdate = Updateable<PaymentTable>;

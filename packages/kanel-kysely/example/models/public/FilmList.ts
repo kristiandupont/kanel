@@ -3,7 +3,7 @@
 
 import type { FilmId } from './Film';
 import type MpaaRating from './MpaaRating';
-import type { ColumnType } from 'kysely';
+import type { ColumnType, Selectable } from 'kysely';
 
 /** Represents the view public.film_list */
 export default interface FilmListTable {
@@ -24,4 +24,4 @@ export default interface FilmListTable {
   actors: ColumnType<string, never, never>;
 }
 
-export type FilmList = FilmListTable;
+export type FilmList = Selectable<FilmListTable>;

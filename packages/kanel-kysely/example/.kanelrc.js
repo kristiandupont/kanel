@@ -43,6 +43,7 @@ module.exports = {
     'pg_catalog.json': 'string',
     'pg_catalog.jsonb': 'string',
     'pg_catalog.bpchar': 'string',
+    'pg_catalog.bytea': { name: 'bytea', typeImports: [{ name: 'bytea', path: 'bytea', isAbsolute: true, isDefault: true }] },
     'public.citext': 'string'
   },
 };

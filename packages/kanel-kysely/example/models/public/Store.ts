@@ -3,7 +3,7 @@
 
 import type { StaffId } from './Staff';
 import type { AddressId } from './Address';
-import type { ColumnType } from 'kysely';
+import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 export type StoreId = number;
 
@@ -15,7 +15,11 @@ export default interface StoreTable {
 
   address_id: ColumnType<AddressId, AddressId, AddressId | null>;
 
-  last_update: ColumnType<Date | string, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
 }
 
-export type Store = StoreTable;
+export type Store = Selectable<StoreTable>;
+
+export type NewStore = Insertable<StoreTable>;
+
+export type StoreUpdate = Updateable<StoreTable>;
