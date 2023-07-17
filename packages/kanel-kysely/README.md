@@ -2,6 +2,7 @@
 
 Generate [Kysely](https://kysely.dev/) types directly from your Postgres database.
 This packages extends [Kanel](https://github.com/kristiandupont/kanel) with some Kysely specific features.
+Check ./example/.kanelrc.js for how to customize your schema generation.
 
 ```typescript
 // @generated

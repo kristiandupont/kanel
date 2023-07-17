@@ -93,7 +93,7 @@ const makeKyselyHook: (config: MakeKyselyConfig) => PreRenderHook =
 
     const dbDeclaration: TypeDeclaration = {
       declarationType: 'typeDeclaration',
-      name: 'Datbase',
+      name: 'Database',
       typeImports: schemaImports,
       typeDefinition: [
         schemaImports.map((dbImport) => dbImport.name).join(' | '),

@@ -89,6 +89,9 @@ const processFile = (
 
           let initializerType = 'never';
           if (canInitialize) {
+            if (baseType === 'Date') {
+              baseType += ' | string';
+            }
             initializerType =
               column.isNullable || column.defaultValue || column.isIdentity
                 ? `${baseType} | null`
@@ -152,6 +155,7 @@ const processFile = (
       exportAs: 'named',
     });
   }
+
   if (canMutate) {
     result.push({
       declarationType: 'typeDeclaration',
@@ -171,8 +175,8 @@ const processFile = (
   }
 
   const tableImport: TypeImport = {
-    name: selectorName,
-    isDefault: false,
+    name: `${selectorName}Table`,
+    isDefault: true,
     path,
     isAbsolute: false,
     importAsType: true,
