@@ -25,7 +25,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "test": "echo TODO..."
+    "test": "echo TODO...",
+    "run-example": "kanel -c ./example/.kanelrc"
   },
   "devDependencies": {
     "extract-pg-schema": "^4.2.0",

@@ -89,6 +89,9 @@ const processFile = (
 
           let initializerType = 'never';
           if (canInitialize) {
+            if(baseType === "Date") {
+              baseType += " | string";
+            }
             initializerType =
               column.isNullable || column.defaultValue || column.isIdentity
                 ? `${baseType} | null`
@@ -122,53 +125,9 @@ const processFile = (
   result.push({
     declarationType: 'typeDeclaration',
     name: selectorName,
-    typeImports: [
-      {
-        name: 'Selectable',
-        isDefault: false,
-        path: 'kysely',
-        isAbsolute: true,
-        importAsType: true,
-      },
-    ],
-    typeDefinition: [`Selectable<${selectorName}Table>`],
+    typeDefinition: [`${selectorName}Table`],
     exportAs: 'named',
   });
-
-  if (canInitialize) {
-    result.push({
-      declarationType: 'typeDeclaration',
-      name: `New${selectorName}`,
-      typeImports: [
-        {
-          name: 'Insertable',
-          isDefault: false,
-          path: 'kysely',
-          isAbsolute: true,
-          importAsType: true,
-        },
-      ],
-      typeDefinition: [`Insertable<${selectorName}Table>`],
-      exportAs: 'named',
-    });
-  }
-  if (canMutate) {
-    result.push({
-      declarationType: 'typeDeclaration',
-      name: `${selectorName}Update`,
-      typeImports: [
-        {
-          name: 'Updateable',
-          isDefault: false,
-          path: 'kysely',
-          isAbsolute: true,
-          importAsType: true,
-        },
-      ],
-      typeDefinition: [`Updateable<${selectorName}Table>`],
-      exportAs: 'named',
-    });
-  }
 
   const tableImport: TypeImport = {
     name: selectorName,
