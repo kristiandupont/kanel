@@ -21,6 +21,7 @@ module.exports = {
   preDeleteOutputFolder: true,
   enumStyle: 'union',
   preRenderHooks: [makeKyselyHook()],
+  // comment the generateIdentifierType function if you want the default behavior, adding branded ids
   generateIdentifierType: (c, d, config) => {
     // Id columns are already prefixed with the table name, so we don't need to add it here
     const name = toPascalCase(c.name);

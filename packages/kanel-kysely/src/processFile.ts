@@ -89,8 +89,8 @@ const processFile = (
 
           let initializerType = 'never';
           if (canInitialize) {
-            if(baseType === "Date") {
-              baseType += " | string";
+            if (baseType === 'Date') {
+              baseType += ' | string';
             }
             initializerType =
               column.isNullable || column.defaultValue || column.isIdentity

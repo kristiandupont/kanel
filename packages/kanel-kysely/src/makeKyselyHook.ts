@@ -46,7 +46,7 @@ const makeKyselyHook: (config: MakeKyselyConfig) => PreRenderHook =
           compositeDetails,
           'selector',
           instantiatedConfig,
-        ); 
+        );
         const { modifiedDeclarations, tableImport, tableProperty } =
           processFile(
             output[path].declarations,
