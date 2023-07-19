@@ -1,10 +1,5 @@
 import {
-  CompositeTypeDetails,
-  MaterializedViewDetails,
-  TableDetails,
-  ViewDetails,
-} from 'extract-pg-schema';
-import {
+  CompositeDetails,
   CompositeProperty,
   Declaration,
   InstantiatedConfig,
@@ -12,15 +7,23 @@ import {
   TypeImport,
 } from 'kanel';
 
+import MakeKyselyConfig from './MakeKyselyConfig';
+
+/**
+ * This is a quirky way to get Kysely interfaces. Basically, what happens is that this
+ * hook will filter out initializer and mutators. It takes the selector and transforms
+ * it into the Kysely *Table interface, by going over each property. In the end,
+ * it adds the New* and *Update types as per the Kysely documentation.
+ *
+ * This only works when the output from Kanel is close to the default configuration,
+ * if you've changed things around too much it will probably not work.
+ */
 const processFile = (
   declarations: Declaration[],
-  compositeDetails:
-    | TableDetails
-    | ViewDetails
-    | MaterializedViewDetails
-    | CompositeTypeDetails,
+  compositeDetails: CompositeDetails,
   instantiatedConfig: InstantiatedConfig,
   path: string,
+  makeKyselyConfig: MakeKyselyConfig,
 ): {
   modifiedDeclarations: Declaration[];
   tableImport: TypeImport;
@@ -50,10 +53,19 @@ const processFile = (
     canMutate = false;
   }
 
+  const { tableInterfaceName, selectableName, insertableName, updatableName } =
+    makeKyselyConfig.getKyselyItemMetadata(
+      compositeDetails,
+      selectorName,
+      canInitialize,
+      canMutate,
+      instantiatedConfig,
+    );
+
   const modifiedDeclarations = declarations.map((declaration) => {
     if (declaration.declarationType === 'interface') {
       if (declaration.name === selectorName) {
-        const name = declaration.name + 'Table';
+        const name = tableInterfaceName;
         const typeImports = [...(declaration.typeImports || [])];
 
         typeImports.push({
@@ -124,7 +136,7 @@ const processFile = (
 
   result.push({
     declarationType: 'typeDeclaration',
-    name: selectorName,
+    name: selectableName,
     typeImports: [
       {
         name: 'Selectable',
@@ -134,14 +146,14 @@ const processFile = (
         importAsType: true,
       },
     ],
-    typeDefinition: [`Selectable<${selectorName}Table>`],
+    typeDefinition: [`Selectable<${tableInterfaceName}>`],
     exportAs: 'named',
   });
 
-  if (canInitialize) {
+  if (insertableName) {
     result.push({
       declarationType: 'typeDeclaration',
-      name: `New${selectorName}`,
+      name: insertableName,
       typeImports: [
         {
           name: 'Insertable',
@@ -151,15 +163,15 @@ const processFile = (
           importAsType: true,
         },
       ],
-      typeDefinition: [`Insertable<${selectorName}Table>`],
+      typeDefinition: [`Insertable<${tableInterfaceName}>`],
       exportAs: 'named',
     });
   }
 
-  if (canMutate) {
+  if (updatableName) {
     result.push({
       declarationType: 'typeDeclaration',
-      name: `${selectorName}Update`,
+      name: updatableName,
       typeImports: [
         {
           name: 'Updateable',
@@ -169,7 +181,7 @@ const processFile = (
           importAsType: true,
         },
       ],
-      typeDefinition: [`Updateable<${selectorName}Table>`],
+      typeDefinition: [`Updateable<${tableInterfaceName}>`],
       exportAs: 'named',
     });
   }

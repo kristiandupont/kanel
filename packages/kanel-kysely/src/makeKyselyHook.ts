@@ -8,21 +8,18 @@ import {
 } from 'kanel';
 import { dirname, join } from 'path';
 
+import MakeKyselyConfig, { defaultConfig } from './MakeKyselyConfig';
 import processFile from './processFile';
 
 const toPascalCase = recase(null, 'pascal');
 
-interface MakeKyselyConfig {
-  databaseFilename: string;
-}
+const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
+  (makeKyselyConfig_) => async (outputAcc, instantiatedConfig) => {
+    const makeKyselyConfig = {
+      ...defaultConfig,
+      ...makeKyselyConfig_,
+    };
 
-const defaultConfig: MakeKyselyConfig = {
-  databaseFilename: 'Database',
-};
-
-const makeKyselyHook: (config?: MakeKyselyConfig) => PreRenderHook =
-  (config = defaultConfig) =>
-  async (outputAcc, instantiatedConfig) => {
     const output = { ...outputAcc };
 
     const schemaImports: TypeImport[] = [];
@@ -53,6 +50,7 @@ const makeKyselyHook: (config?: MakeKyselyConfig) => PreRenderHook =
             compositeDetails,
             instantiatedConfig,
             path,
+            makeKyselyConfig,
           );
         output[path].declarations = modifiedDeclarations;
         tableImports.push(tableImport);
@@ -89,7 +87,10 @@ const makeKyselyHook: (config?: MakeKyselyConfig) => PreRenderHook =
       schemaImports.push(schemaImport);
     }
 
-    const dbPath = join(instantiatedConfig.outputPath, config.databaseFilename);
+    const dbPath = join(
+      instantiatedConfig.outputPath,
+      makeKyselyConfig.databaseFilename,
+    );
 
     const dbDeclaration: TypeDeclaration = {
       declarationType: 'typeDeclaration',
