@@ -19,7 +19,7 @@ export type InstantiatedConfig = {
 
   getMetadata: GetMetadata;
   getPropertyMetadata: GetPropertyMetadata;
-  generateIdentifierType: GenerateIdentifierType;
+  generateIdentifierType?: GenerateIdentifierType;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 
   enumStyle: 'enum' | 'type';

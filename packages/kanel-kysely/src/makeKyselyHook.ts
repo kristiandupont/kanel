@@ -20,7 +20,7 @@ const defaultConfig: MakeKyselyConfig = {
   databaseFilename: 'Database',
 };
 
-const makeKyselyHook: (config: MakeKyselyConfig) => PreRenderHook =
+const makeKyselyHook: (config?: MakeKyselyConfig) => PreRenderHook =
   (config = defaultConfig) =>
   async (outputAcc, instantiatedConfig) => {
     const output = { ...outputAcc };
