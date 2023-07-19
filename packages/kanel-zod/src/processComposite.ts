@@ -41,6 +41,8 @@ function makeDeclaration(
 
   const typeImports: TypeImport[] = [zImport];
 
+  // TODO: Change this to ${name} = z.object(...) satisfies ${typescriptTypeName}
+  // But not until there is a solution to https://github.com/colinhacks/zod/issues/1628
   const lines: string[] = [
     `export const ${name}: z.Schema<${typescriptTypeName}> = z.object({`,
     ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
