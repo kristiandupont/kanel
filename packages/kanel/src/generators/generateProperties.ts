@@ -28,16 +28,6 @@ const generateProperties = <D extends CompositeDetails>(
 
   const result: InterfacePropertyDeclaration[] = sortedPs.map(
     (p: CompositeProperty): InterfacePropertyDeclaration => {
-      const {
-        name,
-        comment,
-        typeOverride,
-        nullableOverride,
-        optionalOverride,
-      } = config.getPropertyMetadata(p, details, generateFor, config);
-
-      let columnIsNullable = p.isNullable;
-
       // If this is a (materialized or not) view column, we need to check
       // the source table to see if the column is nullable.
       if ((p as ViewColumn | MaterializedViewColumn).source) {
@@ -54,10 +44,18 @@ const generateProperties = <D extends CompositeDetails>(
             >
           ).find((c) => c.name === source.column);
           if (column) {
-            columnIsNullable = column.isNullable;
+            p.isNullable = column.isNullable;
           }
         }
       }
+
+      const {
+        name,
+        comment,
+        typeOverride,
+        nullableOverride,
+        optionalOverride,
+      } = config.getPropertyMetadata(p, details, generateFor, config);
 
       const canBeOptional: boolean =
         p.isNullable || p.defaultValue || p.isIdentity;
@@ -98,7 +96,7 @@ const generateProperties = <D extends CompositeDetails>(
         isOptional = optionalOverride;
       }
 
-      const isNullable = Boolean(nullableOverride ?? columnIsNullable);
+      const isNullable = Boolean(nullableOverride ?? p.isNullable);
 
       return {
         name,
