@@ -37,10 +37,10 @@ export default interface NicerButSlowerFilmList {
 export const nicerButSlowerFilmList: z.Schema<NicerButSlowerFilmList> = z.object({
   fid: filmId,
   title: z.string(),
-  description: z.string(),
+  description: z.string().nullable(),
   category: z.string(),
   price: z.string(),
-  length: z.number(),
-  rating: mpaaRating,
+  length: z.number().nullable(),
+  rating: mpaaRating.nullable(),
   actors: z.string(),
 }) as any;

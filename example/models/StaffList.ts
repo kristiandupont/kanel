@@ -36,7 +36,7 @@ export const staffList: z.Schema<StaffList> = z.object({
   id: staffId,
   name: z.string(),
   address: z.string(),
-  'zip code': z.string(),
+  'zip code': z.string().nullable(),
   phone: z.string(),
   city: z.string(),
   country: z.string(),
