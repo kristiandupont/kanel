@@ -26,8 +26,9 @@ const generateProperties = <D extends CompositeDetails>(
     ? R.sort(config.propertySortFunction, ps as any)
     : ps;
 
-  const result: InterfacePropertyDeclaration[] = sortedPs.map(
-    (p: CompositeProperty): InterfacePropertyDeclaration => {
+  const result: InterfacePropertyDeclaration[] = sortedPs
+    .filter((p) => generateFor === 'selector' || p.generated !== 'ALWAYS')
+    .map((p: CompositeProperty): InterfacePropertyDeclaration => {
       // If this is a (materialized or not) view column, we need to check
       // the source table to see if the column is nullable.
       if ((p as ViewColumn | MaterializedViewColumn).source) {
@@ -58,7 +59,10 @@ const generateProperties = <D extends CompositeDetails>(
       } = config.getPropertyMetadata(p, details, generateFor, config);
 
       const canBeOptional: boolean =
-        p.isNullable || p.defaultValue || p.isIdentity;
+        p.isNullable ||
+        p.defaultValue ||
+        p.isIdentity ||
+        p.generated === 'BY DEFAULT';
 
       const t = typeOverride ?? resolveType(p, details, config);
 
@@ -107,8 +111,7 @@ const generateProperties = <D extends CompositeDetails>(
         typeName,
         typeImports,
       };
-    },
-  );
+    });
   return result;
 };
 

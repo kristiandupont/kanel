@@ -100,18 +100,21 @@ const processFile = (
           }
 
           let initializerType = 'never';
-          if (canInitialize) {
+          if (canInitialize && column.generated !== 'ALWAYS') {
             if (baseType === 'Date') {
               baseType += ' | string';
             }
             initializerType =
-              column.isNullable || column.defaultValue || column.isIdentity
+              column.isNullable ||
+              column.defaultValue ||
+              column.isIdentity ||
+              column.generated === 'BY DEFAULT'
                 ? `${baseType} | null`
                 : baseType;
           }
 
           let mutatorType = 'never';
-          if (canMutate) {
+          if (canMutate && column.generated !== 'ALWAYS') {
             mutatorType = `${baseType} | null`;
           }
 
