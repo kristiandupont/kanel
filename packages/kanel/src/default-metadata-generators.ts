@@ -79,7 +79,7 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   if (typeof innerType === 'object') {
     // Handle non-primitives
     type = innerType.name;
-    imports.push(innerType);
+    imports.push(...innerType.typeImports);
   }
 
   return {
