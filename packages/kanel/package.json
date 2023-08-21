@@ -29,7 +29,7 @@
     "bin/"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf ./build && tsc",,
     "test": "vitest run",
     "version": "npm run build"
   },
