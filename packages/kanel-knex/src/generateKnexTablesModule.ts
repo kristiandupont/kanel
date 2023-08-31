@@ -101,10 +101,10 @@ const generateKnexTablesModule: PreRenderHook = (
       const tableTypeImports = schema.tables.map((table) =>
         getTypeImports(table, instantiatedConfig),
       );
-      const viewTypeImports = schema.tables.map((view) =>
+      const viewTypeImports = schema.views.map((view) =>
         getTypeImports(view, instantiatedConfig),
       );
-      const materializedViewTypeImports = schema.tables.map(
+      const materializedViewTypeImports = schema.materializedViews.map(
         (materializedView) =>
           getTypeImports(materializedView, instantiatedConfig),
       );
