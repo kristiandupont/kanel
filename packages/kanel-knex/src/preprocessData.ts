@@ -66,9 +66,11 @@ function preprocessData(
             }
             dependencies[refTableName].push(tableName);
 
-            outputRow[columnName] = {
-              reference: `${refTableName}.${inputRow[propName]}.${reference.columnName}`,
-            };
+            if (inputRow[propName]) {
+              outputRow[columnName] = {
+                reference: `${refTableName}.${inputRow[propName]}.${reference.columnName}`,
+              };
+            }
           } else {
             outputRow[columnName] = inputRow[propName];
           }
