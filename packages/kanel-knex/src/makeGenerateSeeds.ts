@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs';
-import os from 'os';
 import { resolve } from 'path';
-import { InstantiatedConfig, Output, PreRenderHook } from 'kanel';
+import { InstantiatedConfig, Output, PreRenderHook, writeFile } from 'kanel';
 import parse from '@kristiandupont/mdconf';
 import preprocessData from './preprocessData';
 import { RawSeedData } from './SeedData';
@@ -55,7 +54,7 @@ const makeGenerateSeeds =
         defaults,
       );
 
-      const dstFilePath = resolve(dstPath, file.name.replace('.mdconf', '.js'));
+      const fullPath = resolve(dstPath, file.name.replace('.mdconf', '.js'));
 
       const lines = [
         '// @generated',
@@ -68,7 +67,7 @@ const makeGenerateSeeds =
         'exports.seed = makeSeeder({ data });',
       ];
 
-      await fs.writeFile(dstFilePath, lines.join(os.EOL));
+      writeFile({ fullPath, lines, ensureFolder: true });
     }
 
     // Return unchanged as we wrote the file manually
