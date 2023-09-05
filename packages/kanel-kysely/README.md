@@ -52,3 +52,23 @@ module.exports = {
   preRenderHooks: [makeKyselyHook()],
 };
 ```
+
+## Note About Branded IDs
+Kanel generates some types with extra guards.
+
+```typescript
+/** Identifier type for actor */
+export type ActorId = number & { __flavor?: 'ActorId' };
+```
+
+`{ __flavor?: 'ActorId' }` exists at build time and *not at runtime*. It will prevent you from accidentally passing an incorrect value for the Id.
+
+To pass a string value as primary key or foreign key reference, just add a type assertion for the `<table>Id` generated type.
+
+In cases such as subqueries, the type assertion will happen automatically.
+
+
+
+
+
+
