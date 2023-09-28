@@ -5,4 +5,4 @@ They are built from an instance of the [Sample Database](https://www.postgresqlt
 
 The example uses the Zod extension to generate [Zod](https://github.com/colinhacks/zod) schemas as well. You can see those at the bottom of each file.
 
-![Database diagram](https://sp.postgresqltutorial.com/wp-content/uploads/2018/03/dvd-rental-sample-database-diagram.png)
+![Database diagram](https://postgresqltutorial.com/wp-content/uploads/2018/03/dvd-rental-sample-database-diagram.png)
