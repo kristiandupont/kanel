@@ -1,16 +1,16 @@
-import { EnumDetails, Schema } from 'extract-pg-schema';
-import { tryParse } from 'tagged-comment-parser';
+import { EnumDetails, Schema } from "extract-pg-schema";
+import { tryParse } from "tagged-comment-parser";
 
-import { InstantiatedConfig } from '../config-types';
+import { InstantiatedConfig } from "../config-types";
 import {
   Declaration,
   GenericDeclaration,
   TypeDeclaration,
-} from '../declaration-types';
-import escapeName from '../escapeName';
-import Output, { Path } from '../Output';
+} from "../declaration-types";
+import escapeName from "../escapeName";
+import Output, { Path } from "../Output";
 
-type EnumStyle = 'enum' | 'type';
+type EnumStyle = "enum" | "type";
 
 const makeMapper =
   (style: EnumStyle, config: InstantiatedConfig) =>
@@ -30,29 +30,29 @@ const makeMapper =
       config,
     );
 
-    if (style === 'type') {
+    if (style === "type") {
       const declaration: TypeDeclaration = {
-        declarationType: 'typeDeclaration',
+        declarationType: "typeDeclaration",
         name,
         comment,
-        exportAs: 'default',
+        exportAs: "default",
         typeDefinition: [
-          '', // Start definition on new line
+          "", // Start definition on new line
           ...enumDetails.values.map((value) => `| '${value}'`),
         ],
       };
       return { path, declaration };
     } else {
       const declaration: GenericDeclaration = {
-        declarationType: 'generic',
+        declarationType: "generic",
         comment,
         lines: [
           `enum ${name} {`,
           ...enumDetails.values.map(
             (value) => `  ${escapeName(value)} = '${value}',`,
           ),
-          '};',
-          '',
+          "};",
+          "",
           `export default ${name};`,
         ],
       };

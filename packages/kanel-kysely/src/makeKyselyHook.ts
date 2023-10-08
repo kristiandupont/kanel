@@ -1,17 +1,17 @@
-import { recase } from '@kristiandupont/recase';
+import { recase } from "@kristiandupont/recase";
 import {
   InterfaceDeclaration,
   InterfacePropertyDeclaration,
   PreRenderHook,
   TypeDeclaration,
   TypeImport,
-} from 'kanel';
-import { dirname, join } from 'path';
+} from "kanel";
+import { dirname, join } from "path";
 
-import MakeKyselyConfig, { defaultConfig } from './MakeKyselyConfig';
-import processFile from './processFile';
+import MakeKyselyConfig, { defaultConfig } from "./MakeKyselyConfig";
+import processFile from "./processFile";
 
-const toPascalCase = recase(null, 'pascal');
+const toPascalCase = recase(null, "pascal");
 
 const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
   (makeKyselyConfig_) => async (outputAcc, instantiatedConfig) => {
@@ -41,7 +41,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
       composites.forEach((compositeDetails) => {
         const { path } = instantiatedConfig.getMetadata(
           compositeDetails,
-          'selector',
+          "selector",
           instantiatedConfig,
         );
         const { modifiedDeclarations, tableImport, tableProperty } =
@@ -63,9 +63,9 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
 
       const schemaInterfaceName = `${toPascalCase(schemaName)}Schema`;
       const schemaDeclaration: InterfaceDeclaration = {
-        declarationType: 'interface',
+        declarationType: "interface",
         name: schemaInterfaceName,
-        exportAs: 'default',
+        exportAs: "default",
         typeImports: tableImports,
         properties: tableProps,
       };
@@ -93,13 +93,13 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
     );
 
     const dbDeclaration: TypeDeclaration = {
-      declarationType: 'typeDeclaration',
-      name: 'Database',
+      declarationType: "typeDeclaration",
+      name: "Database",
       typeImports: schemaImports,
       typeDefinition: [
-        schemaImports.map((dbImport) => dbImport.name).join(' | '),
+        schemaImports.map((dbImport) => dbImport.name).join(" | "),
       ],
-      exportAs: 'default',
+      exportAs: "default",
     };
 
     output[dbPath] = {

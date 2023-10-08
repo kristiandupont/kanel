@@ -5,20 +5,20 @@ import {
   TableDetails,
   ViewColumn,
   ViewDetails,
-} from 'extract-pg-schema';
-import { tryParse } from 'tagged-comment-parser';
+} from "extract-pg-schema";
+import { tryParse } from "tagged-comment-parser";
 
-import { InstantiatedConfig } from '../config-types';
-import Details from '../Details';
-import TypeDefinition from '../TypeDefinition';
-import { CompositeDetails, CompositeProperty } from './composite-types';
+import { InstantiatedConfig } from "../config-types";
+import Details from "../Details";
+import TypeDefinition from "../TypeDefinition";
+import { CompositeDetails, CompositeProperty } from "./composite-types";
 
 const resolveTypeFromComment = (
   comment: string | undefined,
 ): TypeDefinition | undefined => {
   const { tags } = tryParse(comment);
   if (tags?.type) {
-    if (typeof tags.type === 'string') {
+    if (typeof tags.type === "string") {
       // If it's just a string, assume system type. No import necessary
       return tags.type;
     } else if (Array.isArray(tags.type)) {
@@ -35,9 +35,9 @@ const resolveTypeFromComment = (
           {
             name,
             path,
-            isAbsolute: isAbsoluteString === 'true',
-            isDefault: isDefaultString === 'true',
-            importAsType: importAsTypeString === 'true',
+            isAbsolute: isAbsoluteString === "true",
+            isDefault: isDefaultString === "true",
+            importAsType: importAsTypeString === "true",
           },
         ],
       };
@@ -74,8 +74,8 @@ const resolveType = (
         );
       }
       if (!target) {
-        console.warn('Could not resolve reference', reference);
-        return 'unknown';
+        console.warn("Could not resolve reference", reference);
+        return "unknown";
       }
 
       const column = (
@@ -86,15 +86,15 @@ const resolveType = (
       if (column) {
         return resolveType(column, target, config);
       } else {
-        console.warn('Could not resolve reference', reference);
-        return 'unknown';
+        console.warn("Could not resolve reference", reference);
+        return "unknown";
       }
     });
 
     return referencedTypes.length === 1
       ? referencedTypes[0]
       : {
-          name: referencedTypes.map((t) => t.name).join(' | '),
+          name: referencedTypes.map((t) => t.name).join(" | "),
           typeImports: referencedTypes.flatMap((t) => t.typeImports),
         };
   }
@@ -118,27 +118,27 @@ const resolveType = (
       );
     }
     if (!target) {
-      target = config.schemas['public']?.tables?.find(
+      target = config.schemas["public"]?.tables?.find(
         (t) => t.name === source.table,
       );
     }
     if (!target) {
-      target = config.schemas['public']?.views?.find(
+      target = config.schemas["public"]?.views?.find(
         (v) =>
           v.name === source.table &&
           v.name !== (d as ViewDetails).informationSchemaValue.table_name,
       );
     }
     if (!target) {
-      target = config.schemas['public']?.materializedViews?.find(
+      target = config.schemas["public"]?.materializedViews?.find(
         (v) => v.name === source.table,
       );
     }
 
     if (!target) {
-      console.warn('Could not resolve source', source);
+      console.warn("Could not resolve source", source);
       // return to prevent error: cannot read property of undefined (reading columns)
-      return 'unknown';
+      return "unknown";
     }
 
     const column = (
@@ -152,7 +152,7 @@ const resolveType = (
 
   // 4) if the column is a primary key, use the generated type for it, if we do that
   if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
-    const { path } = config.getMetadata(d, 'selector', config);
+    const { path } = config.getMetadata(d, "selector", config);
     const { name, exportAs } = config.generateIdentifierType(
       c as TableColumn,
       d as TableDetails,
@@ -166,7 +166,7 @@ const resolveType = (
           name,
           path,
           isAbsolute: false,
-          isDefault: exportAs === 'default',
+          isDefault: exportAs === "default",
           importAsType: true,
         },
       ],
@@ -179,11 +179,11 @@ const resolveType = (
   }
 
   // 6) If the type is a composite, enum, range or domain, reference that.
-  if (['composite', 'enum', 'domain', 'range'].includes(c.type.kind)) {
-    const [schemaName, typeName] = c.type.fullName.split('.');
+  if (["composite", "enum", "domain", "range"].includes(c.type.kind)) {
+    const [schemaName, typeName] = c.type.fullName.split(".");
     let target: Details | undefined;
     switch (c.type.kind) {
-      case 'composite': {
+      case "composite": {
         target =
           config.schemas[schemaName].compositeTypes.find(
             (t) => t.name === typeName,
@@ -193,28 +193,28 @@ const resolveType = (
             (t) => t.name === typeName,
           ) ??
           config.schemas[schemaName].tables?.find((t) => t.name === typeName) ??
-          config.schemas['public']?.views?.find((t) => t.name === typeName) ??
-          config.schemas['public']?.materializedViews?.find(
+          config.schemas["public"]?.views?.find((t) => t.name === typeName) ??
+          config.schemas["public"]?.materializedViews?.find(
             (t) => t.name === typeName,
           ) ??
-          config.schemas['public']?.tables?.find((t) => t.name === typeName);
+          config.schemas["public"]?.tables?.find((t) => t.name === typeName);
         break;
       }
-      case 'enum': {
+      case "enum": {
         target = config.schemas[schemaName].enums.find(
           (t) => t.name === typeName,
         );
 
         break;
       }
-      case 'domain': {
+      case "domain": {
         target = config.schemas[schemaName].domains.find(
           (t) => t.name === typeName,
         );
 
         break;
       }
-      case 'range': {
+      case "range": {
         target = config.schemas[schemaName].ranges.find(
           (t) => t.name === typeName,
         );
@@ -230,7 +230,7 @@ const resolveType = (
         return typeFromComment;
       }
 
-      const { name, path } = config.getMetadata(target, 'selector', config);
+      const { name, path } = config.getMetadata(target, "selector", config);
       return {
         name,
         typeImports: [
@@ -250,7 +250,7 @@ const resolveType = (
   console.warn(
     `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`,
   );
-  return 'unknown';
+  return "unknown";
 };
 
 export default resolveType;

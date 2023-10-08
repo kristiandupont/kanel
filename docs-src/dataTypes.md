@@ -16,12 +16,12 @@ module.exports = {
   // ...
 
   customTypeMap: {
-    'pg_catalog.tsrange': {
-      name: 'Range<Date>',
+    "pg_catalog.tsrange": {
+      name: "Range<Date>",
       typeImports: [
         {
-          name: 'Range',
-          path: 'postgres-range',
+          name: "Range",
+          path: "postgres-range",
           isAbsolute: true,
           isDefault: false,
         },
@@ -34,8 +34,8 @@ module.exports = {
 Now, since `node-postgres` will simply use strings for the ranges, we need to configure it. We can define a custom parser like this:
 
 ```typescript
-import { types } from 'pg';
-import { parse } from 'postgres-range';
+import { types } from "pg";
+import { parse } from "postgres-range";
 
 // This is the OID for tsrange.
 const TSRANGE_OID = 3908;
@@ -48,15 +48,15 @@ That's all good, but if we also want to be able to supply `Range` instances when
 It just so happens that `node-postgres` has a way to do this, even if it's undocumented at the time. Any object that implements a method called `toPostgres` will be serialized using that particular function. So we can monkey-patch the `Range` class to include this method:
 
 ```typescript
-import { types } from 'pg';
-import { parse, Range, serialize } from 'postgres-range';
+import { types } from "pg";
+import { parse, Range, serialize } from "postgres-range";
 
 // This is the OID for tsrange.
 const TSRANGE_OID = 3908;
 types.setTypeParser(TSRANGE_OID, (v) => parse(v, (v) => new Date(v)));
 
 (Range.prototype as any).toPostgres = function (
-  prepareValue: (v: Date) => string
+  prepareValue: (v: Date) => string,
 ): string {
   return serialize(this as Range<Date>, prepareValue);
 };

@@ -1,4 +1,4 @@
-import TypeImport from './TypeImport';
+import TypeImport from "./TypeImport";
 
 export type DeclarationBase = {
   comment?: string[];
@@ -6,10 +6,10 @@ export type DeclarationBase = {
 };
 
 export type TypeDeclaration = DeclarationBase & {
-  declarationType: 'typeDeclaration';
+  declarationType: "typeDeclaration";
   name: string;
   typeDefinition: string[];
-  exportAs: 'named' | 'default';
+  exportAs: "named" | "default";
 };
 
 export type InterfacePropertyDeclaration = {
@@ -23,15 +23,15 @@ export type InterfacePropertyDeclaration = {
 };
 
 export type InterfaceDeclaration = DeclarationBase & {
-  declarationType: 'interface';
+  declarationType: "interface";
   name: string;
   base?: string;
   properties: InterfacePropertyDeclaration[];
-  exportAs: 'named' | 'default';
+  exportAs: "named" | "default";
 };
 
 export type GenericDeclaration = DeclarationBase & {
-  declarationType: 'generic';
+  declarationType: "generic";
   lines: string[];
 };
 

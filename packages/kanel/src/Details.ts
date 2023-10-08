@@ -6,7 +6,7 @@ import {
   RangeDetails,
   TableDetails,
   ViewDetails,
-} from 'extract-pg-schema';
+} from "extract-pg-schema";
 
 type Details =
   | TableDetails

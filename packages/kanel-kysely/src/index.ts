@@ -1,1 +1,1 @@
-export { default as makeKyselyHook } from './makeKyselyHook';
+export { default as makeKyselyHook } from "./makeKyselyHook";

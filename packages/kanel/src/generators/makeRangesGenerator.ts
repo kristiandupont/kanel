@@ -1,9 +1,9 @@
-import { RangeDetails, Schema } from 'extract-pg-schema';
-import { tryParse } from 'tagged-comment-parser';
+import { RangeDetails, Schema } from "extract-pg-schema";
+import { tryParse } from "tagged-comment-parser";
 
-import { InstantiatedConfig } from '../config-types';
-import { Declaration, TypeDeclaration } from '../declaration-types';
-import Output, { Path } from '../Output';
+import { InstantiatedConfig } from "../config-types";
+import { Declaration, TypeDeclaration } from "../declaration-types";
+import Output, { Path } from "../Output";
 
 const makeMapper =
   (config: InstantiatedConfig) =>
@@ -40,12 +40,12 @@ const makeMapper =
     // }
 
     const declaration: TypeDeclaration = {
-      declarationType: 'typeDeclaration',
+      declarationType: "typeDeclaration",
       name,
       comment,
-      exportAs: 'default',
+      exportAs: "default",
       // typeDefinition: [`[lowerBound: ${rType}, upperBound: ${rType}]`],
-      typeDefinition: ['string'],
+      typeDefinition: ["string"],
       typeImports: [],
     };
     return { path, declaration };

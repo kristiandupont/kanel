@@ -1,6 +1,6 @@
-import fs, { existsSync, mkdirSync } from 'fs';
-import os from 'os';
-import path, { dirname } from 'path';
+import fs, { existsSync, mkdirSync } from "fs";
+import os from "os";
+import path, { dirname } from "path";
 
 const writeFile = ({
   fullPath,
@@ -22,7 +22,7 @@ const writeFile = ({
   }
 
   const content = lines.join(os.EOL);
-  fs.writeFileSync(fullPath, content, 'utf8');
+  fs.writeFileSync(fullPath, content, "utf8");
 };
 
 export default writeFile;

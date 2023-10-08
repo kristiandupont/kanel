@@ -1,11 +1,11 @@
-import { DomainDetails, Schema } from 'extract-pg-schema';
-import { tryParse } from 'tagged-comment-parser';
+import { DomainDetails, Schema } from "extract-pg-schema";
+import { tryParse } from "tagged-comment-parser";
 
-import { InstantiatedConfig } from '../config-types';
-import { Declaration, TypeDeclaration } from '../declaration-types';
-import Output, { Path } from '../Output';
-import TypeDefinition from '../TypeDefinition';
-import TypeImport from '../TypeImport';
+import { InstantiatedConfig } from "../config-types";
+import { Declaration, TypeDeclaration } from "../declaration-types";
+import Output, { Path } from "../Output";
+import TypeDefinition from "../TypeDefinition";
+import TypeImport from "../TypeImport";
 
 const makeMapper =
   (config: InstantiatedConfig) =>
@@ -30,11 +30,11 @@ const makeMapper =
 
     const mapped: TypeDefinition = config.typeMap[domainDetails.innerType];
     if (!mapped) {
-      typeDefinition = ['unknown'];
+      typeDefinition = ["unknown"];
       console.warn(
         `Domain '${name}' has unknown type '${domainDetails.innerType}'`,
       );
-    } else if (typeof mapped === 'string') {
+    } else if (typeof mapped === "string") {
       typeDefinition = [mapped];
     } else {
       typeDefinition = [mapped.name];
@@ -42,10 +42,10 @@ const makeMapper =
     }
 
     const declaration: TypeDeclaration = {
-      declarationType: 'typeDeclaration',
+      declarationType: "typeDeclaration",
       name,
       comment,
-      exportAs: 'default',
+      exportAs: "default",
       typeDefinition,
       typeImports,
     };

@@ -1,14 +1,14 @@
-import { PgType, Schema } from 'extract-pg-schema';
-import { ConnectionConfig } from 'pg';
+import { PgType, Schema } from "extract-pg-schema";
+import { ConnectionConfig } from "pg";
 
-import { CompositeProperty } from './generators/composite-types';
+import { CompositeProperty } from "./generators/composite-types";
 import {
   GenerateIdentifierType,
   GetMetadata,
   GetPropertyMetadata,
-} from './metadata-types';
-import Output from './Output';
-import TypeMap from './TypeMap';
+} from "./metadata-types";
+import Output from "./Output";
+import TypeMap from "./TypeMap";
 
 type Awaitable<T> = T | PromiseLike<T>;
 
@@ -22,7 +22,7 @@ export type InstantiatedConfig = {
   generateIdentifierType?: GenerateIdentifierType;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 
-  enumStyle: 'enum' | 'type';
+  enumStyle: "enum" | "type";
 
   outputPath: string;
   preDeleteOutputFolder: boolean;
@@ -50,7 +50,7 @@ export type Config = {
   generateIdentifierType?: GenerateIdentifierType;
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
 
-  enumStyle?: 'enum' | 'type';
+  enumStyle?: "enum" | "type";
 
   outputPath?: string;
   preDeleteOutputFolder?: boolean;

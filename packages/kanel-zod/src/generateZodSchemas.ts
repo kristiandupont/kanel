@@ -1,16 +1,16 @@
-import { Declaration, Output, Path, PreRenderHook, TypeImport } from 'kanel';
+import { Declaration, Output, Path, PreRenderHook, TypeImport } from "kanel";
 
-import defaultZodTypeMap from './defaultZodTypeMap';
+import defaultZodTypeMap from "./defaultZodTypeMap";
 import {
   defaultGetZodIdentifierMetadata,
   defaultGetZodSchemaMetadata,
   GenerateZodSchemasConfig,
-} from './GenerateZodSchemasConfig';
-import getIdentifierDeclaration from './getIdentifierDeclaration';
-import processComposite from './processComposite';
-import processDomain from './processDomain';
-import processEnum from './processEnum';
-import processRange from './processRange';
+} from "./GenerateZodSchemasConfig";
+import getIdentifierDeclaration from "./getIdentifierDeclaration";
+import processComposite from "./processComposite";
+import processDomain from "./processDomain";
+import processEnum from "./processEnum";
+import processRange from "./processRange";
 
 const createOrAppendFileContents = (
   outputAcc: Output,

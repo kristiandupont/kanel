@@ -13,10 +13,10 @@ Kanel no longer generates an `index.ts` file per default. There is a hook provid
 In `.kanelrc.js`:
 
 ```javascript
-const { generateIndexFile } = require('kanel');
+const { generateIndexFile } = require("kanel");
 
 module.exports = {
-  connection: '...',
+  connection: "...",
 
   // Generate an index file with exports of everything
   preRenderHooks: [generateIndexFile],

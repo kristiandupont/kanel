@@ -1,23 +1,23 @@
-import { extractSchemas } from 'extract-pg-schema';
-import rmfr from 'rmfr';
+import { extractSchemas } from "extract-pg-schema";
+import rmfr from "rmfr";
 
-import { Config, InstantiatedConfig, PreRenderHook } from './config-types';
+import { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
 import {
   defaultGenerateIdentifierType,
   defaultGetMetadata,
   defaultGetPropertyMetadata,
   defaultPropertySortFunction,
-} from './default-metadata-generators';
-import defaultTypeMap from './defaultTypeMap';
-import makeCompositeGenerator from './generators/makeCompositeGenerator';
-import makeDomainsGenerator from './generators/makeDomainsGenerator';
-import makeEnumsGenerator from './generators/makeEnumsGenerator';
-import makeRangesGenerator from './generators/makeRangesGenerator';
-import markAsGenerated from './hooks/markAsGenerated';
-import Output from './Output';
-import render from './render';
-import TypeMap from './TypeMap';
-import writeFile from './writeFile';
+} from "./default-metadata-generators";
+import defaultTypeMap from "./defaultTypeMap";
+import makeCompositeGenerator from "./generators/makeCompositeGenerator";
+import makeDomainsGenerator from "./generators/makeDomainsGenerator";
+import makeEnumsGenerator from "./generators/makeEnumsGenerator";
+import makeRangesGenerator from "./generators/makeRangesGenerator";
+import markAsGenerated from "./hooks/markAsGenerated";
+import Output from "./Output";
+import render from "./render";
+import TypeMap from "./TypeMap";
+import writeFile from "./writeFile";
 
 type Progress = {
   onProgressStart?: (total: number) => void;
@@ -53,20 +53,20 @@ const processDatabase = async (
     getPropertyMetadata,
     generateIdentifierType,
     propertySortFunction,
-    enumStyle: config.enumStyle ?? 'enum',
+    enumStyle: config.enumStyle ?? "enum",
     typeMap,
     schemas,
     connection: config.connection,
-    outputPath: config.outputPath ?? '.',
+    outputPath: config.outputPath ?? ".",
     preDeleteOutputFolder: config.preDeleteOutputFolder ?? false,
     resolveViews: config.resolveViews ?? true,
   };
 
   const generators = [
-    makeCompositeGenerator('table', instantiatedConfig),
-    makeCompositeGenerator('view', instantiatedConfig),
-    makeCompositeGenerator('materializedView', instantiatedConfig),
-    makeCompositeGenerator('compositeType', instantiatedConfig),
+    makeCompositeGenerator("table", instantiatedConfig),
+    makeCompositeGenerator("view", instantiatedConfig),
+    makeCompositeGenerator("materializedView", instantiatedConfig),
+    makeCompositeGenerator("compositeType", instantiatedConfig),
     makeEnumsGenerator(instantiatedConfig),
     makeRangesGenerator(instantiatedConfig),
     makeDomainsGenerator(instantiatedConfig),

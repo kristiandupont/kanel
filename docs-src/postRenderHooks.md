@@ -9,7 +9,7 @@ A post-render hook has the following signature:
 export type PostRenderHook = (
   path: string,
   lines: string[],
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => Awaitable<string[]>;
 ```
 

@@ -1,17 +1,17 @@
-import { recase } from '@kristiandupont/recase';
-import { TableColumn } from 'extract-pg-schema';
-import { join } from 'path';
-import { tryParse } from 'tagged-comment-parser';
+import { recase } from "@kristiandupont/recase";
+import { TableColumn } from "extract-pg-schema";
+import { join } from "path";
+import { tryParse } from "tagged-comment-parser";
 
-import { CompositeProperty } from './generators/composite-types';
-import resolveType from './generators/resolveType';
+import { CompositeProperty } from "./generators/composite-types";
+import resolveType from "./generators/resolveType";
 import {
   GenerateIdentifierType,
   GetMetadata,
   GetPropertyMetadata,
-} from './metadata-types';
+} from "./metadata-types";
 
-const toPascalCase = recase(null, 'pascal');
+const toPascalCase = recase(null, "pascal");
 
 // #region defaultGetMetadata
 export const defaultGetMetadata: GetMetadata = (
@@ -20,13 +20,13 @@ export const defaultGetMetadata: GetMetadata = (
   instantiatedConfig,
 ) => {
   const { comment: strippedComment } = tryParse(details.comment);
-  const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
+  const isAgentNoun = ["initializer", "mutator"].includes(generateFor);
 
   const relationComment = isAgentNoun
     ? `Represents the ${generateFor} for the ${details.kind} ${details.schemaName}.${details.name}`
     : `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
 
-  const suffix = isAgentNoun ? `_${generateFor}` : '';
+  const suffix = isAgentNoun ? `_${generateFor}` : "";
 
   return {
     name: toPascalCase(details.name + suffix),
@@ -53,7 +53,7 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
     name: property.name,
     comment: [
       ...(strippedComment ? [strippedComment] : []),
-      ...(generateFor === 'initializer' && property.defaultValue
+      ...(generateFor === "initializer" && property.defaultValue
         ? [`Default value: ${property.defaultValue}`]
         : []),
     ],
@@ -76,16 +76,16 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   const imports = [];
 
   let type = innerType;
-  if (typeof innerType === 'object') {
+  if (typeof innerType === "object") {
     // Handle non-primitives
     type = innerType.name;
     imports.push(...innerType.typeImports);
   }
 
   return {
-    declarationType: 'typeDeclaration',
+    declarationType: "typeDeclaration",
     name,
-    exportAs: 'named',
+    exportAs: "named",
     typeDefinition: [`${type} & { __brand: '${name}' }`],
     typeImports: imports,
     comment: [`Identifier type for ${details.schemaName}.${details.name}`],

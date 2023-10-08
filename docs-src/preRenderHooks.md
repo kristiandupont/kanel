@@ -8,7 +8,7 @@ A pre-render hook has the following signature:
 ```typescript
 export type PreRenderHook = (
   outputAcc: Output,
-  instantiatedConfig: InstantiatedConfig
+  instantiatedConfig: InstantiatedConfig,
 ) => Awaitable<Output>;
 ```
 

@@ -1,4 +1,10 @@
-import{_ as s,o as a,c as n,S as e}from"./chunks/framework.cbdddcbb.js";const d=JSON.parse('{"title":"Zod extension for Kanel","description":"","frontmatter":{},"headers":[],"relativePath":"kanel-zod.md","filePath":"kanel-zod.md"}'),o={name:"kanel-zod.md"},l=e(`<h1 id="zod-extension-for-kanel" tabindex="-1">Zod extension for Kanel <a class="header-anchor" href="#zod-extension-for-kanel" aria-label="Permalink to &quot;Zod extension for Kanel&quot;">​</a></h1><p>Generate <a href="https://github.com/colinhacks/zod" target="_blank" rel="noreferrer">Zod</a> schemas directly from your Postgres database. This packages extends <a href="https://github.com/kristiandupont/kanel" target="_blank" rel="noreferrer">Kanel</a> with some Zod specific features.</p><div class="language-typescript"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki material-theme-palenight"><code><span class="line"><span style="color:#676E95;font-style:italic;">/** Zod schema for actor */</span></span>
+import { _ as s, o as a, c as n, S as e } from "./chunks/framework.cbdddcbb.js";
+const d = JSON.parse(
+    '{"title":"Zod extension for Kanel","description":"","frontmatter":{},"headers":[],"relativePath":"kanel-zod.md","filePath":"kanel-zod.md"}',
+  ),
+  o = { name: "kanel-zod.md" },
+  l = e(
+    `<h1 id="zod-extension-for-kanel" tabindex="-1">Zod extension for Kanel <a class="header-anchor" href="#zod-extension-for-kanel" aria-label="Permalink to &quot;Zod extension for Kanel&quot;">​</a></h1><p>Generate <a href="https://github.com/colinhacks/zod" target="_blank" rel="noreferrer">Zod</a> schemas directly from your Postgres database. This packages extends <a href="https://github.com/kristiandupont/kanel" target="_blank" rel="noreferrer">Kanel</a> with some Zod specific features.</p><div class="language-typescript"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki material-theme-palenight"><code><span class="line"><span style="color:#676E95;font-style:italic;">/** Zod schema for actor */</span></span>
 <span class="line"><span style="color:#89DDFF;font-style:italic;">export</span><span style="color:#A6ACCD;"> </span><span style="color:#C792EA;">const</span><span style="color:#A6ACCD;"> actor </span><span style="color:#89DDFF;">=</span><span style="color:#A6ACCD;"> z</span><span style="color:#89DDFF;">.</span><span style="color:#82AAFF;">object</span><span style="color:#A6ACCD;">(</span><span style="color:#89DDFF;">{</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">actor_id</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> z</span><span style="color:#89DDFF;">.</span><span style="color:#82AAFF;">number</span><span style="color:#A6ACCD;">()</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">first_name</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> z</span><span style="color:#89DDFF;">.</span><span style="color:#82AAFF;">string</span><span style="color:#A6ACCD;">()</span><span style="color:#89DDFF;">,</span></span>
@@ -10,4 +16,12 @@ import{_ as s,o as a,c as n,S as e}from"./chunks/framework.cbdddcbb.js";const d=
 <span class="line"><span style="color:#89DDFF;">  </span><span style="color:#676E95;font-style:italic;">// ... your config here.</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#F07178;">preRenderHooks</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> [generateZodSchemas]</span><span style="color:#89DDFF;">,</span></span>
-<span class="line"><span style="color:#89DDFF;">};</span></span></code></pre></div>`,10),p=[l];function t(r,c,i,y,D,F){return a(),n("div",null,p)}const C=s(o,[["render",t]]);export{d as __pageData,C as default};
+<span class="line"><span style="color:#89DDFF;">};</span></span></code></pre></div>`,
+    10,
+  ),
+  p = [l];
+function t(r, c, i, y, D, F) {
+  return a(), n("div", null, p);
+}
+const C = s(o, [["render", t]]);
+export { d as __pageData, C as default };

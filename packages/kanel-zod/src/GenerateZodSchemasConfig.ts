@@ -1,7 +1,7 @@
-import { recase } from '@kristiandupont/recase';
-import { TableDetails } from 'extract-pg-schema';
-import { TableColumn } from 'extract-pg-schema';
-import { Details, InstantiatedConfig, Path, TypeMap } from 'kanel';
+import { recase } from "@kristiandupont/recase";
+import { TableDetails } from "extract-pg-schema";
+import { TableColumn } from "extract-pg-schema";
+import { Details, InstantiatedConfig, Path, TypeMap } from "kanel";
 
 export type GenerateZodSchemasConfig = {
   getZodSchemaMetadata: GetZodSchemaMetadata;
@@ -11,11 +11,11 @@ export type GenerateZodSchemasConfig = {
 
 export type GetZodSchemaMetadata = (
   d: Details,
-  generateFor: 'selector' | 'initializer' | 'mutator' | undefined,
+  generateFor: "selector" | "initializer" | "mutator" | undefined,
   instantiatedConfig: InstantiatedConfig,
 ) => { name: string; comment?: string[]; path: Path };
 
-const toCamelCase = recase(null, 'camel');
+const toCamelCase = recase(null, "camel");
 
 export type GetZodIdentifierMetadata = (
   column: TableColumn,

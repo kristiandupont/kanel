@@ -1,4 +1,10 @@
-import{_ as s,o as a,c as n,S as l}from"./chunks/framework.cbdddcbb.js";const A=JSON.parse('{"title":"getMetadata","description":"","frontmatter":{},"headers":[],"relativePath":"getMetadata.md","filePath":"getMetadata.md"}'),e={name:"getMetadata.md"},o=l(`<h1 id="getmetadata" tabindex="-1">getMetadata <a class="header-anchor" href="#getmetadata" aria-label="Permalink to &quot;getMetadata&quot;">​</a></h1><div class="language-typescript"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki material-theme-palenight"><code><span class="line"><span style="color:#A6ACCD;">getMetadata</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> (</span></span>
+import { _ as s, o as a, c as n, S as l } from "./chunks/framework.cbdddcbb.js";
+const A = JSON.parse(
+    '{"title":"getMetadata","description":"","frontmatter":{},"headers":[],"relativePath":"getMetadata.md","filePath":"getMetadata.md"}',
+  ),
+  e = { name: "getMetadata.md" },
+  o = l(
+    `<h1 id="getmetadata" tabindex="-1">getMetadata <a class="header-anchor" href="#getmetadata" aria-label="Permalink to &quot;getMetadata&quot;">​</a></h1><div class="language-typescript"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki material-theme-palenight"><code><span class="line"><span style="color:#A6ACCD;">getMetadata</span><span style="color:#89DDFF;">?:</span><span style="color:#A6ACCD;"> (</span></span>
 <span class="line"><span style="color:#A6ACCD;">  details: Details</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#A6ACCD;">  generateFor: </span><span style="color:#89DDFF;">&#39;</span><span style="color:#C3E88D;">selector</span><span style="color:#89DDFF;">&#39;</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">|</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">&#39;</span><span style="color:#C3E88D;">initializer</span><span style="color:#89DDFF;">&#39;</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">|</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">&#39;</span><span style="color:#C3E88D;">mutator</span><span style="color:#89DDFF;">&#39;</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">|</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">undefined,</span></span>
 <span class="line"><span style="color:#A6ACCD;">  config: InstantiatedConfig</span></span>
@@ -84,4 +90,12 @@ import{_ as s,o as a,c as n,S as l}from"./chunks/framework.cbdddcbb.js";const A=
 <span class="line"><span style="color:#676E95;font-style:italic;"> * </span><span style="color:#89DDFF;font-style:italic;">@</span><span style="color:#C792EA;font-style:italic;">deprecated</span><span style="color:#676E95;font-style:italic;"> Use </span><span style="color:#89DDFF;font-style:italic;">{@</span><span style="color:#C792EA;font-style:italic;">link</span><span style="color:#FFCB6B;font-style:italic;"> </span><span style="color:#A6ACCD;font-style:italic;">MemberInfo</span><span style="color:#89DDFF;font-style:italic;">}</span><span style="color:#676E95;font-style:italic;"> instead</span></span>
 <span class="line"><span style="color:#676E95;font-style:italic;"> */</span></span>
 <span class="line"><span style="color:#C792EA;">interface</span><span style="color:#A6ACCD;"> </span><span style="color:#FFCB6B;">MemberAddress</span><span style="color:#A6ACCD;"> </span><span style="color:#89DDFF;">{</span></span>
-<span class="line"><span style="color:#89DDFF;">  </span><span style="color:#676E95;font-style:italic;">// ...</span></span></code></pre></div><p>You may want to use the incoming <code>details.comment</code> string here.</p><p>The <code>path</code> field tells Kanel where (i.e. in which file) to place the type. Note that this field should <em>not</em> include the <code>.ts</code> extension which is added automatically. The reason for this is that this field is also used for generating imports and those should not include extensions.</p>`,39),p=[o];function t(c,r,i,y,D,F){return a(),n("div",null,p)}const d=s(e,[["render",t]]);export{A as __pageData,d as default};
+<span class="line"><span style="color:#89DDFF;">  </span><span style="color:#676E95;font-style:italic;">// ...</span></span></code></pre></div><p>You may want to use the incoming <code>details.comment</code> string here.</p><p>The <code>path</code> field tells Kanel where (i.e. in which file) to place the type. Note that this field should <em>not</em> include the <code>.ts</code> extension which is added automatically. The reason for this is that this field is also used for generating imports and those should not include extensions.</p>`,
+    39,
+  ),
+  p = [o];
+function t(c, r, i, y, D, F) {
+  return a(), n("div", null, p);
+}
+const d = s(e, [["render", t]]);
+export { A as __pageData, d as default };

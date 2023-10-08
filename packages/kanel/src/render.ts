@@ -1,6 +1,6 @@
-import { Declaration } from './declaration-types';
-import escapeName from './escapeName';
-import ImportGenerator from './ImportGenerator';
+import { Declaration } from "./declaration-types";
+import escapeName from "./escapeName";
+import ImportGenerator from "./ImportGenerator";
 
 const processComments = (
   comments: string[] | undefined,
@@ -10,7 +10,7 @@ const processComments = (
     return [];
   }
 
-  const i = ' '.repeat(indentation);
+  const i = " ".repeat(indentation);
   if (comments.length === 1) {
     return [`${i}/** ${comments[0]} */`];
   } else {
@@ -29,10 +29,10 @@ const processDeclaration = (
   const declarationLines: string[] = [];
 
   switch (declaration.declarationType) {
-    case 'typeDeclaration': {
+    case "typeDeclaration": {
       const { exportAs, name, typeDefinition, comment } = declaration;
       declarationLines.push(...processComments(comment, 0));
-      if (exportAs === 'default') {
+      if (exportAs === "default") {
         if (typeDefinition.length === 1) {
           declarationLines.push(`type ${name} = ${typeDefinition[0]};`);
         } else {
@@ -42,7 +42,7 @@ const processDeclaration = (
           );
           declarationLines.push(`type ${name} = ${head}`, ...tailLines);
         }
-        declarationLines.push('', `export default ${name};`);
+        declarationLines.push("", `export default ${name};`);
       } else {
         if (typeDefinition.length === 1) {
           declarationLines.push(`export type ${name} = ${typeDefinition[0]};`);
@@ -56,24 +56,24 @@ const processDeclaration = (
       }
       break;
     }
-    case 'interface': {
+    case "interface": {
       const { exportAs, name, base, properties, comment } = declaration;
       declarationLines.push(
         ...(processComments(comment, 0) || []),
-        `export${exportAs === 'default' ? ' default' : ''} interface ${name}${
-          base ? ` extends ${base}` : ''
+        `export${exportAs === "default" ? " default" : ""} interface ${name}${
+          base ? ` extends ${base}` : ""
         } {`,
       );
       properties.forEach((property, index) => {
         if (index > 0) {
-          declarationLines.push('');
+          declarationLines.push("");
         }
         declarationLines.push(
           ...(processComments(property.comment, 2) || []),
-          `  ${escapeName(property.name)}${property.isOptional ? '?' : ''}: ${
+          `  ${escapeName(property.name)}${property.isOptional ? "?" : ""}: ${
             property.typeName
-          }${'[]'.repeat(property.dimensions)}${
-            property.isNullable ? ' | null' : ''
+          }${"[]".repeat(property.dimensions)}${
+            property.isNullable ? " | null" : ""
           };`,
         );
         if (property.typeImports) {
@@ -82,10 +82,10 @@ const processDeclaration = (
           );
         }
       });
-      declarationLines.push('}');
+      declarationLines.push("}");
       break;
     }
-    case 'generic': {
+    case "generic": {
       declarationLines.push(
         ...processComments(declaration.comment, 0),
         ...declaration.lines,
@@ -114,7 +114,7 @@ const render = (declarations: Declaration[], outputPath: string): string[] => {
 
   declarations.forEach((declaration, index) => {
     if (index > 0) {
-      lines.push('');
+      lines.push("");
     }
 
     const declarationLines = processDeclaration(declaration, importGenerator);
@@ -123,7 +123,7 @@ const render = (declarations: Declaration[], outputPath: string): string[] => {
 
   const importLines = importGenerator.generateLines();
   if (importLines.length > 0) {
-    importLines.push('');
+    importLines.push("");
   }
 
   return [...importLines, ...lines];

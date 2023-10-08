@@ -7,7 +7,7 @@ import {
   TableDetails,
   ViewColumn,
   ViewDetails,
-} from 'extract-pg-schema';
+} from "extract-pg-schema";
 
 export type CompositeDetails =
   | CompositeTypeDetails

@@ -5,29 +5,29 @@ import {
   TableDetails,
   ViewColumn,
   ViewDetails,
-} from 'extract-pg-schema';
-import * as R from 'ramda';
+} from "extract-pg-schema";
+import * as R from "ramda";
 
-import { InstantiatedConfig } from '../config-types';
-import { InterfacePropertyDeclaration } from '../declaration-types';
-import TypeImport from '../TypeImport';
-import { CompositeDetails, CompositeProperty } from './composite-types';
-import resolveType from './resolveType';
+import { InstantiatedConfig } from "../config-types";
+import { InterfacePropertyDeclaration } from "../declaration-types";
+import TypeImport from "../TypeImport";
+import { CompositeDetails, CompositeProperty } from "./composite-types";
+import resolveType from "./resolveType";
 
 const generateProperties = <D extends CompositeDetails>(
   details: D,
-  generateFor: 'selector' | 'initializer' | 'mutator',
+  generateFor: "selector" | "initializer" | "mutator",
   config: InstantiatedConfig,
 ): InterfacePropertyDeclaration[] => {
   const ps =
-    details.kind === 'compositeType' ? details.attributes : details.columns;
+    details.kind === "compositeType" ? details.attributes : details.columns;
 
   const sortedPs = config.propertySortFunction
     ? R.sort(config.propertySortFunction, ps as any)
     : ps;
 
   const result: InterfacePropertyDeclaration[] = sortedPs
-    .filter((p) => generateFor === 'selector' || p.generated !== 'ALWAYS')
+    .filter((p) => generateFor === "selector" || p.generated !== "ALWAYS")
     .map((p: CompositeProperty): InterfacePropertyDeclaration => {
       // If this is a (materialized or not) view column, we need to check
       // the source table to see if the column is nullable.
@@ -62,14 +62,14 @@ const generateProperties = <D extends CompositeDetails>(
         p.isNullable ||
         p.defaultValue ||
         p.isIdentity ||
-        p.generated === 'BY DEFAULT';
+        p.generated === "BY DEFAULT";
 
       const t = typeOverride ?? resolveType(p, details, config);
 
       let typeName: string;
       let typeImports: TypeImport[] = [];
 
-      if (typeof t === 'string') {
+      if (typeof t === "string") {
         typeName = t;
       } else {
         typeName = t.name;
@@ -80,15 +80,15 @@ const generateProperties = <D extends CompositeDetails>(
 
       if (optionalOverride === undefined) {
         switch (generateFor) {
-          case 'selector': {
+          case "selector": {
             isOptional = false;
             break;
           }
-          case 'initializer': {
+          case "initializer": {
             isOptional = canBeOptional;
             break;
           }
-          case 'mutator': {
+          case "mutator": {
             isOptional = true;
             break;
           }

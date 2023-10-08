@@ -4,8 +4,8 @@
 getPropertyMetadata: (
   property: CompositeProperty,
   details: CompositeDetails,
-  generateFor: 'selector' | 'initializer' | 'mutator',
-  config: InstantiatedConfig
+  generateFor: "selector" | "initializer" | "mutator",
+  config: InstantiatedConfig,
 ) => PropertyMetadata;
 ```
 
@@ -29,7 +29,7 @@ export interface TableColumn {
   maxLength: number | null;
   isNullable: boolean;
   isPrimaryKey: boolean;
-  generated: 'ALWAYS' | 'NEVER' | 'BY DEFAULT';
+  generated: "ALWAYS" | "NEVER" | "BY DEFAULT";
   isUpdatable: boolean;
   isIdentity: boolean;
   ordinalPosition: number;

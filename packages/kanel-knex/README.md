@@ -17,7 +17,7 @@ It will create a file in your output folder called `knex-tables.ts` which will c
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generateKnexTablesModule } = require('kanel-knex');
+const { generateKnexTablesModule } = require("kanel-knex");
 
 module.exports = {
   // ... your config here.
@@ -33,7 +33,7 @@ If you are using Knex for migrations, you will have two tables in your database 
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { knexTypeFilter } = require('kanel-knex');
+const { knexTypeFilter } = require("kanel-knex");
 
 module.exports = {
   // ... your config here.
@@ -70,7 +70,7 @@ The `generateMigrationCheck` pre-render hook will create a file for you that con
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generateMigrationCheck } = require('kanel-knex');
+const { generateMigrationCheck } = require("kanel-knex");
 
 module.exports = {
   // ... your config here.

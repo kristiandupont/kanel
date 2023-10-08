@@ -1,6 +1,6 @@
-import path from 'path';
+import path from "path";
 
-import TypeImport from './TypeImport';
+import TypeImport from "./TypeImport";
 
 type ImportSet = {
   default?: string;
@@ -36,11 +36,11 @@ class ImportGenerator {
       let relativePath = path.relative(this.srcFolder, absolutePath);
 
       // We never want Windows-style paths in our source. Fix it if necessary.
-      if (path.sep === '\\') {
-        relativePath = relativePath.replaceAll('\\', '/');
+      if (path.sep === "\\") {
+        relativePath = relativePath.replaceAll("\\", "/");
       }
 
-      if (relativePath[0] !== '.') {
+      if (relativePath[0] !== ".") {
         relativePath = `./${relativePath}`;
       }
       importPath = relativePath;
@@ -128,12 +128,12 @@ class ImportGenerator {
     const allImports = [
       ...(appliedDefaultImport ? [appliedDefaultImport] : []),
       ...(appliedNamedImports.length > 0
-        ? [`{ ${appliedNamedImports.join(', ')} }`]
+        ? [`{ ${appliedNamedImports.join(", ")} }`]
         : []),
-    ].join(', ');
+    ].join(", ");
 
     return `import ${
-      importAsType ? 'type ' : ''
+      importAsType ? "type " : ""
     }${allImports} from '${relativePath}';`;
   }
 }

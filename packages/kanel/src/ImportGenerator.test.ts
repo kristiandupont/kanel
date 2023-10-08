@@ -1,15 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
-import ImportGenerator from './ImportGenerator';
+import ImportGenerator from "./ImportGenerator";
 
-describe('ImportGenerator', () => {
-  it('should generate an import statement', () => {
-    const ig = new ImportGenerator('/src/some-module');
+describe("ImportGenerator", () => {
+  it("should generate an import statement", () => {
+    const ig = new ImportGenerator("/src/some-module");
 
     ig.addImport({
-      name: 'func',
+      name: "func",
       isDefault: true,
-      path: '/src/lib/func',
+      path: "/src/lib/func",
       isAbsolute: false,
       importAsType: false,
     });
@@ -18,73 +18,73 @@ describe('ImportGenerator', () => {
     expect(generatedLines).toEqual(["import func from './lib/func';"]);
   });
 
-  it('should support various cases', () => {
-    const ig = new ImportGenerator('/package/src/some-module');
+  it("should support various cases", () => {
+    const ig = new ImportGenerator("/package/src/some-module");
 
     ig.addImport({
-      name: 'defaultFunc',
+      name: "defaultFunc",
       isDefault: true,
-      path: '/package/src/lib/defaultFunc',
+      path: "/package/src/lib/defaultFunc",
       isAbsolute: false,
       importAsType: false,
     });
 
     ig.addImport({
-      name: 'namedFunc1',
+      name: "namedFunc1",
       isDefault: false,
-      path: '/package/src/lib/namedFunc',
+      path: "/package/src/lib/namedFunc",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'namedFunc2',
+      name: "namedFunc2",
       isDefault: false,
-      path: '/package/src/lib/namedFunc',
+      path: "/package/src/lib/namedFunc",
       isAbsolute: false,
       importAsType: false,
     });
 
     ig.addImport({
-      name: 'pck',
+      name: "pck",
       isDefault: true,
-      path: '/package/package.json',
+      path: "/package/package.json",
       isAbsolute: false,
       importAsType: false,
     });
 
     ig.addImport({
-      name: 'sister',
+      name: "sister",
       isDefault: true,
-      path: '/package/sister-src/sister',
+      path: "/package/sister-src/sister",
       isAbsolute: false,
       importAsType: false,
     });
 
     ig.addImport({
-      name: 'defComb',
+      name: "defComb",
       isDefault: true,
-      path: '/package/src/comb',
+      path: "/package/src/comb",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'defNamed1',
+      name: "defNamed1",
       isDefault: false,
-      path: '/package/src/comb',
+      path: "/package/src/comb",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'defNamed2',
+      name: "defNamed2",
       isDefault: false,
-      path: '/package/src/comb',
+      path: "/package/src/comb",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'defNamed3',
+      name: "defNamed3",
       isDefault: false,
-      path: '/package/src/comb',
+      path: "/package/src/comb",
       isAbsolute: false,
       importAsType: false,
     });
@@ -99,42 +99,42 @@ describe('ImportGenerator', () => {
     ]);
   });
 
-  it('should ignore duplicates', () => {
-    const ig = new ImportGenerator('./some-module');
+  it("should ignore duplicates", () => {
+    const ig = new ImportGenerator("./some-module");
 
     ig.addImport({
-      name: 'def',
+      name: "def",
       isDefault: true,
-      path: './pkg',
+      path: "./pkg",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'def',
+      name: "def",
       isDefault: true,
-      path: './pkg',
+      path: "./pkg",
       isAbsolute: false,
       importAsType: false,
     });
 
     ig.addImport({
-      name: 'named1',
+      name: "named1",
       isDefault: false,
-      path: './pkg',
+      path: "./pkg",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'named2',
+      name: "named2",
       isDefault: false,
-      path: './pkg',
+      path: "./pkg",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'named1',
+      name: "named1",
       isDefault: false,
-      path: './pkg',
+      path: "./pkg",
       isAbsolute: false,
       importAsType: false,
     });
@@ -145,49 +145,49 @@ describe('ImportGenerator', () => {
     ]);
   });
 
-  it('should complain about multiple (different) default imports', () => {
-    const ig = new ImportGenerator('./some-module');
+  it("should complain about multiple (different) default imports", () => {
+    const ig = new ImportGenerator("./some-module");
 
     ig.addImport({
-      name: 'def',
+      name: "def",
       isDefault: true,
-      path: './pkg',
+      path: "./pkg",
       isAbsolute: false,
       importAsType: false,
     });
 
     expect(() =>
       ig.addImport({
-        name: 'def2',
+        name: "def2",
         isDefault: true,
-        path: './pkg',
+        path: "./pkg",
         isAbsolute: false,
         importAsType: false,
       }),
     ).toThrow("Multiple default imports attempted: def and def2 from './pkg'");
   });
 
-  it('should support aboslute imports', () => {
-    const ig = new ImportGenerator('./some-module');
+  it("should support aboslute imports", () => {
+    const ig = new ImportGenerator("./some-module");
 
     ig.addImport({
-      name: 'path',
+      name: "path",
       isDefault: true,
-      path: 'path',
+      path: "path",
       isAbsolute: true,
       importAsType: false,
     });
     ig.addImport({
-      name: 'existsSync',
+      name: "existsSync",
       isDefault: false,
-      path: 'fs',
+      path: "fs",
       isAbsolute: true,
       importAsType: false,
     });
     ig.addImport({
-      name: 'mkDirSync',
+      name: "mkDirSync",
       isDefault: false,
-      path: 'fs',
+      path: "fs",
       isAbsolute: true,
       importAsType: false,
     });
@@ -199,27 +199,27 @@ describe('ImportGenerator', () => {
     ]);
   });
 
-  it('should not import items from the same file', () => {
-    const ig = new ImportGenerator('./src/some-module');
+  it("should not import items from the same file", () => {
+    const ig = new ImportGenerator("./src/some-module");
 
     ig.addImport({
-      name: 'path',
+      name: "path",
       isDefault: true,
-      path: 'path',
+      path: "path",
       isAbsolute: true,
       importAsType: false,
     });
     ig.addImport({
-      name: 'someDefaultImport',
+      name: "someDefaultImport",
       isDefault: true,
-      path: './src/some-module',
+      path: "./src/some-module",
       isAbsolute: false,
       importAsType: false,
     });
     ig.addImport({
-      name: 'someNamedImport',
+      name: "someNamedImport",
       isDefault: false,
-      path: './src/some-module',
+      path: "./src/some-module",
       isAbsolute: false,
       importAsType: false,
     });
@@ -228,27 +228,27 @@ describe('ImportGenerator', () => {
     expect(generatedLines).toEqual(["import path from 'path';"]);
   });
 
-  it('should support type-only imports', () => {
-    const ig = new ImportGenerator('./some-module');
+  it("should support type-only imports", () => {
+    const ig = new ImportGenerator("./some-module");
 
     ig.addImport({
-      name: 'Member',
+      name: "Member",
       isDefault: true,
-      path: 'member',
+      path: "member",
       isAbsolute: true,
       importAsType: true,
     });
     ig.addImport({
-      name: 'AccountId',
+      name: "AccountId",
       isDefault: false,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: true,
     });
     ig.addImport({
-      name: 'AccountInitializer',
+      name: "AccountInitializer",
       isDefault: false,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: true,
     });
@@ -260,41 +260,41 @@ describe('ImportGenerator', () => {
     ]);
   });
 
-  it('should support combinations of type-only and non-type-only imports', () => {
-    const ig = new ImportGenerator('./some-module');
+  it("should support combinations of type-only and non-type-only imports", () => {
+    const ig = new ImportGenerator("./some-module");
 
     ig.addImport({
-      name: 'Member',
+      name: "Member",
       isDefault: true,
-      path: 'member',
+      path: "member",
       isAbsolute: true,
       importAsType: true,
     });
     ig.addImport({
-      name: 'AccountId',
+      name: "AccountId",
       isDefault: false,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: true,
     });
     ig.addImport({
-      name: 'AccountInitializer',
+      name: "AccountInitializer",
       isDefault: false,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: true,
     });
     ig.addImport({
-      name: 'Account',
+      name: "Account",
       isDefault: true,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: false,
     });
     ig.addImport({
-      name: 'AccountType',
+      name: "AccountType",
       isDefault: false,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: false,
     });
@@ -308,20 +308,20 @@ describe('ImportGenerator', () => {
   });
 
   // This is necessary because of https://github.com/tc39/proposal-type-annotations/issues/16
-  it('should combine default and named type-only imports correctly', () => {
-    const ig = new ImportGenerator('./some-module');
+  it("should combine default and named type-only imports correctly", () => {
+    const ig = new ImportGenerator("./some-module");
 
     ig.addImport({
-      name: 'Account',
+      name: "Account",
       isDefault: true,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: true,
     });
     ig.addImport({
-      name: 'AccountId',
+      name: "AccountId",
       isDefault: false,
-      path: 'account',
+      path: "account",
       isAbsolute: true,
       importAsType: true,
     });

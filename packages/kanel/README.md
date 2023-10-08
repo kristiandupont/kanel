@@ -32,8 +32,8 @@ $ npx kanel
 Example of running generation from code:
 
 ```typescript
-import { processDatabase } from 'kanel';
-import config from './kanelrc';
+import { processDatabase } from "kanel";
+import config from "./kanelrc";
 
 async function run() {
   await processDatabase(config);

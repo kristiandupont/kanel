@@ -1,4 +1,10 @@
-import{_ as s,o as n,c as a,S as p}from"./chunks/framework.cbdddcbb.js";const A=JSON.parse('{"title":"generateIdentifierType","description":"","frontmatter":{},"headers":[],"relativePath":"generateIdentifierType.md","filePath":"generateIdentifierType.md"}'),l={name:"generateIdentifierType.md"},e=p(`<h1 id="generateidentifiertype" tabindex="-1">generateIdentifierType <a class="header-anchor" href="#generateidentifiertype" aria-label="Permalink to &quot;generateIdentifierType&quot;">​</a></h1><div class="language-typescript"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki material-theme-palenight"><code><span class="line"><span style="color:#FFCB6B;">generateIdentifierType</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> (</span></span>
+import { _ as s, o as n, c as a, S as p } from "./chunks/framework.cbdddcbb.js";
+const A = JSON.parse(
+    '{"title":"generateIdentifierType","description":"","frontmatter":{},"headers":[],"relativePath":"generateIdentifierType.md","filePath":"generateIdentifierType.md"}',
+  ),
+  l = { name: "generateIdentifierType.md" },
+  e = p(
+    `<h1 id="generateidentifiertype" tabindex="-1">generateIdentifierType <a class="header-anchor" href="#generateidentifiertype" aria-label="Permalink to &quot;generateIdentifierType&quot;">​</a></h1><div class="language-typescript"><button title="Copy Code" class="copy"></button><span class="lang">typescript</span><pre class="shiki material-theme-palenight"><code><span class="line"><span style="color:#FFCB6B;">generateIdentifierType</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> (</span></span>
 <span class="line"><span style="color:#A6ACCD;">  column: TableColumn</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#A6ACCD;">  details: TableDetails</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#A6ACCD;">  config: InstantiatedConfig</span></span>
@@ -30,4 +36,12 @@ import{_ as s,o as n,c as a,S as p}from"./chunks/framework.cbdddcbb.js";const A=
 <span class="line"><span style="color:#F07178;">    typeImports</span><span style="color:#89DDFF;">:</span><span style="color:#F07178;"> </span><span style="color:#A6ACCD;">imports</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#F07178;">    comment</span><span style="color:#89DDFF;">:</span><span style="color:#F07178;"> [</span><span style="color:#89DDFF;">\`</span><span style="color:#C3E88D;">Identifier type for </span><span style="color:#89DDFF;">\${</span><span style="color:#A6ACCD;">details</span><span style="color:#89DDFF;">.</span><span style="color:#A6ACCD;">schemaName</span><span style="color:#89DDFF;">}</span><span style="color:#C3E88D;">.</span><span style="color:#89DDFF;">\${</span><span style="color:#A6ACCD;">details</span><span style="color:#89DDFF;">.</span><span style="color:#A6ACCD;">name</span><span style="color:#89DDFF;">}\`</span><span style="color:#F07178;">]</span><span style="color:#89DDFF;">,</span></span>
 <span class="line"><span style="color:#F07178;">  </span><span style="color:#89DDFF;">};</span></span>
-<span class="line"><span style="color:#89DDFF;">};</span></span></code></pre></div>`,6),o=[e];function t(c,r,y,F,D,i){return n(),a("div",null,o)}const d=s(l,[["render",t]]);export{A as __pageData,d as default};
+<span class="line"><span style="color:#89DDFF;">};</span></span></code></pre></div>`,
+    6,
+  ),
+  o = [e];
+function t(c, r, y, F, D, i) {
+  return n(), a("div", null, o);
+}
+const d = s(l, [["render", t]]);
+export { A as __pageData, d as default };

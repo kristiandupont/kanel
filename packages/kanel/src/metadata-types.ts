@@ -1,13 +1,13 @@
-import { TableColumn, TableDetails } from 'extract-pg-schema';
+import { TableColumn, TableDetails } from "extract-pg-schema";
 
-import { InstantiatedConfig } from './config-types';
-import { TypeDeclaration } from './declaration-types';
-import Details from './Details';
+import { InstantiatedConfig } from "./config-types";
+import { TypeDeclaration } from "./declaration-types";
+import Details from "./Details";
 import {
   CompositeDetails,
   CompositeProperty,
-} from './generators/composite-types';
-import TypeDefinition from './TypeDefinition';
+} from "./generators/composite-types";
+import TypeDefinition from "./TypeDefinition";
 
 export type TypeMetadata = {
   name: string;
@@ -17,7 +17,7 @@ export type TypeMetadata = {
 
 export type GetMetadata = (
   details: Details,
-  generateFor: 'selector' | 'initializer' | 'mutator' | undefined,
+  generateFor: "selector" | "initializer" | "mutator" | undefined,
   instantiatedConfig: InstantiatedConfig,
 ) => TypeMetadata;
 
@@ -32,7 +32,7 @@ export type PropertyMetadata = {
 export type GetPropertyMetadata = (
   property: CompositeProperty,
   details: CompositeDetails,
-  generateFor: 'selector' | 'initializer' | 'mutator',
+  generateFor: "selector" | "initializer" | "mutator",
   instantiatedConfig: InstantiatedConfig,
 ) => PropertyMetadata;
 

@@ -1,11 +1,11 @@
-import { TableDetails } from 'extract-pg-schema';
-import { GenericDeclaration, InstantiatedConfig, TypeImport } from 'kanel';
+import { TableDetails } from "extract-pg-schema";
+import { GenericDeclaration, InstantiatedConfig, TypeImport } from "kanel";
 
 import {
   GenerateZodSchemasConfig,
   GetZodIdentifierMetadata,
-} from './GenerateZodSchemasConfig';
-import zImport from './zImport';
+} from "./GenerateZodSchemasConfig";
+import zImport from "./zImport";
 
 const getIdentifierDeclaration = (
   details: TableDetails,
@@ -23,7 +23,7 @@ const getIdentifierDeclaration = (
     declaration: GenericDeclaration;
   }[] = [];
 
-  if (details.kind === 'table' && instantiatedConfig.generateIdentifierType) {
+  if (details.kind === "table" && instantiatedConfig.generateIdentifierType) {
     const { columns } = details;
     const identifierColumns = columns.filter(
       (c) => c.isPrimaryKey && !c.reference,
@@ -47,7 +47,7 @@ const getIdentifierDeclaration = (
 
       if (c.type.fullName in config.zodTypeMap) {
         const x = config.zodTypeMap[c.type.fullName];
-        if (typeof x === 'string') {
+        if (typeof x === "string") {
           zodType = x;
         } else {
           zodType = x.name;
@@ -56,7 +56,7 @@ const getIdentifierDeclaration = (
       }
 
       const declaration: GenericDeclaration = {
-        declarationType: 'generic',
+        declarationType: "generic",
         typeImports,
         comment,
         lines: [

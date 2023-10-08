@@ -44,7 +44,7 @@ export interface TableColumn {
   maxLength: number | null;
   isNullable: boolean;
   isPrimaryKey: boolean;
-  generated: 'ALWAYS' | 'NEVER' | 'BY DEFAULT';
+  generated: "ALWAYS" | "NEVER" | "BY DEFAULT";
   isUpdatable: boolean;
   isIdentity: boolean;
   ordinalPosition: number;
@@ -109,7 +109,7 @@ export interface ViewColumn {
   defaultValue: any;
   isArray: boolean;
   maxLength: number | null;
-  generated: 'ALWAYS' | 'NEVER' | 'BY DEFAULT';
+  generated: "ALWAYS" | "NEVER" | "BY DEFAULT";
   isUpdatable: boolean;
   isIdentity: boolean;
   ordinalPosition: number;

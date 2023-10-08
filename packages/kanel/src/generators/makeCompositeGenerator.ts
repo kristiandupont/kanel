@@ -1,16 +1,16 @@
-import { Kind, Schema } from 'extract-pg-schema';
-import { tryParse } from 'tagged-comment-parser';
+import { Kind, Schema } from "extract-pg-schema";
+import { tryParse } from "tagged-comment-parser";
 
-import { InstantiatedConfig } from '../config-types';
-import { Declaration, InterfaceDeclaration } from '../declaration-types';
-import Output, { Path } from '../Output';
-import { CompositeDetails } from './composite-types';
-import generateProperties from './generateProperties';
+import { InstantiatedConfig } from "../config-types";
+import { Declaration, InterfaceDeclaration } from "../declaration-types";
+import Output, { Path } from "../Output";
+import { CompositeDetails } from "./composite-types";
+import generateProperties from "./generateProperties";
 
 const makeMapper =
   <D extends CompositeDetails>(config: InstantiatedConfig) =>
   (details: D): { path: Path; declaration: Declaration }[] => {
-    if (details.kind === 'compositeType') {
+    if (details.kind === "compositeType") {
       // If a composite type has a @type tag in the comment,
       // we will use that type instead of a generated one.
       const { tags } = tryParse(details.comment);
@@ -24,9 +24,9 @@ const makeMapper =
       name: selectorName,
       comment: selectorComment,
       path,
-    } = config.getMetadata(details, 'selector', config);
+    } = config.getMetadata(details, "selector", config);
 
-    if (details.kind === 'table' && config.generateIdentifierType) {
+    if (details.kind === "table" && config.generateIdentifierType) {
       const { columns } = details;
       const identifierColumns = columns.filter(
         (c) => c.isPrimaryKey && !c.reference,
@@ -37,47 +37,47 @@ const makeMapper =
       );
     }
 
-    const selectorProperties = generateProperties(details, 'selector', config);
+    const selectorProperties = generateProperties(details, "selector", config);
 
     const selectorDeclaration: InterfaceDeclaration = {
-      declarationType: 'interface',
+      declarationType: "interface",
       name: selectorName,
       comment: selectorComment,
-      exportAs: 'default',
+      exportAs: "default",
       properties: selectorProperties,
     };
     declarations.push(selectorDeclaration);
 
-    if (details.kind === 'table') {
+    if (details.kind === "table") {
       const { name: initializerName, comment: initializerComment } =
-        config.getMetadata(details, 'initializer', config);
+        config.getMetadata(details, "initializer", config);
       const initializerProperties = generateProperties(
         details,
-        'initializer',
+        "initializer",
         config,
       );
 
       const initializerDeclaration: InterfaceDeclaration = {
-        declarationType: 'interface',
+        declarationType: "interface",
         name: initializerName,
         comment: initializerComment,
-        exportAs: 'named',
+        exportAs: "named",
         properties: initializerProperties,
       };
       declarations.push(initializerDeclaration);
 
       const { name: mutatorName, comment: mutatorComment } = config.getMetadata(
         details,
-        'mutator',
+        "mutator",
         config,
       );
-      const mutatorProperties = generateProperties(details, 'mutator', config);
+      const mutatorProperties = generateProperties(details, "mutator", config);
 
       const mutatorDeclaration: InterfaceDeclaration = {
-        declarationType: 'interface',
+        declarationType: "interface",
         name: mutatorName,
         comment: mutatorComment,
-        exportAs: 'named',
+        exportAs: "named",
         properties: mutatorProperties,
       };
       declarations.push(mutatorDeclaration);

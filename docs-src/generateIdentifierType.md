@@ -4,7 +4,7 @@
 generateIdentifierType: (
   column: TableColumn,
   details: TableDetails,
-  config: InstantiatedConfig
+  config: InstantiatedConfig,
 ) => TypeDeclaration;
 ```
 

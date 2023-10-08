@@ -3,17 +3,17 @@ import {
   GenericDeclaration,
   InstantiatedConfig,
   TypeImport,
-} from 'kanel';
-import { CompositeDetails } from 'kanel/build/generators/composite-types';
+} from "kanel";
+import { CompositeDetails } from "kanel/build/generators/composite-types";
 
-import generateProperties from './generateProperties';
-import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
-import zImport from './zImport';
+import generateProperties from "./generateProperties";
+import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import zImport from "./zImport";
 
 function makeDeclaration(
   instantiatedConfig: InstantiatedConfig,
   c: CompositeDetails,
-  generateFor: 'selector' | 'initializer' | 'mutator',
+  generateFor: "selector" | "initializer" | "mutator",
   nonCompositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
   config: GenerateZodSchemasConfig,
@@ -46,7 +46,7 @@ function makeDeclaration(
   const lines: string[] = [
     `export const ${name}: z.Schema<${typescriptTypeName}> = z.object({`,
     ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
-    '}) as any;',
+    "}) as any;",
   ];
 
   properties.forEach((p) => {
@@ -54,7 +54,7 @@ function makeDeclaration(
   });
 
   const declaration: GenericDeclaration = {
-    declarationType: 'generic',
+    declarationType: "generic",
     comment,
     typeImports,
     lines,
@@ -74,18 +74,18 @@ const processComposite = (
   const selectorDeclaration: GenericDeclaration = makeDeclaration(
     instantiatedConfig,
     c,
-    'selector',
+    "selector",
     nonCompositeTypeImports,
     identifierTypeImports,
     config,
   );
   declarations.push(selectorDeclaration);
 
-  if (c.kind === 'table') {
+  if (c.kind === "table") {
     const initializerDeclaration: GenericDeclaration = makeDeclaration(
       instantiatedConfig,
       c,
-      'initializer',
+      "initializer",
       nonCompositeTypeImports,
       identifierTypeImports,
       config,
@@ -95,7 +95,7 @@ const processComposite = (
     const mutatorDeclaration: GenericDeclaration = makeDeclaration(
       instantiatedConfig,
       c,
-      'mutator',
+      "mutator",
       nonCompositeTypeImports,
       identifierTypeImports,
       config,

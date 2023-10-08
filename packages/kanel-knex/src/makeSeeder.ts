@@ -1,6 +1,6 @@
-import { Knex } from 'knex';
+import { Knex } from "knex";
 
-import SeedData, { TableData } from './SeedData';
+import SeedData, { TableData } from "./SeedData";
 
 const mapObject = <T, U>(obj: Record<string, T>, fn: (v: T) => U) => {
   const result: Record<string, U> = {};
@@ -13,7 +13,7 @@ const mapObject = <T, U>(obj: Record<string, T>, fn: (v: T) => U) => {
 // Turn `abc` into a plain string, and `{ "x": 1 }` into an object.
 const unBackTick = (v: string) => {
   let s: string | any = v;
-  if (v.indexOf('`') === 0) {
+  if (v.indexOf("`") === 0) {
     const unStringed = v.slice(1, -1);
     s = JSON.parse(unStringed);
   }
@@ -37,11 +37,11 @@ const addTable = async (
 ): Promise<TableEntity> => {
   const initializers = tableData.rows.map((row) => {
     const values = mapObject(row, (columnData) => {
-      if (typeof columnData === 'string') {
+      if (typeof columnData === "string") {
         return unBackTick(columnData);
       } else {
         const reference = columnData.reference;
-        const [tableName, rowRef, columnName] = reference.split('.');
+        const [tableName, rowRef, columnName] = reference.split(".");
         if (!entityMap[tableName]) {
           throw new Error(
             `Table '${tableName}' (referenced as '${reference}') not found`,
@@ -62,15 +62,15 @@ const addTable = async (
         return value;
       }
     });
-    if (values['@ref']) {
-      delete values['@ref'];
+    if (values["@ref"]) {
+      delete values["@ref"];
     }
 
     return values;
   });
 
   const objects: Record<string, any>[] = await knex(tableData.name)
-    .returning('*')
+    .returning("*")
     .insert(initializers);
 
   const result: TableEntity = {};
@@ -78,8 +78,8 @@ const addTable = async (
     let rowRef = String(i);
     if (tableData.indexColumn) {
       rowRef = object[tableData.indexColumn];
-    } else if (tableData.rows[i]['@ref']) {
-      rowRef = tableData.rows[i]['@ref'] as string;
+    } else if (tableData.rows[i]["@ref"]) {
+      rowRef = tableData.rows[i]["@ref"] as string;
     }
     result[rowRef] = object;
   }

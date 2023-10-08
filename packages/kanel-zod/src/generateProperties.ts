@@ -4,10 +4,10 @@ import {
   InstantiatedConfig,
   resolveType,
   TypeImport,
-} from 'kanel';
-import * as R from 'ramda';
+} from "kanel";
+import * as R from "ramda";
 
-import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
+import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
 export type ZodPropertyDeclaration = {
   name: string;
@@ -17,14 +17,14 @@ export type ZodPropertyDeclaration = {
 
 const generateProperties = <D extends CompositeDetails>(
   details: D,
-  generateFor: 'selector' | 'initializer' | 'mutator',
+  generateFor: "selector" | "initializer" | "mutator",
   nonCompositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
 ): ZodPropertyDeclaration[] => {
   const ps =
-    details.kind === 'compositeType' ? details.attributes : details.columns;
+    details.kind === "compositeType" ? details.attributes : details.columns;
 
   const sortedPs = instantiatedConfig.propertySortFunction
     ? R.sort(instantiatedConfig.propertySortFunction, ps as any)
@@ -47,15 +47,15 @@ const generateProperties = <D extends CompositeDetails>(
       let zodType: string;
       const typeImports: TypeImport[] = [];
 
-      if (typeof t !== 'string' && t.name in identifierTypeImports) {
+      if (typeof t !== "string" && t.name in identifierTypeImports) {
         const x = identifierTypeImports[t.name];
         typeImports.push(x);
         zodType = x.name;
       } else if (p.type.fullName in config.zodTypeMap) {
         const x = config.zodTypeMap[p.type.fullName];
-        if (typeof x === 'string') {
+        if (typeof x === "string") {
           zodType = x;
-          if ('dimensions' in p) {
+          if ("dimensions" in p) {
             for (let i = p.dimensions || 0; i > 0; i--) {
               zodType = `${zodType}.array()`;
             }
@@ -78,15 +78,15 @@ const generateProperties = <D extends CompositeDetails>(
 
       if (optionalOverride === undefined) {
         switch (generateFor) {
-          case 'selector': {
+          case "selector": {
             isOptional = false;
             break;
           }
-          case 'initializer': {
+          case "initializer": {
             isOptional = canBeOptional;
             break;
           }
-          case 'mutator': {
+          case "mutator": {
             isOptional = true;
             break;
           }
@@ -102,17 +102,17 @@ const generateProperties = <D extends CompositeDetails>(
 
       const qualifiers = [];
       if (isOptional) {
-        qualifiers.push('optional()');
+        qualifiers.push("optional()");
       }
       if (isNullable) {
-        qualifiers.push('nullable()');
+        qualifiers.push("nullable()");
       }
       // if (comment) {
       //   qualifiers.push(`describe('${comment}')`);
       // }
 
       const value =
-        qualifiers.length > 0 ? `${zodType}.${qualifiers.join('.')}` : zodType;
+        qualifiers.length > 0 ? `${zodType}.${qualifiers.join(".")}` : zodType;
 
       return {
         name,

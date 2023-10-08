@@ -45,16 +45,16 @@ The `enumStyle` can be either `type` or `enum` (default). Postgres enums will th
 This, if you have an enum `Fruit` consisting of the values `apples`, `oranges` and `bananas`, you will get this type with `enumStyle === 'type'`:
 
 ```typescript
-type Fruit = 'apples' | 'oranges' | 'bananas';
+type Fruit = "apples" | "oranges" | "bananas";
 ```
 
 ..or, with `enumStyle === 'enum'`:
 
 ```typescript
 enum Fruit {
-  apples = 'apples',
-  oranges = 'oranges',
-  bananas = 'bananas',
+  apples = "apples",
+  oranges = "oranges",
+  bananas = "bananas",
 }
 ```
 

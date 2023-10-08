@@ -1,7 +1,7 @@
-import { DomainDetails } from 'extract-pg-schema';
-import { GenericDeclaration, InstantiatedConfig, TypeImport } from 'kanel';
+import { DomainDetails } from "extract-pg-schema";
+import { GenericDeclaration, InstantiatedConfig, TypeImport } from "kanel";
 
-import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
+import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
 const processDomain = (
   d: DomainDetails,
@@ -21,21 +21,21 @@ const processDomain = (
   // const zodType = zodTypeMap[tsType];
   let zodType = config.zodTypeMap[d.innerType];
   if (!zodType) {
-    zodType = 'z.unknown()';
+    zodType = "z.unknown()";
   }
 
   const lines: string[] = [`export const ${name} = ${zodType};`];
 
   const typeImport: TypeImport = {
-    name: 'z',
+    name: "z",
     isDefault: false,
-    path: 'zod',
+    path: "zod",
     isAbsolute: true,
     importAsType: false,
   };
 
   const declaration: GenericDeclaration = {
-    declarationType: 'generic',
+    declarationType: "generic",
     comment: [`Zod schema for ${d.name}`],
     typeImports: [typeImport],
     lines,

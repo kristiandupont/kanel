@@ -1,55 +1,55 @@
-import chalk from 'chalk';
-import cliProgress from 'cli-progress';
-import fs from 'fs';
-import optionator from 'optionator';
-import path from 'path';
+import chalk from "chalk";
+import cliProgress from "cli-progress";
+import fs from "fs";
+import optionator from "optionator";
+import path from "path";
 
-import { Config } from '../config-types';
-import processDatabase from '../processDatabase';
+import { Config } from "../config-types";
+import processDatabase from "../processDatabase";
 
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { version } = require('../../package.json');
+const { version } = require("../../package.json");
 
 export async function main(): Promise<void> {
-  console.info(chalk.greenBright('Kanel'));
+  console.info(chalk.greenBright("Kanel"));
 
   const o = optionator({
-    prepend: 'Usage: kanel [options]',
+    prepend: "Usage: kanel [options]",
     append: `Version ${version}`,
     options: [
       {
-        option: 'help',
-        alias: 'h',
-        type: 'Boolean',
-        description: 'displays help',
+        option: "help",
+        alias: "h",
+        type: "Boolean",
+        description: "displays help",
       },
       {
-        option: 'version',
-        alias: 'v',
-        type: 'Boolean',
-        description: 'displays version',
+        option: "version",
+        alias: "v",
+        type: "Boolean",
+        description: "displays version",
       },
       {
-        option: 'config',
-        alias: 'c',
-        type: 'path::String',
+        option: "config",
+        alias: "c",
+        type: "path::String",
         description:
-          'Use this configuration, overriding .kanelrc.js config options if present',
+          "Use this configuration, overriding .kanelrc.js config options if present",
       },
       {
-        option: 'database',
-        alias: 'd',
-        type: 'String',
+        option: "database",
+        alias: "d",
+        type: "String",
         description:
-          'Database connection string. Will override the connection field in the config file if present',
+          "Database connection string. Will override the connection field in the config file if present",
       },
       {
-        option: 'output',
-        alias: 'o',
-        type: 'path::String',
+        option: "output",
+        alias: "o",
+        type: "path::String",
         description:
-          'Output directory. Will override the output field in the config file if present',
+          "Output directory. Will override the output field in the config file if present",
       },
     ],
   });
@@ -74,23 +74,23 @@ export async function main(): Promise<void> {
   }
 
   let config: Config;
-  const configFile = path.join(process.cwd(), options.config || '.kanelrc.js');
+  const configFile = path.join(process.cwd(), options.config || ".kanelrc.js");
   if (
     fs.existsSync(configFile) ||
-    fs.existsSync(configFile + '.js') ||
-    fs.existsSync(configFile + '.cjs') ||
-    fs.existsSync(configFile + '.json')
+    fs.existsSync(configFile + ".js") ||
+    fs.existsSync(configFile + ".cjs") ||
+    fs.existsSync(configFile + ".json")
   ) {
     console.info(`Using config file: ${configFile}`);
     try {
       config = require(configFile);
     } catch (error) {
-      console.error('Could not open config file:', error);
+      console.error("Could not open config file:", error);
       process.exit(1);
     }
   } else {
     if (options.config) {
-      console.error('Could not open ' + options.config);
+      console.error("Could not open " + options.config);
       process.exit(1);
     }
     config = { connection: undefined };
@@ -100,7 +100,7 @@ export async function main(): Promise<void> {
     config.connection = options.database;
   }
   if (!config.connection) {
-    console.error('No database specified, in config file or command line');
+    console.error("No database specified, in config file or command line");
     process.exit(1);
   }
 
@@ -108,7 +108,7 @@ export async function main(): Promise<void> {
     config.outputPath = options.output;
   }
   if (!config.outputPath) {
-    console.error('No output path specified, in config file or command line');
+    console.error("No output path specified, in config file or command line");
     process.exit(1);
   }
 

@@ -1,4 +1,4 @@
-import { CompositeDetails, InstantiatedConfig } from 'kanel';
+import { CompositeDetails, InstantiatedConfig } from "kanel";
 
 interface MakeKyselyConfig {
   databaseFilename: string;
@@ -17,7 +17,7 @@ interface MakeKyselyConfig {
 }
 
 export const defaultConfig: MakeKyselyConfig = {
-  databaseFilename: 'Database',
+  databaseFilename: "Database",
   getKyselyItemMetadata: (d, selectorName, canInitialize, canMutate) => ({
     tableInterfaceName: `${selectorName}Table`,
     selectableName: selectorName,

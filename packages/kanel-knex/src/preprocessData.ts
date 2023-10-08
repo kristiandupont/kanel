@@ -1,7 +1,7 @@
-import { Schema } from 'extract-pg-schema';
-import { tryParse } from 'tagged-comment-parser';
+import { Schema } from "extract-pg-schema";
+import { tryParse } from "tagged-comment-parser";
 
-import SeedData, { ColumnData, RawSeedData, TableData } from './SeedData';
+import SeedData, { ColumnData, RawSeedData, TableData } from "./SeedData";
 
 function preprocessData(
   inputData: RawSeedData,
@@ -31,12 +31,12 @@ function preprocessData(
 
     const defaultRow = {};
     for (const defaultName of Object.keys(defaults)) {
-      const [table, column] = defaultName.split('.');
+      const [table, column] = defaultName.split(".");
 
       if (table === tableName) {
         defaultRow[column] = defaults[defaultName];
       } else if (
-        table === '*' &&
+        table === "*" &&
         dbTable.columns.some((c) => c.name === column)
       ) {
         defaultRow[column] = defaults[defaultName];
@@ -47,7 +47,7 @@ function preprocessData(
       const outputRow: Record<string, ColumnData> = { ...defaultRow };
       const propNames = Object.keys(inputRow);
       for (const propName of propNames) {
-        const { tags = {}, comment: columnName = '' } = tryParse(propName);
+        const { tags = {}, comment: columnName = "" } = tryParse(propName);
 
         // The "column" might be only a @ref tag, so only add it if it has a name.
         if (columnName) {
@@ -80,7 +80,7 @@ function preprocessData(
           if (columnName) {
             outputTable.indexColumn = columnName;
           } else {
-            outputRow['@ref'] = inputRow[propName];
+            outputRow["@ref"] = inputRow[propName];
           }
         }
       }

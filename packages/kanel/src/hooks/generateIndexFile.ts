@@ -1,8 +1,8 @@
-import { join, relative, sep } from 'path';
+import { join, relative, sep } from "path";
 
-import { PreRenderHook } from '../config-types';
-import Details from '../Details';
-import { FileContents } from '../Output';
+import { PreRenderHook } from "../config-types";
+import Details from "../Details";
+import { FileContents } from "../Output";
 
 const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
   const allEntities: Details[] = Object.values(
@@ -19,29 +19,29 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
 
     const { path, name: selectorName } = instantiatedConfig.getMetadata(
       d,
-      'selector',
+      "selector",
       instantiatedConfig,
     );
     let importPath = relative(instantiatedConfig.outputPath, path);
 
     // We never want Windows-style paths in our source. Fix it if necessary.
-    if (sep === '\\') {
-      importPath = importPath.replaceAll('\\', '/');
+    if (sep === "\\") {
+      importPath = importPath.replaceAll("\\", "/");
     }
 
-    if (d.kind === 'table') {
+    if (d.kind === "table") {
       const additionalImports = [];
 
       const { name: initializerName } = instantiatedConfig.getMetadata(
         d,
-        'initializer',
+        "initializer",
         instantiatedConfig,
       );
       additionalImports.push(initializerName);
 
       const { name: mutatorName } = instantiatedConfig.getMetadata(
         d,
-        'mutator',
+        "mutator",
         instantiatedConfig,
       );
       additionalImports.push(mutatorName);
@@ -62,10 +62,10 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
       }
 
       result = `export type { default as ${selectorName}, ${additionalImports.join(
-        ', ',
+        ", ",
       )} } from './${importPath}';`;
-    } else if (d.kind === 'enum') {
-      const prefix = instantiatedConfig.enumStyle === 'type' ? 'type ' : '';
+    } else if (d.kind === "enum") {
+      const prefix = instantiatedConfig.enumStyle === "type" ? "type " : "";
       result = `export ${prefix}{ default as ${selectorName} } from './${importPath}';`;
     } else {
       result = `export type { default as ${selectorName} } from './${importPath}';`;
@@ -77,13 +77,13 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
   const indexFile: FileContents = {
     declarations: [
       {
-        declarationType: 'generic',
+        declarationType: "generic",
         lines,
       },
     ],
   };
 
-  const path = join(instantiatedConfig.outputPath, 'index');
+  const path = join(instantiatedConfig.outputPath, "index");
 
   return {
     ...outputAcc,

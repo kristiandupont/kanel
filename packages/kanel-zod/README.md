@@ -28,7 +28,7 @@ The
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generateZodSchemas } = require('kanel-zod');
+const { generateZodSchemas } = require("kanel-zod");
 
 module.exports = {
   // ... your config here.

@@ -18,23 +18,23 @@ $ npm i -D kanel
 ..and then create a configuration file, typically called `.kanelrc.js`. Here is an example of such a file:
 
 ```javascript
-const path = require('path');
+const path = require("path");
 
 /** @type {import('kanel').Config} */
 module.exports = {
   connection: {
-    host: 'localhost',
-    user: 'postgres',
-    password: 'postgres',
-    database: 'acme',
+    host: "localhost",
+    user: "postgres",
+    password: "postgres",
+    database: "acme",
   },
 
   preDeleteOutputFolder: true,
-  outputPath: './src/schemas',
+  outputPath: "./src/schemas",
 
   customTypeMap: {
-    'pg_catalog.tsvector': 'string',
-    'pg_catalog.bpchar': 'string',
+    "pg_catalog.tsvector": "string",
+    "pg_catalog.bpchar": "string",
   },
 };
 ```

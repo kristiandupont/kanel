@@ -4,8 +4,8 @@ import type {
   InstantiatedConfig,
   PreRenderHook,
   TypeImport,
-} from 'kanel';
-import { join } from 'path';
+} from "kanel";
+import { join } from "path";
 
 const getTypeImports = (
   details: Details,
@@ -13,7 +13,7 @@ const getTypeImports = (
 ): TypeImport[] => {
   const selector = instantiatedConfig.getMetadata(
     details,
-    'selector',
+    "selector",
     instantiatedConfig,
   );
   const result: TypeImport[] = [
@@ -26,11 +26,11 @@ const getTypeImports = (
     },
   ];
 
-  const isReadonly = details.kind !== 'table';
+  const isReadonly = details.kind !== "table";
   if (!isReadonly) {
     const initializer = instantiatedConfig.getMetadata(
       details,
-      'initializer',
+      "initializer",
       instantiatedConfig,
     );
     result.push({
@@ -43,7 +43,7 @@ const getTypeImports = (
 
     const mutator = instantiatedConfig.getMetadata(
       details,
-      'mutator',
+      "mutator",
       instantiatedConfig,
     );
     result.push({
@@ -64,26 +64,26 @@ const getLine = (
 ): string => {
   const selector = instantiatedConfig.getMetadata(
     details,
-    'selector',
+    "selector",
     instantiatedConfig,
   );
   const selectorName = selector.name;
 
-  let initializerName = 'never';
-  let mutatorName = 'never';
+  let initializerName = "never";
+  let mutatorName = "never";
 
-  const isReadonly = details.kind !== 'table';
+  const isReadonly = details.kind !== "table";
   if (!isReadonly) {
     const initializer = instantiatedConfig.getMetadata(
       details,
-      'initializer',
+      "initializer",
       instantiatedConfig,
     );
     initializerName = initializer.name;
 
     const mutator = instantiatedConfig.getMetadata(
       details,
-      'mutator',
+      "mutator",
       instantiatedConfig,
     );
     mutatorName = mutator.name;
@@ -118,9 +118,9 @@ const generateKnexTablesModule: PreRenderHook = (
     },
     [
       {
-        name: 'Knex',
+        name: "Knex",
         isAbsolute: true,
-        path: 'knex',
+        path: "knex",
         isDefault: false,
         importAsType: false,
       },
@@ -146,19 +146,19 @@ const generateKnexTablesModule: PreRenderHook = (
 
   const lines: string[] = [
     "declare module 'knex/types/tables' {",
-    '  interface Tables {',
+    "  interface Tables {",
     ...declarationLines,
-    '  }',
-    '}',
+    "  }",
+    "}",
   ];
 
   const declaration: GenericDeclaration = {
-    declarationType: 'generic',
+    declarationType: "generic",
     typeImports,
     lines,
   };
 
-  const path = join(instantiatedConfig.outputPath, 'knex-tables');
+  const path = join(instantiatedConfig.outputPath, "knex-tables");
 
   return {
     ...outputAcc,

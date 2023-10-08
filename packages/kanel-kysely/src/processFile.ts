@@ -5,9 +5,9 @@ import {
   InstantiatedConfig,
   InterfacePropertyDeclaration,
   TypeImport,
-} from 'kanel';
+} from "kanel";
 
-import MakeKyselyConfig from './MakeKyselyConfig';
+import MakeKyselyConfig from "./MakeKyselyConfig";
 
 /**
  * This is a quirky way to get Kysely interfaces. Basically, what happens is that this
@@ -31,24 +31,24 @@ const processFile = (
 } => {
   const { name: selectorName } = instantiatedConfig.getMetadata(
     compositeDetails,
-    'selector',
+    "selector",
     instantiatedConfig,
   );
   const { name: initializerName } = instantiatedConfig.getMetadata(
     compositeDetails,
-    'initializer',
+    "initializer",
     instantiatedConfig,
   );
   const { name: mutatorName } = instantiatedConfig.getMetadata(
     compositeDetails,
-    'mutator',
+    "mutator",
     instantiatedConfig,
   );
 
   let canInitialize = true;
   let canMutate = true;
 
-  if (compositeDetails.kind !== 'table') {
+  if (compositeDetails.kind !== "table") {
     canInitialize = false;
     canMutate = false;
   }
@@ -63,22 +63,22 @@ const processFile = (
     );
 
   const modifiedDeclarations = declarations.map((declaration) => {
-    if (declaration.declarationType === 'interface') {
+    if (declaration.declarationType === "interface") {
       if (declaration.name === selectorName) {
         const name = tableInterfaceName;
         const typeImports = [...(declaration.typeImports || [])];
 
         typeImports.push({
-          name: 'ColumnType',
+          name: "ColumnType",
           isDefault: false,
-          path: 'kysely',
+          path: "kysely",
           isAbsolute: true,
           importAsType: true,
         });
 
         const properties = declaration.properties.map((property) => {
           const columns: CompositeProperty[] =
-            compositeDetails.kind === 'compositeType'
+            compositeDetails.kind === "compositeType"
               ? compositeDetails.attributes
               : compositeDetails.columns;
           const column = columns.find(
@@ -86,35 +86,35 @@ const processFile = (
               instantiatedConfig.getPropertyMetadata(
                 column,
                 compositeDetails,
-                'selector',
+                "selector",
                 instantiatedConfig,
               ).name === property.name,
           );
 
           let baseType = property.typeName;
-          baseType += '[]'.repeat(property.dimensions);
+          baseType += "[]".repeat(property.dimensions);
 
           let selectorType = baseType;
           if (property.isNullable) {
             selectorType = `${selectorType} | null`;
           }
 
-          let initializerType = 'never';
-          if (canInitialize && column.generated !== 'ALWAYS') {
-            if (baseType === 'Date') {
-              baseType += ' | string';
+          let initializerType = "never";
+          if (canInitialize && column.generated !== "ALWAYS") {
+            if (baseType === "Date") {
+              baseType += " | string";
             }
             initializerType =
               column.isNullable ||
               column.defaultValue ||
               column.isIdentity ||
-              column.generated === 'BY DEFAULT'
+              column.generated === "BY DEFAULT"
                 ? `${baseType} | null`
                 : baseType;
           }
 
-          let mutatorType = 'never';
-          if (canMutate && column.generated !== 'ALWAYS') {
+          let mutatorType = "never";
+          if (canMutate && column.generated !== "ALWAYS") {
             mutatorType = `${baseType} | null`;
           }
 
@@ -138,54 +138,54 @@ const processFile = (
   const result = modifiedDeclarations.filter(Boolean);
 
   result.push({
-    declarationType: 'typeDeclaration',
+    declarationType: "typeDeclaration",
     name: selectableName,
     typeImports: [
       {
-        name: 'Selectable',
+        name: "Selectable",
         isDefault: false,
-        path: 'kysely',
+        path: "kysely",
         isAbsolute: true,
         importAsType: true,
       },
     ],
     typeDefinition: [`Selectable<${tableInterfaceName}>`],
-    exportAs: 'named',
+    exportAs: "named",
   });
 
   if (insertableName) {
     result.push({
-      declarationType: 'typeDeclaration',
+      declarationType: "typeDeclaration",
       name: insertableName,
       typeImports: [
         {
-          name: 'Insertable',
+          name: "Insertable",
           isDefault: false,
-          path: 'kysely',
+          path: "kysely",
           isAbsolute: true,
           importAsType: true,
         },
       ],
       typeDefinition: [`Insertable<${tableInterfaceName}>`],
-      exportAs: 'named',
+      exportAs: "named",
     });
   }
 
   if (updatableName) {
     result.push({
-      declarationType: 'typeDeclaration',
+      declarationType: "typeDeclaration",
       name: updatableName,
       typeImports: [
         {
-          name: 'Updateable',
+          name: "Updateable",
           isDefault: false,
-          path: 'kysely',
+          path: "kysely",
           isAbsolute: true,
           importAsType: true,
         },
       ],
       typeDefinition: [`Updateable<${tableInterfaceName}>`],
-      exportAs: 'named',
+      exportAs: "named",
     });
   }
 

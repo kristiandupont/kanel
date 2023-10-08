@@ -1,4 +1,4 @@
-import { Declaration } from './declaration-types';
+import { Declaration } from "./declaration-types";
 
 export type Path = string;
 export type FileContents = {

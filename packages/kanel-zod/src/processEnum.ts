@@ -1,7 +1,7 @@
-import { EnumDetails } from 'extract-pg-schema';
-import { GenericDeclaration, InstantiatedConfig, TypeImport } from 'kanel';
+import { EnumDetails } from "extract-pg-schema";
+import { GenericDeclaration, InstantiatedConfig, TypeImport } from "kanel";
 
-import { GenerateZodSchemasConfig } from './GenerateZodSchemasConfig';
+import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
 const processEnum = (
   e: EnumDetails,
@@ -16,19 +16,19 @@ const processEnum = (
   const lines: string[] = [
     `export const ${name} = z.enum([`,
     ...e.values.map((v) => `  '${v}',`),
-    ']);',
+    "]);",
   ];
 
   const typeImport: TypeImport = {
-    name: 'z',
+    name: "z",
     isDefault: false,
-    path: 'zod',
+    path: "zod",
     isAbsolute: true,
     importAsType: false,
   };
 
   const declaration: GenericDeclaration = {
-    declarationType: 'generic',
+    declarationType: "generic",
     comment: [`Zod schema for ${e.name}`],
     typeImports: [typeImport],
     lines,

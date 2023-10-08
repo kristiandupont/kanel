@@ -7,7 +7,7 @@ const escapeName = (name: string): string => {
   }
 
   try {
-    new Function('var ' + name);
+    new Function("var " + name);
   } catch {
     isLegalIdentifier = false;
   }

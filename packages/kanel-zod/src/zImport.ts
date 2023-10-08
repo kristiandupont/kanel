@@ -1,9 +1,9 @@
-import { TypeImport } from 'kanel';
+import { TypeImport } from "kanel";
 
 const zImport: TypeImport = {
-  name: 'z',
+  name: "z",
   isDefault: false,
-  path: 'zod',
+  path: "zod",
   isAbsolute: true,
   importAsType: false,
 };
