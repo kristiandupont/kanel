@@ -29,10 +29,10 @@
     "run-example": "kanel -c ./example/.kanelrc"
   },
   "devDependencies": {
-    "extract-pg-schema": "^4.2.0",
+    "extract-pg-schema": "^4.2.4",
     "kanel": "*"
   },
   "dependencies": {
-    "@kristiandupont/recase": "^1.2.0"
+    "@kristiandupont/recase": "^1.2.1"
   }
 }
