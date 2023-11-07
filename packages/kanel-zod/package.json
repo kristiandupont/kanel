@@ -24,7 +24,7 @@
   "types": "build/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf ./build && tsc -w",
+    "build": "rm -rf ./build && tsc",
     "test": "echo TODO..."
   },
   "devDependencies": {
