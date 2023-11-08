@@ -134,6 +134,7 @@ export const makeGenerateZodSchemas =
           config.getZodIdentifierMetadata,
           config,
           instantiatedConfig,
+          nonCompositeTypeImports,
         );
 
         for (const result of results) {

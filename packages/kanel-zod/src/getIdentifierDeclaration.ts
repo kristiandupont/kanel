@@ -12,6 +12,7 @@ const getIdentifierDeclaration = (
   getZodIdentifierMetadata: GetZodIdentifierMetadata,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
+  nonCompositeTypeImports: Record<string, TypeImport>,
 ): {
   name: string;
   originalName: string;
@@ -53,6 +54,10 @@ const getIdentifierDeclaration = (
           zodType = x.name;
           typeImports.push(...x.typeImports);
         }
+      } else if (c.type.fullName in nonCompositeTypeImports) {
+        const x = nonCompositeTypeImports[c.type.fullName];
+        zodType = x.name;
+        typeImports.push(x);
       }
 
       const declaration: GenericDeclaration = {
