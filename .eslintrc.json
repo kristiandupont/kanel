@@ -2,6 +2,7 @@
   "root": true,
   "extends": ["@kristiandupont"],
   "rules": {
+    "quotes": "off",
     "@typescript-eslint/prefer-nullish-coalescing": "off",
     "unicorn/import-style": "off",
     "unicorn/no-array-for-each": "off",
