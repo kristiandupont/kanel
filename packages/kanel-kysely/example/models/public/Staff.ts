@@ -9,25 +9,25 @@ export type StaffId = number;
 
 /** Represents the table public.staff */
 export default interface StaffTable {
-  staff_id: ColumnType<StaffId, StaffId | null, StaffId | null>;
+  staff_id: ColumnType<StaffId, StaffId | null, StaffId>;
 
-  first_name: ColumnType<string, string, string | null>;
+  first_name: ColumnType<string, string, string>;
 
-  last_name: ColumnType<string, string, string | null>;
+  last_name: ColumnType<string, string, string>;
 
-  address_id: ColumnType<AddressId, AddressId, AddressId | null>;
+  address_id: ColumnType<AddressId, AddressId, AddressId>;
 
   email: ColumnType<string | null, string | null, string | null>;
 
-  store_id: ColumnType<number, number, number | null>;
+  store_id: ColumnType<number, number, number>;
 
-  active: ColumnType<boolean, boolean | null, boolean | null>;
+  active: ColumnType<boolean, boolean | null, boolean>;
 
-  username: ColumnType<string, string, string | null>;
+  username: ColumnType<string, string, string>;
 
   password: ColumnType<string | null, string | null, string | null>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string>;
 
   picture: ColumnType<bytea | null, bytea | null, bytea | null>;
 }

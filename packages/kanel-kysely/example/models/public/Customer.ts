@@ -8,21 +8,21 @@ export type CustomerId = number;
 
 /** Represents the table public.customer */
 export default interface CustomerTable {
-  customer_id: ColumnType<CustomerId, CustomerId | null, CustomerId | null>;
+  customer_id: ColumnType<CustomerId, CustomerId | null, CustomerId>;
 
-  store_id: ColumnType<number, number, number | null>;
+  store_id: ColumnType<number, number, number>;
 
-  first_name: ColumnType<string, string, string | null>;
+  first_name: ColumnType<string, string, string>;
 
-  last_name: ColumnType<string, string, string | null>;
+  last_name: ColumnType<string, string, string>;
 
   email: ColumnType<string | null, string | null, string | null>;
 
-  address_id: ColumnType<AddressId, AddressId, AddressId | null>;
+  address_id: ColumnType<AddressId, AddressId, AddressId>;
 
-  activebool: ColumnType<boolean, boolean | null, boolean | null>;
+  activebool: ColumnType<boolean, boolean | null, boolean>;
 
-  create_date: ColumnType<Date, Date | string | null, Date | string | null>;
+  create_date: ColumnType<Date, Date | string | null, Date | string>;
 
   last_update: ColumnType<Date | null, Date | string | null, Date | string | null>;
 

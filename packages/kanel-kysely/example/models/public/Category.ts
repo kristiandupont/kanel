@@ -7,11 +7,11 @@ export type CategoryId = number;
 
 /** Represents the table public.category */
 export default interface CategoryTable {
-  category_id: ColumnType<CategoryId, CategoryId | null, CategoryId | null>;
+  category_id: ColumnType<CategoryId, CategoryId | null, CategoryId>;
 
-  name: ColumnType<string, string, string | null>;
+  name: ColumnType<string, string, string>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string>;
 }
 
 export type Category = Selectable<CategoryTable>;

@@ -115,7 +115,7 @@ const processFile = (
 
           let mutatorType = "never";
           if (canMutate && column.generated !== "ALWAYS") {
-            mutatorType = `${baseType} | null`;
+            mutatorType = column.isNullable ? `${baseType} | null` : baseType;
           }
 
           const typeName = `ColumnType<${selectorType}, ${initializerType}, ${mutatorType}>`;

@@ -10,17 +10,17 @@ export type PaymentId = number;
 
 /** Represents the table public.payment */
 export default interface PaymentTable {
-  payment_id: ColumnType<PaymentId, PaymentId | null, PaymentId | null>;
+  payment_id: ColumnType<PaymentId, PaymentId | null, PaymentId>;
 
-  customer_id: ColumnType<CustomerId, CustomerId, CustomerId | null>;
+  customer_id: ColumnType<CustomerId, CustomerId, CustomerId>;
 
-  staff_id: ColumnType<StaffId, StaffId, StaffId | null>;
+  staff_id: ColumnType<StaffId, StaffId, StaffId>;
 
-  rental_id: ColumnType<RentalId, RentalId, RentalId | null>;
+  rental_id: ColumnType<RentalId, RentalId, RentalId>;
 
-  amount: ColumnType<string, string, string | null>;
+  amount: ColumnType<string, string, string>;
 
-  payment_date: ColumnType<Date, Date | string, Date | string | null>;
+  payment_date: ColumnType<Date, Date | string, Date | string>;
 }
 
 export type Payment = Selectable<PaymentTable>;

@@ -10,19 +10,19 @@ export type RentalId = number;
 
 /** Represents the table public.rental */
 export default interface RentalTable {
-  rental_id: ColumnType<RentalId, RentalId | null, RentalId | null>;
+  rental_id: ColumnType<RentalId, RentalId | null, RentalId>;
 
-  rental_date: ColumnType<Date, Date | string, Date | string | null>;
+  rental_date: ColumnType<Date, Date | string, Date | string>;
 
-  inventory_id: ColumnType<InventoryId, InventoryId, InventoryId | null>;
+  inventory_id: ColumnType<InventoryId, InventoryId, InventoryId>;
 
-  customer_id: ColumnType<CustomerId, CustomerId, CustomerId | null>;
+  customer_id: ColumnType<CustomerId, CustomerId, CustomerId>;
 
   return_date: ColumnType<Date | null, Date | string | null, Date | string | null>;
 
-  staff_id: ColumnType<StaffId, StaffId, StaffId | null>;
+  staff_id: ColumnType<StaffId, StaffId, StaffId>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string>;
 }
 
 export type Rental = Selectable<RentalTable>;
