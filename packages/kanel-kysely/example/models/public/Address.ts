@@ -8,21 +8,21 @@ export type AddressId = number;
 
 /** Represents the table public.address */
 export default interface AddressTable {
-  address_id: ColumnType<AddressId, AddressId | null, AddressId | null>;
+  address_id: ColumnType<AddressId, AddressId | null, AddressId>;
 
-  address: ColumnType<string, string, string | null>;
+  address: ColumnType<string, string, string>;
 
   address2: ColumnType<string | null, string | null, string | null>;
 
-  district: ColumnType<string, string, string | null>;
+  district: ColumnType<string, string, string>;
 
-  city_id: ColumnType<CityId, CityId, CityId | null>;
+  city_id: ColumnType<CityId, CityId, CityId>;
 
   postal_code: ColumnType<string | null, string | null, string | null>;
 
-  phone: ColumnType<string, string, string | null>;
+  phone: ColumnType<string, string, string>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string>;
 }
 
 export type Address = Selectable<AddressTable>;

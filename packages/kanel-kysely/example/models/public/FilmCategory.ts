@@ -7,11 +7,11 @@ import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 
 /** Represents the table public.film_category */
 export default interface FilmCategoryTable {
-  film_id: ColumnType<FilmId, FilmId, FilmId | null>;
+  film_id: ColumnType<FilmId, FilmId, FilmId>;
 
-  category_id: ColumnType<CategoryId, CategoryId, CategoryId | null>;
+  category_id: ColumnType<CategoryId, CategoryId, CategoryId>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string | null>;
+  last_update: ColumnType<Date, Date | string | null, Date | string>;
 }
 
 export type FilmCategory = Selectable<FilmCategoryTable>;

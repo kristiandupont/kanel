@@ -16,7 +16,6 @@ import type PaymentTable from './Payment';
 import type RentalTable from './Rental';
 import type StaffTable from './Staff';
 import type StoreTable from './Store';
-import type OrdersTable from './Orders';
 import type ActorInfoTable from './ActorInfo';
 import type CustomerListTable from './CustomerList';
 import type FilmListTable from './FilmList';
@@ -55,8 +54,6 @@ export default interface PublicSchema {
   staff: StaffTable;
 
   store: StoreTable;
-
-  orders: OrdersTable;
 
   actor_info: ActorInfoTable;
 
