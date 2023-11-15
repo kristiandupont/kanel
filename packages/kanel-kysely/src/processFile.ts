@@ -104,13 +104,17 @@ const processFile = (
             if (baseType === "Date") {
               baseType += " | string";
             }
-            initializerType =
-              column.isNullable ||
+
+            initializerType = baseType;
+            if (column.isNullable) {
+              initializerType += " | null";
+            } else if (
               column.defaultValue ||
               column.isIdentity ||
               column.generated === "BY DEFAULT"
-                ? `${baseType} | null`
-                : baseType;
+            ) {
+              initializerType += " | undefined";
+            }
           }
 
           let mutatorType = "never";

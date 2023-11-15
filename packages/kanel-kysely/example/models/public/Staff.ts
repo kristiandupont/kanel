@@ -9,7 +9,7 @@ export type StaffId = number;
 
 /** Represents the table public.staff */
 export default interface StaffTable {
-  staff_id: ColumnType<StaffId, StaffId | null, StaffId>;
+  staff_id: ColumnType<StaffId, StaffId | undefined, StaffId>;
 
   first_name: ColumnType<string, string, string>;
 
@@ -21,13 +21,13 @@ export default interface StaffTable {
 
   store_id: ColumnType<number, number, number>;
 
-  active: ColumnType<boolean, boolean | null, boolean>;
+  active: ColumnType<boolean, boolean | undefined, boolean>;
 
   username: ColumnType<string, string, string>;
 
   password: ColumnType<string | null, string | null, string | null>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 
   picture: ColumnType<bytea | null, bytea | null, bytea | null>;
 }

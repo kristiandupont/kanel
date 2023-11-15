@@ -10,7 +10,7 @@ export type PaymentId = number;
 
 /** Represents the table public.payment */
 export default interface PaymentTable {
-  payment_id: ColumnType<PaymentId, PaymentId | null, PaymentId>;
+  payment_id: ColumnType<PaymentId, PaymentId | undefined, PaymentId>;
 
   customer_id: ColumnType<CustomerId, CustomerId, CustomerId>;
 

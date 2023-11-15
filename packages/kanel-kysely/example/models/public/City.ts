@@ -8,13 +8,13 @@ export type CityId = number;
 
 /** Represents the table public.city */
 export default interface CityTable {
-  city_id: ColumnType<CityId, CityId | null, CityId>;
+  city_id: ColumnType<CityId, CityId | undefined, CityId>;
 
   city: ColumnType<string, string, string>;
 
   country_id: ColumnType<CountryId, CountryId, CountryId>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type City = Selectable<CityTable>;

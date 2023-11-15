@@ -10,7 +10,7 @@ export type FilmId = number;
 
 /** Represents the table public.film */
 export default interface FilmTable {
-  film_id: ColumnType<FilmId, FilmId | null, FilmId>;
+  film_id: ColumnType<FilmId, FilmId | undefined, FilmId>;
 
   title: ColumnType<string, string, string>;
 
@@ -20,17 +20,17 @@ export default interface FilmTable {
 
   language_id: ColumnType<LanguageId, LanguageId, LanguageId>;
 
-  rental_duration: ColumnType<number, number | null, number>;
+  rental_duration: ColumnType<number, number | undefined, number>;
 
-  rental_rate: ColumnType<string, string | null, string>;
+  rental_rate: ColumnType<string, string | undefined, string>;
 
   length: ColumnType<number | null, number | null, number | null>;
 
-  replacement_cost: ColumnType<string, string | null, string>;
+  replacement_cost: ColumnType<string, string | undefined, string>;
 
   rating: ColumnType<MpaaRating | null, MpaaRating | null, MpaaRating | null>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 
   special_features: ColumnType<string[] | null, string[] | null, string[] | null>;
 

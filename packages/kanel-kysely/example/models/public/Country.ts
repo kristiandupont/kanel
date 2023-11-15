@@ -7,11 +7,11 @@ export type CountryId = number;
 
 /** Represents the table public.country */
 export default interface CountryTable {
-  country_id: ColumnType<CountryId, CountryId | null, CountryId>;
+  country_id: ColumnType<CountryId, CountryId | undefined, CountryId>;
 
   country: ColumnType<string, string, string>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type Country = Selectable<CountryTable>;

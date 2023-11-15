@@ -8,7 +8,7 @@ export type AddressId = number;
 
 /** Represents the table public.address */
 export default interface AddressTable {
-  address_id: ColumnType<AddressId, AddressId | null, AddressId>;
+  address_id: ColumnType<AddressId, AddressId | undefined, AddressId>;
 
   address: ColumnType<string, string, string>;
 
@@ -22,7 +22,7 @@ export default interface AddressTable {
 
   phone: ColumnType<string, string, string>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type Address = Selectable<AddressTable>;

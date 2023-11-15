@@ -11,7 +11,7 @@ export default interface FilmActorTable {
 
   film_id: ColumnType<FilmId, FilmId, FilmId>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type FilmActor = Selectable<FilmActorTable>;
