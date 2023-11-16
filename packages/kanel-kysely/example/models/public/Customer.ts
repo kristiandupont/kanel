@@ -8,7 +8,7 @@ export type CustomerId = number;
 
 /** Represents the table public.customer */
 export default interface CustomerTable {
-  customer_id: ColumnType<CustomerId, CustomerId | null, CustomerId>;
+  customer_id: ColumnType<CustomerId, CustomerId | undefined, CustomerId>;
 
   store_id: ColumnType<number, number, number>;
 
@@ -20,9 +20,9 @@ export default interface CustomerTable {
 
   address_id: ColumnType<AddressId, AddressId, AddressId>;
 
-  activebool: ColumnType<boolean, boolean | null, boolean>;
+  activebool: ColumnType<boolean, boolean | undefined, boolean>;
 
-  create_date: ColumnType<Date, Date | string | null, Date | string>;
+  create_date: ColumnType<Date, Date | string | undefined, Date | string>;
 
   last_update: ColumnType<Date | null, Date | string | null, Date | string | null>;
 

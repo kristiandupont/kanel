@@ -8,13 +8,13 @@ export type InventoryId = number;
 
 /** Represents the table public.inventory */
 export default interface InventoryTable {
-  inventory_id: ColumnType<InventoryId, InventoryId | null, InventoryId>;
+  inventory_id: ColumnType<InventoryId, InventoryId | undefined, InventoryId>;
 
   film_id: ColumnType<FilmId, FilmId, FilmId>;
 
   store_id: ColumnType<number, number, number>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type Inventory = Selectable<InventoryTable>;

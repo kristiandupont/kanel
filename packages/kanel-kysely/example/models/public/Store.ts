@@ -9,13 +9,13 @@ export type StoreId = number;
 
 /** Represents the table public.store */
 export default interface StoreTable {
-  store_id: ColumnType<StoreId, StoreId | null, StoreId>;
+  store_id: ColumnType<StoreId, StoreId | undefined, StoreId>;
 
   manager_staff_id: ColumnType<StaffId, StaffId, StaffId>;
 
   address_id: ColumnType<AddressId, AddressId, AddressId>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type Store = Selectable<StoreTable>;

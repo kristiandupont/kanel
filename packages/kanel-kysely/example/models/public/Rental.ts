@@ -10,7 +10,7 @@ export type RentalId = number;
 
 /** Represents the table public.rental */
 export default interface RentalTable {
-  rental_id: ColumnType<RentalId, RentalId | null, RentalId>;
+  rental_id: ColumnType<RentalId, RentalId | undefined, RentalId>;
 
   rental_date: ColumnType<Date, Date | string, Date | string>;
 
@@ -22,7 +22,7 @@ export default interface RentalTable {
 
   staff_id: ColumnType<StaffId, StaffId, StaffId>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type Rental = Selectable<RentalTable>;

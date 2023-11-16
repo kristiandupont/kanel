@@ -7,11 +7,11 @@ export type LanguageId = number;
 
 /** Represents the table public.language */
 export default interface LanguageTable {
-  language_id: ColumnType<LanguageId, LanguageId | null, LanguageId>;
+  language_id: ColumnType<LanguageId, LanguageId | undefined, LanguageId>;
 
   name: ColumnType<string, string, string>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type Language = Selectable<LanguageTable>;

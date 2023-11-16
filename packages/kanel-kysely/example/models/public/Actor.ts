@@ -7,13 +7,13 @@ export type ActorId = number;
 
 /** Represents the table public.actor */
 export default interface ActorTable {
-  actor_id: ColumnType<ActorId, ActorId | null, ActorId>;
+  actor_id: ColumnType<ActorId, ActorId | undefined, ActorId>;
 
   first_name: ColumnType<string, string, string>;
 
   last_name: ColumnType<string, string, string>;
 
-  last_update: ColumnType<Date, Date | string | null, Date | string>;
+  last_update: ColumnType<Date, Date | string | undefined, Date | string>;
 }
 
 export type Actor = Selectable<ActorTable>;
