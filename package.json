@@ -33,7 +33,7 @@
   "devDependencies": {
     "@kristiandupont/dev-deps": "^2.14.0",
     "vitepress": "1.0.0-rc.25",
-    "vue": "3.3.8"
+    "vue": "3.3.9"
   },
   "engines": {
     "node": ">=16.0.0"
