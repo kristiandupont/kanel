@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/ramda": "0.29.9",
-    "np": "8.0.4"
+    "np": "9.0.0"
   },
   "np": {},
   "engines": {
