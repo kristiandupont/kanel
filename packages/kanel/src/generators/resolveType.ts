@@ -57,15 +57,15 @@ const resolveType = (
   }
 
   // 2) If there are references, resolve the type from the targets
-  if ((c as any).references && (c as any).references.length > 0) {
-    const referencedTypes = (c as any).references.map((reference) => {
+  if ("references" in c && c.references.length > 0) {
+    const referencedTypes = c.references.map((reference) => {
       let target: TableDetails | ViewDetails | MaterializedViewDetails =
         config.schemas[reference.schemaName].tables.find(
           (t) => t.name === reference.tableName,
         );
       if (!target) {
         target = config.schemas[reference.schemaName].views.find(
-          (v) => v.name === reference.table,
+          (v) => v.name === reference.tableName,
         );
       }
       if (!target) {
@@ -89,13 +89,18 @@ const resolveType = (
         console.warn("Could not resolve reference", reference);
         return "unknown";
       }
-    });
+    }) as TypeDefinition[];
 
-    return referencedTypes.length === 1
-      ? referencedTypes[0]
+    const dedupedReferencedTypes = [...new Set(referencedTypes)];
+    return dedupedReferencedTypes.length === 1
+      ? dedupedReferencedTypes[0]
       : {
-          name: referencedTypes.map((t) => t.name).join(" | "),
-          typeImports: referencedTypes.flatMap((t) => t.typeImports),
+          name: dedupedReferencedTypes
+            .map((t) => (typeof t === "string" ? t : t.name))
+            .join(" | "),
+          typeImports: dedupedReferencedTypes.flatMap((t) =>
+            typeof t === "string" ? [] : t.typeImports,
+          ),
         };
   }
   // 3) If this is a view with a source (i.e. the table that it's based on),
