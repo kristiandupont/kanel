@@ -20,7 +20,8 @@ import{_ as s,o as i,c as a,R as n}from"./chunks/framework.tNgZIIMt.js";const y=
 <span class="line"><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">    ...</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">defaultZodTypeMap,</span></span>
 <span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">    &#39;pg_catalog.tsvector&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&#39;z.set(z.string())&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
 <span class="line"><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">    &#39;pg_catalog.bytea&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { name:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&#39;z.custom&lt;Bytea&gt;(v =&gt; v)&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, typeImports: [{ name: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&#39;Bytea&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, path: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&#39;bytea&#39;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, isAbsolute: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, isDefault: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">false</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }] }</span></span>
-<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  }</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  },</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  castToSchema: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">})</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">/** </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">@type</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> {import(&#39;../src/Config&#39;).default}</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"> */</span></span>
@@ -89,7 +90,7 @@ import{_ as s,o as i,c as a,R as n}from"./chunks/framework.tNgZIIMt.js";const y=
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  },</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  // Generate an index file with exports of everything</span></span>
-<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  preRenderHooks: [generateIndexFile, generateZodSchemas],</span></span>
+<span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  preRenderHooks: [generateZodSchemas, generateIndexFile],</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  customTypeMap: {</span></span>
 <span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    // A text search vector could be stored as a set of strings. See Film.ts for an example.</span></span>
