@@ -59,7 +59,7 @@ export interface InventoryMutator {
   last_update?: Date;
 }
 
-export const inventoryId = z.number();
+export const inventoryId = z.number() as unknown as z.Schema<InventoryId>;
 
 export const inventory =
 z.object({
@@ -67,7 +67,7 @@ z.object({
   film_id: filmId,
   store_id: z.number(),
   last_update: z.date(),
-}) satisfies z.ZodType<Inventory>;
+}) as unknown as z.Schema<Inventory>
 
 export const inventoryInitializer =
 z.object({
@@ -75,7 +75,7 @@ z.object({
   film_id: filmId,
   store_id: z.number(),
   last_update: z.date().optional(),
-}) satisfies z.ZodType<InventoryInitializer>;
+}) as unknown as z.Schema<InventoryInitializer>
 
 export const inventoryMutator =
 z.object({
@@ -83,4 +83,4 @@ z.object({
   film_id: filmId.optional(),
   store_id: z.number().optional(),
   last_update: z.date().optional(),
-}) satisfies z.ZodType<InventoryMutator>;
+}) as unknown as z.Schema<InventoryMutator>

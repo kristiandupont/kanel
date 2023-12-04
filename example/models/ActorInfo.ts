@@ -26,4 +26,4 @@ z.object({
   first_name: z.string(),
   last_name: z.string(),
   film_info: z.string(),
-}) satisfies z.ZodType<ActorInfo>;
+}) as unknown as z.Schema<ActorInfo>

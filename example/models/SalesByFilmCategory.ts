@@ -16,4 +16,4 @@ export const salesByFilmCategory =
 z.object({
   category: z.string(),
   total_sales: z.string(),
-}) satisfies z.ZodType<SalesByFilmCategory>;
+}) as unknown as z.Schema<SalesByFilmCategory>

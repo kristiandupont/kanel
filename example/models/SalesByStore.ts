@@ -20,4 +20,4 @@ z.object({
   store: z.string(),
   manager: z.string(),
   total_sales: z.string(),
-}) satisfies z.ZodType<SalesByStore>;
+}) as unknown as z.Schema<SalesByStore>

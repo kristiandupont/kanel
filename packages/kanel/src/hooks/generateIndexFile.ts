@@ -69,10 +69,10 @@ export const makeGenerateIndexFile: (
 
     const relativePath = relative(instantiatedConfig.outputPath, path);
 
-    const line = `export {${
+    const line = `export { ${
       // eslint-disable-next-line unicorn/no-array-callback-reference
       exports.map(stringifyExportItem).join(", ")
-    }} from './${relativePath}';`;
+    } } from './${relativePath}';`;
 
     return line;
   });

@@ -21,7 +21,7 @@ const generateZodSchemas = makeGenerateZodSchemas({
     'pg_catalog.tsvector': 'z.set(z.string())',
     'pg_catalog.bytea': { name:'z.custom<Bytea>(v => v)', typeImports: [{ name: 'Bytea', path: 'bytea', isAbsolute: true, isDefault: false }] }
   },
-  applySatisfies: true
+  castToSchema: true
 })
 
 /** @type {import('../src/Config').default} */

@@ -66,7 +66,9 @@ const getIdentifierDeclaration = (
         comment,
         name,
         type: undefined,
-        value: zodType, // Note: branded types are incompatible with satisfies for Zod, so we have to skip that here.
+        value: config.castToSchema
+          ? `${zodType} as unknown as z.Schema<${typescriptDeclaration.name}>`
+          : zodType,
         exportAs: "named",
       };
 

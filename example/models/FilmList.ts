@@ -44,4 +44,4 @@ z.object({
   length: z.number().nullable(),
   rating: mpaaRating.nullable(),
   actors: z.string(),
-}) satisfies z.ZodType<FilmList>;
+}) as unknown as z.Schema<FilmList>

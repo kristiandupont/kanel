@@ -51,18 +51,18 @@ z.object({
   film_id: filmId,
   category_id: categoryId,
   last_update: z.date(),
-}) satisfies z.ZodType<FilmCategory>;
+}) as unknown as z.Schema<FilmCategory>
 
 export const filmCategoryInitializer =
 z.object({
   film_id: filmId,
   category_id: categoryId,
   last_update: z.date().optional(),
-}) satisfies z.ZodType<FilmCategoryInitializer>;
+}) as unknown as z.Schema<FilmCategoryInitializer>
 
 export const filmCategoryMutator =
 z.object({
   film_id: filmId.optional(),
   category_id: categoryId.optional(),
   last_update: z.date().optional(),
-}) satisfies z.ZodType<FilmCategoryMutator>;
+}) as unknown as z.Schema<FilmCategoryMutator>

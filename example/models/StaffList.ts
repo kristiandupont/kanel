@@ -42,4 +42,4 @@ z.object({
   city: z.string(),
   country: z.string(),
   sid: z.number(),
-}) satisfies z.ZodType<StaffList>;
+}) as unknown as z.Schema<StaffList>

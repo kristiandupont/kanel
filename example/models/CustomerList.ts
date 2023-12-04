@@ -46,4 +46,4 @@ z.object({
   country: z.string(),
   notes: z.string(),
   sid: z.number(),
-}) satisfies z.ZodType<CustomerList>;
+}) as unknown as z.Schema<CustomerList>

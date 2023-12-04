@@ -41,15 +41,31 @@ function makeDeclaration(
 
   const typeImports: TypeImport[] = [zImport];
 
-  // This still presents problems because of https://github.com/colinhacks/zod/issues/1628
+  // "satisfies" still presents problems because of https://github.com/colinhacks/zod/issues/1628
+  // Casting works but removes the ability to use .extend, .omit, etc.
+  // A better solution (TODO) is to cast like this:
+  // export const messageEmbedding =
+  // z.object({
+  //   id: messageEmbeddingId,
+  //   message_id: messageId,
+  //   conversation_id: conversationId,
+  //   embedding: z.array(z.number()).nullable(),
+  // })  as unknown as z.ZodObject<{
+  //   id: z.ZodType<MessageEmbeddingId>,
+  //   message_id: z.ZodType<MessageId>,
+  //   conversation_id: z.ZodType<ConversationId>,
+  //   embedding: z.ZodNullable<z.ZodArray<z.ZodType<number>>>,
+  // }>;
+
   const value = [
     "z.object({",
     ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
-    config.applySatisfies
-      ? `}) satisfies z.ZodType<${typescriptTypeName}>;`
-      : "});",
   ];
-
+  if (config.castToSchema) {
+    value.push(`}) as unknown as z.Schema<${typescriptTypeName}>`);
+  } else {
+    value.push("});");
+  }
   properties.forEach((p) => {
     typeImports.push(...p.typeImports);
   });
