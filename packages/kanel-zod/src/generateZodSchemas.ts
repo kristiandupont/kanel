@@ -189,6 +189,7 @@ const generateZodSchemas = makeGenerateZodSchemas({
   getZodSchemaMetadata: defaultGetZodSchemaMetadata,
   getZodIdentifierMetadata: defaultGetZodIdentifierMetadata,
   zodTypeMap: defaultZodTypeMap,
+  castToSchema: true,
 });
 
 export default generateZodSchemas;

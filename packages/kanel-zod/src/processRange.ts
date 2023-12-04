@@ -1,5 +1,5 @@
 import { RangeDetails } from "extract-pg-schema";
-import { GenericDeclaration, InstantiatedConfig, TypeImport } from "kanel";
+import { ConstantDeclaration, InstantiatedConfig, TypeImport } from "kanel";
 
 import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
@@ -7,14 +7,12 @@ const processRange = (
   r: RangeDetails,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
-): GenericDeclaration | undefined => {
+): ConstantDeclaration | undefined => {
   const { name } = config.getZodSchemaMetadata(
     r,
     undefined,
     instantiatedConfig,
   );
-
-  const lines: string[] = [`export const ${name} = z.string();`];
 
   const typeImport: TypeImport = {
     name: "z",
@@ -24,11 +22,14 @@ const processRange = (
     importAsType: false,
   };
 
-  const declaration: GenericDeclaration = {
-    declarationType: "generic",
+  const declaration: ConstantDeclaration = {
+    declarationType: "constant",
     comment: [`Zod schema for ${r.name}`],
     typeImports: [typeImport],
-    lines,
+    name,
+    type: undefined,
+    value: "z.string()",
+    exportAs: "named",
   };
 
   return declaration;

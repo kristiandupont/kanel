@@ -1,5 +1,5 @@
 import { TableDetails } from "extract-pg-schema";
-import { GenericDeclaration, InstantiatedConfig, TypeImport } from "kanel";
+import { ConstantDeclaration, InstantiatedConfig, TypeImport } from "kanel";
 
 import {
   GenerateZodSchemasConfig,
@@ -16,12 +16,12 @@ const getIdentifierDeclaration = (
 ): {
   name: string;
   originalName: string;
-  declaration: GenericDeclaration;
+  declaration: ConstantDeclaration;
 }[] => {
   const result: {
     name: string;
     originalName: string;
-    declaration: GenericDeclaration;
+    declaration: ConstantDeclaration;
   }[] = [];
 
   if (details.kind === "table" && instantiatedConfig.generateIdentifierType) {
@@ -60,13 +60,16 @@ const getIdentifierDeclaration = (
         typeImports.push(x);
       }
 
-      const declaration: GenericDeclaration = {
-        declarationType: "generic",
+      const declaration: ConstantDeclaration = {
+        declarationType: "constant",
         typeImports,
         comment,
-        lines: [
-          `export const ${name}: z.Schema<${typescriptDeclaration.name}> = ${zodType} as any;`,
-        ],
+        name,
+        type: undefined,
+        value: config.castToSchema
+          ? `${zodType} as unknown as z.Schema<${typescriptDeclaration.name}>`
+          : zodType,
+        exportAs: "named",
       };
 
       result.push({

@@ -1,6 +1,6 @@
 import {
+  ConstantDeclaration,
   escapeName,
-  GenericDeclaration,
   InstantiatedConfig,
   TypeImport,
 } from "kanel";
@@ -41,23 +41,43 @@ function makeDeclaration(
 
   const typeImports: TypeImport[] = [zImport];
 
-  // TODO: Change this to ${name} = z.object(...) satisfies ${typescriptTypeName}
-  // But not until there is a solution to https://github.com/colinhacks/zod/issues/1628
-  const lines: string[] = [
-    `export const ${name}: z.Schema<${typescriptTypeName}> = z.object({`,
-    ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
-    "}) as any;",
-  ];
+  // "satisfies" still presents problems because of https://github.com/colinhacks/zod/issues/1628
+  // Casting works but removes the ability to use .extend, .omit, etc.
+  // A better solution (TODO) is to cast like this:
+  // export const messageEmbedding =
+  // z.object({
+  //   id: messageEmbeddingId,
+  //   message_id: messageId,
+  //   conversation_id: conversationId,
+  //   embedding: z.array(z.number()).nullable(),
+  // })  as unknown as z.ZodObject<{
+  //   id: z.ZodType<MessageEmbeddingId>,
+  //   message_id: z.ZodType<MessageId>,
+  //   conversation_id: z.ZodType<ConversationId>,
+  //   embedding: z.ZodNullable<z.ZodArray<z.ZodType<number>>>,
+  // }>;
 
+  const value = [
+    "z.object({",
+    ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
+  ];
+  if (config.castToSchema) {
+    value.push(`}) as unknown as z.Schema<${typescriptTypeName}>`);
+  } else {
+    value.push("});");
+  }
   properties.forEach((p) => {
     typeImports.push(...p.typeImports);
   });
 
-  const declaration: GenericDeclaration = {
-    declarationType: "generic",
+  const declaration: ConstantDeclaration = {
+    declarationType: "constant",
     comment,
     typeImports,
-    lines,
+    name,
+    type: undefined,
+    value,
+    exportAs: "named",
   };
   return declaration;
 }
@@ -68,10 +88,10 @@ const processComposite = (
   instantiatedConfig: InstantiatedConfig,
   nonCompositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
-): GenericDeclaration[] => {
-  const declarations: GenericDeclaration[] = [];
+): ConstantDeclaration[] => {
+  const declarations: ConstantDeclaration[] = [];
 
-  const selectorDeclaration: GenericDeclaration = makeDeclaration(
+  const selectorDeclaration: ConstantDeclaration = makeDeclaration(
     instantiatedConfig,
     c,
     "selector",
@@ -82,7 +102,7 @@ const processComposite = (
   declarations.push(selectorDeclaration);
 
   if (c.kind === "table") {
-    const initializerDeclaration: GenericDeclaration = makeDeclaration(
+    const initializerDeclaration: ConstantDeclaration = makeDeclaration(
       instantiatedConfig,
       c,
       "initializer",
@@ -92,7 +112,7 @@ const processComposite = (
     );
     declarations.push(initializerDeclaration);
 
-    const mutatorDeclaration: GenericDeclaration = makeDeclaration(
+    const mutatorDeclaration: ConstantDeclaration = makeDeclaration(
       instantiatedConfig,
       c,
       "mutator",

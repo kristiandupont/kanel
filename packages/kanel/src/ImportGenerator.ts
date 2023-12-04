@@ -3,10 +3,10 @@ import path from "path";
 import TypeImport from "./TypeImport";
 
 type ImportSet = {
-  default?: string;
-  defaultAsType?: string;
-  named: Set<string>;
-  namedAsType: Set<string>;
+  defaultImport?: string;
+  importDefaultAsType?: boolean;
+  namedImports: Set<string>;
+  namedAsTypeImports: Set<string>;
 };
 
 class ImportGenerator {
@@ -52,32 +52,31 @@ class ImportGenerator {
     }
 
     if (!(importPath in this.importMap)) {
-      this.importMap[importPath] = { named: new Set(), namedAsType: new Set() };
+      this.importMap[importPath] = {
+        namedImports: new Set(),
+        namedAsTypeImports: new Set(),
+      };
     }
 
     const importSet = this.importMap[importPath];
 
     if (isDefault) {
-      if (importAsType) {
-        if (importSet.defaultAsType && importSet.defaultAsType !== name) {
-          throw new Error(
-            `Multiple default imports attempted: ${importSet.defaultAsType} and ${name} from '${importPath}'`,
-          );
-        }
-        importSet.defaultAsType = name;
-      } else {
-        if (importSet.default && importSet.default !== name) {
-          throw new Error(
-            `Multiple default imports attempted: ${importSet.default} and ${name} from '${importPath}'`,
-          );
-        }
-        importSet.default = name;
+      if (
+        importSet.defaultImport &&
+        (importSet.defaultImport !== name ||
+          importSet.importDefaultAsType !== importAsType)
+      ) {
+        throw new Error(
+          `Multiple default imports attempted: ${importSet.defaultImport} and ${name} from '${importPath}'`,
+        );
       }
+      importSet.defaultImport = name;
+      importSet.importDefaultAsType = importAsType;
     } else {
       if (importAsType) {
-        importSet.namedAsType.add(name);
+        importSet.namedAsTypeImports.add(name);
       } else {
-        importSet.named.add(name);
+        importSet.namedImports.add(name);
       }
     }
   }
@@ -85,56 +84,39 @@ class ImportGenerator {
   generateLines(): string[] {
     return Object.keys(this.importMap).flatMap((relativePath) => {
       const {
-        default: defaultImport,
-        defaultAsType: defaultAsTypeImport,
-        named,
-        namedAsType,
+        defaultImport,
+        importDefaultAsType,
+        namedImports,
+        namedAsTypeImports,
       } = this.importMap[relativePath];
 
-      const lines: string[] = [];
+      const importParts: string[] = [];
 
-      if (defaultImport || named.size > 0) {
-        lines.push(
-          this.generateLine(relativePath, false, defaultImport, [...named]),
-        );
+      if (defaultImport) {
+        if (importDefaultAsType) {
+          namedAsTypeImports.add(`default as ${defaultImport}`);
+        } else {
+          importParts.push(defaultImport);
+        }
       }
-      if (defaultAsTypeImport || namedAsType.size > 0) {
-        lines.push(
-          this.generateLine(relativePath, true, defaultAsTypeImport, [
-            ...namedAsType,
-          ]),
-        );
+
+      if (namedImports.size > 0 || namedAsTypeImports.size > 0) {
+        const nonTypeImports = [...namedImports].join(", ");
+        const typeImports = [...namedAsTypeImports]
+          .map((n) => `type ${n}`)
+          .join(", ");
+
+        const bracketedImportString =
+          "{ " +
+          [nonTypeImports, typeImports].filter(Boolean).join(", ") +
+          " }";
+
+        importParts.push(bracketedImportString);
       }
-      return lines;
+
+      const line = `import ${importParts.join(", ")} from '${relativePath}';`;
+      return [line];
     });
-  }
-
-  private generateLine(
-    relativePath: string,
-    importAsType: boolean,
-    defaultImport: string | undefined,
-    namedImports: Array<string>,
-  ): any {
-    const importDefaultAsNamed =
-      importAsType && defaultImport && namedImports.length > 0;
-
-    const appliedDefaultImport = importDefaultAsNamed
-      ? undefined
-      : defaultImport;
-    const appliedNamedImports = importDefaultAsNamed
-      ? [`default as ${defaultImport}`, ...namedImports]
-      : namedImports;
-
-    const allImports = [
-      ...(appliedDefaultImport ? [appliedDefaultImport] : []),
-      ...(appliedNamedImports.length > 0
-        ? [`{ ${appliedNamedImports.join(", ")} }`]
-        : []),
-    ].join(", ");
-
-    return `import ${
-      importAsType ? "type " : ""
-    }${allImports} from '${relativePath}';`;
   }
 }
 

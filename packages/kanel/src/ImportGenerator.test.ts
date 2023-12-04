@@ -167,7 +167,7 @@ describe("ImportGenerator", () => {
     ).toThrow("Multiple default imports attempted: def and def2 from './pkg'");
   });
 
-  it("should support aboslute imports", () => {
+  it("should support absolute imports", () => {
     const ig = new ImportGenerator("./some-module");
 
     ig.addImport({
@@ -255,8 +255,8 @@ describe("ImportGenerator", () => {
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import type Member from 'member';",
-      "import type { AccountId, AccountInitializer } from 'account';",
+      "import { type default as Member } from 'member';",
+      "import { type AccountId, type AccountInitializer } from 'account';",
     ]);
   });
 
@@ -292,7 +292,7 @@ describe("ImportGenerator", () => {
       importAsType: false,
     });
     ig.addImport({
-      name: "AccountType",
+      name: "account",
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -301,9 +301,8 @@ describe("ImportGenerator", () => {
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import type Member from 'member';",
-      "import Account, { AccountType } from 'account';",
-      "import type { AccountId, AccountInitializer } from 'account';",
+      "import { type default as Member } from 'member';",
+      "import Account, { account, type AccountId, type AccountInitializer } from 'account';",
     ]);
   });
 
@@ -328,7 +327,7 @@ describe("ImportGenerator", () => {
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import type { default as Account, AccountId } from 'account';",
+      "import { type AccountId, type default as Account } from 'account';",
     ]);
   });
 });

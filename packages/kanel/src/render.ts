@@ -85,6 +85,38 @@ const processDeclaration = (
       declarationLines.push("}");
       break;
     }
+    case "enum": {
+      const { exportAs, name, values, comment } = declaration;
+      declarationLines.push(
+        ...(processComments(comment, 0) || []),
+        exportAs === "named" ? `export enum ${name} {` : `enum ${name} {`,
+        ...values.map((value) => `  ${escapeName(value)} = '${value}',`),
+        "};",
+      );
+      if (exportAs === "default") {
+        declarationLines.push("", `export default ${name};`);
+      }
+      break;
+    }
+    case "constant": {
+      const { exportAs, name, type, value, comment } = declaration;
+      const values = Array.isArray(value) ? value : [value];
+
+      const valuesWithSemicolon = values.map((v, i) =>
+        i === values.length - 1 ? `${v};` : v,
+      );
+
+      const [valueHead, ...valueTail] = valuesWithSemicolon;
+
+      declarationLines.push(
+        ...(processComments(comment, 0) || []),
+        `export${exportAs === "default" ? " default" : ""} const ${name}${
+          type ? `: ${type}` : ""
+        } = ${valueHead}`,
+        ...valueTail,
+      );
+      break;
+    }
     case "generic": {
       declarationLines.push(
         ...processComments(declaration.comment, 0),
