@@ -50,23 +50,20 @@ export interface LanguageMutator {
 
 export const languageId = z.number() as unknown as z.Schema<LanguageId>;
 
-export const language =
-z.object({
+export const language = z.object({
   language_id: languageId,
   name: z.string(),
   last_update: z.date(),
-}) as unknown as z.Schema<Language>
+}) as unknown as z.Schema<Language>;
 
-export const languageInitializer =
-z.object({
+export const languageInitializer = z.object({
   language_id: languageId.optional(),
   name: z.string(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<LanguageInitializer>
+}) as unknown as z.Schema<LanguageInitializer>;
 
-export const languageMutator =
-z.object({
+export const languageMutator = z.object({
   language_id: languageId.optional(),
   name: z.string().optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<LanguageMutator>
+}) as unknown as z.Schema<LanguageMutator>;

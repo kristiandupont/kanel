@@ -32,8 +32,7 @@ export default interface FilmList {
   actors: string;
 }
 
-export const filmList =
-z.object({
+export const filmList = z.object({
   fid: filmId,
   title: z.string(),
   description: z.string().nullable(),
@@ -42,4 +41,4 @@ z.object({
   length: z.number().nullable(),
   rating: mpaaRating.nullable(),
   actors: z.string(),
-}) as unknown as z.Schema<FilmList>
+}) as unknown as z.Schema<FilmList>;

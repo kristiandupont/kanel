@@ -138,10 +138,9 @@ describe("processGenerationSetup", () => {
     ];
     const lines = render(declarations, "./");
     expect(lines).toEqual([
-      "export const actor: z.Schema<Actor> =",
-      "z.object({",
+      "export const actor: z.Schema<Actor> = z.object({",
       `  actor_id: actorId,`,
-      `})`,
+      `});`,
     ]);
   });
 });

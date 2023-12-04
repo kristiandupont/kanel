@@ -100,12 +100,20 @@ const processDeclaration = (
     }
     case "constant": {
       const { exportAs, name, type, value, comment } = declaration;
+      const values = Array.isArray(value) ? value : [value];
+
+      const valuesWithSemicolon = values.map((v, i) =>
+        i === values.length - 1 ? `${v};` : v,
+      );
+
+      const [valueHead, ...valueTail] = valuesWithSemicolon;
+
       declarationLines.push(
         ...(processComments(comment, 0) || []),
         `export${exportAs === "default" ? " default" : ""} const ${name}${
           type ? `: ${type}` : ""
-        } =${Array.isArray(value) ? "" : " " + value + ";"}`,
-        ...(Array.isArray(value) ? value : []),
+        } = ${valueHead}`,
+        ...valueTail,
       );
       break;
     }

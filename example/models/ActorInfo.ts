@@ -19,10 +19,9 @@ export default interface ActorInfo {
   film_info: string;
 }
 
-export const actorInfo =
-z.object({
+export const actorInfo = z.object({
   actor_id: actorId,
   first_name: z.string(),
   last_name: z.string(),
   film_info: z.string(),
-}) as unknown as z.Schema<ActorInfo>
+}) as unknown as z.Schema<ActorInfo>;

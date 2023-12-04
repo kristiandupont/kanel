@@ -15,11 +15,10 @@ enum MpaaRating {
 export default MpaaRating;
 
 /** Zod schema for mpaa_rating */
-export const mpaaRating =
-z.enum([
+export const mpaaRating = z.enum([
   'G',
   'PG',
   'PG-13',
   'R',
   'NC-17',
-]);
+]);;

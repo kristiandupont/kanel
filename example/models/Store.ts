@@ -61,26 +61,23 @@ export interface StoreMutator {
 
 export const storeId = z.number() as unknown as z.Schema<StoreId>;
 
-export const store =
-z.object({
+export const store = z.object({
   store_id: storeId,
   manager_staff_id: staffId,
   address_id: addressId,
   last_update: z.date(),
-}) as unknown as z.Schema<Store>
+}) as unknown as z.Schema<Store>;
 
-export const storeInitializer =
-z.object({
+export const storeInitializer = z.object({
   store_id: storeId.optional(),
   manager_staff_id: staffId,
   address_id: addressId,
   last_update: z.date().optional(),
-}) as unknown as z.Schema<StoreInitializer>
+}) as unknown as z.Schema<StoreInitializer>;
 
-export const storeMutator =
-z.object({
+export const storeMutator = z.object({
   store_id: storeId.optional(),
   manager_staff_id: staffId.optional(),
   address_id: addressId.optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<StoreMutator>
+}) as unknown as z.Schema<StoreMutator>;

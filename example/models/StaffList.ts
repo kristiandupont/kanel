@@ -31,8 +31,7 @@ export default interface StaffList {
   sid: number;
 }
 
-export const staffList =
-z.object({
+export const staffList = z.object({
   id: staffId,
   name: z.string(),
   address: z.string(),
@@ -41,4 +40,4 @@ z.object({
   city: z.string(),
   country: z.string(),
   sid: z.number(),
-}) as unknown as z.Schema<StaffList>
+}) as unknown as z.Schema<StaffList>;

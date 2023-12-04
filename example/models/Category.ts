@@ -50,23 +50,20 @@ export interface CategoryMutator {
 
 export const categoryId = z.number() as unknown as z.Schema<CategoryId>;
 
-export const category =
-z.object({
+export const category = z.object({
   category_id: categoryId,
   name: z.string(),
   last_update: z.date(),
-}) as unknown as z.Schema<Category>
+}) as unknown as z.Schema<Category>;
 
-export const categoryInitializer =
-z.object({
+export const categoryInitializer = z.object({
   category_id: categoryId.optional(),
   name: z.string(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<CategoryInitializer>
+}) as unknown as z.Schema<CategoryInitializer>;
 
-export const categoryMutator =
-z.object({
+export const categoryMutator = z.object({
   category_id: categoryId.optional(),
   name: z.string().optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<CategoryMutator>
+}) as unknown as z.Schema<CategoryMutator>;

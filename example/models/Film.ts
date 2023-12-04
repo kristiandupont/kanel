@@ -155,8 +155,7 @@ export interface FilmMutator {
 
 export const filmId = z.number() as unknown as z.Schema<FilmId>;
 
-export const film =
-z.object({
+export const film = z.object({
   film_id: filmId,
   title: z.string(),
   description: z.string().nullable(),
@@ -170,10 +169,9 @@ z.object({
   last_update: z.date(),
   special_features: z.string().array().nullable(),
   fulltext: z.set(z.string()),
-}) as unknown as z.Schema<Film>
+}) as unknown as z.Schema<Film>;
 
-export const filmInitializer =
-z.object({
+export const filmInitializer = z.object({
   film_id: filmId.optional(),
   title: z.string(),
   description: z.string().optional().nullable(),
@@ -187,10 +185,9 @@ z.object({
   last_update: z.date().optional(),
   special_features: z.string().array().optional().nullable(),
   fulltext: z.set(z.string()),
-}) as unknown as z.Schema<FilmInitializer>
+}) as unknown as z.Schema<FilmInitializer>;
 
-export const filmMutator =
-z.object({
+export const filmMutator = z.object({
   film_id: filmId.optional(),
   title: z.string().optional(),
   description: z.string().optional().nullable(),
@@ -204,4 +201,4 @@ z.object({
   last_update: z.date().optional(),
   special_features: z.string().array().optional().nullable(),
   fulltext: z.set(z.string()).optional(),
-}) as unknown as z.Schema<FilmMutator>
+}) as unknown as z.Schema<FilmMutator>;

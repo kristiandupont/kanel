@@ -89,8 +89,7 @@ export interface RentalMutator {
 
 export const rentalId = z.number() as unknown as z.Schema<RentalId>;
 
-export const rental =
-z.object({
+export const rental = z.object({
   rental_id: rentalId,
   rental_date: z.date(),
   inventory_id: inventoryId,
@@ -98,10 +97,9 @@ z.object({
   return_date: z.date().nullable(),
   staff_id: staffId,
   last_update: z.date(),
-}) as unknown as z.Schema<Rental>
+}) as unknown as z.Schema<Rental>;
 
-export const rentalInitializer =
-z.object({
+export const rentalInitializer = z.object({
   rental_id: rentalId.optional(),
   rental_date: z.date(),
   inventory_id: inventoryId,
@@ -109,10 +107,9 @@ z.object({
   return_date: z.date().optional().nullable(),
   staff_id: staffId,
   last_update: z.date().optional(),
-}) as unknown as z.Schema<RentalInitializer>
+}) as unknown as z.Schema<RentalInitializer>;
 
-export const rentalMutator =
-z.object({
+export const rentalMutator = z.object({
   rental_id: rentalId.optional(),
   rental_date: z.date().optional(),
   inventory_id: inventoryId.optional(),
@@ -120,4 +117,4 @@ z.object({
   return_date: z.date().optional().nullable(),
   staff_id: staffId.optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<RentalMutator>
+}) as unknown as z.Schema<RentalMutator>;

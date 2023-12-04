@@ -32,8 +32,7 @@ export default interface NicerButSlowerFilmList {
   actors: string;
 }
 
-export const nicerButSlowerFilmList =
-z.object({
+export const nicerButSlowerFilmList = z.object({
   fid: filmId,
   title: z.string(),
   description: z.string().nullable(),
@@ -42,4 +41,4 @@ z.object({
   length: z.number().nullable(),
   rating: mpaaRating.nullable(),
   actors: z.string(),
-}) as unknown as z.Schema<NicerButSlowerFilmList>
+}) as unknown as z.Schema<NicerButSlowerFilmList>;

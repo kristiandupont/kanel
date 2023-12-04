@@ -127,8 +127,7 @@ export interface StaffMutator {
 
 export const staffId = z.number() as unknown as z.Schema<StaffId>;
 
-export const staff =
-z.object({
+export const staff = z.object({
   staff_id: staffId,
   first_name: z.string(),
   last_name: z.string(),
@@ -140,10 +139,9 @@ z.object({
   password: z.string().nullable(),
   last_update: z.date(),
   picture: z.custom<Bytea>(v => v).nullable(),
-}) as unknown as z.Schema<Staff>
+}) as unknown as z.Schema<Staff>;
 
-export const staffInitializer =
-z.object({
+export const staffInitializer = z.object({
   staff_id: staffId.optional(),
   first_name: z.string(),
   last_name: z.string(),
@@ -155,10 +153,9 @@ z.object({
   password: z.string().optional().nullable(),
   last_update: z.date().optional(),
   picture: z.custom<Bytea>(v => v).optional().nullable(),
-}) as unknown as z.Schema<StaffInitializer>
+}) as unknown as z.Schema<StaffInitializer>;
 
-export const staffMutator =
-z.object({
+export const staffMutator = z.object({
   staff_id: staffId.optional(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
@@ -170,4 +167,4 @@ z.object({
   password: z.string().optional().nullable(),
   last_update: z.date().optional(),
   picture: z.custom<Bytea>(v => v).optional().nullable(),
-}) as unknown as z.Schema<StaffMutator>
+}) as unknown as z.Schema<StaffMutator>;

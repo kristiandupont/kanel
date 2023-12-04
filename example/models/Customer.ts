@@ -120,8 +120,7 @@ export interface CustomerMutator {
 
 export const customerId = z.number() as unknown as z.Schema<CustomerId>;
 
-export const customer =
-z.object({
+export const customer = z.object({
   customer_id: customerId,
   store_id: z.number(),
   first_name: z.string(),
@@ -132,10 +131,9 @@ z.object({
   create_date: z.date(),
   last_update: z.date().nullable(),
   active: z.number().nullable(),
-}) as unknown as z.Schema<Customer>
+}) as unknown as z.Schema<Customer>;
 
-export const customerInitializer =
-z.object({
+export const customerInitializer = z.object({
   customer_id: customerId.optional(),
   store_id: z.number(),
   first_name: z.string(),
@@ -146,10 +144,9 @@ z.object({
   create_date: z.date().optional(),
   last_update: z.date().optional().nullable(),
   active: z.number().optional().nullable(),
-}) as unknown as z.Schema<CustomerInitializer>
+}) as unknown as z.Schema<CustomerInitializer>;
 
-export const customerMutator =
-z.object({
+export const customerMutator = z.object({
   customer_id: customerId.optional(),
   store_id: z.number().optional(),
   first_name: z.string().optional(),
@@ -160,4 +157,4 @@ z.object({
   create_date: z.date().optional(),
   last_update: z.date().optional().nullable(),
   active: z.number().optional().nullable(),
-}) as unknown as z.Schema<CustomerMutator>
+}) as unknown as z.Schema<CustomerMutator>;

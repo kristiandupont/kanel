@@ -77,32 +77,29 @@ export interface PaymentMutator {
 
 export const paymentId = z.number() as unknown as z.Schema<PaymentId>;
 
-export const payment =
-z.object({
+export const payment = z.object({
   payment_id: paymentId,
   customer_id: customerId,
   staff_id: staffId,
   rental_id: rentalId,
   amount: z.string(),
   payment_date: z.date(),
-}) as unknown as z.Schema<Payment>
+}) as unknown as z.Schema<Payment>;
 
-export const paymentInitializer =
-z.object({
+export const paymentInitializer = z.object({
   payment_id: paymentId.optional(),
   customer_id: customerId,
   staff_id: staffId,
   rental_id: rentalId,
   amount: z.string(),
   payment_date: z.date(),
-}) as unknown as z.Schema<PaymentInitializer>
+}) as unknown as z.Schema<PaymentInitializer>;
 
-export const paymentMutator =
-z.object({
+export const paymentMutator = z.object({
   payment_id: paymentId.optional(),
   customer_id: customerId.optional(),
   staff_id: staffId.optional(),
   rental_id: rentalId.optional(),
   amount: z.string().optional(),
   payment_date: z.date().optional(),
-}) as unknown as z.Schema<PaymentMutator>
+}) as unknown as z.Schema<PaymentMutator>;
