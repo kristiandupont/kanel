@@ -1,5 +1,5 @@
 import { DomainDetails } from "extract-pg-schema";
-import { GenericDeclaration, InstantiatedConfig, TypeImport } from "kanel";
+import { ConstantDeclaration, InstantiatedConfig, TypeImport } from "kanel";
 
 import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
@@ -7,24 +7,16 @@ const processDomain = (
   d: DomainDetails,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
-): GenericDeclaration | undefined => {
+): ConstantDeclaration | undefined => {
   const { name } = config.getZodSchemaMetadata(
     d,
     undefined,
     instantiatedConfig,
   );
-  // let tsType = instantiatedConfig.typeMap[d.innerType];
-  // if (typeof tsType !== 'string') {
-  //   tsType = 'unknown';
-  // }
-
-  // const zodType = zodTypeMap[tsType];
   let zodType = config.zodTypeMap[d.innerType];
   if (!zodType) {
     zodType = "z.unknown()";
   }
-
-  const lines: string[] = [`export const ${name} = ${zodType};`];
 
   const typeImport: TypeImport = {
     name: "z",
@@ -34,11 +26,17 @@ const processDomain = (
     importAsType: false,
   };
 
-  const declaration: GenericDeclaration = {
-    declarationType: "generic",
+  const declaration: ConstantDeclaration = {
+    declarationType: "constant",
     comment: [`Zod schema for ${d.name}`],
-    typeImports: [typeImport],
-    lines,
+    typeImports: [
+      typeImport,
+      ...(typeof zodType === "string" ? [] : zodType.typeImports),
+    ],
+    name,
+    type: undefined,
+    value: typeof zodType === "string" ? zodType : zodType.name,
+    exportAs: "named",
   };
 
   return declaration;

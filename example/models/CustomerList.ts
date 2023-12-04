@@ -35,7 +35,8 @@ export default interface CustomerList {
   sid: number;
 }
 
-export const customerList: z.Schema<CustomerList> = z.object({
+export const customerList =
+z.object({
   id: customerId,
   name: z.string(),
   address: z.string(),
@@ -45,4 +46,4 @@ export const customerList: z.Schema<CustomerList> = z.object({
   country: z.string(),
   notes: z.string(),
   sid: z.number(),
-}) as any;
+}) satisfies z.ZodType<CustomerList>;

@@ -32,7 +32,8 @@ export default interface StaffList {
   sid: number;
 }
 
-export const staffList: z.Schema<StaffList> = z.object({
+export const staffList =
+z.object({
   id: staffId,
   name: z.string(),
   address: z.string(),
@@ -41,4 +42,4 @@ export const staffList: z.Schema<StaffList> = z.object({
   city: z.string(),
   country: z.string(),
   sid: z.number(),
-}) as any;
+}) satisfies z.ZodType<StaffList>;

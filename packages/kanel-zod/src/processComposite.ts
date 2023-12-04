@@ -1,6 +1,6 @@
 import {
+  ConstantDeclaration,
   escapeName,
-  GenericDeclaration,
   InstantiatedConfig,
   TypeImport,
 } from "kanel";
@@ -41,23 +41,27 @@ function makeDeclaration(
 
   const typeImports: TypeImport[] = [zImport];
 
-  // TODO: Change this to ${name} = z.object(...) satisfies ${typescriptTypeName}
-  // But not until there is a solution to https://github.com/colinhacks/zod/issues/1628
-  const lines: string[] = [
-    `export const ${name}: z.Schema<${typescriptTypeName}> = z.object({`,
+  // This still presents problems because of https://github.com/colinhacks/zod/issues/1628
+  const value = [
+    "z.object({",
     ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
-    "}) as any;",
+    config.applySatisfies
+      ? `}) satisfies z.ZodType<${typescriptTypeName}>;`
+      : "});",
   ];
 
   properties.forEach((p) => {
     typeImports.push(...p.typeImports);
   });
 
-  const declaration: GenericDeclaration = {
-    declarationType: "generic",
+  const declaration: ConstantDeclaration = {
+    declarationType: "constant",
     comment,
     typeImports,
-    lines,
+    name,
+    type: undefined,
+    value,
+    exportAs: "named",
   };
   return declaration;
 }
@@ -68,10 +72,10 @@ const processComposite = (
   instantiatedConfig: InstantiatedConfig,
   nonCompositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
-): GenericDeclaration[] => {
-  const declarations: GenericDeclaration[] = [];
+): ConstantDeclaration[] => {
+  const declarations: ConstantDeclaration[] = [];
 
-  const selectorDeclaration: GenericDeclaration = makeDeclaration(
+  const selectorDeclaration: ConstantDeclaration = makeDeclaration(
     instantiatedConfig,
     c,
     "selector",
@@ -82,7 +86,7 @@ const processComposite = (
   declarations.push(selectorDeclaration);
 
   if (c.kind === "table") {
-    const initializerDeclaration: GenericDeclaration = makeDeclaration(
+    const initializerDeclaration: ConstantDeclaration = makeDeclaration(
       instantiatedConfig,
       c,
       "initializer",
@@ -92,7 +96,7 @@ const processComposite = (
     );
     declarations.push(initializerDeclaration);
 
-    const mutatorDeclaration: GenericDeclaration = makeDeclaration(
+    const mutatorDeclaration: ConstantDeclaration = makeDeclaration(
       instantiatedConfig,
       c,
       "mutator",

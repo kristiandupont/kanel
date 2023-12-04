@@ -1,5 +1,5 @@
 import { EnumDetails } from "extract-pg-schema";
-import { GenericDeclaration, InstantiatedConfig, TypeImport } from "kanel";
+import { ConstantDeclaration, InstantiatedConfig, TypeImport } from "kanel";
 
 import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
@@ -7,14 +7,14 @@ const processEnum = (
   e: EnumDetails,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
-): GenericDeclaration => {
+): ConstantDeclaration => {
   const { name } = config.getZodSchemaMetadata(
     e,
     undefined,
     instantiatedConfig,
   );
   const lines: string[] = [
-    `export const ${name} = z.enum([`,
+    `z.enum([`,
     ...e.values.map((v) => `  '${v}',`),
     "]);",
   ];
@@ -27,11 +27,14 @@ const processEnum = (
     importAsType: false,
   };
 
-  const declaration: GenericDeclaration = {
-    declarationType: "generic",
+  const declaration: ConstantDeclaration = {
+    declarationType: "constant",
     comment: [`Zod schema for ${e.name}`],
     typeImports: [typeImport],
-    lines,
+    name,
+    type: undefined,
+    value: lines,
+    exportAs: "named",
   };
 
   return declaration;

@@ -30,6 +30,21 @@ export type InterfaceDeclaration = DeclarationBase & {
   exportAs: "named" | "default";
 };
 
+export type EnumDeclaration = DeclarationBase & {
+  declarationType: "enum";
+  name: string;
+  values: string[];
+  exportAs: "named" | "default";
+};
+
+export type ConstantDeclaration = DeclarationBase & {
+  declarationType: "constant";
+  name: string;
+  type: string | undefined;
+  value: string | string[];
+  exportAs: "named" | "default";
+};
+
 export type GenericDeclaration = DeclarationBase & {
   declarationType: "generic";
   lines: string[];
@@ -38,4 +53,6 @@ export type GenericDeclaration = DeclarationBase & {
 export type Declaration =
   | TypeDeclaration
   | InterfaceDeclaration
+  | EnumDeclaration
+  | ConstantDeclaration
   | GenericDeclaration;

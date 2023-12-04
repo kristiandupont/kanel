@@ -1,77 +1,80 @@
-import { join, relative, sep } from "path";
+import { join, relative } from "path";
 
 import { PreRenderHook } from "../config-types";
-import Details from "../Details";
+import {
+  ConstantDeclaration,
+  EnumDeclaration,
+  InterfaceDeclaration,
+  TypeDeclaration,
+} from "../declaration-types";
 import { FileContents } from "../Output";
 
-const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
-  const allEntities: Details[] = Object.values(
-    instantiatedConfig.schemas,
-  ).reduce((acc, elem) => {
-    const entitiesInSchema = Object.values(elem)
-      .filter((e) => Array.isArray(e))
-      .flat();
-    return [...acc, ...entitiesInSchema];
-  }, []);
+type GenerateIndexFileConfig = {
+  filter?: (
+    declaration:
+      | TypeDeclaration
+      | InterfaceDeclaration
+      | EnumDeclaration
+      | ConstantDeclaration,
+  ) => boolean;
+};
 
-  const lines = allEntities.map((d) => {
-    let result: string;
+type ExportsItem = {
+  name: string;
+  wasExportedAs: "named" | "default";
+  exportAsType: boolean;
+};
 
-    const { path, name: selectorName } = instantiatedConfig.getMetadata(
-      d,
-      "selector",
-      instantiatedConfig,
-    );
-    let importPath = relative(instantiatedConfig.outputPath, path);
+function stringifyExportItem(item: ExportsItem): string {
+  const prefix = item.exportAsType ? "type " : "";
+  return `${prefix}${item.wasExportedAs === "default" ? "default as " : ""}${
+    item.name
+  }`;
+}
 
-    // We never want Windows-style paths in our source. Fix it if necessary.
-    if (sep === "\\") {
-      importPath = importPath.replaceAll("\\", "/");
-    }
+export const makeGenerateIndexFile: (
+  config: GenerateIndexFileConfig,
+) => PreRenderHook = (config) => (outputAcc, instantiatedConfig) => {
+  const allExports: Record<string, ExportsItem[]> = {};
 
-    if (d.kind === "table") {
-      const additionalImports = [];
-
-      const { name: initializerName } = instantiatedConfig.getMetadata(
-        d,
-        "initializer",
-        instantiatedConfig,
-      );
-      additionalImports.push(initializerName);
-
-      const { name: mutatorName } = instantiatedConfig.getMetadata(
-        d,
-        "mutator",
-        instantiatedConfig,
-      );
-      additionalImports.push(mutatorName);
-
-      if (instantiatedConfig.generateIdentifierType) {
-        const identifierColumns = d.columns.filter(
-          (c) => c.isPrimaryKey && !c.reference,
-        );
-
-        identifierColumns.forEach((c) => {
-          const { name } = instantiatedConfig.generateIdentifierType(
-            c,
-            d,
-            instantiatedConfig,
-          );
-          additionalImports.push(name);
-        });
+  for (const path of Object.keys(outputAcc)) {
+    const file = outputAcc[path];
+    allExports[path] = [];
+    for (const declaration of file.declarations) {
+      if (declaration.declarationType === "generic") {
+        continue;
       }
 
-      result = `export type { default as ${selectorName}, ${additionalImports.join(
-        ", ",
-      )} } from './${importPath}';`;
-    } else if (d.kind === "enum") {
-      const prefix = instantiatedConfig.enumStyle === "type" ? "type " : "";
-      result = `export ${prefix}{ default as ${selectorName} } from './${importPath}';`;
-    } else {
-      result = `export type { default as ${selectorName} } from './${importPath}';`;
+      // eslint-disable-next-line unicorn/no-array-callback-reference
+      if (config.filter && !config.filter(declaration)) {
+        continue;
+      }
+
+      const { name, exportAs, declarationType } = declaration;
+      allExports[path].push({
+        name,
+        wasExportedAs: exportAs,
+        exportAsType: ["typeDeclaration", "interface"].includes(
+          declarationType,
+        ),
+      });
+    }
+  }
+
+  const lines = Object.keys(allExports).map((path) => {
+    const exports = allExports[path];
+    if (exports.length === 0) {
+      return "";
     }
 
-    return result;
+    const relativePath = relative(instantiatedConfig.outputPath, path);
+
+    const line = `export {${
+      // eslint-disable-next-line unicorn/no-array-callback-reference
+      exports.map(stringifyExportItem).join(", ")
+    }} from './${relativePath}';`;
+
+    return line;
   });
 
   const indexFile: FileContents = {
@@ -90,5 +93,7 @@ const generateIndexFile: PreRenderHook = (outputAcc, instantiatedConfig) => {
     [path]: indexFile,
   };
 };
+
+const generateIndexFile = makeGenerateIndexFile({});
 
 export default generateIndexFile;

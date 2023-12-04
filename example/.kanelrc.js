@@ -20,7 +20,8 @@ const generateZodSchemas = makeGenerateZodSchemas({
     ...defaultZodTypeMap,
     'pg_catalog.tsvector': 'z.set(z.string())',
     'pg_catalog.bytea': { name:'z.custom<Bytea>(v => v)', typeImports: [{ name: 'Bytea', path: 'bytea', isAbsolute: true, isDefault: false }] }
-  }
+  },
+  applySatisfies: true
 })
 
 /** @type {import('../src/Config').default} */
@@ -89,7 +90,7 @@ module.exports = {
   },
 
   // Generate an index file with exports of everything
-  preRenderHooks: [generateIndexFile, generateZodSchemas],
+  preRenderHooks: [generateZodSchemas, generateIndexFile],
 
   customTypeMap: {
     // A text search vector could be stored as a set of strings. See Film.ts for an example.

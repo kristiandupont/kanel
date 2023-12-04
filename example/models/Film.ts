@@ -156,9 +156,10 @@ export interface FilmMutator {
   fulltext?: Set<string>;
 }
 
-export const filmId: z.Schema<FilmId> = z.number() as any;
+export const filmId = z.number();
 
-export const film: z.Schema<Film> = z.object({
+export const film =
+z.object({
   film_id: filmId,
   title: z.string(),
   description: z.string().nullable(),
@@ -172,9 +173,10 @@ export const film: z.Schema<Film> = z.object({
   last_update: z.date(),
   special_features: z.string().array().nullable(),
   fulltext: z.set(z.string()),
-}) as any;
+}) satisfies z.ZodType<Film>;
 
-export const filmInitializer: z.Schema<FilmInitializer> = z.object({
+export const filmInitializer =
+z.object({
   film_id: filmId.optional(),
   title: z.string(),
   description: z.string().optional().nullable(),
@@ -188,9 +190,10 @@ export const filmInitializer: z.Schema<FilmInitializer> = z.object({
   last_update: z.date().optional(),
   special_features: z.string().array().optional().nullable(),
   fulltext: z.set(z.string()),
-}) as any;
+}) satisfies z.ZodType<FilmInitializer>;
 
-export const filmMutator: z.Schema<FilmMutator> = z.object({
+export const filmMutator =
+z.object({
   film_id: filmId.optional(),
   title: z.string().optional(),
   description: z.string().optional().nullable(),
@@ -204,4 +207,4 @@ export const filmMutator: z.Schema<FilmMutator> = z.object({
   last_update: z.date().optional(),
   special_features: z.string().array().optional().nullable(),
   fulltext: z.set(z.string()).optional(),
-}) as any;
+}) satisfies z.ZodType<FilmMutator>;

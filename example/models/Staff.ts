@@ -126,9 +126,10 @@ export interface StaffMutator {
   picture?: bytea | null;
 }
 
-export const staffId: z.Schema<StaffId> = z.number() as any;
+export const staffId = z.number();
 
-export const staff: z.Schema<Staff> = z.object({
+export const staff =
+z.object({
   staff_id: staffId,
   first_name: z.string(),
   last_name: z.string(),
@@ -140,9 +141,10 @@ export const staff: z.Schema<Staff> = z.object({
   password: z.string().nullable(),
   last_update: z.date(),
   picture: z.custom<Bytea>(v => v).nullable(),
-}) as any;
+}) satisfies z.ZodType<Staff>;
 
-export const staffInitializer: z.Schema<StaffInitializer> = z.object({
+export const staffInitializer =
+z.object({
   staff_id: staffId.optional(),
   first_name: z.string(),
   last_name: z.string(),
@@ -154,9 +156,10 @@ export const staffInitializer: z.Schema<StaffInitializer> = z.object({
   password: z.string().optional().nullable(),
   last_update: z.date().optional(),
   picture: z.custom<Bytea>(v => v).optional().nullable(),
-}) as any;
+}) satisfies z.ZodType<StaffInitializer>;
 
-export const staffMutator: z.Schema<StaffMutator> = z.object({
+export const staffMutator =
+z.object({
   staff_id: staffId.optional(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
@@ -168,4 +171,4 @@ export const staffMutator: z.Schema<StaffMutator> = z.object({
   password: z.string().optional().nullable(),
   last_update: z.date().optional(),
   picture: z.custom<Bytea>(v => v).optional().nullable(),
-}) as any;
+}) satisfies z.ZodType<StaffMutator>;

@@ -4,10 +4,9 @@ import { tryParse } from "tagged-comment-parser";
 import { InstantiatedConfig } from "../config-types";
 import {
   Declaration,
-  GenericDeclaration,
+  EnumDeclaration,
   TypeDeclaration,
 } from "../declaration-types";
-import escapeName from "../escapeName";
 import Output, { Path } from "../Output";
 
 type EnumStyle = "enum" | "type";
@@ -43,18 +42,12 @@ const makeMapper =
       };
       return { path, declaration };
     } else {
-      const declaration: GenericDeclaration = {
-        declarationType: "generic",
+      const declaration: EnumDeclaration = {
+        declarationType: "enum",
         comment,
-        lines: [
-          `enum ${name} {`,
-          ...enumDetails.values.map(
-            (value) => `  ${escapeName(value)} = '${value}',`,
-          ),
-          "};",
-          "",
-          `export default ${name};`,
-        ],
+        name,
+        exportAs: "default",
+        values: enumDetails.values,
       };
       return { path, declaration };
     }

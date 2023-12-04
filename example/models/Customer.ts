@@ -119,9 +119,10 @@ export interface CustomerMutator {
   active?: number | null;
 }
 
-export const customerId: z.Schema<CustomerId> = z.number() as any;
+export const customerId = z.number();
 
-export const customer: z.Schema<Customer> = z.object({
+export const customer =
+z.object({
   customer_id: customerId,
   store_id: z.number(),
   first_name: z.string(),
@@ -132,9 +133,10 @@ export const customer: z.Schema<Customer> = z.object({
   create_date: z.date(),
   last_update: z.date().nullable(),
   active: z.number().nullable(),
-}) as any;
+}) satisfies z.ZodType<Customer>;
 
-export const customerInitializer: z.Schema<CustomerInitializer> = z.object({
+export const customerInitializer =
+z.object({
   customer_id: customerId.optional(),
   store_id: z.number(),
   first_name: z.string(),
@@ -145,9 +147,10 @@ export const customerInitializer: z.Schema<CustomerInitializer> = z.object({
   create_date: z.date().optional(),
   last_update: z.date().optional().nullable(),
   active: z.number().optional().nullable(),
-}) as any;
+}) satisfies z.ZodType<CustomerInitializer>;
 
-export const customerMutator: z.Schema<CustomerMutator> = z.object({
+export const customerMutator =
+z.object({
   customer_id: customerId.optional(),
   store_id: z.number().optional(),
   first_name: z.string().optional(),
@@ -158,4 +161,4 @@ export const customerMutator: z.Schema<CustomerMutator> = z.object({
   create_date: z.date().optional(),
   last_update: z.date().optional().nullable(),
   active: z.number().optional().nullable(),
-}) as any;
+}) satisfies z.ZodType<CustomerMutator>;

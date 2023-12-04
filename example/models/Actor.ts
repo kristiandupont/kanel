@@ -57,25 +57,28 @@ export interface ActorMutator {
   last_update?: Date;
 }
 
-export const actorId: z.Schema<ActorId> = z.number() as any;
+export const actorId = z.number();
 
-export const actor: z.Schema<Actor> = z.object({
+export const actor =
+z.object({
   actor_id: actorId,
   first_name: z.string(),
   last_name: z.string(),
   last_update: z.date(),
-}) as any;
+}) satisfies z.ZodType<Actor>;
 
-export const actorInitializer: z.Schema<ActorInitializer> = z.object({
+export const actorInitializer =
+z.object({
   actor_id: actorId.optional(),
   first_name: z.string(),
   last_name: z.string(),
   last_update: z.date().optional(),
-}) as any;
+}) satisfies z.ZodType<ActorInitializer>;
 
-export const actorMutator: z.Schema<ActorMutator> = z.object({
+export const actorMutator =
+z.object({
   actor_id: actorId.optional(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   last_update: z.date().optional(),
-}) as any;
+}) satisfies z.ZodType<ActorMutator>;

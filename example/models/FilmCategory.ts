@@ -46,20 +46,23 @@ export interface FilmCategoryMutator {
   last_update?: Date;
 }
 
-export const filmCategory: z.Schema<FilmCategory> = z.object({
+export const filmCategory =
+z.object({
   film_id: filmId,
   category_id: categoryId,
   last_update: z.date(),
-}) as any;
+}) satisfies z.ZodType<FilmCategory>;
 
-export const filmCategoryInitializer: z.Schema<FilmCategoryInitializer> = z.object({
+export const filmCategoryInitializer =
+z.object({
   film_id: filmId,
   category_id: categoryId,
   last_update: z.date().optional(),
-}) as any;
+}) satisfies z.ZodType<FilmCategoryInitializer>;
 
-export const filmCategoryMutator: z.Schema<FilmCategoryMutator> = z.object({
+export const filmCategoryMutator =
+z.object({
   film_id: filmId.optional(),
   category_id: categoryId.optional(),
   last_update: z.date().optional(),
-}) as any;
+}) satisfies z.ZodType<FilmCategoryMutator>;

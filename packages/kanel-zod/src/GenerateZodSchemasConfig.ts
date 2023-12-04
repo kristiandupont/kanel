@@ -7,6 +7,7 @@ export type GenerateZodSchemasConfig = {
   getZodSchemaMetadata: GetZodSchemaMetadata;
   getZodIdentifierMetadata: GetZodIdentifierMetadata;
   zodTypeMap: TypeMap;
+  applySatisfies: boolean;
 };
 
 export type GetZodSchemaMetadata = (
