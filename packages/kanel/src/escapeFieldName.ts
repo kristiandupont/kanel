@@ -1,3 +1,5 @@
+import escapeString from "./escapeString";
+
 /** Used for object fields. If the name is illegal Typescript, put it in quotes. */
 const escapeFieldName = (name: string): string => {
   let isLegalIdentifier = true;
@@ -12,7 +14,7 @@ const escapeFieldName = (name: string): string => {
     isLegalIdentifier = false;
   }
 
-  return isLegalIdentifier ? name : `'${name}'`;
+  return isLegalIdentifier ? name : `'${escapeString(name)}'`;
 };
 
 export default escapeFieldName;

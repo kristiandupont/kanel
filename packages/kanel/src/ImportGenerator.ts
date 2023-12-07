@@ -1,5 +1,6 @@
 import path from "path";
 
+import escapeString from "./escapeString";
 import TypeImport from "./TypeImport";
 
 type ImportSet = {
@@ -114,7 +115,9 @@ class ImportGenerator {
         importParts.push(bracketedImportString);
       }
 
-      const line = `import ${importParts.join(", ")} from '${relativePath}';`;
+      const line = `import ${importParts.join(", ")} from '${escapeString(
+        relativePath,
+      )}';`;
       return [line];
     });
   }

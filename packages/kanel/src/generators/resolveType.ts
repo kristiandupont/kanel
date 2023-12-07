@@ -10,7 +10,6 @@ import { tryParse } from "tagged-comment-parser";
 
 import { InstantiatedConfig } from "../config-types";
 import Details from "../Details";
-import escapeIdentifier from "../escapeIdentifier";
 import TypeDefinition from "../TypeDefinition";
 import { CompositeDetails, CompositeProperty } from "./composite-types";
 
@@ -166,7 +165,7 @@ const resolveType = (
     );
 
     return {
-      name: escapeIdentifier(name),
+      name,
       typeImports: [
         {
           name,
