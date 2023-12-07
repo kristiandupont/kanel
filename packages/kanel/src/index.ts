@@ -2,7 +2,7 @@ export * from "./config-types";
 export * from "./declaration-types";
 export * from "./default-metadata-generators";
 export { default as Details } from "./Details";
-export { default as escapeName } from "./escapeName";
+export { default as escapeFieldName } from "./escapeFieldName";
 export {
   CompositeDetails,
   CompositeProperty,

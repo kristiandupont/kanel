@@ -1,5 +1,5 @@
-/** Used for identifiers. If the name is illegal Typescript, put it in quotes. */
-const escapeName = (name: string): string => {
+/** Used for object fields. If the name is illegal Typescript, put it in quotes. */
+const escapeFieldName = (name: string): string => {
   let isLegalIdentifier = true;
 
   if (name.length === 0 || name.trim() !== name) {
@@ -15,4 +15,4 @@ const escapeName = (name: string): string => {
   return isLegalIdentifier ? name : `'${name}'`;
 };
 
-export default escapeName;
+export default escapeFieldName;

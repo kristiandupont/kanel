@@ -143,4 +143,26 @@ describe("processGenerationSetup", () => {
       `});`,
     ]);
   });
+
+  it("should process a type declaration with special characters", () => {
+    const declarations: Declaration[] = [
+      {
+        declarationType: "typeDeclaration" as const,
+        name: "[example] this is a table! yes, even with symbols: \"'!.Id",
+        exportAs: "named",
+        comment: ["This is a // * /* comment */", "hello"],
+        typeDefinition: [
+          "string & { __brand: '[example] this is a table! yes, even with symbols: \"\\'!.Id' }",
+        ],
+      },
+    ];
+    const lines = render(declarations, "./");
+    expect(lines).toEqual([
+      "/**",
+      " * This is a // * /* comment *\\/",
+      " * hello",
+      " */",
+      `export type ExampleThisIsATableYesEvenWithSymbolsId = string & { __brand: '[example] this is a table! yes, even with symbols: "\\'!.Id' };`,
+    ]);
+  });
 });

@@ -1,5 +1,7 @@
 import { Declaration } from "./declaration-types";
-import escapeName from "./escapeName";
+import escapeComment from "./escapeComment";
+import escapeFieldName from "./escapeFieldName";
+import escapeIdentifier from "./escapeIdentifier";
 import ImportGenerator from "./ImportGenerator";
 
 const processComments = (
@@ -10,13 +12,15 @@ const processComments = (
     return [];
   }
 
+  const escapedComments = comments.map((comment) => escapeComment(comment));
+
   const i = " ".repeat(indentation);
-  if (comments.length === 1) {
-    return [`${i}/** ${comments[0]} */`];
+  if (escapedComments.length === 1) {
+    return [`${i}/** ${escapedComments[0]} */`];
   } else {
     const lines: string[] = [];
     lines.push(`${i}/**`);
-    comments.forEach((comment) => lines.push(`${i} * ${comment}`));
+    escapedComments.forEach((comment) => lines.push(`${i} * ${comment}`));
     lines.push(`${i} */`);
     return lines;
   }
@@ -34,24 +38,34 @@ const processDeclaration = (
       declarationLines.push(...processComments(comment, 0));
       if (exportAs === "default") {
         if (typeDefinition.length === 1) {
-          declarationLines.push(`type ${name} = ${typeDefinition[0]};`);
+          declarationLines.push(
+            `type ${escapeIdentifier(name)} = ${typeDefinition[0]};`,
+          );
         } else {
           const [head, ...tail] = typeDefinition;
           const tailLines = tail.map((l, i) =>
             i === tail.length - 1 ? `  ${l};` : `  ${l}`,
           );
-          declarationLines.push(`type ${name} = ${head}`, ...tailLines);
+          declarationLines.push(
+            `type ${escapeIdentifier(name)} = ${head}`,
+            ...tailLines,
+          );
         }
-        declarationLines.push("", `export default ${name};`);
+        declarationLines.push("", `export default ${escapeIdentifier(name)};`);
       } else {
         if (typeDefinition.length === 1) {
-          declarationLines.push(`export type ${name} = ${typeDefinition[0]};`);
+          declarationLines.push(
+            `export type ${escapeIdentifier(name)} = ${typeDefinition[0]};`,
+          );
         } else {
           const [head, ...tail] = typeDefinition;
           const tailLines = tail.map((l, i) =>
             i === tail.length - 1 ? `  ${l};` : `  ${l}`,
           );
-          declarationLines.push(`export type ${name} = ${head}`, ...tailLines);
+          declarationLines.push(
+            `export type ${escapeIdentifier(name)} = ${head}`,
+            ...tailLines,
+          );
         }
       }
       break;
@@ -60,7 +74,9 @@ const processDeclaration = (
       const { exportAs, name, base, properties, comment } = declaration;
       declarationLines.push(
         ...(processComments(comment, 0) || []),
-        `export${exportAs === "default" ? " default" : ""} interface ${name}${
+        `export${
+          exportAs === "default" ? " default" : ""
+        } interface ${escapeIdentifier(name)}${
           base ? ` extends ${base}` : ""
         } {`,
       );
@@ -70,9 +86,9 @@ const processDeclaration = (
         }
         declarationLines.push(
           ...(processComments(property.comment, 2) || []),
-          `  ${escapeName(property.name)}${property.isOptional ? "?" : ""}: ${
-            property.typeName
-          }${"[]".repeat(property.dimensions)}${
+          `  ${escapeFieldName(property.name)}${
+            property.isOptional ? "?" : ""
+          }: ${property.typeName}${"[]".repeat(property.dimensions)}${
             property.isNullable ? " | null" : ""
           };`,
         );
@@ -89,12 +105,14 @@ const processDeclaration = (
       const { exportAs, name, values, comment } = declaration;
       declarationLines.push(
         ...(processComments(comment, 0) || []),
-        exportAs === "named" ? `export enum ${name} {` : `enum ${name} {`,
-        ...values.map((value) => `  ${escapeName(value)} = '${value}',`),
+        exportAs === "named"
+          ? `export enum ${escapeIdentifier(name)} {`
+          : `enum ${escapeIdentifier(name)} {`,
+        ...values.map((value) => `  ${escapeFieldName(value)} = '${value}',`),
         "};",
       );
       if (exportAs === "default") {
-        declarationLines.push("", `export default ${name};`);
+        declarationLines.push("", `export default ${escapeIdentifier(name)};`);
       }
       break;
     }
@@ -110,7 +128,9 @@ const processDeclaration = (
 
       declarationLines.push(
         ...(processComments(comment, 0) || []),
-        `export${exportAs === "default" ? " default" : ""} const ${name}${
+        `export${
+          exportAs === "default" ? " default" : ""
+        } const ${escapeIdentifier(name)}${
           type ? `: ${type}` : ""
         } = ${valueHead}`,
         ...valueTail,
