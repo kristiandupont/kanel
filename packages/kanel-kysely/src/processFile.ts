@@ -194,7 +194,7 @@ const processFile = (
   }
 
   const tableImport: TypeImport = {
-    name: `${selectorName}Table`,
+    name: tableInterfaceName,
     isDefault: true,
     path,
     isAbsolute: false,

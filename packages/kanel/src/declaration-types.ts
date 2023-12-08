@@ -8,18 +8,17 @@ export type DeclarationBase = {
 export type TypeDeclaration = DeclarationBase & {
   declarationType: "typeDeclaration";
   name: string;
+  /** Must be valid TypeScript */
   typeDefinition: string[];
   exportAs: "named" | "default";
 };
 
-export type InterfacePropertyDeclaration = {
+export type InterfacePropertyDeclaration = DeclarationBase & {
   name: string;
-  comment?: string[];
   dimensions: number;
   isNullable: boolean;
   isOptional: boolean;
   typeName: string;
-  typeImports?: TypeImport[];
 };
 
 export type InterfaceDeclaration = DeclarationBase & {
@@ -40,6 +39,7 @@ export type EnumDeclaration = DeclarationBase & {
 export type ConstantDeclaration = DeclarationBase & {
   declarationType: "constant";
   name: string;
+  /** Must be valid TypeScript */
   type: string | undefined;
   value: string | string[];
   exportAs: "named" | "default";

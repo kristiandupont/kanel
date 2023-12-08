@@ -3,6 +3,8 @@ import { TableColumn } from "extract-pg-schema";
 import { join } from "path";
 import { tryParse } from "tagged-comment-parser";
 
+import escapeIdentifier from "./escapeIdentifier";
+import escapeString from "./escapeString";
 import { CompositeProperty } from "./generators/composite-types";
 import resolveType from "./generators/resolveType";
 import {
@@ -67,7 +69,9 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   details,
   config,
 ) => {
-  const name = toPascalCase(details.name) + toPascalCase(column.name);
+  const name = escapeIdentifier(
+    toPascalCase(details.name) + toPascalCase(column.name),
+  );
   const innerType = resolveType(column, details, {
     ...config,
     // Explicitly disable identifier resolution so we get the actual inner type here
@@ -86,7 +90,7 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
     declarationType: "typeDeclaration",
     name,
     exportAs: "named",
-    typeDefinition: [`${type} & { __brand: '${name}' }`],
+    typeDefinition: [`${type} & { __brand: '${escapeString(name)}' }`],
     typeImports: imports,
     comment: [`Identifier type for ${details.schemaName}.${details.name}`],
   };

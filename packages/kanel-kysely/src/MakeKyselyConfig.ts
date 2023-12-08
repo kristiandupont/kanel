@@ -1,4 +1,4 @@
-import { CompositeDetails, InstantiatedConfig } from "kanel";
+import { CompositeDetails, escapeIdentifier, InstantiatedConfig } from "kanel";
 
 interface MakeKyselyConfig {
   databaseFilename: string;
@@ -19,10 +19,14 @@ interface MakeKyselyConfig {
 export const defaultConfig: MakeKyselyConfig = {
   databaseFilename: "Database",
   getKyselyItemMetadata: (d, selectorName, canInitialize, canMutate) => ({
-    tableInterfaceName: `${selectorName}Table`,
-    selectableName: selectorName,
-    insertableName: canInitialize ? `New${selectorName}` : undefined,
-    updatableName: canMutate ? `${selectorName}Update` : undefined,
+    tableInterfaceName: `${escapeIdentifier(selectorName)}Table`,
+    selectableName: escapeIdentifier(selectorName),
+    insertableName: canInitialize
+      ? `New${escapeIdentifier(selectorName)}`
+      : undefined,
+    updatableName: canMutate
+      ? `${escapeIdentifier(selectorName)}Update`
+      : undefined,
   }),
 };
 
