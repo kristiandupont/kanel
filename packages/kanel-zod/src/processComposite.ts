@@ -64,7 +64,7 @@ function makeDeclaration(
   if (config.castToSchema) {
     value.push(`}) as unknown as z.Schema<${typescriptTypeName}>`);
   } else {
-    value.push("});");
+    value.push("})");
   }
   properties.forEach((p) => {
     typeImports.push(...p.typeImports);
