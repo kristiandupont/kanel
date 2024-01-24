@@ -74,16 +74,21 @@ export async function main(): Promise<void> {
   }
 
   let config: Config;
-  const configFile = path.join(process.cwd(), options.config || ".kanelrc.js");
-  if (
-    fs.existsSync(configFile) ||
-    fs.existsSync(configFile + ".js") ||
-    fs.existsSync(configFile + ".cjs") ||
-    fs.existsSync(configFile + ".json")
-  ) {
-    console.info(`Using config file: ${configFile}`);
+  let configPath: string | undefined;
+  const configCandidates = options.config
+    ? [options.config]
+    : [".kanelrc.js", ".kanelrc.cjs", ".kanelrc.json"];
+  for (const filename of configCandidates) {
+    const candidatePath = path.join(process.cwd(), filename);
+    if (fs.existsSync(candidatePath)) {
+      configPath = candidatePath;
+      break;
+    }
+  }
+  if (configPath) {
+    console.info(`Using config file: ${configPath}`);
     try {
-      config = require(configFile);
+      config = require(configPath);
     } catch (error) {
       console.error("Could not open config file:", error);
       process.exit(1);
