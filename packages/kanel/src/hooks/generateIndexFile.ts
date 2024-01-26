@@ -50,7 +50,7 @@ export const makeGenerateIndexFile: (
         continue;
       }
 
-      const {name, exportAs, declarationType} = declaration;
+      const { name, exportAs, declarationType } = declaration;
       allExports[path].push({
         name,
         wasExportedAs: exportAs,
