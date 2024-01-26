@@ -1,4 +1,4 @@
-import { join, relative } from "path";
+import { join, relative, sep } from "path";
 
 import { PreRenderHook } from "../config-types";
 import {
@@ -50,7 +50,7 @@ export const makeGenerateIndexFile: (
         continue;
       }
 
-      const { name, exportAs, declarationType } = declaration;
+      const {name, exportAs, declarationType} = declaration;
       allExports[path].push({
         name,
         wasExportedAs: exportAs,
@@ -67,7 +67,11 @@ export const makeGenerateIndexFile: (
       return "";
     }
 
-    const relativePath = relative(instantiatedConfig.outputPath, path);
+    let relativePath = relative(instantiatedConfig.outputPath, path);
+    // Fix Windows-style paths in import line
+    if (sep === "\\") {
+      relativePath = relativePath.replaceAll("\\", "/");
+    }
 
     const line = `export { ${
       // eslint-disable-next-line unicorn/no-array-callback-reference
