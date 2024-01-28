@@ -77,7 +77,7 @@ export async function main(): Promise<void> {
   let configPath: string | undefined;
   const configCandidates = options.config
     ? [options.config]
-    : [".kanelrc.js", ".kanelrc.cjs", ".kanelrc.json"];
+    : [".kanelrc.js", ".kanelrc.cjs", ".kanelrc.json", ".kanelrc.ts"];
   for (const filename of configCandidates) {
     const candidatePath = path.join(process.cwd(), filename);
     if (fs.existsSync(candidatePath)) {
