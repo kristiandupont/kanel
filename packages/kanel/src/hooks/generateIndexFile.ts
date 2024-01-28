@@ -45,7 +45,6 @@ export const makeGenerateIndexFile: (
         continue;
       }
 
-      // eslint-disable-next-line unicorn/no-array-callback-reference
       if (config.filter && !config.filter(declaration)) {
         continue;
       }
@@ -73,10 +72,9 @@ export const makeGenerateIndexFile: (
       relativePath = relativePath.replaceAll("\\", "/");
     }
 
-    const line = `export { ${
-      // eslint-disable-next-line unicorn/no-array-callback-reference
-      exports.map(stringifyExportItem).join(", ")
-    } } from './${relativePath}';`;
+    const line = `export { ${exports
+      .map(stringifyExportItem)
+      .join(", ")} } from './${relativePath}';`;
 
     return line;
   });
