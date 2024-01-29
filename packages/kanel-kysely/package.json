@@ -1,6 +1,6 @@
 {
   "name": "kanel-kysely",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "keywords": [
     "postgresql",
     "schema",
@@ -29,7 +29,7 @@
     "run-example": "kanel -c ./example/.kanelrc"
   },
   "devDependencies": {
-    "extract-pg-schema": "^4.2.4",
+    "extract-pg-schema": "^4.6.0",
     "kanel": "*"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 {
   "name": "kanel-zod",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "keywords": [
     "postgresql",
     "schema",
@@ -28,7 +28,7 @@
     "test": "echo TODO..."
   },
   "devDependencies": {
-    "extract-pg-schema": "^4.2.4",
+    "extract-pg-schema": "^4.6.0",
     "kanel": "*"
   },
   "dependencies": {
