@@ -9,8 +9,6 @@ See the documentation [here](https://kristiandupont.github.io/kanel)
 
 Introduction to the idea is outlined [here](https://medium.com/@kristiandupont/generating-typescript-types-from-postgres-48661868ef84).
 
-_Note_: If you are migrating from v2, there are significant breaking changes. There is a [breakdown](https://kristiandupont.github.io/kanel/migration.html) in the documentation.
-
 ## Usage
 
 Install with:
