@@ -1,9 +1,10 @@
-type Matcher = string | RegExp | ((str: string) => boolean);
+type Predicate = (str: string) => boolean;
+type Matcher = string | RegExp | Predicate;
 
-const isString = (str: unknown): str is string => typeof str === "string";
-const isRegExp = (str: unknown): str is RegExp => str instanceof RegExp;
-const isPredicate = (str: unknown): str is (str: string) => boolean =>
-  typeof str === "function";
+const isString = (input: unknown): input is string => typeof input === "string";
+const isRegExp = (input: unknown): input is RegExp => input instanceof RegExp;
+const isPredicate = (input: unknown): input is Predicate =>
+  typeof input === "function";
 
 export const isMatch = (str: string, matcher: Matcher): boolean => {
   if (isString(matcher)) {
