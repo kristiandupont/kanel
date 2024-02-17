@@ -1,17 +1,16 @@
 {
-  "name": "kanel-knex",
-  "version": "2.3.4",
+  "name": "kanel-seeder",
+  "version": "1.0.0",
   "keywords": [
     "postgresql",
     "schema",
-    "typescript",
-    "knex"
+    "typescript"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kristiandupont/kanel.git"
   },
-  "description": "Knex extension for Kanel",
+  "description": "PostgreSQL Seed Data Generator using Kanel",
   "homepage": "https://kristiandupont.github.io/kanel",
   "author": {
     "name": "Kristian Dupont",
@@ -25,14 +24,15 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf ./build && tsc",
-    "test": "vitest run"
-  },
-  "dependencies": {
-    "knex": "^3.0.0",
-    "kanel-seeder": "1.0.0"
+    "test": "echo TODO..."
   },
   "devDependencies": {
     "extract-pg-schema": "^5.0.0",
     "kanel": "*"
+  },
+  "dependencies": {
+    "@kristiandupont/mdconf": "^1.0.8",
+    "tagged-comment-parser": "^1.3.5",
+    "zod": "^3.22.4"
   }
 }
