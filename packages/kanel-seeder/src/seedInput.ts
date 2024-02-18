@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 const seedInput = z.object({
-  config: z.object({
-    schema: z.string(),
-  }),
+  config: z
+    .object({
+      schema: z.string(),
+    })
+    .optional(),
+  defaults: z.record(z.string()).optional(),
   data: z.array(
     z.object({
       name: z.string(),
