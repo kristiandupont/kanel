@@ -1,4 +1,4 @@
-import TypeImport from "./TypeImport";
+import type TypeImport from "./TypeImport";
 
 /**
  * A type definition can either be a string representing a builtin type,

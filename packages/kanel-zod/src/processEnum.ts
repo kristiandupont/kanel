@@ -1,7 +1,11 @@
-import { EnumDetails } from "extract-pg-schema";
-import { ConstantDeclaration, InstantiatedConfig, TypeImport } from "kanel";
+import type { EnumDetails } from "extract-pg-schema";
+import type {
+  ConstantDeclaration,
+  InstantiatedConfig,
+  TypeImport,
+} from "kanel";
 
-import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
 const processEnum = (
   e: EnumDetails,

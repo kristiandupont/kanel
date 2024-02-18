@@ -1,13 +1,14 @@
-import { EnumDetails, Schema } from "extract-pg-schema";
+import type { EnumDetails, Schema } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import { InstantiatedConfig } from "../config-types";
-import {
+import type { InstantiatedConfig } from "../config-types";
+import type {
   Declaration,
   EnumDeclaration,
   TypeDeclaration,
 } from "../declaration-types";
-import Output, { Path } from "../Output";
+import type { Path } from "../Output";
+import type Output from "../Output";
 
 type EnumStyle = "enum" | "type";
 

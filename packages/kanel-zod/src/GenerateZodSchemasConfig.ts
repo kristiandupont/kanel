@@ -1,7 +1,7 @@
 import { recase } from "@kristiandupont/recase";
-import { TableDetails } from "extract-pg-schema";
-import { TableColumn } from "extract-pg-schema";
-import { Details, InstantiatedConfig, Path, TypeMap } from "kanel";
+import type { TableDetails } from "extract-pg-schema";
+import type { TableColumn } from "extract-pg-schema";
+import type { Details, InstantiatedConfig, Path, TypeMap } from "kanel";
 
 export type GenerateZodSchemasConfig = {
   getZodSchemaMetadata: GetZodSchemaMetadata;

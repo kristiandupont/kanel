@@ -1,7 +1,8 @@
-import { Schema } from "extract-pg-schema";
+import type { Schema } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import SeedData, { ColumnData, RawSeedData, TableData } from "./SeedData";
+import type { ColumnData, RawSeedData, TableData } from "./SeedData";
+import type SeedData from "./SeedData";
 
 function preprocessData(
   inputData: RawSeedData,

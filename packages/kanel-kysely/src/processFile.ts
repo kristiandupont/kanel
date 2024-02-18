@@ -1,4 +1,4 @@
-import {
+import type {
   CompositeDetails,
   CompositeProperty,
   Declaration,
@@ -7,7 +7,7 @@ import {
   TypeImport,
 } from "kanel";
 
-import MakeKyselyConfig from "./MakeKyselyConfig";
+import type MakeKyselyConfig from "./MakeKyselyConfig";
 
 /**
  * This is a quirky way to get Kysely interfaces. Basically, what happens is that this

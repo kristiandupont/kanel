@@ -1,13 +1,13 @@
-import {
+import type {
   ConstantDeclaration,
-  escapeName,
   InstantiatedConfig,
   TypeImport,
 } from "kanel";
-import { CompositeDetails } from "kanel/build/generators/composite-types";
+import { escapeName } from "kanel";
+import type { CompositeDetails } from "kanel/build/generators/composite-types";
 
 import generateProperties from "./generateProperties";
-import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";
 
 function makeDeclaration(

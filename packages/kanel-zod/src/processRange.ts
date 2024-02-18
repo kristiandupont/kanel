@@ -1,7 +1,11 @@
-import { RangeDetails } from "extract-pg-schema";
-import { ConstantDeclaration, InstantiatedConfig, TypeImport } from "kanel";
+import type { RangeDetails } from "extract-pg-schema";
+import type {
+  ConstantDeclaration,
+  InstantiatedConfig,
+  TypeImport,
+} from "kanel";
 
-import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
 const processRange = (
   r: RangeDetails,

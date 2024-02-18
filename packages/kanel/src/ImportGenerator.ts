@@ -1,7 +1,7 @@
 import path from "path";
 
 import escapeString from "./escapeString";
-import TypeImport from "./TypeImport";
+import type TypeImport from "./TypeImport";
 
 type ImportSet = {
   defaultImport?: string;

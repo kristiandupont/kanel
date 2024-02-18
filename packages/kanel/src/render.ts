@@ -1,4 +1,4 @@
-import { Declaration } from "./declaration-types";
+import type { Declaration } from "./declaration-types";
 import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
 import escapeIdentifier from "./escapeIdentifier";

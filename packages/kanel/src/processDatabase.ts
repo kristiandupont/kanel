@@ -1,7 +1,7 @@
 import { extractSchemas } from "extract-pg-schema";
 import rmfr from "rmfr";
 
-import { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
+import type { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
 import {
   defaultGenerateIdentifierType,
   defaultGetMetadata,
@@ -14,9 +14,9 @@ import makeDomainsGenerator from "./generators/makeDomainsGenerator";
 import makeEnumsGenerator from "./generators/makeEnumsGenerator";
 import makeRangesGenerator from "./generators/makeRangesGenerator";
 import markAsGenerated from "./hooks/markAsGenerated";
-import Output from "./Output";
+import type Output from "./Output";
 import render from "./render";
-import TypeMap from "./TypeMap";
+import type TypeMap from "./TypeMap";
 import writeFile from "./writeFile";
 
 type Progress = {

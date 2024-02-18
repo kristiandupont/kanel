@@ -1,4 +1,4 @@
-import {
+import type {
   MaterializedViewColumn,
   MaterializedViewDetails,
   TableColumn,
@@ -8,10 +8,10 @@ import {
 } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import { InstantiatedConfig } from "../config-types";
-import Details from "../Details";
-import TypeDefinition from "../TypeDefinition";
-import { CompositeDetails, CompositeProperty } from "./composite-types";
+import type { InstantiatedConfig } from "../config-types";
+import type Details from "../Details";
+import type TypeDefinition from "../TypeDefinition";
+import type { CompositeDetails, CompositeProperty } from "./composite-types";
 
 const resolveTypeFromComment = (
   comment: string | undefined,

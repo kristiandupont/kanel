@@ -1,13 +1,13 @@
 import { recase } from "@kristiandupont/recase";
-import { TableColumn } from "extract-pg-schema";
+import type { TableColumn } from "extract-pg-schema";
 import { join } from "path";
 import { tryParse } from "tagged-comment-parser";
 
 import escapeIdentifier from "./escapeIdentifier";
 import escapeString from "./escapeString";
-import { CompositeProperty } from "./generators/composite-types";
+import type { CompositeProperty } from "./generators/composite-types";
 import resolveType from "./generators/resolveType";
-import {
+import type {
   GenerateIdentifierType,
   GetMetadata,
   GetPropertyMetadata,

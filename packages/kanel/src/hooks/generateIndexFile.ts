@@ -1,13 +1,13 @@
 import { join, relative, sep } from "path";
 
-import { PreRenderHook } from "../config-types";
-import {
+import type { PreRenderHook } from "../config-types";
+import type {
   ConstantDeclaration,
   EnumDeclaration,
   InterfaceDeclaration,
   TypeDeclaration,
 } from "../declaration-types";
-import { FileContents } from "../Output";
+import type { FileContents } from "../Output";
 
 type GenerateIndexFileConfig = {
   filter?: (

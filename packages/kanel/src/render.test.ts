@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Declaration } from "./declaration-types";
+import type { Declaration } from "./declaration-types";
 import render from "./render";
 
 describe("processGenerationSetup", () => {

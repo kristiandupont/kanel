@@ -1,4 +1,5 @@
-import { CompositeDetails, escapeIdentifier, InstantiatedConfig } from "kanel";
+import type { CompositeDetails, InstantiatedConfig } from "kanel";
+import { escapeIdentifier } from "kanel";
 
 interface MakeKyselyConfig {
   databaseFilename: string;

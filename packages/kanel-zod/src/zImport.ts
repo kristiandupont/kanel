@@ -1,4 +1,4 @@
-import { TypeImport } from "kanel";
+import type { TypeImport } from "kanel";
 
 const zImport: TypeImport = {
   name: "z",

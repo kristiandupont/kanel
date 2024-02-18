@@ -1,7 +1,11 @@
-import { TableDetails } from "extract-pg-schema";
-import { ConstantDeclaration, InstantiatedConfig, TypeImport } from "kanel";
+import type { TableDetails } from "extract-pg-schema";
+import type {
+  ConstantDeclaration,
+  InstantiatedConfig,
+  TypeImport,
+} from "kanel";
 
-import {
+import type {
   GenerateZodSchemasConfig,
   GetZodIdentifierMetadata,
 } from "./GenerateZodSchemasConfig";

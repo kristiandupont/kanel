@@ -1,13 +1,13 @@
-import {
+import type {
   CompositeDetails,
   CompositeProperty,
   InstantiatedConfig,
-  resolveType,
   TypeImport,
 } from "kanel";
+import { resolveType } from "kanel";
 import * as R from "ramda";
 
-import { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
 export type ZodPropertyDeclaration = {
   name: string;

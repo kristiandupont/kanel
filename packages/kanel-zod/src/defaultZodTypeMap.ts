@@ -1,4 +1,4 @@
-import { TypeMap } from "kanel";
+import type { TypeMap } from "kanel";
 
 // The values in this map are strings which indicate that `z` is built-in and doesn't need importing.
 // Obviously, that's not the case, but since any declaration that contains any of these will contain

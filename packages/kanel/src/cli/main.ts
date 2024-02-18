@@ -4,7 +4,7 @@ import fs from "fs";
 import optionator from "optionator";
 import path from "path";
 
-import { Config } from "../config-types";
+import type { Config } from "../config-types";
 import processDatabase from "../processDatabase";
 
 // @ts-ignore

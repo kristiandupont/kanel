@@ -1,10 +1,16 @@
-import { Declaration, Output, Path, PreRenderHook, TypeImport } from "kanel";
+import type {
+  Declaration,
+  Output,
+  Path,
+  PreRenderHook,
+  TypeImport,
+} from "kanel";
 
 import defaultZodTypeMap from "./defaultZodTypeMap";
+import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 import {
   defaultGetZodIdentifierMetadata,
   defaultGetZodSchemaMetadata,
-  GenerateZodSchemasConfig,
 } from "./GenerateZodSchemasConfig";
 import getIdentifierDeclaration from "./getIdentifierDeclaration";
 import processComposite from "./processComposite";

@@ -1,4 +1,4 @@
-import TypeImport from "./TypeImport";
+import type TypeImport from "./TypeImport";
 
 export type DeclarationBase = {
   comment?: string[];

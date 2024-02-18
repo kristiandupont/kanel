@@ -1,6 +1,7 @@
-import { Knex } from "knex";
+import type { Knex } from "knex";
 
-import SeedData, { TableData } from "./SeedData";
+import type { TableData } from "./SeedData";
+import type SeedData from "./SeedData";
 
 const mapObject = <T, U>(obj: Record<string, T>, fn: (v: T) => U) => {
   const result: Record<string, U> = {};

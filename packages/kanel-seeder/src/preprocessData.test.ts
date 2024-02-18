@@ -1,4 +1,4 @@
-import { Schema } from "extract-pg-schema";
+import type { Schema } from "extract-pg-schema";
 import { describe, expect, it } from "vitest";
 
 import preprocessData from "./preprocessData";

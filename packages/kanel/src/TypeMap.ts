@@ -1,4 +1,4 @@
-import TypeDefinition from "./TypeDefinition";
+import type TypeDefinition from "./TypeDefinition";
 
 type TypeMap = Record<string, TypeDefinition>;
 

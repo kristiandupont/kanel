@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { defaultGenerateIdentifierType } from "./default-metadata-generators";
-import { GenerateIdentifierType } from "./metadata-types";
+import type { GenerateIdentifierType } from "./metadata-types";
 
 describe("defaultGenerateIdentifierType", () => {
   it("generates correct identifier type", () => {

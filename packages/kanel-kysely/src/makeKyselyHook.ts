@@ -1,5 +1,5 @@
 import { recase } from "@kristiandupont/recase";
-import {
+import type {
   InterfaceDeclaration,
   InterfacePropertyDeclaration,
   PreRenderHook,
@@ -8,7 +8,8 @@ import {
 } from "kanel";
 import { dirname, join } from "path";
 
-import MakeKyselyConfig, { defaultConfig } from "./MakeKyselyConfig";
+import type MakeKyselyConfig from "./MakeKyselyConfig";
+import { defaultConfig } from "./MakeKyselyConfig";
 import processFile from "./processFile";
 
 const toPascalCase = recase(null, "pascal");
