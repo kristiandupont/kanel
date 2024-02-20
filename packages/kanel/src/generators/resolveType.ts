@@ -1,6 +1,8 @@
 import type {
+  ColumnReference,
   MaterializedViewColumn,
   MaterializedViewDetails,
+  Schema,
   TableColumn,
   TableDetails,
   ViewColumn,
@@ -45,63 +47,115 @@ const resolveTypeFromComment = (
   }
 };
 
+const getColumnFromReference = (
+  reference: ColumnReference,
+  schemas: Record<string, Schema>,
+): {
+  column?: TableColumn | ViewColumn | MaterializedViewColumn;
+  details?: TableDetails | ViewDetails | MaterializedViewDetails;
+} => {
+  const schema = schemas[reference.schemaName];
+  if (!schema) {
+    return { column: undefined, details: undefined };
+  }
+  let target: TableDetails | ViewDetails | MaterializedViewDetails =
+    schema.tables.find((t) => t.name === reference.tableName);
+  if (!target) {
+    target = schema.views.find((v) => v.name === reference.tableName);
+  }
+  if (!target) {
+    target = schema.materializedViews.find(
+      (v) => v.name === reference.tableName,
+    );
+  }
+  if (!target) {
+    return { column: undefined, details: undefined };
+  }
+
+  const column = (
+    target.columns as Array<TableColumn | ViewColumn | MaterializedViewColumn>
+  ).find((c) => c.name === reference.columnName);
+  if (column) {
+    return { column, details: target };
+  }
+};
+
+const getTypeFromReferences = (
+  c: CompositeProperty,
+  config: InstantiatedConfig,
+  visited = new Set<CompositeProperty>(),
+): TypeDefinition | undefined => {
+  const references = (c as TableColumn | ViewColumn | MaterializedViewColumn)
+    .references as ColumnReference[];
+  const referencedTypes = references.map((reference) => {
+    const { column, details } = getColumnFromReference(
+      reference,
+      config.schemas,
+    );
+    if (!column) {
+      console.warn("Could not resolve reference", reference);
+      return "unknown";
+    }
+    if (visited.has(column)) {
+      console.warn("Could not resolve circular reference", reference);
+      return "unknown";
+    }
+    return resolveType(column, details, config, visited);
+  });
+
+  const seenTypeNames = new Set<string>();
+  let dedupedReferencedTypes = [];
+  referencedTypes
+    .filter((t) => t !== "unknown")
+    .forEach((t) => {
+      const name = typeof t === "string" ? t : t.name;
+      if (!seenTypeNames.has(name)) {
+        dedupedReferencedTypes.push(t);
+        seenTypeNames.add(name);
+      }
+    });
+
+  // Don't use the simple primitive type if we're generating identifier types
+  if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
+    dedupedReferencedTypes = dedupedReferencedTypes.filter(
+      (t) => typeof t !== "string",
+    );
+  }
+
+  if (dedupedReferencedTypes.length === 0) {
+    return;
+  } else if (dedupedReferencedTypes.length === 1) {
+    return dedupedReferencedTypes[0];
+  } else {
+    return {
+      name: dedupedReferencedTypes
+        .map((t) => (typeof t === "string" ? t : t.name))
+        .join(" | "),
+      typeImports: dedupedReferencedTypes.flatMap((t) =>
+        typeof t === "string" ? [] : t.typeImports,
+      ),
+    };
+  }
+};
+
 const resolveType = (
   c: CompositeProperty,
   d: CompositeDetails,
   config: InstantiatedConfig,
+  visited = new Set<CompositeProperty>(),
 ): TypeDefinition => {
+  visited.add(c);
+
   // 1) Check for a @type tag.
   const typeFromComment = resolveTypeFromComment(c.comment);
   if (typeFromComment) {
     return typeFromComment;
   }
 
-  // 2) If there are references, resolve the type from the targets
+  // 2) If there are references, try to resolve the type from the targets
   if ("references" in c && c.references.length > 0) {
-    const referencedTypes = c.references.map((reference) => {
-      let target: TableDetails | ViewDetails | MaterializedViewDetails =
-        config.schemas[reference.schemaName].tables.find(
-          (t) => t.name === reference.tableName,
-        );
-      if (!target) {
-        target = config.schemas[reference.schemaName].views.find(
-          (v) => v.name === reference.tableName,
-        );
-      }
-      if (!target) {
-        target = config.schemas[reference.schemaName].materializedViews.find(
-          (v) => v.name === reference.tableName,
-        );
-      }
-      if (!target) {
-        console.warn("Could not resolve reference", reference);
-        return "unknown";
-      }
-
-      const column = (
-        target.columns as Array<
-          TableColumn | ViewColumn | MaterializedViewColumn
-        >
-      ).find((c) => c.name === reference.columnName);
-      if (column) {
-        return resolveType(column, target, config);
-      } else {
-        console.warn("Could not resolve reference", reference);
-        return "unknown";
-      }
-    }) as TypeDefinition[];
-
-    const dedupedReferencedTypes = [...new Set(referencedTypes)];
-    return dedupedReferencedTypes.length === 1
-      ? dedupedReferencedTypes[0]
-      : {
-          name: dedupedReferencedTypes
-            .map((t) => (typeof t === "string" ? t : t.name))
-            .join(" | "),
-          typeImports: dedupedReferencedTypes.flatMap((t) =>
-            typeof t === "string" ? [] : t.typeImports,
-          ),
-        };
+    const typeFromReferences = getTypeFromReferences(c, config, visited);
+    if (typeFromReferences) return typeFromReferences;
   }
   // 3) If this is a view with a source (i.e. the table that it's based on),
   // get the type from the source.
