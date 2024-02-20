@@ -7,6 +7,7 @@ import type { Path } from "../Output";
 import type Output from "../Output";
 import type { CompositeDetails } from "./composite-types";
 import generateProperties from "./generateProperties";
+import resolveType from "./resolveType";
 
 const makeMapper =
   <D extends CompositeDetails>(config: InstantiatedConfig) =>
@@ -29,13 +30,22 @@ const makeMapper =
 
     if (details.kind === "table" && config.generateIdentifierType) {
       const { columns } = details;
-      const identifierColumns = columns.filter(
-        (c) => c.isPrimaryKey && !c.reference,
-      );
+      const { path } = config.getMetadata(details, "selector", config);
+      const identifierColumns = columns.filter((c) => c.isPrimaryKey);
 
-      identifierColumns.forEach((c) =>
-        declarations.push(config.generateIdentifierType(c, details, config)),
-      );
+      identifierColumns
+        .filter((c) => {
+          if (!c.references?.length) return true;
+          const type = resolveType(c, details, config);
+          if (typeof type === "string") {
+            return true;
+          }
+          // Unresolved circular reference, we should still generate the identifier type
+          return type.typeImports.some((i) => i.path === path);
+        })
+        .forEach((c) =>
+          declarations.push(config.generateIdentifierType(c, details, config)),
+        );
     }
 
     const selectorProperties = generateProperties(details, "selector", config);
