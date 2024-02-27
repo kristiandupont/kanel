@@ -7,12 +7,7 @@ const seedInput = z.object({
     })
     .optional(),
   defaults: z.record(z.string()).optional(),
-  data: z.array(
-    z.object({
-      name: z.string(),
-      rows: z.array(z.record(z.string())),
-    }),
-  ),
+  data: z.record(z.array(z.record(z.string()))),
 });
 
 export type SeedInput = z.infer<typeof seedInput>;
