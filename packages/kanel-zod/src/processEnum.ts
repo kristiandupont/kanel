@@ -20,7 +20,7 @@ const processEnum = (
   const lines: string[] = [
     `z.enum([`,
     ...e.values.map((v) => `  '${v}',`),
-    "]);",
+    "])",
   ];
 
   const typeImport: TypeImport = {
