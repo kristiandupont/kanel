@@ -1,4 +1,9 @@
-import type { TableColumn, TableDetails } from "extract-pg-schema";
+import type {
+  ForeignTableColumn,
+  ForeignTableDetails,
+  TableColumn,
+  TableDetails,
+} from "extract-pg-schema";
 
 import type { InstantiatedConfig } from "./config-types";
 import type { TypeDeclaration } from "./declaration-types";
@@ -37,7 +42,7 @@ export type GetPropertyMetadata = (
 ) => PropertyMetadata;
 
 export type GenerateIdentifierType = (
-  column: TableColumn,
-  details: TableDetails,
+  column: TableColumn | ForeignTableColumn,
+  details: TableDetails | ForeignTableDetails,
   instantiatedConfig: InstantiatedConfig,
 ) => TypeDeclaration;

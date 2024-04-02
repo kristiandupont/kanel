@@ -1,4 +1,4 @@
-import type { Kind, Schema } from "extract-pg-schema";
+import type { Kind, Schema, TableColumn } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
 import type { InstantiatedConfig } from "../config-types";
@@ -28,14 +28,17 @@ const makeMapper =
       path,
     } = config.getMetadata(details, "selector", config);
 
-    if (details.kind === "table" && config.generateIdentifierType) {
+    if (
+      (details.kind === "table" || details.kind === "foreignTable") &&
+      config.generateIdentifierType
+    ) {
       const { columns } = details;
       const { path } = config.getMetadata(details, "selector", config);
       const identifierColumns = columns.filter((c) => c.isPrimaryKey);
 
       identifierColumns
         .filter((c) => {
-          if (!c.references?.length) return true;
+          if (!(c as TableColumn).references?.length) return true;
           const type = resolveType(c, details, config);
           if (typeof type === "string") {
             return true;
