@@ -54,7 +54,8 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
             makeKyselyConfig,
           );
         output[path].declarations = modifiedDeclarations;
-        if(makeKyselyConfig.includeSchemaNameInTableName) tableProperty.name = `${schemaName}.${tableProperty.name}`
+        if (makeKyselyConfig.includeSchemaNameInTableName)
+          tableProperty.name = `${schemaName}.${tableProperty.name}`;
         tableImports.push(tableImport);
         tableProps.push(tableProperty);
 
