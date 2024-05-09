@@ -54,6 +54,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
             makeKyselyConfig,
           );
         output[path].declarations = modifiedDeclarations;
+        if(makeKyselyConfig.includeSchemaNameInTableName) tableProperty.name = `${schemaName}.${tableProperty.name}`
         tableImports.push(tableImport);
         tableProps.push(tableProperty);
 
@@ -98,7 +99,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
       name: "Database",
       typeImports: schemaImports,
       typeDefinition: [
-        schemaImports.map((dbImport) => dbImport.name).join(" | "),
+        schemaImports.map((dbImport) => dbImport.name).join(" & "),
       ],
       exportAs: "default",
     };

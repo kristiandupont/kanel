@@ -3,6 +3,7 @@ import { escapeIdentifier } from "kanel";
 
 interface MakeKyselyConfig {
   databaseFilename: string;
+  includeSchemaNameInTableName: boolean;
   getKyselyItemMetadata?: (
     d: CompositeDetails,
     selectorName: string,
@@ -19,6 +20,7 @@ interface MakeKyselyConfig {
 
 export const defaultConfig: MakeKyselyConfig = {
   databaseFilename: "Database",
+  includeSchemaNameInTableName: false,
   getKyselyItemMetadata: (d, selectorName, canInitialize, canMutate) => ({
     tableInterfaceName: `${escapeIdentifier(selectorName)}Table`,
     selectableName: escapeIdentifier(selectorName),
