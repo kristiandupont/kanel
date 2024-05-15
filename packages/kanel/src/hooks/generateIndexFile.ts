@@ -86,7 +86,7 @@ export const makeGenerateIndexFile: (
         exportAsType: ["typeDeclaration", "interface"].includes(
           declarationType,
         ),
-      }
+      };
 
       // Add to the global index
       allExports[path].push(declarationItem);
@@ -101,24 +101,26 @@ export const makeGenerateIndexFile: (
   const schemaIndexFiles: Record<string, FileContents> = {};
   for (const schema of Object.keys(schemaExports)) {
     const schemaPath = schemaExports[schema].path;
-    const schemaLines = Object.keys(schemaExports[schema].items).map((itemPath) => {
-      const schemaDeclExports = schemaExports[schema].items[itemPath];
-      if (schemaDeclExports.length === 0) {
-        return "";
-      }
+    const schemaLines = Object.keys(schemaExports[schema].items).map(
+      (itemPath) => {
+        const schemaDeclExports = schemaExports[schema].items[itemPath];
+        if (schemaDeclExports.length === 0) {
+          return "";
+        }
 
-      let relativePath = relative(schemaPath, itemPath);
-      // Fix Windows-style paths in import line
-      if (sep === "\\") {
-        relativePath = relativePath.replaceAll("\\", "/");
-      }
+        let relativePath = relative(schemaPath, itemPath);
+        // Fix Windows-style paths in import line
+        if (sep === "\\") {
+          relativePath = relativePath.replaceAll("\\", "/");
+        }
 
-      const line = `export { ${schemaDeclExports
-        .map(stringifyExportItem)
-        .join(", ")} } from './${relativePath}';`;
+        const line = `export { ${schemaDeclExports
+          .map(stringifyExportItem)
+          .join(", ")} } from './${relativePath}';`;
 
-      return line;
-    });
+        return line;
+      },
+    );
 
     const schemaIndexFile: FileContents = {
       declarations: [
