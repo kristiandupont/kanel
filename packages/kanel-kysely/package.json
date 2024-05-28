@@ -25,12 +25,13 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf ./build && tsc",
-    "test": "echo TODO...",
+    "test": "vitest run",
     "run-example": "kanel -c ./example/.kanelrc"
   },
   "devDependencies": {
     "extract-pg-schema": "^5.0.0",
-    "kanel": "*"
+    "kanel": "*",
+    "vitest": "^1.6.0"
   },
   "dependencies": {
     "@kristiandupont/recase": "^1.2.1"
