@@ -67,3 +67,17 @@ export type ActorId = number & { __flavor?: "ActorId" };
 To pass a string value as primary key or foreign key reference, just add a type assertion for the `<table>Id` generated type.
 
 In cases such as subqueries, the type assertion will happen automatically.
+
+## Usage with `CamelCasePlugin`
+
+If you use Kysely with `CamelCasePlugin` then append `kyselyCamelCaseHook` to `preRenderHooks`:
+
+```ts
+const { makeKyselyHook, kyselyCamelCaseHook } = require("kanel-kysely");
+
+module.exports = {
+  // ... your config here.
+
+  preRenderHooks: [makeKyselyHook(), kyselyCamelCaseHook],
+};
+```
