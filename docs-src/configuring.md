@@ -68,7 +68,7 @@ If you set `preDeleteOutputFolder` to true, Kanel will delete _all_ contents in 
 
 ## customTypeMap
 
-The `customTypeMap` property can be set if you want to specify what a given type should map to. It's a record of a postgres typename to a Typescript type. The key is qualified with schema name, so for instance if you want to map `float8` to `number` (as opposed to the default `string`), you would set it like this:
+The `customTypeMap` property can be set if you want to specify what a given type should map to. It's a record of a postgres typename to a Typescript type. The key is qualified with schema name, which for built-in types means that they should be prefixed with `pg_catalog`. So for instance if you want to map `float8` to `number` (as opposed to the default `string`), you would set it like this:
 
 ```typescript
 {
