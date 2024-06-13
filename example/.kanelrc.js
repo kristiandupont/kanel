@@ -100,6 +100,9 @@ module.exports = {
     // See Staff.ts for an example.
     'pg_catalog.bytea': { name: 'bytea', typeImports: [{ name: 'bytea', path: 'postgres-bytea', isAbsolute: true, isDefault: true }] },
 
+    // If you want to use BigInt for bigserial columns, you can use the following.
+    'pg_catalog.int8': 'BigInt',
+
     // Columns with the following types would probably just be strings in TypeScript.
     'pg_catalog.bpchar': 'string',
     'public.citext': 'string'
