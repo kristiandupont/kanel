@@ -255,8 +255,8 @@ describe("ImportGenerator", () => {
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import { type default as Member } from 'member';",
-      "import { type AccountId, type AccountInitializer } from 'account';",
+      "import type { default as Member } from 'member';",
+      "import type { AccountId, AccountInitializer } from 'account';",
     ]);
   });
 
@@ -301,7 +301,7 @@ describe("ImportGenerator", () => {
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import { type default as Member } from 'member';",
+      "import type { default as Member } from 'member';",
       "import Account, { account, type AccountId, type AccountInitializer } from 'account';",
     ]);
   });
@@ -324,10 +324,17 @@ describe("ImportGenerator", () => {
       isAbsolute: true,
       importAsType: true,
     });
+    ig.addImport({
+      name: "account",
+      isDefault: false,
+      path: "account",
+      isAbsolute: true,
+      importAsType: false,
+    });
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import { type AccountId, type default as Account } from 'account';",
+      "import { account, type AccountId, type default as Account } from 'account';",
     ]);
   });
 });

@@ -101,10 +101,14 @@ class ImportGenerator {
         }
       }
 
+      const onlyTypeImports =
+        namedImports.size === 0 &&
+        (!defaultImport || (defaultImport && importDefaultAsType));
+
       if (namedImports.size > 0 || namedAsTypeImports.size > 0) {
         const nonTypeImports = [...namedImports].join(", ");
         const typeImports = [...namedAsTypeImports]
-          .map((n) => `type ${n}`)
+          .map((n) => (onlyTypeImports ? n : `type ${n}`))
           .join(", ");
 
         const bracketedImportString =
@@ -115,7 +119,7 @@ class ImportGenerator {
         importParts.push(bracketedImportString);
       }
 
-      const line = `import ${importParts.join(", ")} from '${escapeString(
+      const line = `import ${onlyTypeImports ? "type " : ""}${importParts.join(", ")} from '${escapeString(
         relativePath,
       )}';`;
       return [line];
