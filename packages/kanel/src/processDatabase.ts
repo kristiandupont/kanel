@@ -1,5 +1,5 @@
 import { extractSchemas } from "extract-pg-schema";
-import rmfr from "rmfr";
+import { rimraf } from "rimraf";
 
 import type { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
 import {
@@ -101,7 +101,7 @@ const processDatabase = async (
 
   if (instantiatedConfig.preDeleteOutputFolder) {
     console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
-    await rmfr(instantiatedConfig.outputPath, { glob: true });
+    await rimraf(instantiatedConfig.outputPath, { glob: true });
   }
 
   filesToWrite.forEach((file) => writeFile(file));
