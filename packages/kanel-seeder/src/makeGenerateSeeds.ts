@@ -5,8 +5,13 @@ import parseMdconf from "@kristiandupont/mdconf";
 import seedInput, { SeedInput } from "./seedInput";
 import preprocessData from "./preprocessData";
 
+export type MakeGenerateSeedsConfig = {
+  srcPath: string;
+  dstPath: string;
+};
+
 const makeGenerateSeeds =
-  ({ srcPath, dstPath }: { srcPath: string; dstPath: string }): PreRenderHook =>
+  ({ srcPath, dstPath }: MakeGenerateSeedsConfig): PreRenderHook =>
   async (
     outputAcc: Output,
     instantiatedConfig: InstantiatedConfig,
