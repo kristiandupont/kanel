@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/kristiandupont/kanel.git"
   },
-  "description": "Zod extension for Kanel",
+  "description": "Kysely extension for Kanel",
   "homepage": "https://kristiandupont.github.io/kanel",
   "author": {
     "name": "Kristian Dupont",
