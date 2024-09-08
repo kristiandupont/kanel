@@ -27,6 +27,7 @@ export type InstantiatedConfig = {
   outputPath: string;
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
+  esmImports?: boolean;
 };
 
 export type PreRenderHook = (
@@ -59,5 +60,7 @@ export type Config = {
 
   preRenderHooks?: PreRenderHook[];
   postRenderHooks?: PostRenderHook[];
+
+  esmImports?: boolean;
 };
 // #endregion Config

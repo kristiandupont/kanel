@@ -2,6 +2,7 @@ import path from "path";
 
 import escapeString from "./escapeString";
 import type TypeImport from "./TypeImport";
+import type { InstantiatedConfig } from "./config-types";
 
 type ImportSet = {
   defaultImport?: string;
@@ -13,13 +14,15 @@ type ImportSet = {
 class ImportGenerator {
   srcFolder: string;
   srcModuleName: string;
+  config: InstantiatedConfig | undefined;
 
   /**
    * @param srcPath The path (including filename) of the module we're generating imports for.
    */
-  constructor(srcPath: string) {
+  constructor(srcPath: string, config?: InstantiatedConfig) {
     this.srcFolder = path.dirname(srcPath);
     this.srcModuleName = path.basename(srcPath);
+    this.config = config ?? undefined;
   }
 
   importMap: { [index: string]: ImportSet } = {};
@@ -119,9 +122,10 @@ class ImportGenerator {
         importParts.push(bracketedImportString);
       }
 
+      const extension = this.config.esmImports ? ".js" : "";
       const line = `import ${onlyTypeImports ? "type " : ""}${importParts.join(", ")} from '${escapeString(
         relativePath,
-      )}';`;
+      )}${extension}';`;
       return [line];
     });
   }

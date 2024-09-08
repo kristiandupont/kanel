@@ -3,6 +3,7 @@ import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
 import escapeIdentifier from "./escapeIdentifier";
 import ImportGenerator from "./ImportGenerator";
+import type { InstantiatedConfig } from "./config-types";
 
 const processComments = (
   comments: string[] | undefined,
@@ -160,8 +161,8 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (declarations: Declaration[], outputPath: string): string[] => {
-  const importGenerator = new ImportGenerator(outputPath);
+const render = (config: InstantiatedConfig, declarations: Declaration[], outputPath: string): string[] => {
+  const importGenerator = new ImportGenerator(outputPath, config);
   const lines: string[] = [];
 
   declarations.forEach((declaration, index) => {
