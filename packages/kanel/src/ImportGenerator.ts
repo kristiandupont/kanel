@@ -19,7 +19,7 @@ class ImportGenerator {
   /**
    * @param srcPath The path (including filename) of the module we're generating imports for.
    */
-  constructor(srcPath: string, config?: InstantiatedConfig) {
+  constructor(srcPath: string, config: InstantiatedConfig) {
     this.srcFolder = path.dirname(srcPath);
     this.srcModuleName = path.basename(srcPath);
     this.config = config ?? undefined;

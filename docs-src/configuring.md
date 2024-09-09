@@ -91,3 +91,11 @@ See the [preRenderHooks](./preRenderHooks.md) section for more info.
 If you need to do something more brute-force like, you might prefer to create one or more `postRenderHooks`, which will be called with a filename and an array of strings which are the raw contents, just before the file is written.
 
 See the [postRenderHooks](./postRenderHooks.md) section for more info.
+
+## esmImports
+
+Set `esmImports` to `true` to use ESM-style imports (append `.js` to the filename).
+
+Set `esmImports` to `false` to disable ESM-style imports (no extension will be appended).
+
+The default is `false`.

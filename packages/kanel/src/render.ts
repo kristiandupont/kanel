@@ -161,7 +161,7 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (config: InstantiatedConfig, declarations: Declaration[], outputPath: string): string[] => {
+const render = (declarations: Declaration[], outputPath: string, config: InstantiatedConfig): string[] => {
   const importGenerator = new ImportGenerator(outputPath, config);
   const lines: string[] = [];
 

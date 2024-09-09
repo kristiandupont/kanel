@@ -65,3 +65,6 @@ build
 
 .vscode
 cache
+
+example/models/
+

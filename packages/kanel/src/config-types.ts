@@ -27,7 +27,7 @@ export type InstantiatedConfig = {
   outputPath: string;
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
-  esmImports?: boolean;
+  esmImports: boolean;
 };
 
 export type PreRenderHook = (

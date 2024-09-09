@@ -86,7 +86,7 @@ const processDatabase = async (
   }
 
   let filesToWrite = Object.keys(output).map((path) => {
-    const lines = render(instantiatedConfig, output[path].declarations, path);
+    const lines = render(output[path].declarations, path, instantiatedConfig);
     return { fullPath: `${path}.ts`, lines };
   });
 
