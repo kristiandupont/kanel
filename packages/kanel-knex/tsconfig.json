@@ -6,10 +6,6 @@
     "noEmit": false,
   },
   "include": [
-    "./src",
-    "../kanel-seeder/src/makeSeeder.ts",
-    "../kanel-seeder/src/preprocessData.test.ts",
-    "../kanel-seeder/src/preprocessData.ts",
-    "../kanel-seeder/src/SeedData.ts",
+    "./src"
   ],
 }

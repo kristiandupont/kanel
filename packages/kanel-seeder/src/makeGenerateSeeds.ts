@@ -5,19 +5,22 @@ import parseMdconf from "@kristiandupont/mdconf";
 import seedInput, { SeedInput } from "./seedInput";
 import preprocessData from "./preprocessData";
 
+export type MakeGenerateSeedsConfig = {
+  srcPath: string;
+  dstPath: string;
+};
+
 const makeGenerateSeeds =
-  ({ srcPath, dstPath }: { srcPath: string; dstPath: string }): PreRenderHook =>
+  ({ srcPath, dstPath }: MakeGenerateSeedsConfig): PreRenderHook =>
   async (
     outputAcc: Output,
     instantiatedConfig: InstantiatedConfig,
   ): Promise<Output> => {
-    // Use the built-in node module to find files in path with the .mdconf extension
     const allFiles = await fs.readdir(srcPath, { withFileTypes: true });
     const mdconfFiles = allFiles.filter((file) =>
       file.name.endsWith(".mdconf"),
     );
 
-    // For each file, parse the file and add it to the output
     for (const file of mdconfFiles) {
       const srcFilePath = resolve(srcPath, file.name);
       const contents = await fs.readFile(srcFilePath, "utf-8");

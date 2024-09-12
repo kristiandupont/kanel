@@ -19,7 +19,7 @@ const generateZodSchemas = makeGenerateZodSchemas({
   zodTypeMap: {
     ...defaultZodTypeMap,
     'pg_catalog.tsvector': 'z.set(z.string())',
-    'pg_catalog.bytea': { name:'z.custom<Bytea>(v => v)', typeImports: [{ name: 'Bytea', path: 'bytea', isAbsolute: true, isDefault: false }] }
+    'pg_catalog.bytea': { name:'z.custom<Bytea>(v => v)', typeImports: [{ name: 'Bytea', path: 'postgres-bytea', isAbsolute: true, isDefault: false }] }
   },
   castToSchema: true
 })
@@ -98,10 +98,15 @@ module.exports = {
 
     // The bytea package (https://www.npmjs.com/package/postgres-bytea) could be used for byte arrays.
     // See Staff.ts for an example.
-    'pg_catalog.bytea': { name: 'bytea', typeImports: [{ name: 'bytea', path: 'bytea', isAbsolute: true, isDefault: true }] },
+    'pg_catalog.bytea': { name: 'bytea', typeImports: [{ name: 'bytea', path: 'postgres-bytea', isAbsolute: true, isDefault: true }] },
+
+    // If you want to use BigInt for bigserial columns, you can use the following.
+    'pg_catalog.int8': 'BigInt',
 
     // Columns with the following types would probably just be strings in TypeScript.
     'pg_catalog.bpchar': 'string',
     'public.citext': 'string'
   },
+
+  esmImports: false
 };

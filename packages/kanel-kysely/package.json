@@ -1,6 +1,6 @@
 {
   "name": "kanel-kysely",
-  "version": "0.3.3",
+  "version": "0.5.0",
   "keywords": [
     "postgresql",
     "schema",
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/kristiandupont/kanel.git"
   },
-  "description": "Zod extension for Kanel",
+  "description": "Kysely extension for Kanel",
   "homepage": "https://kristiandupont.github.io/kanel",
   "author": {
     "name": "Kristian Dupont",
@@ -25,12 +25,13 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf ./build && tsc",
-    "test": "echo TODO...",
+    "test": "vitest run",
     "run-example": "kanel -c ./example/.kanelrc"
   },
   "devDependencies": {
     "extract-pg-schema": "^5.0.0",
-    "kanel": "*"
+    "kanel": "*",
+    "vitest": "^2.0.0"
   },
   "dependencies": {
     "@kristiandupont/recase": "^1.2.1"

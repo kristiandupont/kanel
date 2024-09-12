@@ -68,7 +68,7 @@ If you set `preDeleteOutputFolder` to true, Kanel will delete _all_ contents in 
 
 ## customTypeMap
 
-The `customTypeMap` property can be set if you want to specify what a given type should map to. It's a record of a postgres typename to a Typescript type. The key is qualified with schema name, so for instance if you want to map `float8` to `number` (as opposed to the default `string`), you would set it like this:
+The `customTypeMap` property can be set if you want to specify what a given type should map to. It's a record of a postgres typename to a Typescript type. The key is qualified with schema name, which for built-in types means that they should be prefixed with `pg_catalog`. So for instance if you want to map `float8` to `number` (as opposed to the default `string`), you would set it like this:
 
 ```typescript
 {
@@ -91,3 +91,11 @@ See the [preRenderHooks](./preRenderHooks.md) section for more info.
 If you need to do something more brute-force like, you might prefer to create one or more `postRenderHooks`, which will be called with a filename and an array of strings which are the raw contents, just before the file is written.
 
 See the [postRenderHooks](./postRenderHooks.md) section for more info.
+
+## esmImports
+
+Set `esmImports` to `true` to use ESM-style imports (append `.js` to the filename).
+
+Set `esmImports` to `false` to disable ESM-style imports (no extension will be appended).
+
+The default is `false`.

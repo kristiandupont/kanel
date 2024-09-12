@@ -1,1 +1,0 @@
-import{_ as s,o as i,c as a,R as t}from"./chunks/framework.tNgZIIMt.js";const y=JSON.parse('{"title":"Data Types","description":"","frontmatter":{},"headers":[],"relativePath":"dataTypes.md","filePath":"dataTypes.md"}'),n={name:"dataTypes.md"},e=t("",12),p=[e];function h(l,k,r,d,E,o){return i(),a("div",null,p)}const c=s(n,[["render",h]]);export{y as __pageData,c as default};

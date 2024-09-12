@@ -25,7 +25,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf ./build && tsc",
-    "test": "vitest run"
+    "test": "echo TODO.."
   },
   "dependencies": {
     "knex": "^3.0.0",

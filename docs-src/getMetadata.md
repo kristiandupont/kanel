@@ -8,7 +8,7 @@ getMetadata?: (
 ) => TypeMetadata;
 ```
 
-This function will give Kanel the information it needs to create types from database items. There is a default implementation provided in [default-metadata-generators.ts](https://github.com/kristiandupont/kanel/blob/master/src/default-metadata-generators.ts) which you can either use as is, as inspiration or you can write your own and call the default as a fallback if you want most cases to work like the default but with a few changes.
+This function will give Kanel the information it needs to create types from database items. There is a default implementation provided in [default-metadata-generators.ts](https://github.com/kristiandupont/kanel/blob/main/packages/kanel/src/default-metadata-generators.ts) which you can either use as is, as inspiration or you can write your own and call the default as a fallback if you want most cases to work like the default but with a few changes.
 
 ## details
 

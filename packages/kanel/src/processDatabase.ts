@@ -1,5 +1,5 @@
 import { extractSchemas } from "extract-pg-schema";
-import rmfr from "rmfr";
+import { rimraf } from "rimraf";
 
 import type { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
 import {
@@ -60,6 +60,7 @@ const processDatabase = async (
     outputPath: config.outputPath ?? ".",
     preDeleteOutputFolder: config.preDeleteOutputFolder ?? false,
     resolveViews: config.resolveViews ?? true,
+    esmImports: config.esmImports ?? false,
   };
 
   const generators = [
@@ -85,7 +86,7 @@ const processDatabase = async (
   }
 
   let filesToWrite = Object.keys(output).map((path) => {
-    const lines = render(output[path].declarations, path);
+    const lines = render(output[path].declarations, path, instantiatedConfig);
     return { fullPath: `${path}.ts`, lines };
   });
 
@@ -101,7 +102,7 @@ const processDatabase = async (
 
   if (instantiatedConfig.preDeleteOutputFolder) {
     console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
-    await rmfr(instantiatedConfig.outputPath, { glob: true });
+    await rimraf(instantiatedConfig.outputPath, { glob: true });
   }
 
   filesToWrite.forEach((file) => writeFile(file));

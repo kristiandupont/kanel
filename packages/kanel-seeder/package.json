@@ -24,7 +24,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf ./build && tsc",
-    "test": "echo TODO..."
+    "test": "vitest run"
   },
   "devDependencies": {
     "extract-pg-schema": "^5.0.0",

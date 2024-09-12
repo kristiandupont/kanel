@@ -1,10 +1,26 @@
-import { describe, expect, it } from "vitest";
-
+import { describe, expect, it, vi } from "vitest";
 import ImportGenerator from "./ImportGenerator";
+import type { InstantiatedConfig } from "./config-types";
+
+// Mocked InstantiatedConfig
+const instantiatedConfig: InstantiatedConfig = {
+  getMetadata: vi.fn(),
+  getPropertyMetadata: vi.fn(),
+  generateIdentifierType: vi.fn(),
+  propertySortFunction: vi.fn(),
+  enumStyle: "enum",
+  typeMap: {},
+  schemas: {},
+  connection: {},
+  outputPath: ".",
+  preDeleteOutputFolder: false,
+  resolveViews: true,
+  esmImports: false,
+};
 
 describe("ImportGenerator", () => {
   it("should generate an import statement", () => {
-    const ig = new ImportGenerator("/src/some-module");
+    const ig = new ImportGenerator("/src/some-module", instantiatedConfig);
 
     ig.addImport({
       name: "func",
@@ -19,7 +35,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support various cases", () => {
-    const ig = new ImportGenerator("/package/src/some-module");
+    const ig = new ImportGenerator("/package/src/some-module", instantiatedConfig);
 
     ig.addImport({
       name: "defaultFunc",
@@ -100,7 +116,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should ignore duplicates", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "def",
@@ -146,7 +162,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should complain about multiple (different) default imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "def",
@@ -168,7 +184,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support absolute imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "path",
@@ -200,7 +216,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should not import items from the same file", () => {
-    const ig = new ImportGenerator("./src/some-module");
+    const ig = new ImportGenerator("./src/some-module", instantiatedConfig);
 
     ig.addImport({
       name: "path",
@@ -229,7 +245,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support type-only imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "Member",
@@ -255,13 +271,13 @@ describe("ImportGenerator", () => {
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import { type default as Member } from 'member';",
-      "import { type AccountId, type AccountInitializer } from 'account';",
+      "import type { default as Member } from 'member';",
+      "import type { AccountId, AccountInitializer } from 'account';",
     ]);
   });
 
   it("should support combinations of type-only and non-type-only imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "Member",
@@ -301,14 +317,14 @@ describe("ImportGenerator", () => {
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import { type default as Member } from 'member';",
+      "import type { default as Member } from 'member';",
       "import Account, { account, type AccountId, type AccountInitializer } from 'account';",
     ]);
   });
 
   // This is necessary because of https://github.com/tc39/proposal-type-annotations/issues/16
   it("should combine default and named type-only imports correctly", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "Account",
@@ -324,10 +340,17 @@ describe("ImportGenerator", () => {
       isAbsolute: true,
       importAsType: true,
     });
+    ig.addImport({
+      name: "account",
+      isDefault: false,
+      path: "account",
+      isAbsolute: true,
+      importAsType: false,
+    });
 
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
-      "import { type AccountId, type default as Account } from 'account';",
+      "import { account, type AccountId, type default as Account } from 'account';",
     ]);
   });
 });

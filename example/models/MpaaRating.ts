@@ -21,4 +21,4 @@ export const mpaaRating = z.enum([
   'PG-13',
   'R',
   'NC-17',
-]);;
+]);
