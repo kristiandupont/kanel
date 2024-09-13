@@ -92,10 +92,8 @@ If you need to do something more brute-force like, you might prefer to create on
 
 See the [postRenderHooks](./postRenderHooks.md) section for more info.
 
-## esmImports
+## importsExtension
 
-Set `esmImports` to `true` to use ESM-style imports (append `.js` to the filename).
+To use a different file extension for project file import references, set `importsExtension` to `.ts`, `.js`, `.mjs`, or `.cjs`.
 
-Set `esmImports` to `false` to disable ESM-style imports (no extension will be appended).
-
-The default is `false`.
+If no value is set, no extension will be appended.

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import ImportGenerator from "./ImportGenerator";
+
 import type { InstantiatedConfig } from "./config-types";
+import ImportGenerator from "./ImportGenerator";
 
 // Mocked InstantiatedConfig
 const instantiatedConfig: InstantiatedConfig = {
@@ -15,7 +16,7 @@ const instantiatedConfig: InstantiatedConfig = {
   outputPath: ".",
   preDeleteOutputFolder: false,
   resolveViews: true,
-  esmImports: false,
+  importsExtension: "",
 };
 
 describe("ImportGenerator", () => {
@@ -35,7 +36,10 @@ describe("ImportGenerator", () => {
   });
 
   it("should support various cases", () => {
-    const ig = new ImportGenerator("/package/src/some-module", instantiatedConfig);
+    const ig = new ImportGenerator(
+      "/package/src/some-module",
+      instantiatedConfig,
+    );
 
     ig.addImport({
       name: "defaultFunc",

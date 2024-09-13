@@ -27,7 +27,7 @@ export type InstantiatedConfig = {
   outputPath: string;
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
-  esmImports: boolean;
+  importsExtension: ".ts" | ".js" | ".mjs" | ".cjs" | "";
 };
 
 export type PreRenderHook = (
@@ -61,6 +61,6 @@ export type Config = {
   preRenderHooks?: PreRenderHook[];
   postRenderHooks?: PostRenderHook[];
 
-  esmImports?: boolean;
+  importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
 };
 // #endregion Config

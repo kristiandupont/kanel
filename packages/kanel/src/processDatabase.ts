@@ -60,7 +60,7 @@ const processDatabase = async (
     outputPath: config.outputPath ?? ".",
     preDeleteOutputFolder: config.preDeleteOutputFolder ?? false,
     resolveViews: config.resolveViews ?? true,
-    esmImports: config.esmImports ?? false,
+    importsExtension: config.importsExtension,
   };
 
   const generators = [

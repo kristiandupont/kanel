@@ -107,6 +107,5 @@ module.exports = {
     'pg_catalog.bpchar': 'string',
     'public.citext': 'string'
   },
-
-  esmImports: false
+  importsExtension: ""
 };

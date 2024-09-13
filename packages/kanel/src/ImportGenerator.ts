@@ -1,8 +1,8 @@
 import path from "path";
 
+import type { InstantiatedConfig } from "./config-types";
 import escapeString from "./escapeString";
 import type TypeImport from "./TypeImport";
-import type { InstantiatedConfig } from "./config-types";
 
 type ImportSet = {
   defaultImport?: string;
@@ -122,7 +122,9 @@ class ImportGenerator {
         importParts.push(bracketedImportString);
       }
 
-      const extension = this.config.esmImports ? ".js" : "";
+      const extension = relativePath.includes("./")
+        ? this.config.importsExtension
+        : "";
       const line = `import ${onlyTypeImports ? "type " : ""}${importParts.join(", ")} from '${escapeString(
         relativePath,
       )}${extension}';`;
