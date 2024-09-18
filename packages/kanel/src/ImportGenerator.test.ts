@@ -1,10 +1,27 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import type { InstantiatedConfig } from "./config-types";
 import ImportGenerator from "./ImportGenerator";
+
+// Mocked InstantiatedConfig
+const instantiatedConfig: InstantiatedConfig = {
+  getMetadata: vi.fn(),
+  getPropertyMetadata: vi.fn(),
+  generateIdentifierType: vi.fn(),
+  propertySortFunction: vi.fn(),
+  enumStyle: "enum",
+  typeMap: {},
+  schemas: {},
+  connection: {},
+  outputPath: ".",
+  preDeleteOutputFolder: false,
+  resolveViews: true,
+  importsExtension: "",
+};
 
 describe("ImportGenerator", () => {
   it("should generate an import statement", () => {
-    const ig = new ImportGenerator("/src/some-module");
+    const ig = new ImportGenerator("/src/some-module", instantiatedConfig);
 
     ig.addImport({
       name: "func",
@@ -19,7 +36,10 @@ describe("ImportGenerator", () => {
   });
 
   it("should support various cases", () => {
-    const ig = new ImportGenerator("/package/src/some-module");
+    const ig = new ImportGenerator(
+      "/package/src/some-module",
+      instantiatedConfig,
+    );
 
     ig.addImport({
       name: "defaultFunc",
@@ -100,7 +120,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should ignore duplicates", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "def",
@@ -146,7 +166,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should complain about multiple (different) default imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "def",
@@ -168,7 +188,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support absolute imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "path",
@@ -200,7 +220,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should not import items from the same file", () => {
-    const ig = new ImportGenerator("./src/some-module");
+    const ig = new ImportGenerator("./src/some-module", instantiatedConfig);
 
     ig.addImport({
       name: "path",
@@ -229,7 +249,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support type-only imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "Member",
@@ -261,7 +281,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support combinations of type-only and non-type-only imports", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "Member",
@@ -308,7 +328,7 @@ describe("ImportGenerator", () => {
 
   // This is necessary because of https://github.com/tc39/proposal-type-annotations/issues/16
   it("should combine default and named type-only imports correctly", () => {
-    const ig = new ImportGenerator("./some-module");
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
 
     ig.addImport({
       name: "Account",

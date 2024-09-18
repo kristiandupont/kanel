@@ -91,3 +91,9 @@ See the [preRenderHooks](./preRenderHooks.md) section for more info.
 If you need to do something more brute-force like, you might prefer to create one or more `postRenderHooks`, which will be called with a filename and an array of strings which are the raw contents, just before the file is written.
 
 See the [postRenderHooks](./postRenderHooks.md) section for more info.
+
+## importsExtension
+
+To use a different file extension for project file import references, set `importsExtension` to `.ts`, `.js`, `.mjs`, or `.cjs`.
+
+If no value is set, no extension will be appended.

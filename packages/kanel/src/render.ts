@@ -1,3 +1,4 @@
+import type { InstantiatedConfig } from "./config-types";
 import type { Declaration } from "./declaration-types";
 import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
@@ -160,8 +161,12 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (declarations: Declaration[], outputPath: string): string[] => {
-  const importGenerator = new ImportGenerator(outputPath);
+const render = (
+  declarations: Declaration[],
+  outputPath: string,
+  config: InstantiatedConfig,
+): string[] => {
+  const importGenerator = new ImportGenerator(outputPath, config);
   const lines: string[] = [];
 
   declarations.forEach((declaration, index) => {

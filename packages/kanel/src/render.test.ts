@@ -1,7 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import type { InstantiatedConfig } from "./config-types";
 import type { Declaration } from "./declaration-types";
 import render from "./render";
+
+// Mocked InstantiatedConfig
+const instantiatedConfig: InstantiatedConfig = {
+  getMetadata: vi.fn(),
+  getPropertyMetadata: vi.fn(),
+  generateIdentifierType: vi.fn(),
+  propertySortFunction: vi.fn(),
+  enumStyle: "enum",
+  typeMap: {},
+  schemas: {},
+  connection: {},
+  outputPath: ".",
+  preDeleteOutputFolder: false,
+  resolveViews: true,
+  importsExtension: "",
+};
 
 describe("processGenerationSetup", () => {
   it("should process a type declaration", () => {
@@ -14,7 +31,7 @@ describe("processGenerationSetup", () => {
         typeDefinition: ["string"],
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([
       "/** This is just a string */",
       `export type MyString = string;`,
@@ -31,7 +48,7 @@ describe("processGenerationSetup", () => {
         typeDefinition: ["", "| 'apples'", "| 'oranges'", "| 'bananas'"],
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([
       `export type MyUnion = `,
       `  | 'apples'`,
@@ -58,7 +75,7 @@ describe("processGenerationSetup", () => {
         ],
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([
       `export default interface Member {`,
       "  /**",
@@ -79,7 +96,7 @@ describe("processGenerationSetup", () => {
         values: ["G", "PG", "PG-13", "R", "NC-17"],
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([
       `export enum MpaaRating {`,
       `  G = 'G',`,
@@ -100,7 +117,7 @@ describe("processGenerationSetup", () => {
         values: ["apples", "oranges", "bananas"],
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([
       `enum Fruit {`,
       `  apples = 'apples',`,
@@ -122,7 +139,7 @@ describe("processGenerationSetup", () => {
         value: "true",
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([`export const MyConstant: boolean = true;`]);
   });
 
@@ -136,7 +153,7 @@ describe("processGenerationSetup", () => {
         value: ["z.object({", "  actor_id: actorId,", "})"],
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([
       "export const actor: z.Schema<Actor> = z.object({",
       `  actor_id: actorId,`,
@@ -156,7 +173,7 @@ describe("processGenerationSetup", () => {
         ],
       },
     ];
-    const lines = render(declarations, "./");
+    const lines = render(declarations, "./", instantiatedConfig);
     expect(lines).toEqual([
       "/**",
       " * This is a // * /* comment *\\/",

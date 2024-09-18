@@ -60,6 +60,7 @@ const processDatabase = async (
     outputPath: config.outputPath ?? ".",
     preDeleteOutputFolder: config.preDeleteOutputFolder ?? false,
     resolveViews: config.resolveViews ?? true,
+    importsExtension: config.importsExtension,
   };
 
   const generators = [
@@ -85,7 +86,7 @@ const processDatabase = async (
   }
 
   let filesToWrite = Object.keys(output).map((path) => {
-    const lines = render(output[path].declarations, path);
+    const lines = render(output[path].declarations, path, instantiatedConfig);
     return { fullPath: `${path}.ts`, lines };
   });
 
