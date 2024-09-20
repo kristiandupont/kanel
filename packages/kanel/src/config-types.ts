@@ -27,7 +27,7 @@ export type InstantiatedConfig = {
   outputPath: string;
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
-  importsExtension: ".ts" | ".js" | ".mjs" | ".cjs" | "";
+  importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
 };
 
 export type PreRenderHook = (

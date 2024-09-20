@@ -17,7 +17,6 @@ const instantiatedConfig: InstantiatedConfig = {
   outputPath: ".",
   preDeleteOutputFolder: false,
   resolveViews: true,
-  importsExtension: "",
 };
 
 describe("processGenerationSetup", () => {

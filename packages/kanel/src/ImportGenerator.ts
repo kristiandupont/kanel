@@ -122,9 +122,8 @@ class ImportGenerator {
         importParts.push(bracketedImportString);
       }
 
-      const extension = relativePath.includes("./")
-        ? this.config.importsExtension
-        : "";
+      const extension =
+        (relativePath.includes("./") ? this.config.importsExtension : "") ?? "";
       const line = `import ${onlyTypeImports ? "type " : ""}${importParts.join(", ")} from '${escapeString(
         relativePath,
       )}${extension}';`;
