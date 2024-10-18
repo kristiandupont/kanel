@@ -98,16 +98,17 @@ const generateKnexTablesModule: PreRenderHook = (
 ) => {
   const typeImports = Object.values(instantiatedConfig.schemas).reduce(
     (acc, schema) => {
-      const tableTypeImports = schema.tables.map((table) =>
-        getTypeImports(table, instantiatedConfig),
-      );
-      const viewTypeImports = schema.views.map((view) =>
-        getTypeImports(view, instantiatedConfig),
-      );
-      const materializedViewTypeImports = schema.materializedViews.map(
-        (materializedView) =>
+      const tableTypeImports = schema.tables
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((table) => getTypeImports(table, instantiatedConfig));
+      const viewTypeImports = schema.views
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((view) => getTypeImports(view, instantiatedConfig));
+      const materializedViewTypeImports = schema.materializedViews
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((materializedView) =>
           getTypeImports(materializedView, instantiatedConfig),
-      );
+        );
 
       return [
         ...acc,
