@@ -72,7 +72,7 @@ export const makeGenerateIndexFile: (
       relativePath = relativePath.replaceAll("\\", "/");
     }
 
-    const extension = instantiatedConfig.importsExtension ?? '';
+    const extension = instantiatedConfig.importsExtension ?? "";
     const line = `export { ${exports
       .map(stringifyExportItem)
       .join(", ")} } from './${relativePath}${extension}';`;
