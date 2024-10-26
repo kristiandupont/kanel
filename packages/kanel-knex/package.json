@@ -1,6 +1,6 @@
 {
   "name": "kanel-knex",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "keywords": [
     "postgresql",
     "schema",
@@ -28,8 +28,7 @@
     "test": "echo TODO.."
   },
   "dependencies": {
-    "knex": "^3.0.0",
-    "kanel-seeder": "1.0.0"
+    "knex": "^3.0.0"
   },
   "devDependencies": {
     "extract-pg-schema": "^5.0.0",
