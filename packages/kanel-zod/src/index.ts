@@ -8,3 +8,4 @@ export {
   defaultGetZodIdentifierMetadata,
   defaultGetZodSchemaMetadata,
 } from "./GenerateZodSchemasConfig";
+export { zodCamelCaseHook } from "./zodCamelCaseHook";
