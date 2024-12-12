@@ -64,7 +64,7 @@ function processSeedInput(
   const data = preprocessData(
     inputData,
     instantiatedConfig.schemas[config.schema],
-    defaults,
+    defaults || {},
   );
 
   const fullPath = resolve(dstPath, file.name.replace(".mdconf", ".js"));
