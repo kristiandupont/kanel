@@ -32,7 +32,7 @@
     "docs:build": "vitepress build docs-src"
   },
   "devDependencies": {
-    "@kristiandupont/dev-deps": "^2.26.0",
+    "@kristiandupont/dev-deps": "^2.30.0",
     "vitepress": "1.5.0",
     "vue": "3.5.13"
   },
