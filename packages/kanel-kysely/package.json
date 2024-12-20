@@ -29,7 +29,7 @@
     "run-example": "kanel -c ./example/.kanelrc"
   },
   "devDependencies": {
-    "extract-pg-schema": "^5.0.0",
+    "extract-pg-schema": "^5.2.0",
     "kanel": "*",
     "vitest": "^2.0.0"
   },
