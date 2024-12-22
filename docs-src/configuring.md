@@ -22,6 +22,8 @@ The only required property in the config object is `connection`.
 
 This is the database connection object. It follows the [`client`](https://node-postgres.com/api/client) constructor in [pg](https://www.npmjs.com/package/pg). As you will typically want to run Kanel on your development machine, you probably want a simple localhost connection as in the example above.
 
+The `connection` parameter can either be an object like shown above or a connection string. If the connection string starts with "file:" the specified path is opened using pglite. For example, when providing `file:my/pglite/db/folder`, the folder `'my/pglite/db/folder'` is opened using pglite.
+
 ## schemas
 
 The `schemas` property can be an array of strings. This will be used as the list of schema names to include when generating types. If omitted, all the non-system schemas found in the database will be processed.
