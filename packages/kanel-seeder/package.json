@@ -27,7 +27,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "extract-pg-schema": "^5.2.0",
+    "extract-pg-schema": "^5.3.3",
     "kanel": "*"
   },
   "dependencies": {
