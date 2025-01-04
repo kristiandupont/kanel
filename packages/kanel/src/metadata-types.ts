@@ -12,6 +12,7 @@ import type {
   CompositeDetails,
   CompositeProperty,
 } from "./generators/composite-types";
+import type { RoutineDetails } from "./generators/routine-types";
 import type TypeDefinition from "./TypeDefinition";
 
 export type TypeMetadata = {
@@ -46,3 +47,19 @@ export type GenerateIdentifierType = (
   details: TableDetails | ForeignTableDetails,
   instantiatedConfig: InstantiatedConfig,
 ) => TypeDeclaration;
+
+export type RoutineMetadata = {
+  path: string;
+
+  parametersName: string;
+  parameters: PropertyMetadata[];
+
+  returnTypeName?: string;
+  returnTypeComment?: string[] | undefined;
+  returnTypeOverride?: TypeDefinition;
+};
+
+export type GetRoutineMetadata = (
+  routineDetails: RoutineDetails,
+  instantiatedConfig: InstantiatedConfig,
+) => RoutineMetadata;

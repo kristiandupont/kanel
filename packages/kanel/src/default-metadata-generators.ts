@@ -10,6 +10,7 @@ import type {
   GenerateIdentifierType,
   GetMetadata,
   GetPropertyMetadata,
+  GetRoutineMetadata,
 } from "./metadata-types";
 
 const toPascalCase = recase(null, "pascal");
@@ -116,3 +117,22 @@ export const defaultPropertySortFunction = (
   }
 };
 // #endregion defaultPropertySortFunction
+
+// #region defaultGetRoutineMetadata
+export const defaultGetRoutineMetadata: GetRoutineMetadata = (
+  details,
+  instantiatedConfig,
+) => ({
+  parametersName: `${details.name}_params`,
+  parameters: details.parameters.map(({ name, type }) => ({
+    name,
+    comment: [],
+    type,
+  })),
+
+  returnTypeName: `${details.name}_return_type`,
+  returnTypeComment: ["Return type for the routine"],
+
+  path: join(instantiatedConfig.outputPath, details.schemaName, details.name),
+});
+// #endregion defaultGetRoutineMetadata

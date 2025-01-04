@@ -6,6 +6,7 @@ import type {
   GenerateIdentifierType,
   GetMetadata,
   GetPropertyMetadata,
+  GetRoutineMetadata,
 } from "./metadata-types";
 import type Output from "./Output";
 import type TypeMap from "./TypeMap";
@@ -20,6 +21,7 @@ export type InstantiatedConfig = {
   getMetadata: GetMetadata;
   getPropertyMetadata: GetPropertyMetadata;
   generateIdentifierType?: GenerateIdentifierType;
+  getRoutineMetadata?: GetRoutineMetadata;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 
   enumStyle: "enum" | "type";
@@ -50,6 +52,7 @@ export type Config = {
   getPropertyMetadata?: GetPropertyMetadata;
   generateIdentifierType?: GenerateIdentifierType;
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
+  getRoutineMetadata?: GetRoutineMetadata;
 
   enumStyle?: "enum" | "type";
 
