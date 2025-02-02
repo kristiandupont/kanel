@@ -24,7 +24,7 @@ const generateZodSchemas = makeGenerateZodSchemas({
   castToSchema: true
 })
 
-/** @type {import('../src/Config').default} */
+/** @type {import('../packages/kanel/src/config-types.ts').Config} */
 module.exports = {
   connection: {
     host: 'localhost',

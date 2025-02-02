@@ -131,7 +131,7 @@ export const defaultGetRoutineMetadata: GetRoutineMetadata = (
   })),
 
   returnTypeName: `${details.name}_return_type`,
-  returnTypeComment: ["Return type for the routine"],
+  returnTypeComment: [`Return type for ${details.name}`],
 
   path: join(instantiatedConfig.outputPath, details.schemaName, details.name),
 });
