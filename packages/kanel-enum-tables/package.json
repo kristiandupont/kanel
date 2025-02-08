@@ -30,6 +30,7 @@
     "knex": "^3.0.0"
   },
   "devDependencies": {
+    "extract-pg-schema": "^5.2.0",
     "kanel": "*"
   },
   "peerDependencies": {
