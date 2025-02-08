@@ -4,8 +4,7 @@
   "keywords": [
     "postgresql",
     "schema",
-    "typescript",
-    "knex"
+    "typescript"
   ],
   "repository": {
     "type": "git",
@@ -24,13 +23,13 @@
   "types": "build/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "test": "echo TODO..."
+    "build": "rm -rf ./build && tsc",
+    "test": "echo TODO.."
   },
   "dependencies": {
-    "knex": "^2.3.0"
+    "knex": "^3.0.0"
   },
-  "peerDependencies": {
-    "kanel": "^3.0.0"
+  "devDependencies": {
+    "kanel": "*"
   }
 }

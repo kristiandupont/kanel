@@ -4,7 +4,7 @@
       "files": ["*.ts", "*.tsx"],
       "parserOptions": {
         "createDefaultProgram": true,
-        "project": "./tsconfig.json"
+        "project": "./packages/kanel-enum-tables/tsconfig.json"
       }
     }
   ]
