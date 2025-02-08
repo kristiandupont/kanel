@@ -4,7 +4,7 @@ This packages extends [Kanel](https://github.com/kristiandupont/kanel) with the 
 
 It uses the [Postgraphile](https://www.graphile.org/postgraphile) concept of [enum tables](https://www.graphile.org/postgraphile/enums/#with-enum-tables).
 
-> Note: @enumName and @enumDescription is not supported at this time.
+> Note: @enumDescription is not supported at this time.
 
 Assuming you already have Kanel installed, add this with
 
@@ -17,7 +17,7 @@ $ npm i -D kanel-enum-tables
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generateEnumTypesFromTableValuesModule } = require('kanel-enum-tables');
+const { generateEnumTypesFromTableValuesModule } = require("kanel-enum-tables");
 
 module.exports = {
   // ... your config here.
