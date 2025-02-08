@@ -31,5 +31,8 @@
   },
   "devDependencies": {
     "kanel": "*"
+  },
+  "peerDependencies": {
+    "kanel": "^3.0.0"
   }
 }
