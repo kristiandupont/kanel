@@ -1,3 +1,4 @@
+import type { TableDetails } from "extract-pg-schema";
 import type {
   EnumDeclaration,
   InterfaceDeclaration,
@@ -5,11 +6,10 @@ import type {
   PreRenderHook,
   TypeDeclaration,
 } from "kanel";
-import type { TableDetails } from "extract-pg-schema";
 import { resolveType } from "kanel";
 import knex from "knex";
 
-const generateEnumTypesFromTableValuesModule: PreRenderHook = async (
+const enumTablesPreRenderHook: PreRenderHook = async (
   outputAccumulator,
   instantiatedConfig,
 ) => {
@@ -81,7 +81,7 @@ const generateEnumTypesFromTableValuesModule: PreRenderHook = async (
 
     // Extract @enumName from the table comment
     const enumNameMatch = table.comment.match(/@enumName\s+(?<enumName>\S+)/);
-    let enumName = enumNameMatch?.groups?.enumName;
+    const enumName = enumNameMatch?.groups?.enumName;
 
     // TODO: There is currently no good way to support @enumDescription because
     // we can't provide a comment per enum value in the EnumDeclaration declaration.
@@ -188,4 +188,4 @@ const generateEnumTypesFromTableValuesModule: PreRenderHook = async (
   };
 };
 
-export default generateEnumTypesFromTableValuesModule;
+export default enumTablesPreRenderHook;

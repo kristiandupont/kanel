@@ -17,11 +17,11 @@ $ npm i -D kanel-enum-tables
 To use it, add it to your `.kanelrc.js` file:
 
 ```javascript
-const { generateEnumTypesFromTableValuesModule } = require("kanel-enum-tables");
+const { enumTablesPreRenderHook } = require("kanel-enum-tables");
 
 module.exports = {
   // ... your config here.
 
-  preRenderHooks: [generateEnumTypesFromTableValuesModule],
+  preRenderHooks: [enumTablesPreRenderHook],
 };
 ```
