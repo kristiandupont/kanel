@@ -33,6 +33,7 @@ const defaultTypeMap: TypeMap = {
   "pg_catalog.tsrange": "string",
   "pg_catalog.tstzrange": "string",
   "pg_catalog.daterange": "string",
+  "pg_catalog._text": "string",
 };
 
 export default defaultTypeMap;
