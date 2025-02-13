@@ -83,7 +83,7 @@ const getColumnFromReference = (
 const getTypeFromReferences = (
   c: CompositeProperty,
   config: InstantiatedConfig,
-  visited = new Set<CompositeProperty>(),
+  visited = new Map<CompositeProperty, TypeDefinition>(),
 ): TypeDefinition | undefined => {
   const references = (c as TableColumn | ViewColumn | MaterializedViewColumn)
     .references as ColumnReference[];
@@ -94,10 +94,6 @@ const getTypeFromReferences = (
     );
     if (!column) {
       console.warn("Could not resolve reference", reference);
-      return "unknown";
-    }
-    if (visited.has(column)) {
-      console.warn("Could not resolve circular reference", reference);
       return "unknown";
     }
     return resolveType(column, details, config, visited);
@@ -142,154 +138,94 @@ const resolveType = (
   c: CompositeProperty,
   d: CompositeDetails,
   config: InstantiatedConfig,
-  visited = new Set<CompositeProperty>(),
+  visited = new Map<CompositeProperty, TypeDefinition>(),
 ): TypeDefinition => {
-  visited.add(c);
 
-  // 1) Check for a @type tag.
-  const typeFromComment = resolveTypeFromComment(c.comment);
-  if (typeFromComment) {
-    return typeFromComment;
+  // Check to see if we have already tried to resolve this column before.
+  // This is to prevent infinite loops when there are circular references.
+  if (visited.has(c)) {
+    return visited.get(c);
   }
 
-  // 2) If there are references, try to resolve the type from the targets
-  if ("references" in c && c.references.length > 0) {
-    const typeFromReferences = getTypeFromReferences(c, config, visited);
-    if (typeFromReferences) return typeFromReferences;
-  }
-  // 3) If this is a view with a source (i.e. the table that it's based on),
-  // get the type from the source.
-  if ((c as ViewColumn | MaterializedViewColumn).source) {
-    const source = (c as ViewColumn | MaterializedViewColumn).source;
-    let target: TableDetails | ViewDetails | MaterializedViewDetails =
-      config.schemas[source.schema].tables.find((t) => t.name === source.table);
+  // Track that we have visited this column to prevent infinite loops.
+  // Later, once we have resolved the type, this value will be overwritten with
+  // the resolved type.
+  visited.set(c, "unknown")
 
-    if (!target) {
-      target = config.schemas[source.schema].views.find(
-        (v) =>
-          v.name === source.table &&
-          v.name !== (d as ViewDetails).informationSchemaValue.table_name,
-      );
-    }
-    if (!target) {
-      target = config.schemas[source.schema].materializedViews.find(
-        (v) => v.name === source.table,
-      );
-    }
-    if (!target) {
-      target = config.schemas["public"]?.tables?.find(
-        (t) => t.name === source.table,
-      );
-    }
-    if (!target) {
-      target = config.schemas["public"]?.views?.find(
-        (v) =>
-          v.name === source.table &&
-          v.name !== (d as ViewDetails).informationSchemaValue.table_name,
-      );
-    }
-    if (!target) {
-      target = config.schemas["public"]?.materializedViews?.find(
-        (v) => v.name === source.table,
-      );
+  const type = (() => {
+
+    // 1) Check for a @type tag.
+    const typeFromComment = resolveTypeFromComment(c.comment);
+    if (typeFromComment) {
+      return typeFromComment;
     }
 
-    if (!target) {
-      console.warn("Could not resolve source", source);
-      // return to prevent error: cannot read property of undefined (reading columns)
-      return "unknown";
+    // 2) If there are references, try to resolve the type from the targets
+    if ("references" in c && c.references.length > 0) {
+      const typeFromReferences = getTypeFromReferences(c, config, visited);
+      if (typeFromReferences) return typeFromReferences;
     }
+    // 3) If this is a view with a source (i.e. the table that it's based on),
+    // get the type from the source.
+    if ((c as ViewColumn | MaterializedViewColumn).source) {
+      const source = (c as ViewColumn | MaterializedViewColumn).source;
+      let target: TableDetails | ViewDetails | MaterializedViewDetails =
+        config.schemas[source.schema].tables.find((t) => t.name === source.table);
 
-    const column = (
-      target.columns as Array<TableColumn | ViewColumn | MaterializedViewColumn>
-    ).find((c) => c.name === source.column);
-
-    if (column) {
-      return resolveType(column, target, config);
-    }
-  }
-
-  // 4) if the column is a primary key, use the generated type for it, if we do that
-  if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
-    const { path } = config.getMetadata(d, "selector", config);
-    const { name, exportAs } = config.generateIdentifierType(
-      c as TableColumn,
-      d as TableDetails,
-      config,
-    );
-
-    return {
-      name,
-      typeImports: [
-        {
-          name,
-          path,
-          isAbsolute: false,
-          isDefault: exportAs === "default",
-          importAsType: true,
-        },
-      ],
-    };
-  }
-
-  // 5) If there is a typemap type, use that
-  if (c.type.fullName in config.typeMap) {
-    return config.typeMap[c.type.fullName];
-  }
-
-  // 6) If the type is a composite, enum, range or domain, reference that.
-  if (["composite", "enum", "domain", "range"].includes(c.type.kind)) {
-    const [schemaName, typeName] = c.type.fullName.split(".");
-    let target: Details | undefined;
-    switch (c.type.kind) {
-      case "composite": {
-        target =
-          config.schemas[schemaName].compositeTypes.find(
-            (t) => t.name === typeName,
-          ) ??
-          config.schemas[schemaName].views?.find((t) => t.name === typeName) ??
-          config.schemas[schemaName].materializedViews?.find(
-            (t) => t.name === typeName,
-          ) ??
-          config.schemas[schemaName].tables?.find((t) => t.name === typeName) ??
-          config.schemas["public"]?.views?.find((t) => t.name === typeName) ??
-          config.schemas["public"]?.materializedViews?.find(
-            (t) => t.name === typeName,
-          ) ??
-          config.schemas["public"]?.tables?.find((t) => t.name === typeName);
-        break;
-      }
-      case "enum": {
-        target = config.schemas[schemaName].enums.find(
-          (t) => t.name === typeName,
+      if (!target) {
+        target = config.schemas[source.schema].views.find(
+          (v) =>
+            v.name === source.table &&
+            v.name !== (d as ViewDetails).informationSchemaValue.table_name,
         );
-
-        break;
       }
-      case "domain": {
-        target = config.schemas[schemaName].domains.find(
-          (t) => t.name === typeName,
+      if (!target) {
+        target = config.schemas[source.schema].materializedViews.find(
+          (v) => v.name === source.table,
         );
-
-        break;
       }
-      case "range": {
-        target = config.schemas[schemaName].ranges.find(
-          (t) => t.name === typeName,
+      if (!target) {
+        target = config.schemas["public"]?.tables?.find(
+          (t) => t.name === source.table,
         );
-
-        break;
       }
-      // No default
+      if (!target) {
+        target = config.schemas["public"]?.views?.find(
+          (v) =>
+            v.name === source.table &&
+            v.name !== (d as ViewDetails).informationSchemaValue.table_name,
+        );
+      }
+      if (!target) {
+        target = config.schemas["public"]?.materializedViews?.find(
+          (v) => v.name === source.table,
+        );
+      }
+
+      if (!target) {
+        console.warn("Could not resolve source", source);
+        // return to prevent error: cannot read property of undefined (reading columns)
+        return "unknown";
+      }
+
+      const column = (
+        target.columns as Array<TableColumn | ViewColumn | MaterializedViewColumn>
+      ).find((c) => c.name === source.column);
+
+      if (column) {
+        return resolveType(column, target, config);
+      }
     }
 
-    if (target) {
-      const typeFromComment = resolveTypeFromComment(target.comment);
-      if (typeFromComment) {
-        return typeFromComment;
-      }
+    // 4) if the column is a primary key, use the generated type for it, if we do that
+    if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
+      const { path } = config.getMetadata(d, "selector", config);
+      const { name, exportAs } = config.generateIdentifierType(
+        c as TableColumn,
+        d as TableDetails,
+        config,
+      );
 
-      const { name, path } = config.getMetadata(target, "selector", config);
       return {
         name,
         typeImports: [
@@ -297,19 +233,98 @@ const resolveType = (
             name,
             path,
             isAbsolute: false,
-            isDefault: true,
+            isDefault: exportAs === "default",
             importAsType: true,
           },
         ],
       };
     }
-  }
 
-  // 7) If not found, set to unknown and print a warning.
-  console.warn(
-    `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`,
-  );
-  return "unknown";
+    // 5) If there is a typemap type, use that
+    if (c.type.fullName in config.typeMap) {
+      return config.typeMap[c.type.fullName];
+    }
+
+    // 6) If the type is a composite, enum, range or domain, reference that.
+    if (["composite", "enum", "domain", "range"].includes(c.type.kind)) {
+      const [schemaName, typeName] = c.type.fullName.split(".");
+      let target: Details | undefined;
+      switch (c.type.kind) {
+        case "composite": {
+          target =
+            config.schemas[schemaName].compositeTypes.find(
+              (t) => t.name === typeName,
+            ) ??
+            config.schemas[schemaName].views?.find((t) => t.name === typeName) ??
+            config.schemas[schemaName].materializedViews?.find(
+              (t) => t.name === typeName,
+            ) ??
+            config.schemas[schemaName].tables?.find((t) => t.name === typeName) ??
+            config.schemas["public"]?.views?.find((t) => t.name === typeName) ??
+            config.schemas["public"]?.materializedViews?.find(
+              (t) => t.name === typeName,
+            ) ??
+            config.schemas["public"]?.tables?.find((t) => t.name === typeName);
+          break;
+        }
+        case "enum": {
+          target = config.schemas[schemaName].enums.find(
+            (t) => t.name === typeName,
+          );
+
+          break;
+        }
+        case "domain": {
+          target = config.schemas[schemaName].domains.find(
+            (t) => t.name === typeName,
+          );
+
+          break;
+        }
+        case "range": {
+          target = config.schemas[schemaName].ranges.find(
+            (t) => t.name === typeName,
+          );
+
+          break;
+        }
+        // No default
+      }
+
+      if (target) {
+        const typeFromComment = resolveTypeFromComment(target.comment);
+        if (typeFromComment) {
+          return typeFromComment;
+        }
+
+        const { name, path } = config.getMetadata(target, "selector", config);
+        return {
+          name,
+          typeImports: [
+            {
+              name,
+              path,
+              isAbsolute: false,
+              isDefault: true,
+              importAsType: true,
+            },
+          ],
+        };
+      }
+    }
+
+    // 7) If not found, set to unknown and print a warning.
+    console.warn(
+      `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`,
+    );
+    return "unknown";
+
+  })();
+
+  // Update the visited map with the resolved type.
+  visited.set(c, type);
+
+  return type;
 };
 
 export default resolveType;
