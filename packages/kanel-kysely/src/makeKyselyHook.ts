@@ -33,6 +33,9 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
         ...schema.materializedViews,
         ...schema.compositeTypes,
       ];
+      if (composites.length === 0) {
+        continue;
+      }
       // Get the schema folder from the first known composite.
       let schemaFolder: string | undefined;
 
