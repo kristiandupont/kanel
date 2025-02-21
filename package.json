@@ -20,7 +20,8 @@
     "packages/kanel-seeder",
     "packages/kanel-knex",
     "packages/kanel-zod",
-    "packages/kanel-kysely"
+    "packages/kanel-kysely",
+    "packages/kanel-enum-tables"
   ],
   "scripts": {
     "run-example": "kanel -c ./example/.kanelrc.js",
