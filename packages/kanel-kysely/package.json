@@ -1,6 +1,6 @@
 {
   "name": "kanel-kysely",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "keywords": [
     "postgresql",
     "schema",
