@@ -26,13 +26,13 @@
     "run-example": "kanel -c ./example/.kanelrc.js",
     "start-example-db": "docker run -d --name dvd-rental -p 54321:5432 kristiandupont/dvdrental-image",
     "stop-example-db": "docker stop dvd-rental",
-    "lint": "eslint . -f visualstudio --report-unused-disable-directives --ext .js,.ts",
-    "lint:fix": "eslint . -f visualstudio --report-unused-disable-directives --ext .js,.ts --fix",
+    "lint": "eslint . --report-unused-disable-directives",
     "docs:dev": "vitepress dev docs-src",
     "docs:build": "vitepress build docs-src"
   },
   "devDependencies": {
-    "@kristiandupont/dev-deps": "^2.30.0",
+    "@eslint/compat": "^1.2.7",
+    "@kristiandupont/dev-deps": "^2.32.0",
     "vitepress": "1.6.3",
     "vue": "3.5.13"
   },

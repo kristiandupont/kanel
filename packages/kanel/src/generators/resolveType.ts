@@ -140,7 +140,6 @@ const resolveType = (
   config: InstantiatedConfig,
   visited = new Map<CompositeProperty, TypeDefinition>(),
 ): TypeDefinition => {
-
   // Check to see if we have already tried to resolve this column before.
   // This is to prevent infinite loops when there are circular references.
   if (visited.has(c)) {
@@ -150,10 +149,9 @@ const resolveType = (
   // Track that we have visited this column to prevent infinite loops.
   // Later, once we have resolved the type, this value will be overwritten with
   // the resolved type.
-  visited.set(c, "unknown")
+  visited.set(c, "unknown");
 
   const type = (() => {
-
     // 1) Check for a @type tag.
     const typeFromComment = resolveTypeFromComment(c.comment);
     if (typeFromComment) {
@@ -170,7 +168,9 @@ const resolveType = (
     if ((c as ViewColumn | MaterializedViewColumn).source) {
       const source = (c as ViewColumn | MaterializedViewColumn).source;
       let target: TableDetails | ViewDetails | MaterializedViewDetails =
-        config.schemas[source.schema].tables.find((t) => t.name === source.table);
+        config.schemas[source.schema].tables.find(
+          (t) => t.name === source.table,
+        );
 
       if (!target) {
         target = config.schemas[source.schema].views.find(
@@ -209,7 +209,9 @@ const resolveType = (
       }
 
       const column = (
-        target.columns as Array<TableColumn | ViewColumn | MaterializedViewColumn>
+        target.columns as Array<
+          TableColumn | ViewColumn | MaterializedViewColumn
+        >
       ).find((c) => c.name === source.column);
 
       if (column) {
@@ -255,11 +257,15 @@ const resolveType = (
             config.schemas[schemaName].compositeTypes.find(
               (t) => t.name === typeName,
             ) ??
-            config.schemas[schemaName].views?.find((t) => t.name === typeName) ??
+            config.schemas[schemaName].views?.find(
+              (t) => t.name === typeName,
+            ) ??
             config.schemas[schemaName].materializedViews?.find(
               (t) => t.name === typeName,
             ) ??
-            config.schemas[schemaName].tables?.find((t) => t.name === typeName) ??
+            config.schemas[schemaName].tables?.find(
+              (t) => t.name === typeName,
+            ) ??
             config.schemas["public"]?.views?.find((t) => t.name === typeName) ??
             config.schemas["public"]?.materializedViews?.find(
               (t) => t.name === typeName,
@@ -318,7 +324,6 @@ const resolveType = (
       `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`,
     );
     return "unknown";
-
   })();
 
   // Update the visited map with the resolved type.

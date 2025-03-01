@@ -2,6 +2,7 @@ import { Dirent, promises as fs } from "fs";
 import { resolve } from "path";
 import { InstantiatedConfig, Output, PreRenderHook, writeFile } from "kanel";
 import parseMdconf from "@kristiandupont/mdconf";
+
 import seedInput, { SeedInput } from "./seedInput";
 import preprocessData from "./preprocessData";
 

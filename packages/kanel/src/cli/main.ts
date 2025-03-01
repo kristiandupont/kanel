@@ -7,8 +7,6 @@ import path from "path";
 import type { Config } from "../config-types";
 import processDatabase from "../processDatabase";
 
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version } = require("../../package.json");
 
 export async function main(): Promise<void> {

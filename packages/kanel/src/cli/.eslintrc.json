@@ -1,6 +1,0 @@
-{
-  "rules": {
-    "unicorn/prefer-module": "off",
-    "unicorn/no-process-exit": "off"
-  }
-}

@@ -1,5 +1,5 @@
-export * from "./config-types";
-export * from "./declaration-types";
+export type * from "./config-types";
+export type * from "./declaration-types";
 export * from "./default-metadata-generators";
 export type { default as Details } from "./Details";
 export { default as escapeComment } from "./escapeComment";
@@ -14,7 +14,7 @@ export type {
 } from "./generators/composite-types";
 export { default as resolveType } from "./generators/resolveType";
 export * from "./hooks";
-export * from "./metadata-types";
+export type * from "./metadata-types";
 export type { FileContents, default as Output, Path } from "./Output";
 export { default as processDatabase } from "./processDatabase";
 export type { default as TypeDefinition } from "./TypeDefinition";
