@@ -19,6 +19,7 @@ const generateProperties = <D extends CompositeDetails>(
   details: D,
   generateFor: "selector" | "initializer" | "mutator",
   nonCompositeTypeImports: Record<string, TypeImport>,
+  compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
@@ -66,6 +67,10 @@ const generateProperties = <D extends CompositeDetails>(
         }
       } else if (p.type.fullName in nonCompositeTypeImports) {
         const x = nonCompositeTypeImports[p.type.fullName];
+        typeImports.push(x);
+        zodType = x.name;
+      } else if (p.type.fullName in compositeTypeImports) {
+        const x = compositeTypeImports[p.type.fullName];
         typeImports.push(x);
         zodType = x.name;
       } else {

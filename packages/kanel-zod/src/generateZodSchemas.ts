@@ -37,6 +37,7 @@ export const makeGenerateZodSchemas =
 
     const nonCompositeTypeImports: Record<string, TypeImport> = {};
     const identifierTypeImports: Record<string, TypeImport> = {};
+    const compositeTypeImports: Record<string, TypeImport> = {};
 
     // First, process the non-composite types. These may be imported by
     // the composed ones so we will generate them first and store them
@@ -157,6 +158,25 @@ export const makeGenerateZodSchemas =
         }
       });
       // #endregion identifiers
+
+      // #region composites
+      schema.compositeTypes.forEach((compositeDetails) => {
+        const { name, path } = config.getZodSchemaMetadata(
+          compositeDetails,
+          undefined,
+          instantiatedConfig,
+        );
+        compositeTypeImports[
+          `${compositeDetails.schemaName}.${compositeDetails.name}`
+        ] = {
+          name,
+          path,
+          isDefault: false,
+          isAbsolute: false,
+          importAsType: false,
+        };
+      });
+      // #endregion composites
     }
 
     // #region composites
@@ -179,6 +199,7 @@ export const makeGenerateZodSchemas =
           config,
           instantiatedConfig,
           nonCompositeTypeImports,
+          compositeTypeImports,
           identifierTypeImports,
         );
         for (const declaration of declarations) {

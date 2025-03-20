@@ -15,6 +15,7 @@ function makeDeclaration(
   c: CompositeDetails,
   generateFor: "selector" | "initializer" | "mutator",
   nonCompositeTypeImports: Record<string, TypeImport>,
+  compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
   config: GenerateZodSchemasConfig,
 ) {
@@ -34,6 +35,7 @@ function makeDeclaration(
     c,
     generateFor,
     nonCompositeTypeImports,
+    compositeTypeImports,
     identifierTypeImports,
     config,
     instantiatedConfig,
@@ -87,6 +89,7 @@ const processComposite = (
   config: GenerateZodSchemasConfig,
   instantiatedConfig: InstantiatedConfig,
   nonCompositeTypeImports: Record<string, TypeImport>,
+  compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
 ): ConstantDeclaration[] => {
   const declarations: ConstantDeclaration[] = [];
@@ -96,6 +99,7 @@ const processComposite = (
     c,
     "selector",
     nonCompositeTypeImports,
+    compositeTypeImports,
     identifierTypeImports,
     config,
   );
@@ -107,6 +111,7 @@ const processComposite = (
       c,
       "initializer",
       nonCompositeTypeImports,
+      compositeTypeImports,
       identifierTypeImports,
       config,
     );
@@ -117,6 +122,7 @@ const processComposite = (
       c,
       "mutator",
       nonCompositeTypeImports,
+      compositeTypeImports,
       identifierTypeImports,
       config,
     );
