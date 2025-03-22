@@ -48,7 +48,10 @@ const processFile = (
   let canInitialize = true;
   let canMutate = true;
 
-  if (compositeDetails.kind !== "table") {
+  if (
+    compositeDetails.kind !== "table" &&
+    compositeDetails.kind !== "compositeType"
+  ) {
     canInitialize = false;
     canMutate = false;
   }
@@ -157,40 +160,42 @@ const processFile = (
     exportAs: "named",
   });
 
-  if (insertableName) {
-    result.push({
-      declarationType: "typeDeclaration",
-      name: insertableName,
-      typeImports: [
-        {
-          name: "Insertable",
-          isDefault: false,
-          path: "kysely",
-          isAbsolute: true,
-          importAsType: true,
-        },
-      ],
-      typeDefinition: [`Insertable<${tableInterfaceName}>`],
-      exportAs: "named",
-    });
-  }
+  if (compositeDetails.kind !== "compositeType") {
+    if (insertableName) {
+      result.push({
+        declarationType: "typeDeclaration",
+        name: insertableName,
+        typeImports: [
+          {
+            name: "Insertable",
+            isDefault: false,
+            path: "kysely",
+            isAbsolute: true,
+            importAsType: true,
+          },
+        ],
+        typeDefinition: [`Insertable<${tableInterfaceName}>`],
+        exportAs: "named",
+      });
+    }
 
-  if (updatableName) {
-    result.push({
-      declarationType: "typeDeclaration",
-      name: updatableName,
-      typeImports: [
-        {
-          name: "Updateable",
-          isDefault: false,
-          path: "kysely",
-          isAbsolute: true,
-          importAsType: true,
-        },
-      ],
-      typeDefinition: [`Updateable<${tableInterfaceName}>`],
-      exportAs: "named",
-    });
+    if (updatableName) {
+      result.push({
+        declarationType: "typeDeclaration",
+        name: updatableName,
+        typeImports: [
+          {
+            name: "Updateable",
+            isDefault: false,
+            path: "kysely",
+            isAbsolute: true,
+            importAsType: true,
+          },
+        ],
+        typeDefinition: [`Updateable<${tableInterfaceName}>`],
+        exportAs: "named",
+      });
+    }
   }
 
   const tableImport: TypeImport = {
