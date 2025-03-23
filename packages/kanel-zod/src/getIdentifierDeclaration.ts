@@ -72,7 +72,7 @@ const getIdentifierDeclaration = (
         type: undefined,
         value: config.castToSchema
           ? `${zodType} as unknown as z.Schema<${typescriptDeclaration.name}>`
-          : zodType,
+          : `${zodType}.transform(value => value as ${typescriptDeclaration.name})`,
         exportAs: "named",
       };
 

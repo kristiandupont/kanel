@@ -73,6 +73,8 @@ const generateProperties = <D extends CompositeDetails>(
         const x = compositeTypeImports[p.type.fullName];
         typeImports.push(x);
         zodType = x.name;
+        if (p.isArray) zodType = `${zodType}.array()`;
+        if (p.isNullable) zodType = `${zodType}.nullable()`;
       } else {
         console.error(
           `kanel-zod: Unknown type for ${name}.${p.name}: ${p.type.fullName}`,
