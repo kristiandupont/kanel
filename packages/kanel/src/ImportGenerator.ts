@@ -29,6 +29,7 @@ class ImportGenerator {
 
   addImport({
     name,
+    asName,
     isDefault,
     path: absolutePath,
     isAbsolute,
@@ -74,13 +75,14 @@ class ImportGenerator {
           `Multiple default imports attempted: ${importSet.defaultImport} and ${name} from '${importPath}'`,
         );
       }
-      importSet.defaultImport = name;
+      importSet.defaultImport = asName || name;
       importSet.importDefaultAsType = importAsType;
     } else {
+      const importName = asName ? `${name} as ${asName}` : name;
       if (importAsType) {
-        importSet.namedAsTypeImports.add(name);
+        importSet.namedAsTypeImports.add(importName);
       } else {
-        importSet.namedImports.add(name);
+        importSet.namedImports.add(importName);
       }
     }
   }

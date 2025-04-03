@@ -24,6 +24,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "func",
+      asName: undefined,
       isDefault: true,
       path: "/src/lib/func",
       isAbsolute: false,
@@ -42,6 +43,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "defaultFunc",
+      asName: undefined,
       isDefault: true,
       path: "/package/src/lib/defaultFunc",
       isAbsolute: false,
@@ -50,6 +52,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "namedFunc1",
+      asName: undefined,
       isDefault: false,
       path: "/package/src/lib/namedFunc",
       isAbsolute: false,
@@ -57,6 +60,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "namedFunc2",
+      asName: undefined,
       isDefault: false,
       path: "/package/src/lib/namedFunc",
       isAbsolute: false,
@@ -65,6 +69,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "pck",
+      asName: undefined,
       isDefault: true,
       path: "/package/package.json",
       isAbsolute: false,
@@ -73,6 +78,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "sister",
+      asName: undefined,
       isDefault: true,
       path: "/package/sister-src/sister",
       isAbsolute: false,
@@ -81,6 +87,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "defComb",
+      asName: undefined,
       isDefault: true,
       path: "/package/src/comb",
       isAbsolute: false,
@@ -88,6 +95,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "defNamed1",
+      asName: undefined,
       isDefault: false,
       path: "/package/src/comb",
       isAbsolute: false,
@@ -95,6 +103,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "defNamed2",
+      asName: undefined,
       isDefault: false,
       path: "/package/src/comb",
       isAbsolute: false,
@@ -102,6 +111,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "defNamed3",
+      asName: undefined,
       isDefault: false,
       path: "/package/src/comb",
       isAbsolute: false,
@@ -123,6 +133,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "def",
+      asName: undefined,
       isDefault: true,
       path: "./pkg",
       isAbsolute: false,
@@ -130,6 +141,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "def",
+      asName: undefined,
       isDefault: true,
       path: "./pkg",
       isAbsolute: false,
@@ -138,6 +150,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "named1",
+      asName: undefined,
       isDefault: false,
       path: "./pkg",
       isAbsolute: false,
@@ -145,6 +158,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "named2",
+      asName: undefined,
       isDefault: false,
       path: "./pkg",
       isAbsolute: false,
@@ -152,6 +166,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "named1",
+      asName: undefined,
       isDefault: false,
       path: "./pkg",
       isAbsolute: false,
@@ -169,6 +184,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "def",
+      asName: undefined,
       isDefault: true,
       path: "./pkg",
       isAbsolute: false,
@@ -178,6 +194,7 @@ describe("ImportGenerator", () => {
     expect(() =>
       ig.addImport({
         name: "def2",
+        asName: undefined,
         isDefault: true,
         path: "./pkg",
         isAbsolute: false,
@@ -191,6 +208,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "path",
+      asName: undefined,
       isDefault: true,
       path: "path",
       isAbsolute: true,
@@ -198,6 +216,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "existsSync",
+      asName: undefined,
       isDefault: false,
       path: "fs",
       isAbsolute: true,
@@ -205,6 +224,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "mkDirSync",
+      asName: undefined,
       isDefault: false,
       path: "fs",
       isAbsolute: true,
@@ -223,6 +243,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "path",
+      asName: undefined,
       isDefault: true,
       path: "path",
       isAbsolute: true,
@@ -230,6 +251,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "someDefaultImport",
+      asName: undefined,
       isDefault: true,
       path: "./src/some-module",
       isAbsolute: false,
@@ -237,6 +259,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "someNamedImport",
+      asName: undefined,
       isDefault: false,
       path: "./src/some-module",
       isAbsolute: false,
@@ -252,6 +275,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "Member",
+      asName: undefined,
       isDefault: true,
       path: "member",
       isAbsolute: true,
@@ -259,6 +283,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "AccountId",
+      asName: undefined,
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -266,6 +291,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "AccountInitializer",
+      asName: undefined,
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -284,6 +310,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "Member",
+      asName: undefined,
       isDefault: true,
       path: "member",
       isAbsolute: true,
@@ -291,6 +318,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "AccountId",
+      asName: undefined,
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -298,6 +326,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "AccountInitializer",
+      asName: undefined,
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -305,6 +334,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "Account",
+      asName: undefined,
       isDefault: true,
       path: "account",
       isAbsolute: true,
@@ -312,6 +342,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "account",
+      asName: undefined,
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -331,6 +362,7 @@ describe("ImportGenerator", () => {
 
     ig.addImport({
       name: "Account",
+      asName: undefined,
       isDefault: true,
       path: "account",
       isAbsolute: true,
@@ -338,6 +370,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "AccountId",
+      asName: undefined,
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -345,6 +378,7 @@ describe("ImportGenerator", () => {
     });
     ig.addImport({
       name: "account",
+      asName: undefined,
       isDefault: false,
       path: "account",
       isAbsolute: true,
@@ -354,6 +388,91 @@ describe("ImportGenerator", () => {
     const generatedLines = ig.generateLines();
     expect(generatedLines).toEqual([
       "import { account, type AccountId, type default as Account } from 'account';",
+    ]);
+  });
+
+  it("should support renaming imports with asName", () => {
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+
+    // Test default import renaming
+    ig.addImport({
+      name: "OriginalName",
+      asName: "RenamedDefault",
+      isDefault: true,
+      path: "module",
+      isAbsolute: true,
+      importAsType: false,
+    });
+
+    // Test named import renaming
+    ig.addImport({
+      name: "OriginalNamed",
+      asName: "RenamedNamed",
+      isDefault: false,
+      path: "module",
+      isAbsolute: true,
+      importAsType: false,
+    });
+
+    // Test type import renaming
+    ig.addImport({
+      name: "OriginalType",
+      asName: "RenamedType",
+      isDefault: false,
+      path: "module",
+      isAbsolute: true,
+      importAsType: true,
+    });
+
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual([
+      "import RenamedDefault, { OriginalNamed as RenamedNamed, type OriginalType as RenamedType } from 'module';",
+    ]);
+  });
+
+  it("should handle mixed renamed and non-renamed imports", () => {
+    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+
+    // Mix of renamed and non-renamed imports
+    ig.addImport({
+      name: "Default1",
+      asName: "RenamedDefault",
+      isDefault: true,
+      path: "module1",
+      isAbsolute: true,
+      importAsType: false,
+    });
+
+    ig.addImport({
+      name: "Named1",
+      asName: undefined,
+      isDefault: false,
+      path: "module1",
+      isAbsolute: true,
+      importAsType: false,
+    });
+
+    ig.addImport({
+      name: "Named2",
+      asName: "RenamedNamed",
+      isDefault: false,
+      path: "module1",
+      isAbsolute: true,
+      importAsType: false,
+    });
+
+    ig.addImport({
+      name: "Type1",
+      asName: "RenamedType",
+      isDefault: false,
+      path: "module1",
+      isAbsolute: true,
+      importAsType: true,
+    });
+
+    const generatedLines = ig.generateLines();
+    expect(generatedLines).toEqual([
+      "import RenamedDefault, { Named1, Named2 as RenamedNamed, type Type1 as RenamedType } from 'module1';",
     ]);
   });
 });

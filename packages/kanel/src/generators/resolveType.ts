@@ -36,6 +36,7 @@ const resolveTypeFromComment = (
         typeImports: [
           {
             name,
+            asName: undefined,
             path,
             isAbsolute: isAbsoluteString === "true",
             isDefault: isDefaultString === "true",
@@ -227,12 +228,15 @@ const resolveType = (
         d as TableDetails,
         config,
       );
+      const asName =
+        d.schemaName === "public" ? undefined : `${d.schemaName}_${name}`;
 
       return {
         name,
         typeImports: [
           {
             name,
+            asName,
             path,
             isAbsolute: false,
             isDefault: exportAs === "default",
@@ -304,11 +308,16 @@ const resolveType = (
         }
 
         const { name, path } = config.getMetadata(target, "selector", config);
+        const asName =
+          target.schemaName === "public"
+            ? undefined
+            : `${target.schemaName}_${name}`;
         return {
           name,
           typeImports: [
             {
               name,
+              asName,
               path,
               isAbsolute: false,
               isDefault: true,
