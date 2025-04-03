@@ -3,71 +3,26 @@ import type {
   GenericDeclaration,
   InstantiatedConfig,
   PreRenderHook,
-  TypeImport,
 } from "kanel";
-import { join } from "path";
+import { join, relative } from "path";
 
-const getTypeImports = (
-  details: Details,
-  instantiatedConfig: InstantiatedConfig,
-): TypeImport[] => {
-  const selector = instantiatedConfig.getMetadata(
-    details,
-    "selector",
-    instantiatedConfig,
-  );
-  const result: TypeImport[] = [
-    {
-      name: selector.name,
-      isDefault: true,
-      path: selector.path,
-      isAbsolute: false,
-      importAsType: true,
-    },
-  ];
-
-  const isReadonly = details.kind !== "table";
-  if (!isReadonly) {
-    const initializer = instantiatedConfig.getMetadata(
-      details,
-      "initializer",
-      instantiatedConfig,
-    );
-    result.push({
-      name: initializer.name,
-      isDefault: false,
-      path: initializer.path,
-      isAbsolute: false,
-      importAsType: true,
-    });
-
-    const mutator = instantiatedConfig.getMetadata(
-      details,
-      "mutator",
-      instantiatedConfig,
-    );
-    result.push({
-      name: mutator.name,
-      isDefault: false,
-      path: mutator.path,
-      isAbsolute: false,
-      importAsType: true,
-    });
+const relativeWithDotPrefix = (source: string, target: string) => {
+  const path = relative(source, target);
+  if (path[0] !== "." && path[0] !== "/") {
+    return `./${path}`;
   }
-
-  return result;
+  return path;
 };
 
-const getLine = (
-  details: Details,
-  instantiatedConfig: InstantiatedConfig,
-): string => {
+const getLine = (details: Details, instantiatedConfig: InstantiatedConfig) => {
   const selector = instantiatedConfig.getMetadata(
     details,
     "selector",
     instantiatedConfig,
   );
-  const selectorName = selector.name;
+
+  const createImport = (it: string) =>
+    `import('${relativeWithDotPrefix(instantiatedConfig.outputPath, selector.path)}').${it}`;
 
   let initializerName = "never";
   let mutatorName = "never";
@@ -79,54 +34,35 @@ const getLine = (
       "initializer",
       instantiatedConfig,
     );
-    initializerName = initializer.name;
+    initializerName = createImport(initializer.name);
 
     const mutator = instantiatedConfig.getMetadata(
       details,
       "mutator",
       instantiatedConfig,
     );
-    mutatorName = mutator.name;
+    mutatorName = createImport(mutator.name);
   }
 
-  return `    '${details.name}': Knex.CompositeTableType<${selectorName}, ${initializerName}, ${mutatorName}>;`;
+  const name =
+    details.schemaName === "public"
+      ? details.name
+      : `${details.schemaName}.${details.name}`;
+
+  return `    '${name}': Knex.CompositeTableType<${createImport("default")}, ${initializerName}, ${mutatorName}>;`;
 };
 
 const generateKnexTablesModule: PreRenderHook = (
   outputAcc,
   instantiatedConfig,
 ) => {
-  const typeImports = Object.values(instantiatedConfig.schemas).reduce(
-    (acc, schema) => {
-      const tableTypeImports = schema.tables
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((table) => getTypeImports(table, instantiatedConfig));
-      const viewTypeImports = schema.views
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((view) => getTypeImports(view, instantiatedConfig));
-      const materializedViewTypeImports = schema.materializedViews
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((materializedView) =>
-          getTypeImports(materializedView, instantiatedConfig),
-        );
-
-      return [
-        ...acc,
-        ...tableTypeImports.flat(),
-        ...viewTypeImports.flat(),
-        ...materializedViewTypeImports.flat(),
-      ];
-    },
-    [
-      {
-        name: "Knex",
-        isAbsolute: true,
-        path: "knex",
-        isDefault: false,
-        importAsType: false,
-      },
-    ],
-  );
+  const knexImport = {
+    name: "Knex",
+    isAbsolute: true,
+    path: "knex",
+    isDefault: false,
+    importAsType: false,
+  };
 
   const declarationLines = Object.values(instantiatedConfig.schemas).reduce(
     (acc, schema) => {
@@ -155,7 +91,7 @@ const generateKnexTablesModule: PreRenderHook = (
 
   const declaration: GenericDeclaration = {
     declarationType: "generic",
-    typeImports,
+    typeImports: [knexImport],
     lines,
   };
 
