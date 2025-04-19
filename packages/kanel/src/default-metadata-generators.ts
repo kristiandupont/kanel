@@ -4,7 +4,6 @@ import { join } from "path";
 import { tryParse } from "tagged-comment-parser";
 
 import escapeIdentifier from "./escapeIdentifier";
-import escapeString from "./escapeString";
 import type { CompositeProperty } from "./generators/composite-types";
 import resolveType from "./generators/resolveType";
 import type {
