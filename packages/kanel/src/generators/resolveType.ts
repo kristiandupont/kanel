@@ -85,7 +85,7 @@ const getTypeFromReferences = (
   c: CompositeProperty,
   config: InstantiatedConfig,
   visited = new Map<CompositeProperty, TypeDefinition>(),
-  originCompositeDetails?: CompositeDetails,
+  originCompositeDetails: CompositeDetails,
 ): TypeDefinition | undefined => {
   const references = (c as TableColumn | ViewColumn | MaterializedViewColumn)
     .references as ColumnReference[];
