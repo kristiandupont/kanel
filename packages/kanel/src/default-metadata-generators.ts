@@ -90,7 +90,9 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
     declarationType: "typeDeclaration",
     name,
     exportAs: "named",
-    typeDefinition: [`${type} & { __brand: '${escapeString(name)}' }`],
+    typeDefinition: [
+      `${type} & { __brand: '${details.schemaName}.${details.name}' }`,
+    ],
     typeImports: imports,
     comment: [`Identifier type for ${details.schemaName}.${details.name}`],
   };
