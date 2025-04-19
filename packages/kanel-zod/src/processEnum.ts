@@ -1,11 +1,8 @@
 import type { EnumDetails } from "extract-pg-schema";
-import type {
-  ConstantDeclaration,
-  InstantiatedConfig,
-  TypeImport,
-} from "kanel";
+import type { ConstantDeclaration, InstantiatedConfig } from "kanel";
 
 import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import zImport from "./zImport";
 
 const processEnum = (
   e: EnumDetails,
@@ -23,18 +20,10 @@ const processEnum = (
     "])",
   ];
 
-  const typeImport: TypeImport = {
-    name: "z",
-    isDefault: false,
-    path: "zod",
-    isAbsolute: true,
-    importAsType: false,
-  };
-
   const declaration: ConstantDeclaration = {
     declarationType: "constant",
     comment: [`Zod schema for ${e.name}`],
-    typeImports: [typeImport],
+    typeImports: [zImport],
     name,
     type: undefined,
     value: lines,

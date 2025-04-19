@@ -49,7 +49,7 @@ const generateProperties = <D extends CompositeDetails>(
       const typeImports: TypeImport[] = [];
 
       if (typeof t !== "string" && t.name in identifierTypeImports) {
-        const x = identifierTypeImports[t.name];
+        const x = identifierTypeImports[`${details.schemaName}.${t.name}`];
         typeImports.push(x);
         zodType = x.name;
       } else if (p.type.fullName in config.zodTypeMap) {

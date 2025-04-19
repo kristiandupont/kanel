@@ -1,11 +1,8 @@
 import type { DomainDetails } from "extract-pg-schema";
-import type {
-  ConstantDeclaration,
-  InstantiatedConfig,
-  TypeImport,
-} from "kanel";
+import type { ConstantDeclaration, InstantiatedConfig } from "kanel";
 
 import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import zImport from "./zImport";
 
 const processDomain = (
   d: DomainDetails,
@@ -22,19 +19,11 @@ const processDomain = (
     zodType = "z.unknown()";
   }
 
-  const typeImport: TypeImport = {
-    name: "z",
-    isDefault: false,
-    path: "zod",
-    isAbsolute: true,
-    importAsType: false,
-  };
-
   const declaration: ConstantDeclaration = {
     declarationType: "constant",
     comment: [`Zod schema for ${d.name}`],
     typeImports: [
-      typeImport,
+      zImport,
       ...(typeof zodType === "string" ? [] : zodType.typeImports),
     ],
     name,

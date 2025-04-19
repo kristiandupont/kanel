@@ -64,6 +64,7 @@ export const makeGenerateZodSchemas =
           `${enumDetails.schemaName}.${enumDetails.name}`
         ] = {
           name,
+          asName: undefined,
           path,
           isDefault: false,
           isAbsolute: false,
@@ -91,6 +92,7 @@ export const makeGenerateZodSchemas =
           `${rangeDetails.schemaName}.${rangeDetails.name}`
         ] = {
           name,
+          asName: undefined,
           path,
           isDefault: false,
           isAbsolute: false,
@@ -118,6 +120,7 @@ export const makeGenerateZodSchemas =
           `${domainDetails.schemaName}.${domainDetails.name}`
         ] = {
           name,
+          asName: undefined,
           path,
           isDefault: false,
           isAbsolute: false,
@@ -148,8 +151,9 @@ export const makeGenerateZodSchemas =
           const { name, originalName, declaration } = result;
 
           output = createOrAppendFileContents(output, path, declaration);
-          identifierTypeImports[originalName] = {
+          identifierTypeImports[`${schemaName}.${originalName}`] = {
             name,
+            asName: undefined,
             path,
             isDefault: false,
             isAbsolute: false,
@@ -170,6 +174,7 @@ export const makeGenerateZodSchemas =
           `${compositeDetails.schemaName}.${compositeDetails.name}`
         ] = {
           name,
+          asName: undefined,
           path,
           isDefault: false,
           isAbsolute: false,

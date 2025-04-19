@@ -84,6 +84,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
 
       const schemaImport: TypeImport = {
         name: schemaInterfaceName,
+        asName: undefined,
         isDefault: true,
         path: schemaPath,
         isAbsolute: false,
