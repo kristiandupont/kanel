@@ -36,6 +36,7 @@ const resolveTypeFromComment = (
         typeImports: [
           {
             name,
+            asName: undefined,
             path,
             isAbsolute: isAbsoluteString === "true",
             isDefault: isDefaultString === "true",
@@ -84,6 +85,7 @@ const getTypeFromReferences = (
   c: CompositeProperty,
   config: InstantiatedConfig,
   visited = new Map<CompositeProperty, TypeDefinition>(),
+  originCompositeDetails: CompositeDetails,
 ): TypeDefinition | undefined => {
   const references = (c as TableColumn | ViewColumn | MaterializedViewColumn)
     .references as ColumnReference[];
@@ -96,7 +98,13 @@ const getTypeFromReferences = (
       console.warn("Could not resolve reference", reference);
       return "unknown";
     }
-    return resolveType(column, details, config, visited);
+    return resolveType(
+      column,
+      details,
+      config,
+      visited,
+      originCompositeDetails,
+    );
   });
 
   const seenTypeNames = new Set<string>();
@@ -139,6 +147,7 @@ const resolveType = (
   d: CompositeDetails,
   config: InstantiatedConfig,
   visited = new Map<CompositeProperty, TypeDefinition>(),
+  originCompositeDetails: CompositeDetails = d,
 ): TypeDefinition => {
   // Check to see if we have already tried to resolve this column before.
   // This is to prevent infinite loops when there are circular references.
@@ -160,8 +169,15 @@ const resolveType = (
 
     // 2) If there are references, try to resolve the type from the targets
     if ("references" in c && c.references.length > 0) {
-      const typeFromReferences = getTypeFromReferences(c, config, visited);
-      if (typeFromReferences) return typeFromReferences;
+      const typeFromReferences = getTypeFromReferences(
+        c,
+        config,
+        visited,
+        originCompositeDetails,
+      );
+      if (typeFromReferences) {
+        return typeFromReferences;
+      }
     }
     // 3) If this is a view with a source (i.e. the table that it's based on),
     // get the type from the source.
@@ -215,7 +231,13 @@ const resolveType = (
       ).find((c) => c.name === source.column);
 
       if (column) {
-        return resolveType(column, target, config);
+        return resolveType(
+          column,
+          target,
+          config,
+          visited,
+          originCompositeDetails,
+        );
       }
     }
 
@@ -227,12 +249,15 @@ const resolveType = (
         d as TableDetails,
         config,
       );
+      const sameSchema = originCompositeDetails.schemaName === d.schemaName;
+      const asName = sameSchema ? undefined : `${d.schemaName}_${name}`;
 
       return {
-        name,
+        name: asName ?? name,
         typeImports: [
           {
             name,
+            asName,
             path,
             isAbsolute: false,
             isDefault: exportAs === "default",
@@ -304,11 +329,15 @@ const resolveType = (
         }
 
         const { name, path } = config.getMetadata(target, "selector", config);
+        const sameSchema =
+          originCompositeDetails.schemaName === target.schemaName;
+        const asName = sameSchema ? undefined : `${target.schemaName}_${name}`;
         return {
-          name,
+          name: asName ?? name,
           typeImports: [
             {
               name,
+              asName,
               path,
               isAbsolute: false,
               isDefault: true,

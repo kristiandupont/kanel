@@ -1,6 +1,7 @@
 import type { GenericDeclaration, PreRenderHook, TypeImport } from "kanel";
 import knex from "knex";
 import { join } from "path";
+import knexImport from "./knexImport";
 
 const generateMigrationCheck: PreRenderHook = async (
   outputAcc,
@@ -17,15 +18,7 @@ const generateMigrationCheck: PreRenderHook = async (
 
   db.destroy();
 
-  const typeImports: TypeImport[] = [
-    {
-      name: "Knex",
-      isDefault: false,
-      path: "knex",
-      isAbsolute: true,
-      importAsType: false,
-    },
-  ];
+  const typeImports: TypeImport[] = [knexImport];
 
   const lines = [
     "/** This is the migration that was set when the types were generated. */",

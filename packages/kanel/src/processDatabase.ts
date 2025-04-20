@@ -25,10 +25,22 @@ type Progress = {
   onProgressEnd?: () => void;
 };
 
+const defaultConfig: Partial<Config> = {
+  getMetadata: defaultGetMetadata,
+  getPropertyMetadata: defaultGetPropertyMetadata,
+  generateIdentifierType: defaultGenerateIdentifierType,
+  propertySortFunction: defaultPropertySortFunction,
+  outputPath: ".",
+  enumStyle: "enum",
+  resolveViews: true,
+  preDeleteOutputFolder: false,
+};
+
 const processDatabase = async (
-  config: Config,
+  cfg: Config,
   progress?: Progress,
 ): Promise<void> => {
+  const config = { ...defaultConfig, ...cfg };
   const schemas = await extractSchemas(config.connection, {
     schemas: config.schemas,
     typeFilter: config.typeFilter,
@@ -40,26 +52,18 @@ const processDatabase = async (
     ...config.customTypeMap,
   };
 
-  const getMetadata = config.getMetadata ?? defaultGetMetadata;
-  const getPropertyMetadata =
-    config.getPropertyMetadata ?? defaultGetPropertyMetadata;
-  const generateIdentifierType =
-    config.generateIdentifierType ?? defaultGenerateIdentifierType;
-  const propertySortFunction =
-    config.propertySortFunction ?? defaultPropertySortFunction;
-
   const instantiatedConfig: InstantiatedConfig = {
-    getMetadata,
-    getPropertyMetadata,
-    generateIdentifierType,
-    propertySortFunction,
-    enumStyle: config.enumStyle ?? "enum",
+    getMetadata: config.getMetadata,
+    getPropertyMetadata: config.getPropertyMetadata,
+    generateIdentifierType: config.generateIdentifierType,
+    propertySortFunction: config.propertySortFunction,
+    enumStyle: config.enumStyle,
     typeMap,
     schemas,
     connection: config.connection,
-    outputPath: config.outputPath ?? ".",
-    preDeleteOutputFolder: config.preDeleteOutputFolder ?? false,
-    resolveViews: config.resolveViews ?? true,
+    outputPath: config.outputPath,
+    preDeleteOutputFolder: config.preDeleteOutputFolder,
+    resolveViews: config.resolveViews,
     importsExtension: config.importsExtension,
   };
 

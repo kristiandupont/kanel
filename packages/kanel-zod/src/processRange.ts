@@ -1,11 +1,8 @@
 import type { RangeDetails } from "extract-pg-schema";
-import type {
-  ConstantDeclaration,
-  InstantiatedConfig,
-  TypeImport,
-} from "kanel";
+import type { ConstantDeclaration, InstantiatedConfig } from "kanel";
 
 import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import zImport from "./zImport";
 
 const processRange = (
   r: RangeDetails,
@@ -18,18 +15,10 @@ const processRange = (
     instantiatedConfig,
   );
 
-  const typeImport: TypeImport = {
-    name: "z",
-    isDefault: false,
-    path: "zod",
-    isAbsolute: true,
-    importAsType: false,
-  };
-
   const declaration: ConstantDeclaration = {
     declarationType: "constant",
     comment: [`Zod schema for ${r.name}`],
-    typeImports: [typeImport],
+    typeImports: [zImport],
     name,
     type: undefined,
     value: "z.string()",
