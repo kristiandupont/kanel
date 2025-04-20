@@ -17,7 +17,7 @@ describe("defaultGenerateIdentifierType", () => {
       declarationType: "typeDeclaration",
       comment: ["Identifier type for public.my_things"],
       name: "MyThingsThingId",
-      typeDefinition: ["unknown & { __brand: 'MyThingsThingId' }"],
+      typeDefinition: ["unknown & { __brand: 'public.my_things' }"],
     });
   });
 
@@ -34,7 +34,9 @@ describe("defaultGenerateIdentifierType", () => {
       declarationType: "typeDeclaration",
       comment: ["Identifier type for special_schema!'..special_table!'."],
       name: "SpecialTableSpecialCol",
-      typeDefinition: ["unknown & { __brand: 'SpecialTableSpecialCol' }"],
+      typeDefinition: [
+        "unknown & { __brand: 'special_schema!'..special_table!'.' }",
+      ],
     });
   });
 });
