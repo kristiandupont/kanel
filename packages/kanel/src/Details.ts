@@ -2,6 +2,7 @@ import type {
   CompositeTypeDetails,
   DomainDetails,
   EnumDetails,
+  ForeignTableDetails,
   MaterializedViewDetails,
   RangeDetails,
   TableDetails,
@@ -10,6 +11,7 @@ import type {
 
 type Details =
   | TableDetails
+  | ForeignTableDetails
   | ViewDetails
   | MaterializedViewDetails
   | EnumDetails

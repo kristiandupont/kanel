@@ -1,6 +1,8 @@
 import type {
   CompositeTypeAttribute,
   CompositeTypeDetails,
+  ForeignTableColumn,
+  ForeignTableDetails,
   MaterializedViewColumn,
   MaterializedViewDetails,
   TableColumn,
@@ -12,11 +14,14 @@ import type {
 export type CompositeDetails =
   | CompositeTypeDetails
   | TableDetails
+  | ForeignTableDetails
   | ViewDetails
-  | MaterializedViewDetails;
+  | MaterializedViewDetails
+  | ForeignTableDetails;
 
 export type CompositeProperty =
   | TableColumn
+  | ForeignTableColumn
   | ViewColumn
   | MaterializedViewColumn
   | CompositeTypeAttribute;
