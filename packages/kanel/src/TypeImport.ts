@@ -14,7 +14,7 @@ type TypeImport = {
    * The name to use in the file where this type is imported.
    * If not provided, the name will be the same as the name of the type.
    */
-  asName: string | undefined;
+  asName?: string;
 
   /**
    * If true, this type is imported as the default export
