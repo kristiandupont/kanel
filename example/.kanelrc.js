@@ -10,8 +10,6 @@ const {
   defaultZodTypeMap 
 } = require('kanel-zod');
 
-const { generateKnexTablesModule } = require('kanel-knex');
-
 const toPascalCase = recase('snake', 'pascal');
 const outputPath = './example/models';
 
@@ -92,7 +90,7 @@ module.exports = {
   },
 
   // Generate an index file with exports of everything
-  preRenderHooks: [generateZodSchemas, generateKnexTablesModule, generateIndexFile],
+  preRenderHooks: [generateZodSchemas, generateIndexFile],
 
   customTypeMap: {
     // A text search vector could be stored as a set of strings. See Film.ts for an example.
