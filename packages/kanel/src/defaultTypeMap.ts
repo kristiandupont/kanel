@@ -33,6 +33,26 @@ const defaultTypeMap: TypeMap = {
   "pg_catalog.tsrange": "string",
   "pg_catalog.tstzrange": "string",
   "pg_catalog.daterange": "string",
+
+  text: "string",
+  integer: "number",
+  bigint: "string",
+  smallint: "number",
+  real: "number",
+  double: "number",
+  numeric: "string",
+  decimal: "string",
+  boolean: "boolean",
+  char: "string",
+  bpchar: "string",
+  varchar: "string",
+  uuid: "string",
+  inet: "string",
+  date: "Date",
+  time: "Date",
+  timetz: "Date",
+  timestamp: "Date",
+  "timestamp without time zone": "Date",
 };
 
 export default defaultTypeMap;

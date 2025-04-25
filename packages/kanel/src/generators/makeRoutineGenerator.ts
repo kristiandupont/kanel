@@ -6,8 +6,26 @@ import type { InstantiatedConfig } from "../config-types";
 import type { Declaration, InterfaceDeclaration } from "../declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
+import type TypeMap from "../TypeMap";
 
 type RoutineDetails = FunctionDetails | ProcedureDetails;
+
+function resolveSimpleType(pgType: string, typeMap: TypeMap) {
+  if (pgType.endsWith("[]")) {
+    const elementType = pgType.slice(0, -2);
+    const resolved = resolveSimpleType(elementType, typeMap);
+    if (typeof resolved === "string") {
+      return resolved + "[]";
+    } else {
+      return {
+        ...resolved,
+        name: resolved.name + "[]",
+      };
+    }
+  } else {
+    return typeMap[pgType];
+  }
+}
 
 const makeMapper =
   (config: InstantiatedConfig) =>
@@ -31,35 +49,80 @@ const makeMapper =
       comment: parameters.map(({ comment }) => comment).flat(),
       exportAs: "named",
       properties: parameters.map(
-        ({ name, typeOverride, nullableOverride, optionalOverride }) => ({
-          name,
-          dimensions: 0,
-          isNullable: nullableOverride ?? false,
-          isOptional: optionalOverride ?? false,
-          typeName: "unknown",
-        }),
+        ({ name, typeOverride, nullableOverride, optionalOverride }, index) => {
+          let t = typeOverride;
+          if (!t) {
+            const sourceTypeName = routineDetails.parameters[index].type;
+            if (sourceTypeName) {
+              t = resolveSimpleType(sourceTypeName, config.typeMap);
+            }
+          }
+          const typeName = typeof t === "string" ? t : t.name;
+          return {
+            name,
+            dimensions: 0,
+            isNullable: nullableOverride ?? false,
+            isOptional: optionalOverride ?? false,
+            typeName,
+          };
+        },
       ),
     };
 
-    const returnTypeDeclaration: Declaration = returnTypeTypeOverride
-      ? {
-          declarationType: "typeDeclaration",
-          name: returnTypeName,
-          comment: returnTypeComment,
-          typeDefinition: [returnTypeTypeOverride.toString()],
-          exportAs: "named",
+    let returnTypeDeclaration: Declaration | undefined;
+    if (returnTypeTypeOverride) {
+      returnTypeDeclaration = {
+        declarationType: "typeDeclaration",
+        name: returnTypeName,
+        comment: returnTypeComment,
+        typeDefinition: [returnTypeTypeOverride.toString()],
+        exportAs: "named",
+      };
+    } else {
+      if ("returnType" in routineDetails) {
+        const returnType = routineDetails.returnType;
+        if (typeof returnType === "string") {
+          if (returnType in config.typeMap) {
+            const typeDef = config.typeMap[returnType];
+            let typeDefinitionLine: string;
+            if (typeof typeDef === "string") {
+              typeDefinitionLine = typeDef;
+            } else {
+              typeDefinitionLine = typeDef.name;
+            }
+            returnTypeDeclaration = {
+              declarationType: "typeDeclaration",
+              name: returnTypeName,
+              comment: returnTypeComment,
+              typeDefinition: [typeDefinitionLine],
+              exportAs: "named",
+            };
+          }
+        } else {
+          if (returnType.type === "table") {
+            returnTypeDeclaration = {
+              declarationType: "interface",
+              name: returnTypeName,
+              comment: returnTypeComment,
+              exportAs: "named",
+              properties: returnType.columns.map((column) => ({
+                name: column.name,
+                typeName: resolveSimpleType(column.type, config.typeMap),
+                dimensions: 0,
+                isNullable: false,
+                isOptional: false,
+              })),
+            };
+          }
         }
-      : {
-          declarationType: "interface",
-          name: returnTypeName,
-          comment: returnTypeComment,
-          exportAs: "named",
-          properties: [],
-        };
+      }
+    }
 
     return [
       { path, declaration: parameterDeclaration },
-      { path, declaration: returnTypeDeclaration },
+      ...(returnTypeDeclaration
+        ? [{ path, declaration: returnTypeDeclaration }]
+        : []),
     ];
   };
 
@@ -69,6 +132,7 @@ const makeRoutineGenerator =
     const mapper = makeMapper(config);
     const declarations: { path: string; declaration: Declaration }[] =
       (schema[`${kind}s`] as RoutineDetails[])?.map(mapper).flat() ?? [];
+
     return declarations.reduce((acc, { path, declaration }) => {
       const existing = acc[path];
       if (existing) {

@@ -124,10 +124,9 @@ export const defaultGetRoutineMetadata: GetRoutineMetadata = (
   instantiatedConfig,
 ) => ({
   parametersName: `${details.name}_params`,
-  parameters: details.parameters.map(({ name, type }) => ({
+  parameters: details.parameters.map(({ name }) => ({
     name,
     comment: [],
-    type,
   })),
 
   returnTypeName: `${details.name}_return_type`,

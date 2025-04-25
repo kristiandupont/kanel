@@ -73,6 +73,17 @@ module.exports = {
     }
   },
 
+  getRoutineMetadata: (details, instantiatedConfig) => ({
+    parametersName: `${details.name}_params`,
+    parameters: details.parameters.map(({ name }) => ({
+      name,
+      comment: [],
+    })),
+    returnTypeName: `${details.name}_return_type`,
+    returnTypeComment: [`Return type for ${details.name}`],
+    path: join(outputPath, details.name),
+  }),
+
 
   // This implementation will generate flavored instead of branded types.
   // See: https://spin.atomicobject.com/2018/01/15/typescript-flexible-nominal-typing/

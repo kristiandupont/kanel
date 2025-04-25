@@ -32,6 +32,7 @@ const defaultConfig: Partial<Config> = {
   getPropertyMetadata: defaultGetPropertyMetadata,
   generateIdentifierType: defaultGenerateIdentifierType,
   propertySortFunction: defaultPropertySortFunction,
+  getRoutineMetadata: defaultGetRoutineMetadata,
   outputPath: ".",
   enumStyle: "enum",
   resolveViews: true,
