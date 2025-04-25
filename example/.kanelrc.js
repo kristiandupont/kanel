@@ -24,7 +24,7 @@ const generateZodSchemas = makeGenerateZodSchemas({
   castToSchema: true
 })
 
-/** @type {import('../src/Config').default} */
+/** @type {import('../packages/kanel/src/config-types.ts').Config} */
 module.exports = {
   connection: {
     host: 'localhost',
@@ -72,6 +72,17 @@ module.exports = {
       ]
     }
   },
+
+  getRoutineMetadata: (details, instantiatedConfig) => ({
+    parametersName: `${details.name}_params`,
+    parameters: details.parameters.map(({ name }) => ({
+      name,
+      comment: [],
+    })),
+    returnTypeName: `${details.name}_return_type`,
+    returnTypeComment: [`Return type for ${details.name}`],
+    path: join(outputPath, details.name),
+  }),
 
 
   // This implementation will generate flavored instead of branded types.

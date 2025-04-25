@@ -6,6 +6,7 @@ import {
   defaultGenerateIdentifierType,
   defaultGetMetadata,
   defaultGetPropertyMetadata,
+  defaultGetRoutineMetadata,
   defaultPropertySortFunction,
 } from "./default-metadata-generators";
 import defaultTypeMap from "./defaultTypeMap";
@@ -13,6 +14,7 @@ import makeCompositeGenerator from "./generators/makeCompositeGenerator";
 import makeDomainsGenerator from "./generators/makeDomainsGenerator";
 import makeEnumsGenerator from "./generators/makeEnumsGenerator";
 import makeRangesGenerator from "./generators/makeRangesGenerator";
+import makeRoutineGenerator from "./generators/makeRoutineGenerator";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
 import render from "./render";
@@ -30,6 +32,7 @@ const defaultConfig: Partial<Config> = {
   getPropertyMetadata: defaultGetPropertyMetadata,
   generateIdentifierType: defaultGenerateIdentifierType,
   propertySortFunction: defaultPropertySortFunction,
+  getRoutineMetadata: defaultGetRoutineMetadata,
   outputPath: ".",
   enumStyle: "enum",
   resolveViews: true,
@@ -57,6 +60,7 @@ const processDatabase = async (
     getPropertyMetadata: config.getPropertyMetadata,
     generateIdentifierType: config.generateIdentifierType,
     propertySortFunction: config.propertySortFunction,
+    getRoutineMetadata: config.getRoutineMetadata,
     enumStyle: config.enumStyle,
     typeMap,
     schemas,
@@ -76,6 +80,8 @@ const processDatabase = async (
     makeEnumsGenerator(instantiatedConfig),
     makeRangesGenerator(instantiatedConfig),
     makeDomainsGenerator(instantiatedConfig),
+    makeRoutineGenerator("function", instantiatedConfig),
+    makeRoutineGenerator("procedure", instantiatedConfig),
   ];
 
   let output: Output = {};

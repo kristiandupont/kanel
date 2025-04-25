@@ -2,8 +2,10 @@ import type {
   CompositeTypeDetails,
   DomainDetails,
   EnumDetails,
+  FunctionDetails,
   ForeignTableDetails,
   MaterializedViewDetails,
+  ProcedureDetails,
   RangeDetails,
   TableDetails,
   ViewDetails,
@@ -17,6 +19,8 @@ type Details =
   | EnumDetails
   | RangeDetails
   | DomainDetails
-  | CompositeTypeDetails;
+  | CompositeTypeDetails
+  | FunctionDetails
+  | ProcedureDetails;
 
 export default Details;
