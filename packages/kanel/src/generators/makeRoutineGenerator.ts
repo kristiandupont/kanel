@@ -23,7 +23,10 @@ function resolveSimpleType(pgType: string, typeMap: TypeMap) {
       };
     }
   } else {
-    return typeMap[pgType];
+    if (!typeMap[pgType]) {
+      console.warn(`Unknown type '${pgType}'`);
+    }
+    return typeMap[pgType] ?? "unknown";
   }
 }
 
