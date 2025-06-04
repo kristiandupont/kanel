@@ -117,6 +117,21 @@ const processDeclaration = (
       }
       break;
     }
+    case "constArray": {
+      const { exportAs, name, values, comment } = declaration;
+      declarationLines.push(
+        ...(processComments(comment, 0) || []),
+        exportAs === "named"
+          ? `export const ${escapeIdentifier(name)} = [`
+          : `const ${escapeIdentifier(name)} = [`,
+        values.map((v) => `'${v}'`).join(", "),
+        "] as const;",
+      );
+      if (exportAs === "default") {
+        declarationLines.push("", `export default ${escapeIdentifier(name)};`);
+      }
+      break;
+    }
     case "constant": {
       const { exportAs, name, type, value, comment } = declaration;
       const values = Array.isArray(value) ? value : [value];
