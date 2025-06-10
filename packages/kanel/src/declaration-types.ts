@@ -36,6 +36,13 @@ export type EnumDeclaration = DeclarationBase & {
   exportAs: "named" | "default";
 };
 
+export type ConstArrayDeclaration = DeclarationBase & {
+  declarationType: "constArray";
+  name: string;
+  values: string[];
+  exportAs: "named" | "default";
+};
+
 export type ConstantDeclaration = DeclarationBase & {
   declarationType: "constant";
   name: string;
@@ -51,6 +58,7 @@ export type GenericDeclaration = DeclarationBase & {
 };
 
 export type Declaration =
+  | ConstArrayDeclaration
   | TypeDeclaration
   | InterfaceDeclaration
   | EnumDeclaration
