@@ -9,6 +9,8 @@ See the documentation [here](https://kristiandupont.github.io/kanel)
 
 Introduction to the idea is outlined [here](https://medium.com/@kristiandupont/generating-typescript-types-from-postgres-48661868ef84).
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/kristiandupont/kanel)
+
 ## Usage
 
 Install with:
