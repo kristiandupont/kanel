@@ -68,7 +68,7 @@ class ImportGenerator {
     if (isDefault) {
       if (
         importSet.defaultImport &&
-        (importSet.defaultImport !== name ||
+        (importSet.defaultImport !== (asName || name) ||
           importSet.importDefaultAsType !== importAsType)
       ) {
         throw new Error(
