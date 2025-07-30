@@ -128,6 +128,42 @@ describe("processGenerationSetup", () => {
     ]);
   });
 
+  it("should process an enum as a const array", () => {
+    const declarations: Declaration[] = [
+      {
+        declarationType: "constArray" as const,
+        name: "MpaaRating",
+        exportAs: "named",
+        values: ["G", "PG", "PG-13", "R", "NC-17"],
+      },
+    ];
+    const lines = render(declarations, "./", instantiatedConfig);
+    expect(lines).toEqual([
+      `export const MpaaRating = [`,
+      `'G', 'PG', 'PG-13', 'R', 'NC-17'`,
+      `] as const;`,
+    ]);
+  });
+
+  it("should support a default exported enum", () => {
+    const declarations: Declaration[] = [
+      {
+        declarationType: "constArray" as const,
+        name: "Fruit",
+        exportAs: "default",
+        values: ["apples", "oranges", "bananas"],
+      },
+    ];
+    const lines = render(declarations, "./", instantiatedConfig);
+    expect(lines).toEqual([
+      "const Fruit = [",
+      "'apples', 'oranges', 'bananas'",
+      "] as const;",
+      "",
+      "export default Fruit;",
+    ]);
+  });
+
   it("should process a constant", () => {
     const declarations: Declaration[] = [
       {
