@@ -37,7 +37,7 @@
     "@kristiandupont/recase": "^1.2.1",
     "chalk": "4.1.2",
     "cli-progress": "^3.11.2",
-    "extract-pg-schema": "^5.5.1",
+    "extract-pg-schema": "^5.7.3",
     "optionator": "^0.9.1",
     "pg": "^8.10.0",
     "ramda": "^0.30.0",
