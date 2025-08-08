@@ -1,5 +1,9 @@
-import type { InstantiatedConfig } from "./config-types";
 import type { Declaration } from "./declaration-types";
+import type {
+  FileContents,
+  TypescriptFileContents,
+  GenericFileContents,
+} from "./Output";
 import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
 import escapeIdentifier from "./escapeIdentifier";
@@ -161,12 +165,11 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (
+const renderTypescript = (
   declarations: Declaration[],
   outputPath: string,
-  config: InstantiatedConfig,
 ): string[] => {
-  const importGenerator = new ImportGenerator(outputPath, config);
+  const importGenerator = new ImportGenerator(outputPath);
   const lines: string[] = [];
 
   declarations.forEach((declaration, index) => {
@@ -184,6 +187,15 @@ const render = (
   }
 
   return [...importLines, ...lines];
+};
+
+const render = (fileContents: FileContents, path: string): string[] => {
+  if (fileContents.filetype === "typescript") {
+    return renderTypescript(fileContents.declarations, path);
+  } else if (fileContents.filetype === "generic") {
+    return fileContents.content.split("\n");
+  }
+  throw new Error(`Unknown file type: ${(fileContents as any).filetype}`);
 };
 
 export default render;

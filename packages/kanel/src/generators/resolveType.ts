@@ -9,7 +9,7 @@ import type {
   ViewDetails,
 } from "extract-pg-schema";
 
-import type { InstantiatedConfig } from "../config-types";
+import { useKanelContext } from "../context";
 import type Details from "../Details";
 import type TypeDefinition from "../TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
@@ -49,28 +49,22 @@ const getColumnFromReference = (
 
 const getTypeFromReferences = (
   c: CompositeProperty,
-  config: InstantiatedConfig,
   visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails,
 ): TypeDefinition | undefined => {
+  const context = useKanelContext();
   const references = (c as TableColumn | ViewColumn | MaterializedViewColumn)
     .references as ColumnReference[];
   const referencedTypes = references.map((reference) => {
     const { column, details } = getColumnFromReference(
       reference,
-      config.schemas,
+      context.instantiatedSources.mainDb.schemas,
     );
     if (!column) {
       console.warn("Could not resolve reference", reference);
       return "unknown";
     }
-    return resolveType(
-      column,
-      details,
-      config,
-      visited,
-      originCompositeDetails,
-    );
+    return resolveType(column, details, visited, originCompositeDetails);
   });
 
   const seenTypeNames = new Set<string>();
@@ -86,7 +80,10 @@ const getTypeFromReferences = (
     });
 
   // Don't use the simple primitive type if we're generating identifier types
-  if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
+  if (
+    context.config.generateIdentifierType &&
+    (c as TableColumn).isPrimaryKey
+  ) {
     dedupedReferencedTypes = dedupedReferencedTypes.filter(
       (t) => typeof t !== "string",
     );
@@ -111,7 +108,6 @@ const getTypeFromReferences = (
 const resolveType = (
   c: CompositeProperty,
   d: CompositeDetails,
-  config: InstantiatedConfig,
   visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails = d,
 ): TypeDefinition => {
@@ -132,7 +128,6 @@ const resolveType = (
     if ("references" in c && c.references.length > 0) {
       const typeFromReferences = getTypeFromReferences(
         c,
-        config,
         visited,
         originCompositeDetails,
       );
@@ -144,39 +139,44 @@ const resolveType = (
     // get the type from the source.
     if ((c as ViewColumn | MaterializedViewColumn).source) {
       const source = (c as ViewColumn | MaterializedViewColumn).source;
+      const context = useKanelContext();
       let target: TableDetails | ViewDetails | MaterializedViewDetails =
-        config.schemas[source.schema].tables.find(
+        context.instantiatedSources.mainDb.schemas[source.schema].tables.find(
           (t) => t.name === source.table,
         );
 
       if (!target) {
-        target = config.schemas[source.schema].views.find(
+        target = context.instantiatedSources.mainDb.schemas[
+          source.schema
+        ].views.find(
           (v) =>
             v.name === source.table &&
             v.name !== (d as ViewDetails).informationSchemaValue.table_name,
         );
       }
       if (!target) {
-        target = config.schemas[source.schema].materializedViews.find(
-          (v) => v.name === source.table,
-        );
+        target = context.instantiatedSources.mainDb.schemas[
+          source.schema
+        ].materializedViews.find((v) => v.name === source.table);
       }
       if (!target) {
-        target = config.schemas["public"]?.tables?.find(
-          (t) => t.name === source.table,
-        );
+        target = context.instantiatedSources.mainDb.schemas[
+          "public"
+        ]?.tables?.find((t) => t.name === source.table);
       }
       if (!target) {
-        target = config.schemas["public"]?.views?.find(
+        target = context.instantiatedSources.mainDb.schemas[
+          "public"
+        ]?.views?.find(
           (v) =>
             v.name === source.table &&
             v.name !== (d as ViewDetails).informationSchemaValue.table_name,
         );
       }
       if (!target) {
-        target = config.schemas["public"]?.materializedViews?.find(
-          (v) => v.name === source.table,
-        );
+        target = context.instantiatedSources.mainDb.schemas[
+          "public"
+        ]?.materializedViews?.find((v) => v.name === source.table);
       }
 
       if (!target) {

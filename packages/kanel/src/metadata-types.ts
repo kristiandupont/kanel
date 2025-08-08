@@ -5,7 +5,6 @@ import type {
   TableDetails,
 } from "extract-pg-schema";
 
-import type { InstantiatedConfig } from "./config-types";
 import type { TypeDeclaration } from "./declaration-types";
 import type Details from "./Details";
 import type {

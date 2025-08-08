@@ -36,30 +36,7 @@ export type InstantiatedSourceRegistry = Record<
 // New v4 generator type
 export type Generator = () => Promise<Output>;
 
-// Updated InstantiatedConfig for v4
-export type InstantiatedConfig = {
-  // Legacy fields for backward compatibility during migration
-  connection: string | ConnectionConfig;
-  schemas: Record<string, Schema>;
-
-  // New v4 fields
-  sources?: InstantiatedSourceRegistry;
-
-  typeMap: TypeMap;
-
-  getMetadata: GetMetadata;
-  getPropertyMetadata: GetPropertyMetadata;
-  generateIdentifierType?: GenerateIdentifierType;
-  getRoutineMetadata?: GetRoutineMetadata;
-  propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
-
-  enumStyle: "enum" | "type";
-
-  outputPath: string;
-  preDeleteOutputFolder: boolean;
-  resolveViews: boolean;
-  moduleFormat?: "esm" | "commonjs" | "auto";
-};
+// InstantiatedConfig has been removed in v4 - use context system instead
 
 // Updated hook signatures for v4 (no instantiatedConfig parameter)
 export type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;

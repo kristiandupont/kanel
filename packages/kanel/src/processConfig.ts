@@ -1,21 +1,13 @@
 import { rimraf } from "rimraf";
 
-import type { Config, InstantiatedConfig } from "./config-types";
-import {
-  defaultGenerateIdentifierType,
-  defaultGetMetadata,
-  defaultGetPropertyMetadata,
-  defaultGetRoutineMetadata,
-  defaultPropertySortFunction,
-} from "./default-metadata-generators";
-import defaultTypeMap from "./defaultTypeMap";
+import type { Config } from "./config-types";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
 import render from "./render";
-import type TypeMap from "./TypeMap";
 import writeFile from "./writeFile";
 import { runWithContext } from "./context";
 import { instantiateSources } from "./sources";
+import { getModuleFormat, getOutputExtension } from "./moduleFormat";
 
 type Progress = {
   onProgressStart?: (total: number) => void;
@@ -23,23 +15,11 @@ type Progress = {
   onProgressEnd?: () => void;
 };
 
-const defaultConfig: Partial<Config> = {
-  getMetadata: defaultGetMetadata,
-  getPropertyMetadata: defaultGetPropertyMetadata,
-  generateIdentifierType: defaultGenerateIdentifierType,
-  propertySortFunction: defaultPropertySortFunction,
-  getRoutineMetadata: defaultGetRoutineMetadata,
-  outputPath: ".",
-  enumStyle: "type",
-  resolveViews: true,
-  preDeleteOutputFolder: false,
-};
-
 const processConfig = async (
   cfg: Config,
-  progress?: Progress,
+  _progress?: Progress,
 ): Promise<void> => {
-  const config = { ...defaultConfig, ...cfg };
+  const config = cfg;
 
   // Handle legacy v3 config during migration
   if (config.connection && !config.sources) {
@@ -60,30 +40,6 @@ const processConfig = async (
 
   // Instantiate sources (connect to databases and extract schemas)
   const instantiatedSources = await instantiateSources(config.sources);
-
-  // Create type map
-  const typeMap: TypeMap = {
-    ...defaultTypeMap,
-    ...config.customTypeMap,
-  };
-
-  // Create instantiated config for backward compatibility
-  const instantiatedConfig: InstantiatedConfig = {
-    sources: instantiatedSources,
-    typeMap,
-    getMetadata: config.getMetadata,
-    getPropertyMetadata: config.getPropertyMetadata,
-    generateIdentifierType: config.generateIdentifierType,
-    propertySortFunction: config.propertySortFunction,
-    getRoutineMetadata: config.getRoutineMetadata,
-    enumStyle: config.enumStyle,
-    connection: config.connection || "",
-    schemas: instantiatedSources.default?.schemas || {},
-    outputPath: config.outputPath,
-    preDeleteOutputFolder: config.preDeleteOutputFolder,
-    resolveViews: config.resolveViews,
-    moduleFormat: config.moduleFormat,
-  };
 
   // Create context
   const context = {
@@ -109,18 +65,16 @@ const processConfig = async (
     }
 
     // Render and write files
+    const moduleFormat = getModuleFormat(config);
+    const outputExtension = getOutputExtension(moduleFormat);
+
     let filesToWrite = Object.keys(combinedOutput).map((path) => {
       const fileContents = combinedOutput[path];
+      const lines = render(fileContents, path);
 
       if (fileContents.filetype === "typescript") {
-        const lines = render(
-          fileContents.declarations,
-          path,
-          instantiatedConfig,
-        );
-        return { fullPath: `${path}.ts`, lines };
+        return { fullPath: `${path}${outputExtension}`, lines };
       } else if (fileContents.filetype === "generic") {
-        const lines = fileContents.content.split("\n");
         return { fullPath: `${path}.${fileContents.extension}`, lines };
       } else {
         throw new Error(`Unknown file type: ${(fileContents as any).filetype}`);
@@ -139,9 +93,9 @@ const processConfig = async (
     }
 
     // Clean output folder if requested
-    if (instantiatedConfig.preDeleteOutputFolder) {
-      console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
-      await rimraf(instantiatedConfig.outputPath, { glob: true });
+    if (config.preDeleteOutputFolder) {
+      console.info(`Clearing old files in ${config.outputPath}`);
+      await rimraf(config.outputPath, { glob: true });
     }
 
     // Write files
