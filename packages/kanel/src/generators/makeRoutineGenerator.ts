@@ -3,7 +3,10 @@ import type { FunctionDetails } from "extract-pg-schema/build/kinds/extractFunct
 import type { ProcedureDetails } from "extract-pg-schema/build/kinds/extractProcedure";
 
 import type { InstantiatedConfig } from "../config-types";
-import type { Declaration, InterfaceDeclaration } from "../declaration-types";
+import type {
+  TsDeclaration,
+  InterfaceDeclaration,
+} from "../ts-declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
 import type TypeMap from "../TypeMap";
@@ -34,7 +37,7 @@ const makeMapper =
   (config: InstantiatedConfig) =>
   (
     routineDetails: RoutineDetails,
-  ): { path: Path; declaration: Declaration }[] => {
+  ): { path: Path; declaration: TsDeclaration }[] => {
     const metadata = config.getRoutineMetadata?.(routineDetails, config);
     if (!metadata) return undefined;
     const {
@@ -72,7 +75,7 @@ const makeMapper =
       ),
     };
 
-    let returnTypeDeclaration: Declaration | undefined;
+    let returnTypeDeclaration: TsDeclaration | undefined;
     if (returnTypeTypeOverride) {
       returnTypeDeclaration = {
         declarationType: "typeDeclaration",
@@ -133,7 +136,7 @@ const makeRoutineGenerator =
   (kind: Kind, config: InstantiatedConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
     const mapper = makeMapper(config);
-    const declarations: { path: string; declaration: Declaration }[] =
+    const declarations: { path: string; declaration: TsDeclaration }[] =
       (schema[`${kind}s`] as RoutineDetails[])?.map(mapper).flat() ?? [];
 
     return declarations.reduce((acc, { path, declaration }) => {

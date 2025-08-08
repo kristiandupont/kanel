@@ -1,5 +1,5 @@
 import type { InstantiatedConfig } from "./config-types";
-import type { Declaration } from "./declaration-types";
+import type { TsDeclaration } from "./ts-declaration-types";
 import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
 import escapeIdentifier from "./escapeIdentifier";
@@ -28,7 +28,7 @@ const processComments = (
 };
 
 const processDeclaration = (
-  declaration: Declaration,
+  declaration: TsDeclaration,
   importGenerator: ImportGenerator,
 ) => {
   const declarationLines: string[] = [];
@@ -162,7 +162,7 @@ const processDeclaration = (
 };
 
 const render = (
-  declarations: Declaration[],
+  declarations: TsDeclaration[],
   outputPath: string,
   config: InstantiatedConfig,
 ): string[] => {

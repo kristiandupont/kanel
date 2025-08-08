@@ -9,7 +9,7 @@ import type {
 import * as R from "ramda";
 
 import type { InstantiatedConfig } from "../config-types";
-import type { InterfacePropertyDeclaration } from "../declaration-types";
+import type { InterfacePropertyDeclaration } from "../ts-declaration-types";
 import type TypeImport from "../TypeImport";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
 import resolveType from "./resolveType";

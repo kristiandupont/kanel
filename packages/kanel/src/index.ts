@@ -1,5 +1,5 @@
 export type * from "./config-types";
-export type * from "./declaration-types";
+export type * from "./ts-declaration-types";
 export * from "./default-metadata-generators";
 export type { default as Details } from "./Details";
 export { default as escapeComment } from "./escapeComment";

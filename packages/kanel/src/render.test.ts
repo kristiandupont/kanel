@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { InstantiatedConfig } from "./config-types";
-import type { Declaration } from "./declaration-types";
+import type { TsDeclaration } from "./ts-declaration-types";
 import render from "./render";
 
 // Mocked InstantiatedConfig
@@ -21,7 +21,7 @@ const instantiatedConfig: InstantiatedConfig = {
 
 describe("processGenerationSetup", () => {
   it("should process a type declaration", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
         name: "MyString",
@@ -38,7 +38,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should work with multi-line type definitions", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
         name: "MyUnion",
@@ -57,7 +57,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process an interface", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "interface" as const,
         name: "Member",
@@ -87,7 +87,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process an enum", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "enum" as const,
         name: "MpaaRating",
@@ -108,7 +108,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should support a default exported enum", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "enum" as const,
         name: "Fruit",
@@ -129,7 +129,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process a constant", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "constant" as const,
         name: "MyConstant",
@@ -143,7 +143,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process a multi-line constant", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "constant" as const,
         name: "actor",
@@ -161,7 +161,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process a type declaration with special characters", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
         name: "[example] this is a table! yes, even with symbols: \"'!.Id",

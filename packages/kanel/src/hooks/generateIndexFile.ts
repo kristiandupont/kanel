@@ -6,7 +6,7 @@ import type {
   EnumDeclaration,
   InterfaceDeclaration,
   TypeDeclaration,
-} from "../declaration-types";
+} from "../ts-declaration-types";
 import type { FileContents } from "../Output";
 
 type GenerateIndexFileConfig = {

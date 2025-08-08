@@ -3,10 +3,10 @@ import { tryParse } from "tagged-comment-parser";
 
 import type { InstantiatedConfig } from "../config-types";
 import type {
-  Declaration,
+  TsDeclaration,
   EnumDeclaration,
   TypeDeclaration,
-} from "../declaration-types";
+} from "../ts-declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
 
@@ -16,7 +16,7 @@ const makeMapper =
   (style: EnumStyle, config: InstantiatedConfig) =>
   (
     enumDetails: EnumDetails,
-  ): { path: Path; declaration: Declaration } | undefined => {
+  ): { path: Path; declaration: TsDeclaration } | undefined => {
     // If an enum has a @type tag in the comment,
     // we will use that type instead of a generated one.
     const { tags } = tryParse(enumDetails.comment);

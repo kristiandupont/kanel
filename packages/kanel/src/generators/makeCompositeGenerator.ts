@@ -2,7 +2,10 @@ import type { Kind, Schema, TableColumn } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
 import type { InstantiatedConfig } from "../config-types";
-import type { Declaration, InterfaceDeclaration } from "../declaration-types";
+import type {
+  TsDeclaration,
+  InterfaceDeclaration,
+} from "../ts-declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
 import type { CompositeDetails } from "./composite-types";
@@ -11,7 +14,7 @@ import resolveType from "./resolveType";
 
 const makeMapper =
   <D extends CompositeDetails>(config: InstantiatedConfig) =>
-  (details: D): { path: Path; declaration: Declaration }[] => {
+  (details: D): { path: Path; declaration: TsDeclaration }[] => {
     if (details.kind === "compositeType") {
       // If a composite type has a @type tag in the comment,
       // we will use that type instead of a generated one.
@@ -21,7 +24,7 @@ const makeMapper =
       }
     }
 
-    const declarations: Declaration[] = [];
+    const declarations: TsDeclaration[] = [];
     const {
       name: selectorName,
       comment: selectorComment,
@@ -106,7 +109,7 @@ const makeCompositeGenerator =
   (kind: Kind, config: InstantiatedConfig) =>
   (schema: Schema, outputAcc: Output): Output => {
     const mapper = makeMapper(config);
-    const declarations: { path: string; declaration: Declaration }[] =
+    const declarations: { path: string; declaration: TsDeclaration }[] =
       (schema[`${kind}s`] as CompositeDetails[])?.map(mapper).flat() ?? [];
     return declarations.reduce((acc, { path, declaration }) => {
       const existing = acc[path];

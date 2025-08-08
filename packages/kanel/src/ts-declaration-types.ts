@@ -50,7 +50,7 @@ export type GenericDeclaration = DeclarationBase & {
   lines: string[];
 };
 
-export type Declaration =
+export type TsDeclaration =
   | TypeDeclaration
   | InterfaceDeclaration
   | EnumDeclaration
