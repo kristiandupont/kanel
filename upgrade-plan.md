@@ -51,7 +51,33 @@ COMMENT ON COLUMN users.status IS '@type: UserStatus';
 - Enables better tooling and IDE support
 - Aligns with the generator-based architecture
 
-### 3. Multi-Format Post-Render Hook Support
+### 3. Support for Multiple File Formats
+
+**Current v3**: Pre-render hooks take an accumulated output consisting of abstract typescript code.
+
+**V4 Enhancement**: Pre-render hooks take an accumulated output consisting of various file formats.
+
+```typescript
+type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
+
+export type Path = string;
+export type TypescriptFileContents = {
+  filetype: "typescript";
+  declarations: TypescriptDeclaration[]; // The "Declaration" type, now
+};
+
+export type GenericFileContents = {
+  filetype: "generic";
+  extension: string;
+  content: string;
+};
+
+// ..future other formats.
+
+type FileContents = TypescriptFileContents | GenericFileContents;
+
+type Output = Record<Path, FileContents>;
+```
 
 **Current v3**: Post-render hooks only process TypeScript files
 
@@ -59,31 +85,10 @@ COMMENT ON COLUMN users.status IS '@type: UserStatus';
 
 ```typescript
 type PostRenderHook = (
-  path: string,
+  path: string, // Now incluudes extension
   lines: string[],
-  fileType: "typescript" | "python" | "json" | "javascript" | "yaml" | "sql",
 ) => Awaitable<string[]>;
-
-// Example: Generate Python types alongside TypeScript
-const pythonPostRenderHook: PostRenderHook = (path, lines, fileType) => {
-  if (fileType === "typescript") {
-    // Generate corresponding Python file
-    const pythonPath = path.replace(".ts", ".py");
-    const pythonContent = convertToPythonTypes(lines);
-    // Write Python file or return modified content
-  }
-  return lines;
-};
 ```
-
-**Supported Formats**:
-
-- TypeScript (`.ts`, `.tsx`)
-- Python (`.py`)
-- JSON (`.json`)
-- JavaScript (`.js`, `.mjs`, `.cjs`)
-- YAML (`.yml`, `.yaml`)
-- SQL (`.sql`)
 
 ### 4. Enums Default to Unions
 
@@ -126,9 +131,7 @@ const config: Config = {
   sources: {
     mainDb: { type: "postgres", connection: "postgres://..." },
   },
-  generators: [
-    { generator: typescriptGenerator, config: { source: "mainDb" } },
-  ],
+  generators: [makePgTsGenerator({ source: "mainDb" })],
 };
 
 export default config;
@@ -204,9 +207,6 @@ interface Config {
 
   // Module format configuration
   moduleFormat?: "esm" | "commonjs" | "auto";
-
-  // Legacy support (for backward compatibility)
-  importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
 }
 ```
 
@@ -223,18 +223,9 @@ interface Config {
 **Auto-Detection**: The system can auto-detect module format based on:
 
 - `package.json` `"type": "module"` field
-- File extensions in the project
 - TypeScript configuration (`tsconfig.json`)
 
-**Benefits**:
-
-- Proper ESM/CommonJS compatibility
-- Better bundler support (Vite, Webpack, Rollup)
-- Correct Node.js module resolution
-- Future-proof for modern TypeScript projects
-- Maintains backward compatibility for legacy projects
-
-**Integration with zshy**: For packages that need to support both ESM and CommonJS consumers, we'll use [zshy](https://github.com/colinhacks/zshy) as our build tool. zshy automatically handles:
+**Integration with zshy**: In order tosupport both ESM and CommonJS consumers, we'll use [zshy](https://github.com/colinhacks/zshy) as our build tool. zshy automatically handles:
 
 - Dual-package builds (ESM + CommonJS) from a single TypeScript codebase
 - Proper import/export extension rewriting
@@ -251,9 +242,8 @@ This means Kanel can focus on generating clean TypeScript code, while zshy handl
 3. **Direct Function References**: JavaScript config allows passing generators as functions, not strings
 4. **Context-Based Architecture**: AsyncLocalStorage eliminates prop-drilling of configuration
 5. **Direct Schema Access**: Generators work with native schema formats (no abstraction layer)
-6. **Hybrid Pipeline**: Independent generators + retained hook system for cross-generator coordination
+6. **Hybrid Pipeline**: Independent generators + hook system for cross-generator coordination
 7. **Multi-Format Output**: Support for generating multiple file formats from the same schema
-8. **Explicit Configuration**: No magic comments or hidden behavior
 
 ## Target Architecture Components
 
@@ -263,17 +253,18 @@ Reusable source definitions that multiple generators can reference:
 
 ```typescript
 interface SourceRegistry {
-  [name: string]:
-    | PostgresSource
-    | SwaggerSource
-    | JsonSchemaSource
-    | FileSource;
+  [name: string]: PostgresSource;
+  // | SwaggerSource
+  // | JsonSchemaSource
+  // | FileSource;
 }
 
 interface PostgresSource {
   type: "postgres";
   connection: string | ConnectionConfig;
 }
+
+// Possible future sources:
 
 interface SwaggerSource {
   type: "swagger";
@@ -287,65 +278,31 @@ interface JsonSchemaSource {
 }
 ```
 
+Those are the ones specified in the config. Once Kanel is running, it will create an `InstantiatedSourceRegistry` from the `SourceRegistry`. In this, a postgres source will contain a connection to the database, and a schema, and similar for the other sources.
+
 ### 2. Generator System (Function-Based)
 
 ```typescript
-type Generator = (
-  sourceData: any, // Native schema format (PG schema, Swagger spec, etc.)
-  config: GeneratorConfig,
-) => GeneratedOutput;
-
-interface GeneratorConfig {
-  source?: string; // Reference to shared source, or direct connection
-  options?: Record<string, any>;
-  customizers?: {
-    getEntityMetadata?: (
-      details: Details,
-      defaultResult: TypeMetadata,
-    ) => TypeMetadata;
-    getPropertyMetadata?: (
-      property: CompositeProperty,
-      details: CompositeDetails,
-      generateFor: "selector" | "initializer" | "mutator",
-      defaultResult: PropertyMetadata,
-    ) => PropertyMetadata;
-    generateIdentifierType?: (
-      column: TableColumn,
-      details: TableDetails,
-      defaultResult: TypeDeclaration,
-    ) => TypeDeclaration;
-  };
-  typeMappings?: Record<string, string>;
-  outputFormat?:
-    | "typescript"
-    | "python"
-    | "json"
-    | "javascript"
-    | "yaml"
-    | "sql";
-}
+type Generator = () => Awaitable<Output>;
 ```
 
-**Key Principle**: Generators work directly with native schema formats (PostgreSQL schema, OpenAPI spec, etc.) without abstraction layers.
+**Key Principle**: Generators are pretty much identical to post render hooks, but they do not take an output as a parameter, and instead of overriding the output, the outputs from generators will be combined into one before passed into the pre-render hook pipeline.
 
+```typescript
 // Context accessed via AsyncLocalStorage (no prop-drilling)
 interface KanelContext {
-sources: SourceRegistry; // Access to all shared sources
-outputPath: string;
-importsExtension: string;
-sharedTypeRegistry: SharedTypeRegistry;
-writeFile: (path: string, content: string, format?: string) => Promise<void>;
+  config: Config;
+  instantiatedSources: InstantiatedSourceRegistry;
 }
 
 const useKanelContext = () => asyncLocalStorage.getStore();
-
-````
+```
 
 ### 4. Enhanced Hook System
 
 ```typescript
 type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
-type PostRenderHook = (path: string, lines: string[], fileType: "typescript" | "python" | "json" | "javascript" | "yaml" | "sql") => Awaitable<string[]>;
+type PostRenderHook = (path: string, lines: string[]) => Awaitable<string[]>;
 
 // Hooks access context directly, no config parameter needed
 const generateIndexFile: PreRenderHook = (outputAcc) => {
@@ -353,27 +310,15 @@ const generateIndexFile: PreRenderHook = (outputAcc) => {
   // Generate index file logic...
 };
 
-const formatPythonFile: PostRenderHook = (path, lines, fileType) => {
-  if (fileType === "python") return formatPythonCode(lines);
-  return lines;
+const prettier: PostRenderHook = async (path, lines) => {
+  const formatted = await prettier.format(lines, { parser: "typescript" });
+  return formatted.split("\n");
 };
-````
+```
 
 **Key Use Cases**: PreRenderHooks for cross-generator coordination, PostRenderHooks for file-level modifications and multi-format generation.
 
-### 4. Type Customization System
-
-Multi-level type resolution with explicit configuration:
-
-1. Column-specific overrides (most specific)
-2. Pattern-based overrides
-3. Global type overrides
-4. Generator-specific type maps
-5. Default generator type maps
-
-**Removed**: Comment-based overrides (v3 compatibility)
-
-### 5. Enhanced Customization Functions
+### 4. Enhanced Customization Functions
 
 **v3 Problem**: Users had to manually call default implementations
 **v4 Solution**: Default result is always provided as a parameter
@@ -398,13 +343,6 @@ const getPropertyMetadata = (
 
 **Benefits**: No manual default implementation calls, always available default result, cleaner customization.
 
-### 6. Cross-Generator Coordination
-
-- **Independent Generators**: Each generator works with native schema formats
-- **Shared Sources**: Multiple generators can reference same database/file
-- **PreRenderHooks**: Handle cross-generator coordination (index files, knex-tables)
-- **Shared Type Registry**: Coordinate branded types across generators when needed
-
 ## Target Configuration Format
 
 ```typescript
@@ -414,50 +352,24 @@ interface Config {
     [name: string]: PostgresSource | SwaggerSource | JsonSchemaSource;
   };
 
-  filters?: InputFilter[];
-
-  typeCustomization?: {
-    globalOverrides?: Record<string, TypeDefinition>;
-    columnOverrides?: ColumnOverride[];
-    // Removed: commentBasedOverrides?: boolean;
-  };
-
   // Generators can be passed as direct function references
-  generators: Array<
-    | Generator
-    | {
-        generator: Generator;
-        config: GeneratorConfig;
-      }
-  >;
+  generators: Generator[];
 
-  // Enhanced hook system with multi-format support
+  // Hooks
   preRenderHooks?: PreRenderHook[];
   postRenderHooks?: PostRenderHook[];
 
-  output: OutputConfig;
-
-  // New: Default enum style (defaults to "type" for unions)
-  enumStyle?: "enum" | "type";
-
   // Modern module format configuration
   moduleFormat?: "esm" | "commonjs" | "auto";
-
-  // Legacy support (for backward compatibility)
-  importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
 }
 
 // Example usage with shared sources and multi-format output:
 const config = {
   sources: {
     mainDb: { type: "postgres", connection: "postgres://..." },
-    legacyDb: { type: "postgres", connection: "postgres://legacy..." },
-    apiSpec: { type: "swagger", url: "https://api.example.com/swagger.json" },
   },
   generators: [
-    // Multiple generators sharing same source
-    {
-      generator: typescriptGenerator,
+    makePgTsGenerator({
       config: {
         source: "mainDb",
         customizers: {
@@ -479,90 +391,10 @@ const config = {
           }),
         },
       },
-    },
-    {
-      generator: pythonGenerator,
-      config: { source: "mainDb", outputFormat: "python" },
-    },
-    { generator: zodGenerator, config: { source: "mainDb", strictMode: true } },
-
-    // Generator from different source
-    { generator: legacyTypesGenerator, config: { source: "legacyDb" } },
-
-    // Generator from API spec
-    { generator: swaggerTypesGenerator, config: { source: "apiSpec" } },
-
-    // Direct function with inline source
-    (sourceData, config) => generateCustomTypes(sourceData, config),
+    }),
   ],
   preRenderHooks: [generateIndexFile],
   postRenderHooks: [markAsGenerated, formatPythonFile],
-  enumStyle: "type", // Default to unions
-};
-```
-
-## Migration Strategy
-
-### Breaking Changes Summary
-
-1. **Postgres Comments**: `@type` tags in comments no longer work
-2. **Enum Default**: Enums now default to unions instead of enum declarations
-3. **Config Files**: TypeScript config files now use `npx tsx`
-4. **Hook Signatures**: Post-render hooks now receive file type parameter
-5. **No Backwards Compatibility**: v3 configs need migration
-
-### Migration Tools
-
-#### 1. Config Migration Tool
-
-```bash
-npx kanel-migrate-v3-to-v4 --config .kanelrc.js --output kanel-config.ts
-```
-
-This tool will:
-
-- Convert v3 config to v4 format
-- Remove comment-based type overrides
-- Update enum style defaults
-- Generate migration guide for manual changes
-
-#### 2. Comment Migration
-
-For users who relied on postgres comments:
-
-```typescript
-// Before (v3): Using comments
-// COMMENT ON COLUMN users.status IS '@type: UserStatus';
-
-// After (v4): Using explicit configuration
-const config = {
-  typeCustomization: {
-    columnOverrides: [
-      {
-        table: "users",
-        column: "status",
-        typeOverride: "UserStatus",
-      },
-    ],
-  },
-};
-```
-
-#### 3. Enum Style Migration
-
-```typescript
-// Before (v3): Default enum declarations
-enum UserStatus {
-  active = "active",
-  inactive = "inactive",
-}
-
-// After (v4): Default union types
-type UserStatus = "active" | "inactive";
-
-// Or explicitly opt into enums
-const config = {
-  enumStyle: "enum",
 };
 ```
 
