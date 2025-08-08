@@ -3,7 +3,7 @@ import type { TableColumn } from "extract-pg-schema";
 import { join } from "path";
 
 import escapeIdentifier from "./escapeIdentifier";
-import type { CompositeProperty } from "./generators/composite-types";
+import type { CompositeProperty } from "./generators/pg-ts-generator/composite-types";
 import type {
   GenerateIdentifierType,
   GetMetadata,

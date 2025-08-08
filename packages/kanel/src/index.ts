@@ -11,8 +11,8 @@ export { default as escapeString } from "./escapeString";
 export type {
   CompositeDetails,
   CompositeProperty,
-} from "./generators/composite-types";
-export { default as resolveType } from "./generators/resolveType";
+} from "./generators/pg-ts-generator/composite-types";
+export { default as resolveType } from "./generators/pg-ts-generator/resolveType";
 export * from "./hooks";
 export type * from "./metadata-types";
 export type { FileContents, default as Output, Path } from "./Output";

@@ -10,8 +10,8 @@ import type Details from "./Details";
 import type {
   CompositeDetails,
   CompositeProperty,
-} from "./generators/composite-types";
-import type { RoutineDetails } from "./generators/routine-types";
+} from "./generators/pg-ts-generator/composite-types";
+import type { RoutineDetails } from "./generators/pg-ts-generator/routine-types";
 import type TypeDefinition from "./TypeDefinition";
 
 export type TypeMetadata = {

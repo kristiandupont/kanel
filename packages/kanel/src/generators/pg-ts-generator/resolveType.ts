@@ -9,9 +9,9 @@ import type {
   ViewDetails,
 } from "extract-pg-schema";
 
-import { useKanelContext } from "../context";
-import type Details from "../Details";
-import type TypeDefinition from "../TypeDefinition";
+import { useKanelContext } from "../../context";
+import type Details from "../../Details";
+import type TypeDefinition from "../../TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
 
 const getColumnFromReference = (

@@ -1,7 +1,7 @@
 import type { PgType, Schema } from "extract-pg-schema";
 import type { ConnectionConfig } from "pg";
 
-import type { CompositeProperty } from "./generators/composite-types";
+import type { CompositeProperty } from "./generators/pg-ts-generator/composite-types";
 import type {
   GenerateIdentifierType,
   GetMetadata,

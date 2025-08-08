@@ -10,11 +10,11 @@ import {
   defaultPropertySortFunction,
 } from "./default-metadata-generators";
 import defaultTypeMap from "./defaultTypeMap";
-import makeCompositeGenerator from "./generators/makeCompositeGenerator";
-import makeDomainsGenerator from "./generators/makeDomainsGenerator";
-import makeEnumsGenerator from "./generators/makeEnumsGenerator";
-import makeRangesGenerator from "./generators/makeRangesGenerator";
-import makeRoutineGenerator from "./generators/makeRoutineGenerator";
+import makeCompositeGenerator from "./generators/pg-ts-generator/makeCompositeGenerator";
+import makeDomainsGenerator from "./generators/pg-ts-generator/makeDomainsGenerator";
+import makeEnumsGenerator from "./generators/pg-ts-generator/makeEnumsGenerator";
+import makeRangesGenerator from "./generators/pg-ts-generator/makeRangesGenerator";
+import makeRoutineGenerator from "./generators/pg-ts-generator/makeRoutineGenerator";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
 import render from "./render";
