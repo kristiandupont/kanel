@@ -1,5 +1,4 @@
 import type { Kind, Schema, TableColumn } from "extract-pg-schema";
-import { tryParse } from "tagged-comment-parser";
 
 import type { InstantiatedConfig } from "../config-types";
 import type { Declaration, InterfaceDeclaration } from "../declaration-types";
@@ -12,15 +11,6 @@ import resolveType from "./resolveType";
 const makeMapper =
   <D extends CompositeDetails>(config: InstantiatedConfig) =>
   (details: D): { path: Path; declaration: Declaration }[] => {
-    if (details.kind === "compositeType") {
-      // If a composite type has a @type tag in the comment,
-      // we will use that type instead of a generated one.
-      const { tags } = tryParse(details.comment);
-      if (tags?.type) {
-        return [];
-      }
-    }
-
     const declarations: Declaration[] = [];
     const {
       name: selectorName,

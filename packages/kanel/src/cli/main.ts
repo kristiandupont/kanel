@@ -5,7 +5,7 @@ import optionator from "optionator";
 import path from "path";
 
 import type { Config } from "../config-types";
-import processDatabase from "../processDatabase";
+import processConfig from "../processConfig";
 
 const { version } = require("../../package.json");
 
@@ -33,7 +33,7 @@ export async function main(): Promise<void> {
         alias: "c",
         type: "path::String",
         description:
-          "Use this configuration, overriding .kanelrc.js config options if present",
+          "Use this configuration, overriding kanel-config.ts config options if present",
       },
       {
         option: "database",
@@ -75,7 +75,12 @@ export async function main(): Promise<void> {
   let configPath: string | undefined;
   const configCandidates = options.config
     ? [options.config]
-    : [".kanelrc.js", ".kanelrc.cjs", ".kanelrc.json", ".kanelrc.ts"];
+    : [
+        "kanel-config.ts",
+        "kanel-config.js",
+        "kanel-config.cjs",
+        "kanel-config.json",
+      ];
   for (const filename of configCandidates) {
     const candidatePath = path.join(process.cwd(), filename);
     if (fs.existsSync(candidatePath)) {
@@ -86,7 +91,20 @@ export async function main(): Promise<void> {
   if (configPath) {
     console.info(`Using config file: ${configPath}`);
     try {
-      config = require(configPath);
+      if (configPath.endsWith(".ts")) {
+        // Use tsx for TypeScript config files
+        const { execSync } = require("child_process");
+        const result = execSync(
+          `npx tsx --eval "console.log(JSON.stringify(require('${configPath}').default || require('${configPath}')))"`,
+          {
+            encoding: "utf8",
+            cwd: process.cwd(),
+          },
+        );
+        config = JSON.parse(result.trim());
+      } else {
+        config = require(configPath);
+      }
     } catch (error) {
       console.error("Could not open config file:", error);
       process.exit(1);
@@ -96,7 +114,7 @@ export async function main(): Promise<void> {
       console.error("Could not open " + options.config);
       process.exit(1);
     }
-    config = { connection: undefined };
+    config = { connection: undefined, generators: [] };
   }
 
   if (options.database) {
@@ -123,7 +141,7 @@ export async function main(): Promise<void> {
   };
 
   try {
-    await processDatabase(config, progress);
+    await processConfig(config, progress);
     process.exit(0);
   } catch (error) {
     console.error(error);

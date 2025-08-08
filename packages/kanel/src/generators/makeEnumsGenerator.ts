@@ -1,5 +1,4 @@
 import type { EnumDetails, Schema } from "extract-pg-schema";
-import { tryParse } from "tagged-comment-parser";
 
 import type { InstantiatedConfig } from "../config-types";
 import type {
@@ -17,13 +16,6 @@ const makeMapper =
   (
     enumDetails: EnumDetails,
   ): { path: Path; declaration: Declaration } | undefined => {
-    // If an enum has a @type tag in the comment,
-    // we will use that type instead of a generated one.
-    const { tags } = tryParse(enumDetails.comment);
-    if (tags?.type) {
-      return undefined;
-    }
-
     const { name, comment, path } = config.getMetadata(
       enumDetails,
       undefined,

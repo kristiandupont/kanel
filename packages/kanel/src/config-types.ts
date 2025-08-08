@@ -13,9 +13,38 @@ import type TypeMap from "./TypeMap";
 
 type Awaitable<T> = T | PromiseLike<T>;
 
-export type InstantiatedConfig = {
+// New v4 source types
+export interface PostgresSource {
+  type: "postgres";
+  connection: string | ConnectionConfig;
+  schemas?: string[];
+  typeFilter?: (pgType: PgType) => boolean;
+}
+
+export interface InstantiatedPostgresSource {
+  type: "postgres";
   connection: string | ConnectionConfig;
   schemas: Record<string, Schema>;
+}
+
+export type SourceRegistry = Record<string, PostgresSource>;
+export type InstantiatedSourceRegistry = Record<
+  string,
+  InstantiatedPostgresSource
+>;
+
+// New v4 generator type
+export type Generator = () => Promise<Output>;
+
+// Updated InstantiatedConfig for v4
+export type InstantiatedConfig = {
+  // Legacy fields for backward compatibility during migration
+  connection: string | ConnectionConfig;
+  schemas: Record<string, Schema>;
+
+  // New v4 fields
+  sources?: InstantiatedSourceRegistry;
+
   typeMap: TypeMap;
 
   getMetadata: GetMetadata;
@@ -29,23 +58,39 @@ export type InstantiatedConfig = {
   outputPath: string;
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
-  importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
+  moduleFormat?: "esm" | "commonjs" | "auto";
 };
 
-export type PreRenderHook = (
-  outputAcc: Output,
-  instantiatedConfig: InstantiatedConfig,
-) => Awaitable<Output>;
+// Updated hook signatures for v4 (no instantiatedConfig parameter)
+export type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
 
 export type PostRenderHook = (
   path: string,
   lines: string[],
-  instantiatedConfig: InstantiatedConfig,
 ) => Awaitable<string[]>;
 
-// #region Config
+// New v4 Config interface
 export type Config = {
-  connection: string | ConnectionConfig;
+  // Sources configuration
+  sources?: SourceRegistry;
+
+  // Generators
+  generators: Generator[];
+
+  // Hooks
+  preRenderHooks?: PreRenderHook[];
+  postRenderHooks?: PostRenderHook[];
+
+  // Output configuration
+  outputPath?: string;
+  preDeleteOutputFolder?: boolean;
+  resolveViews?: boolean;
+
+  // Module format configuration
+  moduleFormat?: "esm" | "commonjs" | "auto";
+
+  // Legacy support for backward compatibility during migration
+  connection?: string | ConnectionConfig;
   schemas?: string[];
   typeFilter?: (pgType: PgType) => boolean;
   getMetadata?: GetMetadata;
@@ -53,17 +98,7 @@ export type Config = {
   generateIdentifierType?: GenerateIdentifierType;
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
   getRoutineMetadata?: GetRoutineMetadata;
-
   enumStyle?: "enum" | "type";
-
-  outputPath?: string;
-  preDeleteOutputFolder?: boolean;
   customTypeMap?: TypeMap;
-  resolveViews?: boolean;
-
-  preRenderHooks?: PreRenderHook[];
-  postRenderHooks?: PostRenderHook[];
-
   importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
 };
-// #endregion Config

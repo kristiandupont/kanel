@@ -24,7 +24,7 @@ export type TypeMetadata = {
 export type GetMetadata = (
   details: Details,
   generateFor: "selector" | "initializer" | "mutator" | undefined,
-  instantiatedConfig: InstantiatedConfig,
+  defaultResult: TypeMetadata,
 ) => TypeMetadata;
 
 export type PropertyMetadata = {
@@ -39,13 +39,13 @@ export type GetPropertyMetadata = (
   property: CompositeProperty,
   details: CompositeDetails,
   generateFor: "selector" | "initializer" | "mutator",
-  instantiatedConfig: InstantiatedConfig,
+  defaultResult: PropertyMetadata,
 ) => PropertyMetadata;
 
 export type GenerateIdentifierType = (
   column: TableColumn | ForeignTableColumn,
   details: TableDetails | ForeignTableDetails,
-  instantiatedConfig: InstantiatedConfig,
+  defaultResult: TypeDeclaration,
 ) => TypeDeclaration;
 
 export type RoutineMetadata = {
@@ -61,5 +61,5 @@ export type RoutineMetadata = {
 
 export type GetRoutineMetadata = (
   routineDetails: RoutineDetails,
-  instantiatedConfig: InstantiatedConfig,
+  defaultResult: RoutineMetadata,
 ) => RoutineMetadata;

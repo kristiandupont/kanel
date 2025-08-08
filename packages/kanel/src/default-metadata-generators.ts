@@ -1,11 +1,9 @@
 import { recase } from "@kristiandupont/recase";
 import type { TableColumn } from "extract-pg-schema";
 import { join } from "path";
-import { tryParse } from "tagged-comment-parser";
 
 import escapeIdentifier from "./escapeIdentifier";
 import type { CompositeProperty } from "./generators/composite-types";
-import resolveType from "./generators/resolveType";
 import type {
   GenerateIdentifierType,
   GetMetadata,
@@ -19,9 +17,8 @@ const toPascalCase = recase(null, "pascal");
 export const defaultGetMetadata: GetMetadata = (
   details,
   generateFor,
-  instantiatedConfig,
+  defaultResult,
 ) => {
-  const { comment: strippedComment } = tryParse(details.comment);
   const isAgentNoun = ["initializer", "mutator"].includes(generateFor);
 
   const relationComment = isAgentNoun
@@ -32,9 +29,9 @@ export const defaultGetMetadata: GetMetadata = (
 
   return {
     name: toPascalCase(details.name + suffix),
-    comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
+    comment: [relationComment, ...(defaultResult.comment || [])],
     path: join(
-      instantiatedConfig.outputPath,
+      defaultResult.path,
       details.schemaName,
       toPascalCase(details.name),
     ),
@@ -47,53 +44,34 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
   property,
   _details,
   generateFor,
-  _instantiatedConfig,
-) => {
-  const { comment: strippedComment } = tryParse(property.comment);
-
-  return {
-    name: property.name,
-    comment: [
-      ...(strippedComment ? [strippedComment] : []),
-      ...(generateFor === "initializer" && property.defaultValue
-        ? [`Default value: ${property.defaultValue}`]
-        : []),
-    ],
-  };
-};
+  defaultResult,
+) => ({
+  name: property.name,
+  comment: [
+    ...(defaultResult.comment || []),
+    ...(generateFor === "initializer" && property.defaultValue
+      ? [`Default value: ${property.defaultValue}`]
+      : []),
+  ],
+});
 // #endregion defaultGetPropertyMetadata
 
 // #region defaultGenerateIdentifierType
 export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   column,
   details,
-  config,
+  defaultResult,
 ) => {
   const name = escapeIdentifier(
     toPascalCase(details.name) + toPascalCase(column.name),
   );
-  const innerType = resolveType(column, details, {
-    ...config,
-    // Explicitly disable identifier resolution so we get the actual inner type here
-    generateIdentifierType: undefined,
-  });
-  const imports = [];
-
-  let type = innerType;
-  if (typeof innerType === "object") {
-    // Handle non-primitives
-    type = innerType.name;
-    imports.push(...innerType.typeImports);
-  }
 
   return {
-    declarationType: "typeDeclaration",
+    ...defaultResult,
     name,
-    exportAs: "named",
     typeDefinition: [
-      `${type} & { __brand: '${details.schemaName}.${details.name}' }`,
+      `${defaultResult.typeDefinition[0]} & { __brand: '${details.schemaName}.${details.name}' }`,
     ],
-    typeImports: imports,
     comment: [`Identifier type for ${details.schemaName}.${details.name}`],
   };
 };
@@ -121,8 +99,9 @@ export const defaultPropertySortFunction = (
 // #region defaultGetRoutineMetadata
 export const defaultGetRoutineMetadata: GetRoutineMetadata = (
   details,
-  instantiatedConfig,
+  defaultResult,
 ) => ({
+  ...defaultResult,
   parametersName: `${details.name}_params`,
   parameters: details.parameters.map(({ name }) => ({
     name,
@@ -132,6 +111,6 @@ export const defaultGetRoutineMetadata: GetRoutineMetadata = (
   returnTypeName: `${details.name}_return_type`,
   returnTypeComment: [`Return type for ${details.name}`],
 
-  path: join(instantiatedConfig.outputPath, details.schemaName, details.name),
+  path: defaultResult.path,
 });
 // #endregion defaultGetRoutineMetadata

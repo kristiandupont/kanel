@@ -34,7 +34,7 @@ const defaultConfig: Partial<Config> = {
   propertySortFunction: defaultPropertySortFunction,
   getRoutineMetadata: defaultGetRoutineMetadata,
   outputPath: ".",
-  enumStyle: "enum",
+  enumStyle: "type",
   resolveViews: true,
   preDeleteOutputFolder: false,
 };
