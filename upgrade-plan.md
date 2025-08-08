@@ -398,51 +398,249 @@ const config = {
 };
 ```
 
-## Implementation Sketch
+## Implementation Plan
 
-### Phase 1: Foundation & Breaking Changes
+Based on the current codebase analysis, here's a concrete implementation plan:
 
-- [ ] Remove postgres comment parsing from `resolveType.ts`
-- [ ] Update enum default from "enum" to "type" in `defaultConfig`
-- [ ] Add file type support to post-render hooks
-- [ ] Update binary to support TypeScript config files with `npx tsx`
-- [ ] Update config file discovery to use `kanel-config.ts` naming
-- [ ] Modify customization functions to include default result parameter
-- [ ] Implement modern TypeScript module support (`.mts`, `.cts`, proper extensions)
-- [ ] Create migration tool for v3 → v4 config conversion
-- [ ] Update all type resolution to remove comment-based overrides
+### High-Level Steps
 
-### Phase 2: Multi-Format Support
+1. **Foundation & Breaking Changes** - Remove v3 compatibility, update core types
+2. **New Architecture Implementation** - Implement generator system and context
+3. **Multi-Format Support** - Extend output system for multiple file types
+4. **Package Ecosystem Migration** - Convert existing packages to new system
+5. **Testing & Documentation** - Comprehensive testing and migration guides
 
-- [ ] Extend `PostRenderHook` type to include file type parameter
-- [ ] Update `writeFile` function to support multiple formats
-- [ ] Add format detection based on file extensions
-- [ ] Create example generators for Python, JSON, YAML output
-- [ ] Update documentation with multi-format examples
+### Phase 1: Foundation & Breaking Changes (Detailed)
 
-### Phase 3: Generator Ecosystem
+#### 1.1 Update Config Types and CLI
 
-- [ ] Create base generator interfaces and utilities
-- [ ] Implement TypeScript generator (extracted from current code)
-- [ ] Create Python generator example
-- [ ] Create JSON schema generator example
-- [ ] Update existing packages (kanel-zod, kanel-kysely) to use new generator system
+- **File**: `packages/kanel/src/config-types.ts`
+  - Add new `Config` interface with `sources`, `generators`, `moduleFormat`
+  - Remove v3-specific fields (`connection`, `customTypeMap`, etc.)
+  - Update `InstantiatedConfig` to include `instantiatedSources`
+- **File**: `packages/kanel/src/cli/main.ts`
+  - Update config file discovery to use `kanel-config.ts` naming
+  - Add TypeScript config support with `npx tsx`
+  - Update config validation for new structure
 
-### Phase 4: Testing & Documentation
+#### 1.2 Remove Postgres Comment Support
 
-- [ ] Write comprehensive tests for new architecture
-- [ ] Create migration guides and examples
-- [ ] Update all documentation to reflect v4 changes
-- [ ] Create example projects demonstrating multi-format generation
-- [ ] Performance testing and optimization
+- **File**: `packages/kanel/src/generators/resolveType.ts`
+  - Remove `resolveTypeFromComment` function (lines 15-49)
+  - Remove `tryParse` import from `tagged-comment-parser`
+  - Update `resolveType` function to remove comment-based type resolution
+- **File**: `packages/kanel/src/generators/makeCompositeGenerator.ts`
+  - Remove comment parsing logic (lines 18-24)
+  - Remove `tryParse` import
 
-### Phase 5: Package Updates
+#### 1.3 Update Enum Defaults
 
-- [ ] Update `kanel-zod` to use generator system
-- [ ] Update `kanel-kysely` to use generator system
-- [ ] Update `kanel-seeder` to use generator system
-- [ ] Update `kanel-knex` to use pre-render hooks
-- [ ] Create new packages for Python, JSON, YAML generators
+- **File**: `packages/kanel/src/processDatabase.ts`
+  - Change `enumStyle: "enum"` to `enumStyle: "type"` in `defaultConfig` (line 33)
+- **File**: `packages/kanel/src/generators/makeEnumsGenerator.ts`
+  - Update default behavior to generate unions instead of enums
+
+#### 1.4 Update Customization Functions
+
+- **File**: `packages/kanel/src/metadata-types.ts`
+
+  - Update function signatures to include default result parameter:
+
+    ```typescript
+    // Before
+    getMetadata: (
+      details: Details,
+      generateFor: string,
+      config: InstantiatedConfig,
+    ) => TypeMetadata;
+
+    // After
+    getMetadata: (details: Details, defaultResult: TypeMetadata) =>
+      TypeMetadata;
+    ```
+
+  - Update all customization function types similarly
+
+- **File**: `packages/kanel/src/default-metadata-generators.ts`
+  - Refactor to provide default implementations that can be called by the system
+  - Update all functions to work with new signatures
+
+#### 1.5 Create New Output System
+
+- **File**: `packages/kanel/src/Output.ts` (completely rewrite)
+
+  ```typescript
+  export type Path = string;
+
+  export type TypescriptFileContents = {
+    filetype: "typescript";
+    declarations: TypescriptDeclaration[];
+  };
+
+  export type GenericFileContents = {
+    filetype: "generic";
+    extension: string;
+    content: string;
+  };
+
+  type FileContents = TypescriptFileContents | GenericFileContents;
+  type Output = Record<Path, FileContents>;
+  ```
+
+#### 1.6 Create Context System
+
+- **New File**: `packages/kanel/src/context.ts`
+
+  ```typescript
+  import { AsyncLocalStorage } from "async_hooks";
+
+  interface KanelContext {
+    config: Config;
+    instantiatedSources: InstantiatedSourceRegistry;
+  }
+
+  const asyncLocalStorage = new AsyncLocalStorage<KanelContext>();
+
+  export const useKanelContext = () => {
+    const context = asyncLocalStorage.getStore();
+    if (!context) throw new Error("Kanel context not available");
+    return context;
+  };
+
+  export const runWithContext = async <T>(
+    context: KanelContext,
+    fn: () => Promise<T>,
+  ): Promise<T> => {
+    return asyncLocalStorage.run(context, fn);
+  };
+  ```
+
+#### 1.7 Create Source Registry System
+
+- **New File**: `packages/kanel/src/sources/index.ts`
+
+  ```typescript
+  interface PostgresSource {
+    type: "postgres";
+    connection: string | ConnectionConfig;
+  }
+
+  interface InstantiatedPostgresSource {
+    type: "postgres";
+    connection: string | ConnectionConfig;
+    schemas: Record<string, Schema>;
+  }
+
+  export type SourceRegistry = Record<string, PostgresSource>;
+  export type InstantiatedSourceRegistry = Record<
+    string,
+    InstantiatedPostgresSource
+  >;
+
+  export const instantiateSources = async (
+    sources: SourceRegistry,
+  ): Promise<InstantiatedSourceRegistry> => {
+    // Implementation to connect to databases and extract schemas
+  };
+  ```
+
+#### 1.8 Create Base Generator Interface
+
+- **New File**: `packages/kanel/src/generators/base.ts`
+
+  ```typescript
+  import type Output from "../Output";
+
+  export type Generator = () => Promise<Output>;
+
+  export const makePgTsGenerator = (config: {
+    source: string;
+    customizers?: {
+      getEntityMetadata?: (
+        details: Details,
+        defaultResult: TypeMetadata,
+      ) => TypeMetadata;
+      getPropertyMetadata?: (
+        property: CompositeProperty,
+        details: CompositeDetails,
+        generateFor: string,
+        defaultResult: PropertyMetadata,
+      ) => PropertyMetadata;
+      generateIdentifierType?: (
+        column: TableColumn,
+        details: TableDetails,
+        defaultResult: TypeDeclaration,
+      ) => TypeDeclaration;
+    };
+  }): Generator => {
+    // Implementation that extracts current TypeScript generation logic
+  };
+  ```
+
+#### 1.9 Update Main Processing Function
+
+- **File**: `packages/kanel/src/processDatabase.ts` (rename to `processConfig.ts`)
+
+  - Completely rewrite to use new architecture:
+
+    ```typescript
+    const processConfig = async (config: Config): Promise<void> => {
+      const instantiatedSources = await instantiateSources(config.sources);
+      const context: KanelContext = { config, instantiatedSources };
+
+      return runWithContext(context, async () => {
+        // Run generators
+        const outputs = await Promise.all(
+          config.generators.map((generator) => generator()),
+        );
+
+        // Combine outputs
+        let combinedOutput: Output = {};
+        outputs.forEach((output) => {
+          combinedOutput = { ...combinedOutput, ...output };
+        });
+
+        // Run pre-render hooks
+        for (const hook of config.preRenderHooks ?? []) {
+          combinedOutput = await hook(combinedOutput);
+        }
+
+        // Render and write files
+        // ... implementation
+      });
+    };
+    ```
+
+#### 1.10 Update Hook System
+
+- **File**: `packages/kanel/src/config-types.ts`
+  - Update hook signatures to remove `instantiatedConfig` parameter:
+    ```typescript
+    export type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
+    export type PostRenderHook = (
+      path: string,
+      lines: string[],
+    ) => Awaitable<string[]>;
+    ```
+- **File**: `packages/kanel/src/hooks/markAsGenerated.ts`
+  - Update to new signature without `instantiatedConfig`
+
+#### 1.11 Create Migration Tool
+
+- **New File**: `packages/kanel/src/migration/v3-to-v4.ts`
+  - Function to convert v3 config to v4 format
+  - Extract customization functions and wrap them
+  - Generate migration guide with manual steps needed
+
+### Success Criteria for Phase 1
+
+- [ ] All v3 configs can be migrated to v4 format
+- [ ] Postgres comment parsing is completely removed
+- [ ] Enums default to unions
+- [ ] Customization functions work with default result parameter
+- [ ] New generator system can produce same output as v3
+- [ ] TypeScript config files work with `npx tsx`
+- [ ] All tests pass with new architecture
 
 ## Architecture Considerations & Tradeoffs
 
