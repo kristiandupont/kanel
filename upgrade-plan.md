@@ -206,19 +206,19 @@ interface Config {
   // ... other config options
 
   // Module format configuration
-  moduleFormat?: "esm" | "commonjs" | "auto";
+  moduleFormat?: "esm" | "commonjs" | "classic" | "auto";
 }
 ```
 
 **Module Format Mapping**:
 
-| `moduleFormat`          | Output Extension | Import Extension | Use Case                   |
-| ----------------------- | ---------------- | ---------------- | -------------------------- |
-| `"esm"`                 | `.mts`           | `.js`            | Modern ESM projects        |
-| `"commonjs"`            | `.cts`           | `.cjs`           | Traditional Node.js        |
-| `"auto"`                | `.ts`            | `.js`            | Auto-detected from project |
-| `"auto"` (ESM detected) | `.mts`           | `.js`            | Auto-detected ESM          |
-| `"auto"` (CJS detected) | `.cts`           | `.cjs`           | Auto-detected CommonJS     |
+| `moduleFormat`          | Output Extension | Import Extension | Use Case               |
+| ----------------------- | ---------------- | ---------------- | ---------------------- |
+| `"esm"`                 | `.mts`           | `.js`            | Modern ESM projects    |
+| `"commonjs"`            | `.cts`           | `.cjs`           | Traditional Node.js    |
+| `"classic"`             | `.ts`            | ``               | Old school TypeScript  |
+| `"auto"` (ESM detected) | `.mts`           | `.js`            | Auto-detected ESM      |
+| `"auto"` (CJS detected) | `.cts`           | `.cjs`           | Auto-detected CommonJS |
 
 **Auto-Detection**: The system can auto-detect module format based on:
 
@@ -417,7 +417,7 @@ Based on the current codebase analysis, here's a concrete implementation plan:
 - **File**: `packages/kanel/src/config-types.ts`
   - ✅ Add new `Config` interface with `sources`, `generators`, `moduleFormat`
   - ✅ Remove v3-specific fields (`connection`, `customTypeMap`, etc.)
-  - ✅ Update `InstantiatedConfig` to include `instantiatedSources`
+  - ✅ Remove `InstantiatedConfig` (replaced by context system)
 - **File**: `packages/kanel/src/cli/main.ts`
   - ✅ Update config file discovery to use `kanel-config.ts` naming
   - ✅ Add TypeScript config support with `npx tsx`
@@ -435,7 +435,7 @@ Based on the current codebase analysis, here's a concrete implementation plan:
 
 #### ✅ 1.3 Update Enum Defaults
 
-- **File**: `packages/kanel/src/processDatabase.ts`
+- **File**: `packages/kanel/src/processConfig.ts`
   - ✅ Change `enumStyle: "enum"` to `enumStyle: "type"` in `defaultConfig` (line 33)
 - **File**: `packages/kanel/src/generators/makeEnumsGenerator.ts`
   - ✅ Update default behavior to generate unions instead of enums
@@ -625,12 +625,14 @@ Based on the current codebase analysis, here's a concrete implementation plan:
 - **File**: `packages/kanel/src/hooks/markAsGenerated.ts`
   - ✅ Update to new signature without `instantiatedConfig`
 
-#### ✅ 1.11 Create Migration Tool
+#### ✅ 1.11 Remove Legacy Properties
 
-- **New File**: `packages/kanel/src/migration/v3-to-v4.ts`
-  - ✅ Function to convert v3 config to v4 format
-  - ✅ Extract customization functions and wrap them
-  - ✅ Generate migration guide with manual steps needed
+- **File**: `packages/kanel/src/config-types.ts`
+  - ✅ Remove all legacy properties from `Config` interface
+  - ✅ Remove `InstantiatedConfig` type entirely
+- **File**: `packages/kanel/src/processConfig.ts`
+  - ✅ Remove legacy v3 config conversion logic
+  - ✅ Update to use context system exclusively
 
 ### Success Criteria for Phase 1
 
@@ -641,6 +643,159 @@ Based on the current codebase analysis, here's a concrete implementation plan:
 - ⚠️ New generator system can produce same output as v3 (partially complete - base interface created)
 - ✅ TypeScript config files work with `npx tsx`
 - ⚠️ All tests pass with new architecture (needs testing)
+
+### Phase 2: Generator Implementation & Multi-Format Support (Detailed)
+
+#### 👉 2.1 Remove InstantiatedConfig Dependencies
+
+- **File**: `packages/kanel/src/config-types.ts`
+  - Remove `InstantiatedConfig` type entirely
+  - Update all references to use context system instead
+- **File**: `packages/kanel/src/generators/resolveType.ts`
+  - Replace `InstantiatedConfig` parameter with `useKanelContext()`
+  - Update function signature to remove config parameter
+- **File**: `packages/kanel/src/generators/makeCompositeGenerator.ts`
+  - Replace `InstantiatedConfig` parameter with `useKanelContext()`
+  - Update all function calls to use context
+- **File**: `packages/kanel/src/generators/makeEnumsGenerator.ts`
+  - Replace `InstantiatedConfig` parameter with `useKanelContext()`
+  - Update function signature and calls
+- **File**: `packages/kanel/src/render.ts`
+  - Replace `InstantiatedConfig` parameter with `useKanelContext()`
+  - Update function signature and implementation
+
+#### 2.2 Implement TypeScript Generator
+
+- **File**: `packages/kanel/src/generators/base.ts`
+
+  - Implement `makePgTsGenerator` function:
+
+    ```typescript
+    export const makePgTsGenerator = (config: GeneratorConfig): Generator => {
+      return async () => {
+        const context = useKanelContext();
+        const source = context.instantiatedSources[config.source];
+        if (!source || source.type !== "postgres") {
+          throw new Error(`Invalid source: ${config.source}`);
+        }
+
+        const output: Output = {};
+
+        // Extract current generation logic from existing generators
+        // and adapt to use context system
+        // Generate TypeScript files with proper filetype
+
+        return output;
+      };
+    };
+    ```
+
+- **File**: `packages/kanel/src/generators/typescript/index.ts`
+  - Create new TypeScript generator module
+  - Extract and refactor existing generation logic from:
+    - `makeCompositeGenerator.ts`
+    - `makeEnumsGenerator.ts`
+    - `makeDomainsGenerator.ts`
+    - `makeRangesGenerator.ts`
+    - `makeRoutineGenerator.ts`
+
+#### 2.3 Update Render System for Multi-Format
+
+- **File**: `packages/kanel/src/render.ts`
+  - Update to handle new output types:
+    ```typescript
+    const render = (fileContents: FileContents, path: string): string[] => {
+      if (fileContents.filetype === "typescript") {
+        return renderTypescript(fileContents.declarations, path);
+      } else if (fileContents.filetype === "generic") {
+        return fileContents.content.split("\n");
+      }
+      throw new Error(`Unknown file type: ${(fileContents as any).filetype}`);
+    };
+    ```
+- **File**: `packages/kanel/src/renderTypescript.ts`
+  - Extract TypeScript-specific rendering logic
+  - Handle modern module format support (`.mts`, `.cts`)
+
+#### 2.4 Implement Modern Module Support
+
+- **File**: `packages/kanel/src/moduleFormat.ts`
+
+  - Create module format utilities:
+
+```typescript
+export const getModuleFormat = (config: Config) => {
+  if (config.moduleFormat === "auto") {
+    // Auto-detect based on package.json, tsconfig.json, etc.
+    return detectModuleFormat();
+  }
+  return config.moduleFormat || "auto";
+};
+
+export const getOutputExtension = (moduleFormat: string) => {
+  switch (moduleFormat) {
+    case "esm":
+      return ".mts";
+    case "commonjs":
+      return ".cts";
+    case "classic":
+      return ".ts";
+    default:
+      return ".ts";
+  }
+};
+
+export const getImportExtension = (moduleFormat: string) => {
+  switch (moduleFormat) {
+    case "esm":
+      return ".js";
+    case "commonjs":
+      return ".cjs";
+    case "classic":
+      return ""; // No extension for classic TypeScript
+    default:
+      return ".js";
+  }
+};
+```
+
+- **File**: `packages/kanel/src/ImportGenerator.ts`
+  - Update to use proper import extensions based on module format
+  - Handle `.js`, `.mjs`, `.cjs` extensions in import statements
+  - **Critical**: Add comprehensive tests for all module format scenarios:
+    - `"esm"` → `.js` extensions
+    - `"commonjs"` → `.cjs` extensions
+    - `"classic"` → no extensions (empty string)
+    - `"auto"` → auto-detected extensions
+  - Test edge cases: mixed module formats, circular imports, relative vs absolute paths
+
+#### 2.7 Update WriteFile System
+
+- **File**: `packages/kanel/src/writeFile.ts`
+
+  - Update to handle multiple file formats:
+
+    ```typescript
+    const writeFile = (file: { fullPath: string; lines: string[] }) => {
+      const { fullPath, lines } = file;
+      const content = lines.join("\n");
+
+      // Ensure directory exists
+      const dir = path.dirname(fullPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      fs.writeFileSync(fullPath, content);
+    };
+    ```
+
+### Success Criteria for Phase 2
+
+- [ ] All generators use context system instead of InstantiatedConfig
+- [ ] TypeScript generator produces same output as v3
+- [ ] Modern module support works with proper file extensions (including "classic" format)
+- [ ] Multi-format output works correctly
 
 ## Architecture Considerations & Tradeoffs
 
