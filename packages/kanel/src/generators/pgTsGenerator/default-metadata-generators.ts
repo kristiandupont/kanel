@@ -3,9 +3,9 @@ import type { TableColumn } from "extract-pg-schema";
 import { join } from "path";
 import { tryParse } from "tagged-comment-parser";
 
-import escapeIdentifier from "./escapeIdentifier";
-import type { CompositeProperty } from "./generators/composite-types";
-import resolveType from "./generators/resolveType";
+import escapeIdentifier from "../../ts-utilities/escapeIdentifier";
+import type { CompositeProperty } from "./sub-generators/composite-types";
+import resolveType from "./sub-generators/resolveType";
 import type {
   GenerateIdentifierType,
   GetMetadata,
@@ -16,11 +16,7 @@ import type {
 const toPascalCase = recase(null, "pascal");
 
 // #region defaultGetMetadata
-export const defaultGetMetadata: GetMetadata = (
-  details,
-  generateFor,
-  instantiatedConfig,
-) => {
+export const defaultGetMetadata: GetMetadata = (details, generateFor) => {
   const { comment: strippedComment } = tryParse(details.comment);
   const isAgentNoun = ["initializer", "mutator"].includes(generateFor);
 
@@ -47,7 +43,6 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
   property,
   _details,
   generateFor,
-  _instantiatedConfig,
 ) => {
   const { comment: strippedComment } = tryParse(property.comment);
 
@@ -67,7 +62,6 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
 export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   column,
   details,
-  config,
 ) => {
   const name = escapeIdentifier(
     toPascalCase(details.name) + toPascalCase(column.name),
@@ -119,10 +113,7 @@ export const defaultPropertySortFunction = (
 // #endregion defaultPropertySortFunction
 
 // #region defaultGetRoutineMetadata
-export const defaultGetRoutineMetadata: GetRoutineMetadata = (
-  details,
-  instantiatedConfig,
-) => ({
+export const defaultGetRoutineMetadata: GetRoutineMetadata = (details) => ({
   parametersName: `${details.name}_params`,
   parameters: details.parameters.map(({ name }) => ({
     name,

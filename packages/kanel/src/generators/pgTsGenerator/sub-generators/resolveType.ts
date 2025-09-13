@@ -10,9 +10,9 @@ import type {
 } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import type { InstantiatedConfig } from "../config-types";
-import type Details from "../Details";
-import type TypeDefinition from "../TypeDefinition";
+import type { InstantiatedConfig } from "../../../config-types";
+import type Details from "../../../Details";
+import type TypeDefinition from "../../../ts-utilities/TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
 
 const resolveTypeFromComment = (

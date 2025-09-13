@@ -1,8 +1,8 @@
 import path from "path";
 
-import type { InstantiatedConfig } from "./config-types";
 import escapeString from "./escapeString";
 import type TypeImport from "./TypeImport";
+import { getImportExtension, type TsModuleFormat } from "./TsModuleFormat";
 
 type ImportSet = {
   defaultImport?: string;
@@ -14,15 +14,15 @@ type ImportSet = {
 class ImportGenerator {
   srcFolder: string;
   srcModuleName: string;
-  config: InstantiatedConfig | undefined;
+  tsModuleFormat: TsModuleFormat;
 
   /**
    * @param srcPath The path (including filename) of the module we're generating imports for.
    */
-  constructor(srcPath: string, config: InstantiatedConfig) {
+  constructor(srcPath: string, tsModuleFormat: TsModuleFormat) {
     this.srcFolder = path.dirname(srcPath);
     this.srcModuleName = path.basename(srcPath);
-    this.config = config ?? undefined;
+    this.tsModuleFormat = tsModuleFormat;
   }
 
   importMap: { [index: string]: ImportSet } = {};
@@ -125,7 +125,9 @@ class ImportGenerator {
       }
 
       const extension =
-        (relativePath.includes("./") ? this.config.importsExtension : "") ?? "";
+        (relativePath.includes("./")
+          ? getImportExtension(this.tsModuleFormat)
+          : "") ?? "";
       const line = `import ${onlyTypeImports ? "type " : ""}${importParts.join(", ")} from '${escapeString(
         relativePath,
       )}${extension}';`;

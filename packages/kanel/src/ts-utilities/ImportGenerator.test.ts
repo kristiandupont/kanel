@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { InstantiatedConfig } from "./config-types";
+import type { InstantiatedConfig } from "../config-types";
 import ImportGenerator from "./ImportGenerator";
 
 // Mocked InstantiatedConfig

@@ -1,69 +1,54 @@
 import type { PgType, Schema } from "extract-pg-schema";
 import type { ConnectionConfig } from "pg";
 
-import type { CompositeProperty } from "./generators/composite-types";
-import type {
-  GenerateIdentifierType,
-  GetMetadata,
-  GetPropertyMetadata,
-  GetRoutineMetadata,
-} from "./metadata-types";
 import type Output from "./Output";
-import type TypeMap from "./TypeMap";
+import type { Awaitable } from "./Awaitable";
+import type { TsModuleFormat } from "./ts-utilities/TsModuleFormat";
+import type Generator from "./generators/Generator";
 
-type Awaitable<T> = T | PromiseLike<T>;
-
-export type InstantiatedConfig = {
+export type PostgresSource = {
+  type: "postgres";
+  name: string;
   connection: string | ConnectionConfig;
-  schemas: Record<string, Schema>;
-  typeMap: TypeMap;
-
-  getMetadata: GetMetadata;
-  getPropertyMetadata: GetPropertyMetadata;
-  generateIdentifierType?: GenerateIdentifierType;
-  getRoutineMetadata?: GetRoutineMetadata;
-  propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
-
-  enumStyle: "enum" | "type";
-
-  outputPath: string;
-  preDeleteOutputFolder: boolean;
-  resolveViews: boolean;
-  importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
+  schemaNames?: string[];
+  typeFilter?: (pgType: PgType) => boolean;
 };
 
-export type PreRenderHook = (
-  outputAcc: Output,
-  instantiatedConfig: InstantiatedConfig,
-) => Awaitable<Output>;
+export type Source = PostgresSource;
+
+export type InstantiatedPostgresSource = {
+  type: "postgres";
+  name: string;
+  connection: string | ConnectionConfig;
+
+  schemas: Record<string, Schema>;
+};
+
+export type InstantiatedSource = InstantiatedPostgresSource;
+
+export type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
 
 export type PostRenderHook = (
   path: string,
   lines: string[],
-  instantiatedConfig: InstantiatedConfig,
 ) => Awaitable<string[]>;
 
 // #region Config
 export type Config = {
-  connection: string | ConnectionConfig;
-  schemas?: string[];
-  typeFilter?: (pgType: PgType) => boolean;
-  getMetadata?: GetMetadata;
-  getPropertyMetadata?: GetPropertyMetadata;
-  generateIdentifierType?: GenerateIdentifierType;
-  propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
-  getRoutineMetadata?: GetRoutineMetadata;
+  sources: Record<string, Source>;
 
-  enumStyle?: "enum" | "type";
+  // Generators
+  generators: Generator[];
 
-  outputPath?: string;
-  preDeleteOutputFolder?: boolean;
-  customTypeMap?: TypeMap;
-  resolveViews?: boolean;
-
+  // Hooks
   preRenderHooks?: PreRenderHook[];
   postRenderHooks?: PostRenderHook[];
 
-  importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
+  // Output configuration
+  outputPath: string;
+  preDeleteOutputFolder?: boolean;
+
+  // Module format configuration
+  tsModuleFormat?: TsModuleFormat | "auto";
 };
 // #endregion Config

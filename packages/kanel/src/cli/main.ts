@@ -5,7 +5,7 @@ import optionator from "optionator";
 import path from "path";
 
 import type { Config } from "../config-types";
-import processDatabase from "../processDatabase";
+import run from "../run";
 
 const { version } = require("../../package.json");
 
@@ -123,7 +123,7 @@ export async function main(): Promise<void> {
   };
 
   try {
-    await processDatabase(config, progress);
+    await run(config, progress);
     process.exit(0);
   } catch (error) {
     console.error(error);

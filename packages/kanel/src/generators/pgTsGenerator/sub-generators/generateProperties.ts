@@ -8,17 +8,17 @@ import type {
 } from "extract-pg-schema";
 import * as R from "ramda";
 
-import type { InstantiatedConfig } from "../config-types";
-import type { InterfacePropertyDeclaration } from "../ts-declaration-types";
-import type TypeImport from "../TypeImport";
+import type { InterfacePropertyDeclaration } from "../../../ts-utilities/ts-declaration-types";
+import type TypeImport from "../../../ts-utilities/TypeImport";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
 import resolveType from "./resolveType";
+import { useKanelContext } from "../../../context";
 
 const generateProperties = <D extends CompositeDetails>(
   details: D,
   generateFor: "selector" | "initializer" | "mutator",
-  config: InstantiatedConfig,
 ): InterfacePropertyDeclaration[] => {
+  const { config } = useKanelContext();
   const ps =
     details.kind === "compositeType" ? details.attributes : details.columns;
 

@@ -5,15 +5,14 @@ import type {
   TableDetails,
 } from "extract-pg-schema";
 
-import type { InstantiatedConfig } from "./config-types";
-import type { TypeDeclaration } from "./ts-declaration-types";
-import type Details from "./Details";
+import type { TypeDeclaration } from "../../ts-utilities/ts-declaration-types";
+import type Details from "../../Details";
 import type {
   CompositeDetails,
   CompositeProperty,
-} from "./generators/composite-types";
-import type { RoutineDetails } from "./generators/routine-types";
-import type TypeDefinition from "./TypeDefinition";
+} from "./sub-generators/composite-types";
+import type { RoutineDetails } from "./sub-generators/routine-types";
+import type TypeDefinition from "../../ts-utilities/TypeDefinition";
 
 export type TypeMetadata = {
   name: string;
@@ -24,7 +23,7 @@ export type TypeMetadata = {
 export type GetMetadata = (
   details: Details,
   generateFor: "selector" | "initializer" | "mutator" | undefined,
-  instantiatedConfig: InstantiatedConfig,
+  defaults: TypeMetadata,
 ) => TypeMetadata;
 
 export type PropertyMetadata = {
@@ -39,13 +38,13 @@ export type GetPropertyMetadata = (
   property: CompositeProperty,
   details: CompositeDetails,
   generateFor: "selector" | "initializer" | "mutator",
-  instantiatedConfig: InstantiatedConfig,
+  defaults: PropertyMetadata,
 ) => PropertyMetadata;
 
 export type GenerateIdentifierType = (
   column: TableColumn | ForeignTableColumn,
   details: TableDetails | ForeignTableDetails,
-  instantiatedConfig: InstantiatedConfig,
+  defaults: TypeDeclaration,
 ) => TypeDeclaration;
 
 export type RoutineMetadata = {
@@ -61,5 +60,5 @@ export type RoutineMetadata = {
 
 export type GetRoutineMetadata = (
   routineDetails: RoutineDetails,
-  instantiatedConfig: InstantiatedConfig,
+  defaults: RoutineMetadata,
 ) => RoutineMetadata;

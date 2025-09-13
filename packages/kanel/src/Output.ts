@@ -1,11 +1,6 @@
-import type { TsDeclaration } from "./ts-declaration-types";
+import type { TsFileContents } from "./ts-utilities/renderTsFile";
 
 export type Path = string;
-export type TsFileContents = {
-  filetype: "typescript";
-  declarations: TsDeclaration[];
-};
-
 export type GenericFileContents = {
   filetype: "generic";
   lines: string[];

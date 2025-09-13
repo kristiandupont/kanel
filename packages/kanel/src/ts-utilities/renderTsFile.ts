@@ -1,9 +1,14 @@
-import type { InstantiatedConfig } from "./config-types";
 import type { TsDeclaration } from "./ts-declaration-types";
 import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
 import escapeIdentifier from "./escapeIdentifier";
 import ImportGenerator from "./ImportGenerator";
+import { useKanelContext } from "../context";
+
+export type TsFileContents = {
+  filetype: "typescript";
+  declarations: TsDeclaration[];
+};
 
 const processComments = (
   comments: string[] | undefined,
@@ -161,15 +166,16 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (
-  declarations: TsDeclaration[],
+const renderTsFile = (
+  contents: TsFileContents,
   outputPath: string,
-  config: InstantiatedConfig,
 ): string[] => {
-  const importGenerator = new ImportGenerator(outputPath, config);
+  const { tsModuleFormat } = useKanelContext();
+
+  const importGenerator = new ImportGenerator(outputPath, tsModuleFormat);
   const lines: string[] = [];
 
-  declarations.forEach((declaration, index) => {
+  contents.declarations.forEach((declaration, index) => {
     if (index > 0) {
       lines.push("");
     }
@@ -186,4 +192,4 @@ const render = (
   return [...importLines, ...lines];
 };
 
-export default render;
+export default renderTsFile;

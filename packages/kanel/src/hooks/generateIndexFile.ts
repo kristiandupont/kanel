@@ -6,8 +6,10 @@ import type {
   EnumDeclaration,
   InterfaceDeclaration,
   TypeDeclaration,
-} from "../ts-declaration-types";
+} from "../ts-utilities/ts-declaration-types";
 import type { FileContents } from "../Output";
+import { useKanelContext } from "../context";
+import { getImportExtension } from "../ts-utilities/TsModuleFormat";
 
 type GenerateIndexFileConfig = {
   filter?: (
@@ -34,11 +36,16 @@ function stringifyExportItem(item: ExportsItem): string {
 
 export const makeGenerateIndexFile: (
   config: GenerateIndexFileConfig,
-) => PreRenderHook = (config) => (outputAcc, instantiatedConfig) => {
+) => PreRenderHook = (config) => (outputAcc) => {
+  const { config: kanelConfig, tsModuleFormat } = useKanelContext();
   const allExports: Record<string, ExportsItem[]> = {};
 
   for (const path of Object.keys(outputAcc)) {
     const file = outputAcc[path];
+    if (file.filetype !== "typescript") {
+      continue;
+    }
+
     allExports[path] = [];
     for (const declaration of file.declarations) {
       if (declaration.declarationType === "generic") {
@@ -66,13 +73,13 @@ export const makeGenerateIndexFile: (
       return "";
     }
 
-    let relativePath = relative(instantiatedConfig.outputPath, path);
+    let relativePath = relative(kanelConfig.outputPath, path);
     // Fix Windows-style paths in import line
     if (sep === "\\") {
       relativePath = relativePath.replaceAll("\\", "/");
     }
 
-    const extension = instantiatedConfig.importsExtension ?? "";
+    const extension = getImportExtension(tsModuleFormat);
     const line = `export { ${exports
       .map(stringifyExportItem)
       .join(", ")} } from './${relativePath}${extension}';`;
@@ -81,6 +88,7 @@ export const makeGenerateIndexFile: (
   });
 
   const indexFile: FileContents = {
+    filetype: "typescript",
     declarations: [
       {
         declarationType: "generic",
@@ -89,7 +97,7 @@ export const makeGenerateIndexFile: (
     ],
   };
 
-  const path = join(instantiatedConfig.outputPath, "index");
+  const path = join(kanelConfig.outputPath, "index");
 
   return {
     ...outputAcc,

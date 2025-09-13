@@ -2,13 +2,13 @@ import type { Kind, Schema } from "extract-pg-schema";
 import type { FunctionDetails } from "extract-pg-schema/build/kinds/extractFunction";
 import type { ProcedureDetails } from "extract-pg-schema/build/kinds/extractProcedure";
 
-import type { InstantiatedConfig } from "../config-types";
+import type { InstantiatedConfig } from "../../../config-types";
 import type {
   TsDeclaration,
   InterfaceDeclaration,
-} from "../ts-declaration-types";
-import type { Path } from "../Output";
-import type Output from "../Output";
+} from "../../../ts-utilities/ts-declaration-types";
+import type { Path } from "../../../Output";
+import type Output from "../../../Output";
 import type TypeMap from "../TypeMap";
 
 type RoutineDetails = FunctionDetails | ProcedureDetails;

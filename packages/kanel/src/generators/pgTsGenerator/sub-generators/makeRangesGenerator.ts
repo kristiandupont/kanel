@@ -1,10 +1,13 @@
 import type { RangeDetails, Schema } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import type { InstantiatedConfig } from "../config-types";
-import type { TsDeclaration, TypeDeclaration } from "../ts-declaration-types";
-import type { Path } from "../Output";
-import type Output from "../Output";
+import type { InstantiatedConfig } from "../../../config-types";
+import type {
+  TsDeclaration,
+  TypeDeclaration,
+} from "../../../ts-utilities/ts-declaration-types";
+import type { Path } from "../../../Output";
+import type Output from "../../../Output";
 
 const makeMapper =
   (config: InstantiatedConfig) =>
