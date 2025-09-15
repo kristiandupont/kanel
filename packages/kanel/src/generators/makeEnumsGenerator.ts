@@ -3,6 +3,7 @@ import { tryParse } from "tagged-comment-parser";
 
 import type { InstantiatedConfig } from "../config-types";
 import type {
+  ConstArrayDeclaration,
   Declaration,
   EnumDeclaration,
   TypeDeclaration,
@@ -10,7 +11,7 @@ import type {
 import type { Path } from "../Output";
 import type Output from "../Output";
 
-type EnumStyle = "enum" | "type";
+type EnumStyle = "enum" | "type" | "constArray";
 
 const makeMapper =
   (style: EnumStyle, config: InstantiatedConfig) =>
@@ -40,6 +41,15 @@ const makeMapper =
           "", // Start definition on new line
           ...enumDetails.values.map((value) => `| '${value}'`),
         ],
+      };
+      return { path, declaration };
+    } else if (style === "constArray") {
+      const declaration: ConstArrayDeclaration = {
+        declarationType: "constArray",
+        comment,
+        name,
+        exportAs: "default",
+        values: enumDetails.values,
       };
       return { path, declaration };
     } else {

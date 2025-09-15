@@ -3,6 +3,7 @@ import { join, relative, sep } from "path";
 import type { PreRenderHook } from "../config-types";
 import type {
   ConstantDeclaration,
+  ConstArrayDeclaration,
   EnumDeclaration,
   InterfaceDeclaration,
   TypeDeclaration,
@@ -15,6 +16,7 @@ type GenerateIndexFileConfig = {
       | TypeDeclaration
       | InterfaceDeclaration
       | EnumDeclaration
+      | ConstArrayDeclaration
       | ConstantDeclaration,
   ) => boolean;
 };
