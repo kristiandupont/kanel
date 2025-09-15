@@ -8,9 +8,7 @@ import processDatabase from "../processDatabase";
 import useTestKnex from "../test-helpers/useTestKnex";
 import useSchema from "../test-helpers/useSchema";
 
-vi.mock("../writeFile", () => ({
-  default: vi.fn(),
-}));
+vi.mock("../writeFile", () => ({ default: vi.fn() }));
 
 import writeFile from "../writeFile";
 const mockedWriteFile = vi.mocked(writeFile);
