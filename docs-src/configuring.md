@@ -12,7 +12,7 @@ The update to version 3 introduced several breaking changes. If you are doing th
 
 # The Config type
 
-The configuration type is defined in the [Config.ts](../packages/kanel/src/config-types.ts) file:
+The configuration type is defined in the [Config.ts](https://github.com/kristiandupont/kanel/blob/main/packages/kanel/src/config-types.ts) file:
 
 <<< @/../packages/kanel/src/config-types.ts#Config
 
@@ -20,7 +20,7 @@ The configuration type is defined in the [Config.ts](../packages/kanel/src/confi
 
 The only required property in the config object is `connection`.
 
-This is the database connection object. It follows the [`client`](https://node-postgres.com/api/client) constructor in [pg](https://www.npmjs.com/package/pg). As you will typically want to run Kanel on your development machine, you probably want a simple localhost connection as in the example above.
+This is the database connection object. It follows the [`client`](https://node-postgres.com/apis/client) constructor in [pg](https://www.npmjs.com/package/pg). As you will typically want to run Kanel on your development machine, you probably want a simple localhost connection as in the example above.
 
 The `connection` parameter can either be an object like shown above or a connection string. If the connection string starts with "file:" the specified path is opened using pglite. For example, when providing `file:my/pglite/db/folder`, the folder `'my/pglite/db/folder'` is opened using pglite.
 
