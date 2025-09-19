@@ -1,4 +1,4 @@
-import type { InstantiatedConfig } from "./config-types";
+import { useKanelContext } from "./context";
 import type { Declaration } from "./declaration-types";
 import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
@@ -161,12 +161,12 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (
-  declarations: Declaration[],
-  outputPath: string,
-  config: InstantiatedConfig,
-): string[] => {
-  const importGenerator = new ImportGenerator(outputPath, config);
+const render = (declarations: Declaration[], outputPath: string): string[] => {
+  const { instantiatedConfig } = useKanelContext();
+  const importGenerator = new ImportGenerator(
+    outputPath,
+    instantiatedConfig.importsExtension,
+  );
   const lines: string[] = [];
 
   declarations.forEach((declaration, index) => {

@@ -8,7 +8,7 @@ import type {
 } from "extract-pg-schema";
 import * as R from "ramda";
 
-import type { InstantiatedConfig } from "../config-types";
+import { useKanelContext } from "../context";
 import type { InterfacePropertyDeclaration } from "../declaration-types";
 import type TypeImport from "../TypeImport";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
@@ -17,13 +17,14 @@ import resolveType from "./resolveType";
 const generateProperties = <D extends CompositeDetails>(
   details: D,
   generateFor: "selector" | "initializer" | "mutator",
-  config: InstantiatedConfig,
 ): InterfacePropertyDeclaration[] => {
+  const { instantiatedConfig } = useKanelContext();
+
   const ps =
     details.kind === "compositeType" ? details.attributes : details.columns;
 
-  const sortedPs = config.propertySortFunction
-    ? R.sort(config.propertySortFunction, ps as any)
+  const sortedPs = instantiatedConfig.propertySortFunction
+    ? R.sort(instantiatedConfig.propertySortFunction, ps as any)
     : ps;
 
   const result: InterfacePropertyDeclaration[] = sortedPs
@@ -34,7 +35,7 @@ const generateProperties = <D extends CompositeDetails>(
       if ((p as ViewColumn | MaterializedViewColumn).source) {
         const source = (p as ViewColumn | MaterializedViewColumn).source;
         const target: TableDetails | ViewDetails | MaterializedViewDetails =
-          config.schemas[source.schema].tables.find(
+          instantiatedConfig.schemas[source.schema].tables.find(
             (t) => t.name === source.table,
           );
 
@@ -56,7 +57,12 @@ const generateProperties = <D extends CompositeDetails>(
         typeOverride,
         nullableOverride,
         optionalOverride,
-      } = config.getPropertyMetadata(p, details, generateFor, config);
+      } = instantiatedConfig.getPropertyMetadata(
+        p,
+        details,
+        generateFor,
+        instantiatedConfig,
+      );
 
       const canBeOptional: boolean =
         p.isNullable ||
@@ -64,7 +70,7 @@ const generateProperties = <D extends CompositeDetails>(
         p.isIdentity ||
         p.generated === "BY DEFAULT";
 
-      const t = typeOverride ?? resolveType(p, details, config);
+      const t = typeOverride ?? resolveType(p, details);
 
       let typeName: string;
       let typeImports: TypeImport[] = [];
