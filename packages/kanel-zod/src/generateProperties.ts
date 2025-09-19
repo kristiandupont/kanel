@@ -43,7 +43,7 @@ const generateProperties = <D extends CompositeDetails>(
       const canBeOptional: boolean =
         p.isNullable || p.defaultValue || p.isIdentity;
 
-      const t = typeOverride ?? resolveType(p, details, instantiatedConfig);
+      const t = typeOverride ?? resolveType(p, details);
 
       let zodType: string;
       const typeImports: TypeImport[] = [];
