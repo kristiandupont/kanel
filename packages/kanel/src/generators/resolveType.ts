@@ -10,7 +10,7 @@ import type {
 } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import type { InstantiatedConfig } from "../config-types";
+import { useKanelContext } from "../context";
 import type Details from "../Details";
 import type TypeDefinition from "../TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
@@ -83,28 +83,23 @@ const getColumnFromReference = (
 
 const getTypeFromReferences = (
   c: CompositeProperty,
-  config: InstantiatedConfig,
   visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails,
 ): TypeDefinition | undefined => {
+  const { instantiatedConfig } = useKanelContext();
+
   const references = (c as TableColumn | ViewColumn | MaterializedViewColumn)
     .references as ColumnReference[];
   const referencedTypes = references.map((reference) => {
     const { column, details } = getColumnFromReference(
       reference,
-      config.schemas,
+      instantiatedConfig.schemas,
     );
     if (!column) {
       console.warn("Could not resolve reference", reference);
       return "unknown";
     }
-    return resolveType(
-      column,
-      details,
-      config,
-      visited,
-      originCompositeDetails,
-    );
+    return resolveType(column, details, false, visited, originCompositeDetails);
   });
 
   const seenTypeNames = new Set<string>();
@@ -120,7 +115,10 @@ const getTypeFromReferences = (
     });
 
   // Don't use the simple primitive type if we're generating identifier types
-  if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
+  if (
+    instantiatedConfig.generateIdentifierType &&
+    (c as TableColumn).isPrimaryKey
+  ) {
     dedupedReferencedTypes = dedupedReferencedTypes.filter(
       (t) => typeof t !== "string",
     );
@@ -145,10 +143,12 @@ const getTypeFromReferences = (
 const resolveType = (
   c: CompositeProperty,
   d: CompositeDetails,
-  config: InstantiatedConfig,
+  retainInnerIdentifierType = false,
   visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails = d,
 ): TypeDefinition => {
+  const { instantiatedConfig } = useKanelContext();
+
   // Check to see if we have already tried to resolve this column before.
   // This is to prevent infinite loops when there are circular references.
   if (visited.has(c)) {
@@ -171,7 +171,6 @@ const resolveType = (
     if ("references" in c && c.references.length > 0) {
       const typeFromReferences = getTypeFromReferences(
         c,
-        config,
         visited,
         originCompositeDetails,
       );
@@ -184,36 +183,36 @@ const resolveType = (
     if ((c as ViewColumn | MaterializedViewColumn).source) {
       const source = (c as ViewColumn | MaterializedViewColumn).source;
       let target: TableDetails | ViewDetails | MaterializedViewDetails =
-        config.schemas[source.schema].tables.find(
+        instantiatedConfig.schemas[source.schema].tables.find(
           (t) => t.name === source.table,
         );
 
       if (!target) {
-        target = config.schemas[source.schema].views.find(
+        target = instantiatedConfig.schemas[source.schema].views.find(
           (v) =>
             v.name === source.table &&
             v.name !== (d as ViewDetails).informationSchemaValue.table_name,
         );
       }
       if (!target) {
-        target = config.schemas[source.schema].materializedViews.find(
-          (v) => v.name === source.table,
-        );
+        target = instantiatedConfig.schemas[
+          source.schema
+        ].materializedViews.find((v) => v.name === source.table);
       }
       if (!target) {
-        target = config.schemas["public"]?.tables?.find(
+        target = instantiatedConfig.schemas["public"]?.tables?.find(
           (t) => t.name === source.table,
         );
       }
       if (!target) {
-        target = config.schemas["public"]?.views?.find(
+        target = instantiatedConfig.schemas["public"]?.views?.find(
           (v) =>
             v.name === source.table &&
             v.name !== (d as ViewDetails).informationSchemaValue.table_name,
         );
       }
       if (!target) {
-        target = config.schemas["public"]?.materializedViews?.find(
+        target = instantiatedConfig.schemas["public"]?.materializedViews?.find(
           (v) => v.name === source.table,
         );
       }
@@ -234,7 +233,7 @@ const resolveType = (
         return resolveType(
           column,
           target,
-          config,
+          retainInnerIdentifierType,
           visited,
           originCompositeDetails,
         );
@@ -242,12 +241,20 @@ const resolveType = (
     }
 
     // 4) if the column is a primary key, use the generated type for it, if we do that
-    if (config.generateIdentifierType && (c as TableColumn).isPrimaryKey) {
-      const { path } = config.getMetadata(d, "selector", config);
-      const { name, exportAs } = config.generateIdentifierType(
+    if (
+      instantiatedConfig.generateIdentifierType &&
+      !retainInnerIdentifierType &&
+      (c as TableColumn).isPrimaryKey
+    ) {
+      const { path } = instantiatedConfig.getMetadata(
+        d,
+        "selector",
+        instantiatedConfig,
+      );
+      const { name, exportAs } = instantiatedConfig.generateIdentifierType(
         c as TableColumn,
         d as TableDetails,
-        config,
+        instantiatedConfig,
       );
       const sameSchema = originCompositeDetails.schemaName === d.schemaName;
       const asName = sameSchema ? undefined : `${d.schemaName}_${name}`;
@@ -268,8 +275,8 @@ const resolveType = (
     }
 
     // 5) If there is a typemap type, use that
-    if (c.type.fullName in config.typeMap) {
-      return config.typeMap[c.type.fullName];
+    if (c.type.fullName in instantiatedConfig.typeMap) {
+      return instantiatedConfig.typeMap[c.type.fullName];
     }
 
     // 6) If the type is a composite, enum, range or domain, reference that.
@@ -279,41 +286,45 @@ const resolveType = (
       switch (c.type.kind) {
         case "composite": {
           target =
-            config.schemas[schemaName].compositeTypes.find(
+            instantiatedConfig.schemas[schemaName].compositeTypes.find(
               (t) => t.name === typeName,
             ) ??
-            config.schemas[schemaName].views?.find(
+            instantiatedConfig.schemas[schemaName].views?.find(
               (t) => t.name === typeName,
             ) ??
-            config.schemas[schemaName].materializedViews?.find(
+            instantiatedConfig.schemas[schemaName].materializedViews?.find(
               (t) => t.name === typeName,
             ) ??
-            config.schemas[schemaName].tables?.find(
+            instantiatedConfig.schemas[schemaName].tables?.find(
               (t) => t.name === typeName,
             ) ??
-            config.schemas["public"]?.views?.find((t) => t.name === typeName) ??
-            config.schemas["public"]?.materializedViews?.find(
+            instantiatedConfig.schemas["public"]?.views?.find(
               (t) => t.name === typeName,
             ) ??
-            config.schemas["public"]?.tables?.find((t) => t.name === typeName);
+            instantiatedConfig.schemas["public"]?.materializedViews?.find(
+              (t) => t.name === typeName,
+            ) ??
+            instantiatedConfig.schemas["public"]?.tables?.find(
+              (t) => t.name === typeName,
+            );
           break;
         }
         case "enum": {
-          target = config.schemas[schemaName].enums.find(
+          target = instantiatedConfig.schemas[schemaName].enums.find(
             (t) => t.name === typeName,
           );
 
           break;
         }
         case "domain": {
-          target = config.schemas[schemaName].domains.find(
+          target = instantiatedConfig.schemas[schemaName].domains.find(
             (t) => t.name === typeName,
           );
 
           break;
         }
         case "range": {
-          target = config.schemas[schemaName].ranges.find(
+          target = instantiatedConfig.schemas[schemaName].ranges.find(
             (t) => t.name === typeName,
           );
 
@@ -328,7 +339,11 @@ const resolveType = (
           return typeFromComment;
         }
 
-        const { name, path } = config.getMetadata(target, "selector", config);
+        const { name, path } = instantiatedConfig.getMetadata(
+          target,
+          "selector",
+          instantiatedConfig,
+        );
         const sameSchema =
           originCompositeDetails.schemaName === target.schemaName;
         const asName = sameSchema ? undefined : `${target.schemaName}_${name}`;

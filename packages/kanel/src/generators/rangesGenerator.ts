@@ -1,16 +1,18 @@
 import type { RangeDetails, Schema } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import type { InstantiatedConfig } from "../config-types";
+import { useKanelContext } from "../context";
 import type { Declaration, TypeDeclaration } from "../declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
 
 const makeMapper =
-  (config: InstantiatedConfig) =>
+  () =>
   (
     rangeDetails: RangeDetails,
   ): { path: Path; declaration: Declaration } | undefined => {
+    const { instantiatedConfig } = useKanelContext();
+
     // If a range has a @type tag in the comment,
     // we will use that type instead of a generated one.
     const { tags } = tryParse(rangeDetails.comment);
@@ -18,16 +20,16 @@ const makeMapper =
       return undefined;
     }
 
-    const { name, comment, path } = config.getMetadata(
+    const { name, comment, path } = instantiatedConfig.getMetadata(
       rangeDetails,
       undefined,
-      config,
+      instantiatedConfig,
     );
 
     // let rType: string;
     // const typeImports: TypeImport[] = [];
 
-    // const mapped: TypeDefinition = config.typeMap[rangeDetails.innerType];
+    // const mapped: TypeDefinition = instantiatedConfig.typeMap[rangeDetails.innerType];
     // if (!mapped) {
     //   rType = 'unknown';
     //   console.warn(
@@ -52,23 +54,21 @@ const makeMapper =
     return { path, declaration };
   };
 
-const makeRangesGenerator =
-  (config: InstantiatedConfig) =>
-  (schema: Schema, outputAcc: Output): Output => {
-    const declarations = schema.ranges?.map(makeMapper(config)) ?? [];
-    return declarations.reduce((acc, elem) => {
-      if (elem === undefined) return acc;
-      const { path, declaration } = elem;
-      const existing = acc[path];
-      if (existing) {
-        existing.declarations.push(declaration);
-      } else {
-        acc[path] = {
-          declarations: [declaration],
-        };
-      }
-      return acc;
-    }, outputAcc);
-  };
+const rangesGenerator = (schema: Schema, outputAcc: Output): Output => {
+  const declarations = schema.ranges?.map(makeMapper()) ?? [];
+  return declarations.reduce((acc, elem) => {
+    if (elem === undefined) return acc;
+    const { path, declaration } = elem;
+    const existing = acc[path];
+    if (existing) {
+      existing.declarations.push(declaration);
+    } else {
+      acc[path] = {
+        declarations: [declaration],
+      };
+    }
+    return acc;
+  }, outputAcc);
+};
 
-export default makeRangesGenerator;
+export default rangesGenerator;

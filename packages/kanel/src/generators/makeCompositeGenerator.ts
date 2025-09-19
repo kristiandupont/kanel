@@ -1,7 +1,7 @@
 import type { Kind, Schema, TableColumn } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import type { InstantiatedConfig } from "../config-types";
+import { useKanelContext } from "../context";
 import type { Declaration, InterfaceDeclaration } from "../declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
@@ -10,8 +10,10 @@ import generateProperties from "./generateProperties";
 import resolveType from "./resolveType";
 
 const makeMapper =
-  <D extends CompositeDetails>(config: InstantiatedConfig) =>
+  <D extends CompositeDetails>() =>
   (details: D): { path: Path; declaration: Declaration }[] => {
+    const { instantiatedConfig } = useKanelContext();
+
     if (details.kind === "compositeType") {
       // If a composite type has a @type tag in the comment,
       // we will use that type instead of a generated one.
@@ -26,20 +28,24 @@ const makeMapper =
       name: selectorName,
       comment: selectorComment,
       path,
-    } = config.getMetadata(details, "selector", config);
+    } = instantiatedConfig.getMetadata(details, "selector", instantiatedConfig);
 
     if (
       (details.kind === "table" || details.kind === "foreignTable") &&
-      config.generateIdentifierType
+      instantiatedConfig.generateIdentifierType
     ) {
       const { columns } = details;
-      const { path } = config.getMetadata(details, "selector", config);
+      const { path } = instantiatedConfig.getMetadata(
+        details,
+        "selector",
+        instantiatedConfig,
+      );
       const identifierColumns = columns.filter((c) => c.isPrimaryKey);
 
       identifierColumns
         .filter((c) => {
           if (!(c as TableColumn).references?.length) return true;
-          const type = resolveType(c, details, config);
+          const type = resolveType(c, details);
           if (typeof type === "string") {
             return true;
           }
@@ -47,11 +53,17 @@ const makeMapper =
           return type.typeImports.some((i) => i.path === path);
         })
         .forEach((c) =>
-          declarations.push(config.generateIdentifierType(c, details, config)),
+          declarations.push(
+            instantiatedConfig.generateIdentifierType(
+              c,
+              details,
+              instantiatedConfig,
+            ),
+          ),
         );
     }
 
-    const selectorProperties = generateProperties(details, "selector", config);
+    const selectorProperties = generateProperties(details, "selector");
 
     const selectorDeclaration: InterfaceDeclaration = {
       declarationType: "interface",
@@ -64,12 +76,12 @@ const makeMapper =
 
     if (details.kind === "table") {
       const { name: initializerName, comment: initializerComment } =
-        config.getMetadata(details, "initializer", config);
-      const initializerProperties = generateProperties(
-        details,
-        "initializer",
-        config,
-      );
+        instantiatedConfig.getMetadata(
+          details,
+          "initializer",
+          instantiatedConfig,
+        );
+      const initializerProperties = generateProperties(details, "initializer");
 
       const initializerDeclaration: InterfaceDeclaration = {
         declarationType: "interface",
@@ -80,12 +92,9 @@ const makeMapper =
       };
       declarations.push(initializerDeclaration);
 
-      const { name: mutatorName, comment: mutatorComment } = config.getMetadata(
-        details,
-        "mutator",
-        config,
-      );
-      const mutatorProperties = generateProperties(details, "mutator", config);
+      const { name: mutatorName, comment: mutatorComment } =
+        instantiatedConfig.getMetadata(details, "mutator", instantiatedConfig);
+      const mutatorProperties = generateProperties(details, "mutator");
 
       const mutatorDeclaration: InterfaceDeclaration = {
         declarationType: "interface",
@@ -103,9 +112,9 @@ const makeMapper =
 // "Composite" in this case means tables, views, materialized views and composite types.
 // I.e. anything that has "properties" and will be turned into an interface in Typescript.
 const makeCompositeGenerator =
-  (kind: Kind, config: InstantiatedConfig) =>
+  (kind: Kind) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const mapper = makeMapper(config);
+    const mapper = makeMapper();
     const declarations: { path: string; declaration: Declaration }[] =
       (schema[`${kind}s`] as CompositeDetails[])?.map(mapper).flat() ?? [];
     return declarations.reduce((acc, { path, declaration }) => {

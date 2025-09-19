@@ -67,16 +67,12 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
 export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   column,
   details,
-  config,
+  _config,
 ) => {
   const name = escapeIdentifier(
     toPascalCase(details.name) + toPascalCase(column.name),
   );
-  const innerType = resolveType(column, details, {
-    ...config,
-    // Explicitly disable identifier resolution so we get the actual inner type here
-    generateIdentifierType: undefined,
-  });
+  const innerType = resolveType(column, details, true);
   const imports = [];
 
   let type = innerType;

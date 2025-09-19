@@ -1,26 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import type { InstantiatedConfig } from "./config-types";
 import ImportGenerator from "./ImportGenerator";
-
-// Mocked InstantiatedConfig
-const instantiatedConfig: InstantiatedConfig = {
-  getMetadata: vi.fn(),
-  getPropertyMetadata: vi.fn(),
-  generateIdentifierType: vi.fn(),
-  propertySortFunction: vi.fn(),
-  enumStyle: "enum",
-  typeMap: {},
-  schemas: {},
-  connection: {},
-  outputPath: ".",
-  preDeleteOutputFolder: false,
-  resolveViews: true,
-};
 
 describe("ImportGenerator", () => {
   it("should generate an import statement", () => {
-    const ig = new ImportGenerator("/src/some-module", instantiatedConfig);
+    const ig = new ImportGenerator("/src/some-module", undefined);
 
     ig.addImport({
       name: "func",
@@ -36,10 +20,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support various cases", () => {
-    const ig = new ImportGenerator(
-      "/package/src/some-module",
-      instantiatedConfig,
-    );
+    const ig = new ImportGenerator("/package/src/some-module", undefined);
 
     ig.addImport({
       name: "defaultFunc",
@@ -129,7 +110,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should ignore duplicates", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     ig.addImport({
       name: "def",
@@ -180,7 +161,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should complain about multiple (different) default imports", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     ig.addImport({
       name: "def",
@@ -204,7 +185,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support absolute imports", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     ig.addImport({
       name: "path",
@@ -239,7 +220,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should not import items from the same file", () => {
-    const ig = new ImportGenerator("./src/some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./src/some-module", undefined);
 
     ig.addImport({
       name: "path",
@@ -271,7 +252,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support type-only imports", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     ig.addImport({
       name: "Member",
@@ -306,7 +287,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support combinations of type-only and non-type-only imports", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     ig.addImport({
       name: "Member",
@@ -358,7 +339,7 @@ describe("ImportGenerator", () => {
 
   // This is necessary because of https://github.com/tc39/proposal-type-annotations/issues/16
   it("should combine default and named type-only imports correctly", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     ig.addImport({
       name: "Account",
@@ -392,7 +373,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should support renaming imports with asName", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     // Test default import renaming
     ig.addImport({
@@ -431,7 +412,7 @@ describe("ImportGenerator", () => {
   });
 
   it("should handle mixed renamed and non-renamed imports", () => {
-    const ig = new ImportGenerator("./some-module", instantiatedConfig);
+    const ig = new ImportGenerator("./some-module", undefined);
 
     // Mix of renamed and non-renamed imports
     ig.addImport({

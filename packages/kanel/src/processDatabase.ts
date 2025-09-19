@@ -2,6 +2,7 @@ import { extractSchemas } from "extract-pg-schema";
 import { rimraf } from "rimraf";
 
 import type { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
+import { runWithContext } from "./context";
 import {
   defaultGenerateIdentifierType,
   defaultGetMetadata,
@@ -11,9 +12,9 @@ import {
 } from "./default-metadata-generators";
 import defaultTypeMap from "./defaultTypeMap";
 import makeCompositeGenerator from "./generators/makeCompositeGenerator";
-import makeDomainsGenerator from "./generators/makeDomainsGenerator";
-import makeEnumsGenerator from "./generators/makeEnumsGenerator";
-import makeRangesGenerator from "./generators/makeRangesGenerator";
+import domainsGenerator from "./generators/domainsGenerator";
+import enumsGenerator from "./generators/enumsGenerator";
+import rangesGenerator from "./generators/rangesGenerator";
 import makeRoutineGenerator from "./generators/makeRoutineGenerator";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
@@ -71,52 +72,58 @@ const processDatabase = async (
     importsExtension: config.importsExtension,
   };
 
-  const generators = [
-    makeCompositeGenerator("table", instantiatedConfig),
-    makeCompositeGenerator("foreignTable", instantiatedConfig),
-    makeCompositeGenerator("view", instantiatedConfig),
-    makeCompositeGenerator("materializedView", instantiatedConfig),
-    makeCompositeGenerator("compositeType", instantiatedConfig),
-    makeEnumsGenerator(instantiatedConfig),
-    makeRangesGenerator(instantiatedConfig),
-    makeDomainsGenerator(instantiatedConfig),
-    makeRoutineGenerator("function", instantiatedConfig),
-    makeRoutineGenerator("procedure", instantiatedConfig),
-  ];
+  await runWithContext({ instantiatedConfig }, async () => {
+    const generators = [
+      makeCompositeGenerator("table"),
+      makeCompositeGenerator("foreignTable"),
+      makeCompositeGenerator("view"),
+      makeCompositeGenerator("materializedView"),
+      makeCompositeGenerator("compositeType"),
+      enumsGenerator,
+      rangesGenerator,
+      domainsGenerator,
+      makeRoutineGenerator("function"),
+      makeRoutineGenerator("procedure"),
+    ];
 
-  let output: Output = {};
-  Object.values(schemas).forEach((schema) => {
-    generators.forEach((generator) => {
-      output = generator(schema, output);
+    let output: Output = {};
+    Object.values(schemas).forEach((schema) => {
+      generators.forEach((generator) => {
+        output = generator(schema, output);
+      });
     });
+
+    const preRenderHooks: PreRenderHook[] = config.preRenderHooks ?? [];
+    for (const hook of preRenderHooks) {
+      output = await hook(output, instantiatedConfig);
+    }
+
+    let filesToWrite = Object.keys(output).map((path) => {
+      const lines = render(output[path].declarations, path);
+      return { fullPath: `${path}.ts`, lines };
+    });
+
+    const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
+    for (const hook of postRenderHooks) {
+      filesToWrite = await Promise.all(
+        filesToWrite.map(async (file) => {
+          const lines = await hook(
+            file.fullPath,
+            file.lines,
+            instantiatedConfig,
+          );
+          return { ...file, lines };
+        }),
+      );
+    }
+
+    if (instantiatedConfig.preDeleteOutputFolder) {
+      console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
+      await rimraf(instantiatedConfig.outputPath, { glob: true });
+    }
+
+    filesToWrite.forEach((file) => writeFile(file));
   });
-
-  const preRenderHooks: PreRenderHook[] = config.preRenderHooks ?? [];
-  for (const hook of preRenderHooks) {
-    output = await hook(output, instantiatedConfig);
-  }
-
-  let filesToWrite = Object.keys(output).map((path) => {
-    const lines = render(output[path].declarations, path, instantiatedConfig);
-    return { fullPath: `${path}.ts`, lines };
-  });
-
-  const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
-  for (const hook of postRenderHooks) {
-    filesToWrite = await Promise.all(
-      filesToWrite.map(async (file) => {
-        const lines = await hook(file.fullPath, file.lines, instantiatedConfig);
-        return { ...file, lines };
-      }),
-    );
-  }
-
-  if (instantiatedConfig.preDeleteOutputFolder) {
-    console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
-    await rimraf(instantiatedConfig.outputPath, { glob: true });
-  }
-
-  filesToWrite.forEach((file) => writeFile(file));
 };
 
 export default processDatabase;

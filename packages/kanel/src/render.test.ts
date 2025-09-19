@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { createTestContext, runWithContextSync } from "./context";
 import type { InstantiatedConfig } from "./config-types";
 import type { Declaration } from "./declaration-types";
 import render from "./render";
@@ -20,6 +21,12 @@ const instantiatedConfig: InstantiatedConfig = {
 };
 
 describe("processGenerationSetup", () => {
+  let testContext: ReturnType<typeof createTestContext>;
+
+  beforeEach(() => {
+    testContext = createTestContext(instantiatedConfig);
+  });
+
   it("should process a type declaration", () => {
     const declarations: Declaration[] = [
       {
@@ -30,7 +37,9 @@ describe("processGenerationSetup", () => {
         typeDefinition: ["string"],
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([
       "/** This is just a string */",
       `export type MyString = string;`,
@@ -47,7 +56,9 @@ describe("processGenerationSetup", () => {
         typeDefinition: ["", "| 'apples'", "| 'oranges'", "| 'bananas'"],
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([
       `export type MyUnion = `,
       `  | 'apples'`,
@@ -74,7 +85,9 @@ describe("processGenerationSetup", () => {
         ],
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([
       `export default interface Member {`,
       "  /**",
@@ -95,7 +108,9 @@ describe("processGenerationSetup", () => {
         values: ["G", "PG", "PG-13", "R", "NC-17"],
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([
       `export enum MpaaRating {`,
       `  G = 'G',`,
@@ -116,7 +131,9 @@ describe("processGenerationSetup", () => {
         values: ["apples", "oranges", "bananas"],
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([
       `enum Fruit {`,
       `  apples = 'apples',`,
@@ -138,7 +155,9 @@ describe("processGenerationSetup", () => {
         value: "true",
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([`export const MyConstant: boolean = true;`]);
   });
 
@@ -152,7 +171,9 @@ describe("processGenerationSetup", () => {
         value: ["z.object({", "  actor_id: actorId,", "})"],
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([
       "export const actor: z.Schema<Actor> = z.object({",
       `  actor_id: actorId,`,
@@ -172,7 +193,9 @@ describe("processGenerationSetup", () => {
         ],
       },
     ];
-    const lines = render(declarations, "./", instantiatedConfig);
+    const lines = runWithContextSync(testContext, () =>
+      render(declarations, "./"),
+    );
     expect(lines).toEqual([
       "/**",
       " * This is a // * /* comment *\\/",

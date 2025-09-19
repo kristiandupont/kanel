@@ -2,7 +2,7 @@ import type { Kind, Schema } from "extract-pg-schema";
 import type { FunctionDetails } from "extract-pg-schema/build/kinds/extractFunction";
 import type { ProcedureDetails } from "extract-pg-schema/build/kinds/extractProcedure";
 
-import type { InstantiatedConfig } from "../config-types";
+import { useKanelContext } from "../context";
 import type { Declaration, InterfaceDeclaration } from "../declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
@@ -31,11 +31,16 @@ function resolveSimpleType(pgType: string, typeMap: TypeMap) {
 }
 
 const makeMapper =
-  (config: InstantiatedConfig) =>
+  () =>
   (
     routineDetails: RoutineDetails,
   ): { path: Path; declaration: Declaration }[] => {
-    const metadata = config.getRoutineMetadata?.(routineDetails, config);
+    const { instantiatedConfig } = useKanelContext();
+
+    const metadata = instantiatedConfig.getRoutineMetadata?.(
+      routineDetails,
+      instantiatedConfig,
+    );
     if (!metadata) return undefined;
     const {
       parametersName,
@@ -57,7 +62,7 @@ const makeMapper =
           if (!t) {
             const sourceTypeName = routineDetails.parameters[index].type;
             if (sourceTypeName) {
-              t = resolveSimpleType(sourceTypeName, config.typeMap);
+              t = resolveSimpleType(sourceTypeName, instantiatedConfig.typeMap);
             }
           }
           const typeName = typeof t === "string" ? t : t.name;
@@ -85,8 +90,8 @@ const makeMapper =
       if ("returnType" in routineDetails) {
         const returnType = routineDetails.returnType;
         if (typeof returnType === "string") {
-          if (returnType in config.typeMap) {
-            const typeDef = config.typeMap[returnType];
+          if (returnType in instantiatedConfig.typeMap) {
+            const typeDef = instantiatedConfig.typeMap[returnType];
             let typeDefinitionLine: string;
             if (typeof typeDef === "string") {
               typeDefinitionLine = typeDef;
@@ -110,7 +115,10 @@ const makeMapper =
               exportAs: "named",
               properties: returnType.columns.map((column) => ({
                 name: column.name,
-                typeName: resolveSimpleType(column.type, config.typeMap),
+                typeName: resolveSimpleType(
+                  column.type,
+                  instantiatedConfig.typeMap,
+                ),
                 dimensions: 0,
                 isNullable: false,
                 isOptional: false,
@@ -130,9 +138,9 @@ const makeMapper =
   };
 
 const makeRoutineGenerator =
-  (kind: Kind, config: InstantiatedConfig) =>
+  (kind: Kind) =>
   (schema: Schema, outputAcc: Output): Output => {
-    const mapper = makeMapper(config);
+    const mapper = makeMapper();
     const declarations: { path: string; declaration: Declaration }[] =
       (schema[`${kind}s`] as RoutineDetails[])?.map(mapper).flat() ?? [];
 
