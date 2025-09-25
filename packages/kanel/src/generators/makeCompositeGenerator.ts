@@ -2,7 +2,11 @@ import type { Kind, Schema, TableColumn } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
-import type { Declaration, InterfaceDeclaration } from "../declaration-types";
+import {
+  type TsDeclaration,
+  type InterfaceDeclaration,
+  registerTsDeclaration,
+} from "../ts-utilities/ts-declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
 import type { CompositeDetails } from "./composite-types";
@@ -11,7 +15,7 @@ import resolveType from "./resolveType";
 
 const makeMapper =
   <D extends CompositeDetails>() =>
-  (details: D): { path: Path; declaration: Declaration }[] => {
+  (details: D): { path: Path; declaration: TsDeclaration }[] => {
     const { instantiatedConfig } = useKanelContext();
 
     if (details.kind === "compositeType") {
@@ -23,7 +27,7 @@ const makeMapper =
       }
     }
 
-    const declarations: Declaration[] = [];
+    const declarations: TsDeclaration[] = [];
     const {
       name: selectorName,
       comment: selectorComment,
@@ -115,19 +119,13 @@ const makeCompositeGenerator =
   (kind: Kind) =>
   (schema: Schema, outputAcc: Output): Output => {
     const mapper = makeMapper();
-    const declarations: { path: string; declaration: Declaration }[] =
+    const declarations: { path: string; declaration: TsDeclaration }[] =
       (schema[`${kind}s`] as CompositeDetails[])?.map(mapper).flat() ?? [];
-    return declarations.reduce((acc, { path, declaration }) => {
-      const existing = acc[path];
-      if (existing) {
-        existing.declarations.push(declaration);
-      } else {
-        acc[path] = {
-          declarations: [declaration],
-        };
-      }
-      return acc;
-    }, outputAcc);
+    return declarations.reduce(
+      (acc, { path, declaration }) =>
+        registerTsDeclaration(acc, path, declaration),
+      outputAcc,
+    );
   };
 
 export default makeCompositeGenerator;

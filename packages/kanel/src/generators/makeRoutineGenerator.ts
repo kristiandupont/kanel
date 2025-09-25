@@ -3,7 +3,10 @@ import type { FunctionDetails } from "extract-pg-schema/build/kinds/extractFunct
 import type { ProcedureDetails } from "extract-pg-schema/build/kinds/extractProcedure";
 
 import { useKanelContext } from "../context";
-import type { Declaration, InterfaceDeclaration } from "../declaration-types";
+import type {
+  TsDeclaration,
+  InterfaceDeclaration,
+} from "../ts-utilities/ts-declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
 import type TypeMap from "../TypeMap";
@@ -34,7 +37,7 @@ const makeMapper =
   () =>
   (
     routineDetails: RoutineDetails,
-  ): { path: Path; declaration: Declaration }[] => {
+  ): { path: Path; declaration: TsDeclaration }[] => {
     const { instantiatedConfig } = useKanelContext();
 
     const metadata = instantiatedConfig.getRoutineMetadata?.(
@@ -77,7 +80,7 @@ const makeMapper =
       ),
     };
 
-    let returnTypeDeclaration: Declaration | undefined;
+    let returnTypeDeclaration: TsDeclaration | undefined;
     if (returnTypeTypeOverride) {
       returnTypeDeclaration = {
         declarationType: "typeDeclaration",
@@ -141,15 +144,21 @@ const makeRoutineGenerator =
   (kind: Kind) =>
   (schema: Schema, outputAcc: Output): Output => {
     const mapper = makeMapper();
-    const declarations: { path: string; declaration: Declaration }[] =
+    const declarations: { path: string; declaration: TsDeclaration }[] =
       (schema[`${kind}s`] as RoutineDetails[])?.map(mapper).flat() ?? [];
 
     return declarations.reduce((acc, { path, declaration }) => {
       const existing = acc[path];
       if (existing) {
+        if (existing.fileType !== "typescript") {
+          throw new Error(
+            `Path ${path} already exists and is not a typescript file`,
+          );
+        }
         existing.declarations.push(declaration);
       } else {
         acc[path] = {
+          fileType: "typescript",
           declarations: [declaration],
         };
       }

@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createTestContext, runWithContextSync } from "./context";
-import type { InstantiatedConfig } from "./config-types";
-import type { Declaration } from "./declaration-types";
-import render from "./render";
+import { createTestContext, runWithContextSync } from "../context";
+import type { InstantiatedConfig } from "../config-types";
+import type { TsDeclaration } from "./ts-declaration-types";
+import renderTsFile from "./renderTsFile";
 
 // Mocked InstantiatedConfig
 const instantiatedConfig: InstantiatedConfig = {
@@ -28,7 +28,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process a type declaration", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
         name: "MyString",
@@ -38,7 +38,7 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([
       "/** This is just a string */",
@@ -47,7 +47,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should work with multi-line type definitions", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
         name: "MyUnion",
@@ -57,7 +57,7 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([
       `export type MyUnion = `,
@@ -68,7 +68,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process an interface", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "interface" as const,
         name: "Member",
@@ -86,7 +86,7 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([
       `export default interface Member {`,
@@ -100,7 +100,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process an enum", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "enum" as const,
         name: "MpaaRating",
@@ -109,7 +109,7 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([
       `export enum MpaaRating {`,
@@ -123,7 +123,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should support a default exported enum", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "enum" as const,
         name: "Fruit",
@@ -132,7 +132,7 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([
       `enum Fruit {`,
@@ -146,7 +146,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process a constant", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "constant" as const,
         name: "MyConstant",
@@ -156,13 +156,13 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([`export const MyConstant: boolean = true;`]);
   });
 
   it("should process a multi-line constant", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "constant" as const,
         name: "actor",
@@ -172,7 +172,7 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([
       "export const actor: z.Schema<Actor> = z.object({",
@@ -182,7 +182,7 @@ describe("processGenerationSetup", () => {
   });
 
   it("should process a type declaration with special characters", () => {
-    const declarations: Declaration[] = [
+    const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
         name: "[example] this is a table! yes, even with symbols: \"'!.Id",
@@ -194,7 +194,7 @@ describe("processGenerationSetup", () => {
       },
     ];
     const lines = runWithContextSync(testContext, () =>
-      render(declarations, "./"),
+      renderTsFile(declarations, "./"),
     );
     expect(lines).toEqual([
       "/**",

@@ -6,14 +6,14 @@ import type {
 } from "extract-pg-schema";
 
 import type { InstantiatedConfig } from "./config-types";
-import type { TypeDeclaration } from "./declaration-types";
+import type { TypeDeclaration } from "./ts-utilities/ts-declaration-types";
 import type Details from "./Details";
 import type {
   CompositeDetails,
   CompositeProperty,
 } from "./generators/composite-types";
 import type { RoutineDetails } from "./generators/routine-types";
-import type TypeDefinition from "./TypeDefinition";
+import type TypeDefinition from "./ts-utilities/TypeDefinition";
 
 export type TypeMetadata = {
   name: string;

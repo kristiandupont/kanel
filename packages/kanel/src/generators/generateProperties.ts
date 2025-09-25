@@ -9,8 +9,8 @@ import type {
 import * as R from "ramda";
 
 import { useKanelContext } from "../context";
-import type { InterfacePropertyDeclaration } from "../declaration-types";
-import type TypeImport from "../TypeImport";
+import type { InterfacePropertyDeclaration } from "../ts-utilities/ts-declaration-types";
+import type TypeImport from "../ts-utilities/TypeImport";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
 import resolveType from "./resolveType";
 

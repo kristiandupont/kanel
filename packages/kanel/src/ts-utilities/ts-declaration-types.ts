@@ -1,3 +1,4 @@
+import type { default as Output, Path } from "../Output";
 import type TypeImport from "./TypeImport";
 
 export type DeclarationBase = {
@@ -50,9 +51,30 @@ export type GenericDeclaration = DeclarationBase & {
   lines: string[];
 };
 
-export type Declaration =
+export type TsDeclaration =
   | TypeDeclaration
   | InterfaceDeclaration
   | EnumDeclaration
   | ConstantDeclaration
   | GenericDeclaration;
+
+export function registerTsDeclaration(
+  output: Output,
+  path: Path,
+  declaration: TsDeclaration,
+): Output {
+  const newOutput = { ...output };
+
+  if (newOutput[path]) {
+    if (newOutput[path].fileType !== "typescript") {
+      throw new Error(
+        `Path ${path} already exists and is not a typescript file`,
+      );
+    }
+    newOutput[path].declarations.push(declaration);
+  } else {
+    newOutput[path] = { fileType: "typescript", declarations: [declaration] };
+  }
+
+  return newOutput;
+}
