@@ -8,7 +8,12 @@ export type {
 export { default as resolveType } from "./generators/resolveType";
 export * from "./hooks";
 export type * from "./metadata-types";
-export type { FileContents, default as Output, Path,TsFileContents } from "./Output";
+export type {
+  FileContents,
+  default as Output,
+  Path,
+  TsFileContents,
+} from "./Output";
 export { default as processDatabase } from "./processDatabase";
 export { default as escapeComment } from "./ts-utilities/escapeComment";
 export { default as escapeFieldName } from "./ts-utilities/escapeFieldName";
