@@ -1,5 +1,5 @@
 import type { InstantiatedConfig } from "kanel";
-import { assert, expect, it } from "vitest";
+import { expect, it } from "vitest";
 
 import { kyselyCamelCaseHook } from "./kyselyCamelCaseHook.js";
 
@@ -7,6 +7,7 @@ it("Should transform all properties to camelCase", async () => {
   const output = await kyselyCamelCaseHook(
     {
       foo: {
+        fileType: "typescript",
         declarations: [
           {
             declarationType: "interface",
@@ -39,6 +40,7 @@ it("Should transform all properties to camelCase", async () => {
         ],
       },
       bar: {
+        fileType: "typescript",
         declarations: [
           {
             declarationType: "interface",
@@ -74,21 +76,12 @@ it("Should transform all properties to camelCase", async () => {
     undefined as InstantiatedConfig,
   );
 
-  assert("properties" in output["foo"].declarations[0]);
-  assert("properties" in output["foo"].declarations[1]);
-  assert("properties" in output["bar"].declarations[0]);
+  const foo = output.foo as any;
+  const bar = output.bar as any;
 
-  expect(
-    [
-      ...output["foo"].declarations[0].properties,
-      ...output["foo"].declarations[1].properties,
-      ...output["bar"].declarations[0].properties,
-    ].map((x) => x.name),
-  ).toEqual([
-    "snakeCase",
-    "sCREAMINGSNAKECASE",
-    "kebabCase",
-    "pascalCase",
-    "sTuDlYcApS",
-  ]);
+  expect(foo.declarations[0].properties[0].name).toBe("snakeCase");
+  expect(foo.declarations[1].properties[0].name).toBe("sCREAMINGSNAKECASE");
+  expect(bar.declarations[0].properties[0].name).toBe("kebabCase");
+  expect(bar.declarations[0].properties[1].name).toBe("pascalCase");
+  expect(bar.declarations[0].properties[2].name).toBe("sTuDlYcApS");
 });

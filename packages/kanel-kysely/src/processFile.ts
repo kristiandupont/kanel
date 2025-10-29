@@ -1,9 +1,9 @@
 import type {
   CompositeDetails,
   CompositeProperty,
-  Declaration,
   InstantiatedConfig,
   InterfacePropertyDeclaration,
+  TsFileContents,
   TypeImport,
 } from "kanel";
 
@@ -19,13 +19,13 @@ import type MakeKyselyConfig from "./MakeKyselyConfig";
  * if you've changed things around too much it will probably not work.
  */
 const processFile = (
-  declarations: Declaration[],
+  declarations: TsFileContents["declarations"],
   compositeDetails: CompositeDetails,
   instantiatedConfig: InstantiatedConfig,
   path: string,
   makeKyselyConfig: MakeKyselyConfig,
 ): {
-  modifiedDeclarations: Declaration[];
+  modifiedDeclarations: TsFileContents["declarations"];
   tableImport: TypeImport;
   tableProperty: InterfacePropertyDeclaration;
 } => {

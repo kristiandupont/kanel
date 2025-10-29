@@ -5,21 +5,27 @@ const toCamelCase = recase(null, "camel");
 
 export const kyselyCamelCaseHook: PreRenderHook = (output) =>
   Object.fromEntries(
-    Object.entries(output).map(([path, fileContents]) => [
-      path,
-      {
-        ...fileContents,
-        declarations: fileContents.declarations.map((declaration) =>
-          declaration.declarationType === "interface"
-            ? {
-                ...declaration,
-                properties: declaration.properties.map((property) => ({
-                  ...property,
-                  name: toCamelCase(property.name),
-                })),
-              }
-            : declaration,
-        ),
-      },
-    ]),
+    Object.entries(output).map(([path, fileContents]) => {
+      if (fileContents.fileType === "typescript") {
+        return [
+          path,
+          {
+            ...fileContents,
+            declarations: fileContents.declarations.map((declaration) =>
+              declaration.declarationType === "interface"
+                ? {
+                    ...declaration,
+                    properties: declaration.properties.map((property) => ({
+                      ...property,
+                      name: toCamelCase(property.name),
+                    })),
+                  }
+                : declaration,
+            ),
+          },
+        ];
+      } else {
+        return [path, fileContents];
+      }
+    }),
   );

@@ -1,5 +1,5 @@
 import type {
-  Declaration,
+  TsDeclaration,
   Output,
   Path,
   PreRenderHook,
@@ -21,14 +21,19 @@ import processRange from "./processRange";
 const createOrAppendFileContents = (
   outputAcc: Output,
   path: Path,
-  declaration: Declaration,
-): Output => ({
-  ...outputAcc,
-  [path]: {
-    ...outputAcc[path],
-    declarations: [...(outputAcc[path]?.declarations ?? []), declaration],
-  },
-});
+  declaration: TsDeclaration
+): Output => {
+  if (outputAcc[path].fileType !== "typescript") {
+    throw new Error(`Path ${path} is not a typescript file`);
+  }
+    return ({
+      ...outputAcc,
+      [path]: {
+        ...outputAcc[path],
+        declarations: [...(outputAcc[path]?.declarations ?? []), declaration],
+      },
+    });
+  };
 
 export const makeGenerateZodSchemas =
   (config: GenerateZodSchemasConfig): PreRenderHook =>
@@ -52,12 +57,16 @@ export const makeGenerateZodSchemas =
           undefined,
           instantiatedConfig,
         );
+        if (output[path].fileType !== "typescript") {
+          throw new Error(`Path ${path} is not a typescript file`);
+        }
         const declaration = processEnum(
           enumDetails,
           config,
           instantiatedConfig,
         );
         output[path] = {
+          fileType: "typescript",
           declarations: [...output[path].declarations, declaration],
         };
         nonCompositeTypeImports[
@@ -80,12 +89,16 @@ export const makeGenerateZodSchemas =
           undefined,
           instantiatedConfig,
         );
+        if (output[path].fileType !== "typescript") {
+          throw new Error(`Path ${path} is not a typescript file`);
+        }
         const declaration = processRange(
           rangeDetails,
           config,
           instantiatedConfig,
         );
         output[path] = {
+          fileType: "typescript",
           declarations: [...output[path].declarations, declaration],
         };
         nonCompositeTypeImports[
@@ -108,12 +121,16 @@ export const makeGenerateZodSchemas =
           undefined,
           instantiatedConfig,
         );
+        if (output[path].fileType !== "typescript") {
+          throw new Error(`Path ${path} is not a typescript file`);
+        }
         const declaration = processDomain(
           domainDetails,
           config,
           instantiatedConfig,
         );
         output[path] = {
+          fileType: "typescript",
           declarations: [...output[path].declarations, declaration],
         };
         nonCompositeTypeImports[

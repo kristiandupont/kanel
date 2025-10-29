@@ -107,7 +107,7 @@ const getLine = (
   return `    '${name}': Knex.CompositeTableType<${selectorName}, ${initializerName}, ${mutatorName}>;`;
 };
 
-const generateKnexTablesModule: PreRenderHook = (
+const generateKnexTablesModule: PreRenderHook = async (
   outputAcc,
   instantiatedConfig,
 ) => {
@@ -178,7 +178,7 @@ const generateKnexTablesModule: PreRenderHook = (
 
   return {
     ...outputAcc,
-    [path]: { declarations: [declaration] },
+    [path]: { fileType: "typescript", declarations: [declaration] },
   };
 };
 

@@ -34,13 +34,18 @@ export const zodCamelCaseHook: PreRenderHook = (output) => {
     });
 
   const outputWithCamelCase = Object.fromEntries(
-    Object.entries(output).map(([path, fileContents]) => [
-      path,
-      {
-        ...fileContents,
-        declarations: transformDeclarations(fileContents.declarations),
-      },
-    ]),
+    Object.entries(output).map(([path, fileContents]) => {
+      if (fileContents.fileType !== "typescript") {
+        throw new Error(`Path ${path} is not a typescript file`);
+      }
+      return [
+        path,
+        {
+          ...fileContents,
+          declarations: transformDeclarations(fileContents.declarations),
+        },
+      ];
+    }),
   );
 
   return outputWithCamelCase;
