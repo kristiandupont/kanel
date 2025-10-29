@@ -53,7 +53,7 @@ const generateMigrationCheck: PreRenderHook = async (
 
   return {
     ...outputAcc,
-    [path]: { declarations: [declaration] },
+    [path]: { fileType: "typescript", declarations: [declaration] },
   };
 };
 

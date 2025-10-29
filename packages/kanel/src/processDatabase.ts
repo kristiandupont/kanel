@@ -18,7 +18,7 @@ import rangesGenerator from "./generators/rangesGenerator";
 import makeRoutineGenerator from "./generators/makeRoutineGenerator";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
-import render from "./render";
+import renderTsFile from "./ts-utilities/renderTsFile";
 import type TypeMap from "./TypeMap";
 import writeFile from "./writeFile";
 
@@ -99,8 +99,14 @@ const processDatabase = async (
     }
 
     let filesToWrite = Object.keys(output).map((path) => {
-      const lines = render(output[path].declarations, path);
-      return { fullPath: `${path}.ts`, lines };
+      const file = output[path];
+      if (file.fileType === "typescript") {
+        const lines = renderTsFile(file.declarations, path);
+        return { fullPath: `${path}.ts`, lines };
+      } else if (file.fileType === "generic") {
+        return { fullPath: path, lines: file.lines };
+      }
+      throw new Error(`Path ${path} is an unknown file type`);
     });
 
     const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];

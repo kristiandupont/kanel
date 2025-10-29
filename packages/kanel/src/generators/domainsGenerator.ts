@@ -2,17 +2,21 @@ import type { DomainDetails, Schema } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
-import type { Declaration, TypeDeclaration } from "../declaration-types";
+import {
+  registerTsDeclaration,
+  type TsDeclaration,
+  type TypeDeclaration,
+} from "../ts-utilities/ts-declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
-import type TypeDefinition from "../TypeDefinition";
-import type TypeImport from "../TypeImport";
+import type TypeDefinition from "../ts-utilities/TypeDefinition";
+import type TypeImport from "../ts-utilities/TypeImport";
 
 const makeMapper =
   () =>
   (
     domainDetails: DomainDetails,
-  ): { path: Path; declaration: Declaration } | undefined => {
+  ): { path: Path; declaration: TsDeclaration } | undefined => {
     const { instantiatedConfig } = useKanelContext();
 
     // If a domain has a @type tag in the comment,
@@ -58,19 +62,10 @@ const makeMapper =
 
 const domainsGenerator = (schema: Schema, outputAcc: Output): Output => {
   const declarations = schema.domains?.map(makeMapper()) ?? [];
-  return declarations.reduce((acc, elem) => {
-    if (elem === undefined) return acc;
-    const { path, declaration } = elem;
-    const existing = acc[path];
-    if (existing) {
-      existing.declarations.push(declaration);
-    } else {
-      acc[path] = {
-        declarations: [declaration],
-      };
-    }
-    return acc;
-  }, outputAcc);
+  return declarations.reduce(
+    (acc, elem) => registerTsDeclaration(acc, elem.path, elem.declaration),
+    outputAcc,
+  );
 };
 
 export default domainsGenerator;

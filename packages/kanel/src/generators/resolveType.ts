@@ -12,7 +12,7 @@ import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
 import type Details from "../Details";
-import type TypeDefinition from "../TypeDefinition";
+import type TypeDefinition from "../ts-utilities/TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
 
 const resolveTypeFromComment = (

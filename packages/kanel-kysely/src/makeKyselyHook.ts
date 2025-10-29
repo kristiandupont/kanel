@@ -48,6 +48,9 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
           "selector",
           instantiatedConfig,
         );
+        if (output[path].fileType !== "typescript") {
+          throw new Error(`Path ${path} is not a typescript file`);
+        }
         const { modifiedDeclarations, tableImport, tableProperty } =
           processFile(
             output[path].declarations,
@@ -79,6 +82,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
       const schemaPath = join(schemaFolder, schemaInterfaceName);
 
       output[schemaPath] = {
+        fileType: "typescript",
         declarations: [schemaDeclaration],
       };
 
@@ -110,6 +114,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
     };
 
     output[dbPath] = {
+      fileType: "typescript",
       declarations: [dbDeclaration],
     };
 

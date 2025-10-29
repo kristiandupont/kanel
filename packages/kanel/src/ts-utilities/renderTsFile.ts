@@ -1,5 +1,5 @@
-import { useKanelContext } from "./context";
-import type { Declaration } from "./declaration-types";
+import { useKanelContext } from "../context";
+import type { TsDeclaration } from "./ts-declaration-types";
 import escapeComment from "./escapeComment";
 import escapeFieldName from "./escapeFieldName";
 import escapeIdentifier from "./escapeIdentifier";
@@ -28,7 +28,7 @@ const processComments = (
 };
 
 const processDeclaration = (
-  declaration: Declaration,
+  declaration: TsDeclaration,
   importGenerator: ImportGenerator,
 ) => {
   const declarationLines: string[] = [];
@@ -161,7 +161,10 @@ const processDeclaration = (
   return declarationLines;
 };
 
-const render = (declarations: Declaration[], outputPath: string): string[] => {
+const renderTsFile = (
+  declarations: TsDeclaration[],
+  outputPath: string,
+): string[] => {
   const { instantiatedConfig } = useKanelContext();
   const importGenerator = new ImportGenerator(
     outputPath,
@@ -186,4 +189,4 @@ const render = (declarations: Declaration[], outputPath: string): string[] => {
   return [...importLines, ...lines];
 };
 
-export default render;
+export default renderTsFile;

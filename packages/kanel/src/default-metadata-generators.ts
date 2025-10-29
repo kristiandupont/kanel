@@ -3,7 +3,7 @@ import type { TableColumn } from "extract-pg-schema";
 import { join } from "path";
 import { tryParse } from "tagged-comment-parser";
 
-import escapeIdentifier from "./escapeIdentifier";
+import escapeIdentifier from "./ts-utilities/escapeIdentifier";
 import type { CompositeProperty } from "./generators/composite-types";
 import resolveType from "./generators/resolveType";
 import type {

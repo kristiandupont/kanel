@@ -2,7 +2,10 @@ import type { RangeDetails, Schema } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
-import type { Declaration, TypeDeclaration } from "../declaration-types";
+import type {
+  TsDeclaration,
+  TypeDeclaration,
+} from "../ts-utilities/ts-declaration-types";
 import type { Path } from "../Output";
 import type Output from "../Output";
 
@@ -10,7 +13,7 @@ const makeMapper =
   () =>
   (
     rangeDetails: RangeDetails,
-  ): { path: Path; declaration: Declaration } | undefined => {
+  ): { path: Path; declaration: TsDeclaration } | undefined => {
     const { instantiatedConfig } = useKanelContext();
 
     // If a range has a @type tag in the comment,
@@ -61,9 +64,15 @@ const rangesGenerator = (schema: Schema, outputAcc: Output): Output => {
     const { path, declaration } = elem;
     const existing = acc[path];
     if (existing) {
+      if (existing.fileType !== "typescript") {
+        throw new Error(
+          `Path ${path} already exists and is not a typescript file`,
+        );
+      }
       existing.declarations.push(declaration);
     } else {
       acc[path] = {
+        fileType: "typescript",
         declarations: [declaration],
       };
     }

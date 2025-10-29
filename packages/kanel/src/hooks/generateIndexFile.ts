@@ -6,8 +6,8 @@ import type {
   EnumDeclaration,
   InterfaceDeclaration,
   TypeDeclaration,
-} from "../declaration-types";
-import type { FileContents } from "../Output";
+} from "../ts-utilities/ts-declaration-types";
+import type { TsFileContents } from "../Output";
 
 type GenerateIndexFileConfig = {
   filter?: (
@@ -39,6 +39,11 @@ export const makeGenerateIndexFile: (
 
   for (const path of Object.keys(outputAcc)) {
     const file = outputAcc[path];
+    if (file.fileType !== "typescript") {
+      // Only process typescript files
+      continue;
+    }
+
     allExports[path] = [];
     for (const declaration of file.declarations) {
       if (declaration.declarationType === "generic") {
@@ -80,7 +85,8 @@ export const makeGenerateIndexFile: (
     return line;
   });
 
-  const indexFile: FileContents = {
+  const indexFile: TsFileContents = {
+    fileType: "typescript",
     declarations: [
       {
         declarationType: "generic",
