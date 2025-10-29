@@ -21,19 +21,19 @@ import processRange from "./processRange";
 const createOrAppendFileContents = (
   outputAcc: Output,
   path: Path,
-  declaration: TsDeclaration
+  declaration: TsDeclaration,
 ): Output => {
   if (outputAcc[path].fileType !== "typescript") {
     throw new Error(`Path ${path} is not a typescript file`);
   }
-    return ({
-      ...outputAcc,
-      [path]: {
-        ...outputAcc[path],
-        declarations: [...(outputAcc[path]?.declarations ?? []), declaration],
-      },
-    });
+  return {
+    ...outputAcc,
+    [path]: {
+      ...outputAcc[path],
+      declarations: [...(outputAcc[path]?.declarations ?? []), declaration],
+    },
   };
+};
 
 export const makeGenerateZodSchemas =
   (config: GenerateZodSchemasConfig): PreRenderHook =>
