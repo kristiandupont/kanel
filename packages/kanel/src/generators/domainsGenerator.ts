@@ -1,5 +1,4 @@
 import type { DomainDetails, Schema } from "extract-pg-schema";
-import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
 import {
@@ -16,15 +15,8 @@ const makeMapper =
   () =>
   (
     domainDetails: DomainDetails,
-  ): { path: Path; declaration: TsDeclaration } | undefined => {
+  ): { path: Path; declaration: TsDeclaration } => {
     const { instantiatedConfig } = useKanelContext();
-
-    // If a domain has a @type tag in the comment,
-    // we will use that type instead of a generated one.
-    const { tags } = tryParse(domainDetails.comment);
-    if (tags?.type) {
-      return undefined;
-    }
 
     const { name, comment, path } = instantiatedConfig.getMetadata(
       domainDetails,
