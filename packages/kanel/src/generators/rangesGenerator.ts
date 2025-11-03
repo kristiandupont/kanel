@@ -1,5 +1,4 @@
 import type { RangeDetails, Schema } from "extract-pg-schema";
-import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
 import type {
@@ -11,17 +10,8 @@ import type Output from "../Output";
 
 const makeMapper =
   () =>
-  (
-    rangeDetails: RangeDetails,
-  ): { path: Path; declaration: TsDeclaration } | undefined => {
+  (rangeDetails: RangeDetails): { path: Path; declaration: TsDeclaration } => {
     const { instantiatedConfig } = useKanelContext();
-
-    // If a range has a @type tag in the comment,
-    // we will use that type instead of a generated one.
-    const { tags } = tryParse(rangeDetails.comment);
-    if (tags?.type) {
-      return undefined;
-    }
 
     const { name, comment, path } = instantiatedConfig.getMetadata(
       rangeDetails,
@@ -60,7 +50,6 @@ const makeMapper =
 const rangesGenerator = (schema: Schema, outputAcc: Output): Output => {
   const declarations = schema.ranges?.map(makeMapper()) ?? [];
   return declarations.reduce((acc, elem) => {
-    if (elem === undefined) return acc;
     const { path, declaration } = elem;
     const existing = acc[path];
     if (existing) {

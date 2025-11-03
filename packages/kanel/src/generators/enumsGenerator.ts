@@ -1,5 +1,4 @@
 import type { EnumDetails, Schema } from "extract-pg-schema";
-import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
 import {
@@ -15,17 +14,8 @@ type EnumStyle = "enum" | "type";
 
 const makeMapper =
   (style: EnumStyle) =>
-  (
-    enumDetails: EnumDetails,
-  ): { path: Path; declaration: TsDeclaration } | undefined => {
+  (enumDetails: EnumDetails): { path: Path; declaration: TsDeclaration } => {
     const { instantiatedConfig } = useKanelContext();
-
-    // If an enum has a @type tag in the comment,
-    // we will use that type instead of a generated one.
-    const { tags } = tryParse(enumDetails.comment);
-    if (tags?.type) {
-      return undefined;
-    }
 
     const { name, comment, path } = instantiatedConfig.getMetadata(
       enumDetails,

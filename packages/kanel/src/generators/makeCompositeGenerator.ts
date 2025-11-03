@@ -1,5 +1,4 @@
 import type { Kind, Schema, TableColumn } from "extract-pg-schema";
-import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
 import {
@@ -17,15 +16,6 @@ const makeMapper =
   <D extends CompositeDetails>() =>
   (details: D): { path: Path; declaration: TsDeclaration }[] => {
     const { instantiatedConfig } = useKanelContext();
-
-    if (details.kind === "compositeType") {
-      // If a composite type has a @type tag in the comment,
-      // we will use that type instead of a generated one.
-      const { tags } = tryParse(details.comment);
-      if (tags?.type) {
-        return [];
-      }
-    }
 
     const declarations: TsDeclaration[] = [];
     const {

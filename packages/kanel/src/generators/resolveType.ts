@@ -8,45 +8,11 @@ import type {
   ViewColumn,
   ViewDetails,
 } from "extract-pg-schema";
-import { tryParse } from "tagged-comment-parser";
 
 import { useKanelContext } from "../context";
 import type Details from "../Details";
 import type TypeDefinition from "../ts-utilities/TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
-
-const resolveTypeFromComment = (
-  comment: string | undefined,
-): TypeDefinition | undefined => {
-  const { tags } = tryParse(comment);
-  if (tags?.type) {
-    if (typeof tags.type === "string") {
-      // If it's just a string, assume system type. No import necessary
-      return tags.type;
-    } else if (Array.isArray(tags.type)) {
-      const [
-        name,
-        path,
-        isAbsoluteString,
-        isDefaultString,
-        importAsTypeString,
-      ] = tags.type;
-      return {
-        name,
-        typeImports: [
-          {
-            name,
-            asName: undefined,
-            path,
-            isAbsolute: isAbsoluteString === "true",
-            isDefault: isDefaultString === "true",
-            importAsType: importAsTypeString === "true",
-          },
-        ],
-      };
-    }
-  }
-};
 
 const getColumnFromReference = (
   reference: ColumnReference,
@@ -161,13 +127,7 @@ const resolveType = (
   visited.set(c, "unknown");
 
   const type = (() => {
-    // 1) Check for a @type tag.
-    const typeFromComment = resolveTypeFromComment(c.comment);
-    if (typeFromComment) {
-      return typeFromComment;
-    }
-
-    // 2) If there are references, try to resolve the type from the targets
+    // 1) If there are references, try to resolve the type from the targets
     if ("references" in c && c.references.length > 0) {
       const typeFromReferences = getTypeFromReferences(
         c,
@@ -334,11 +294,6 @@ const resolveType = (
       }
 
       if (target) {
-        const typeFromComment = resolveTypeFromComment(target.comment);
-        if (typeFromComment) {
-          return typeFromComment;
-        }
-
         const { name, path } = instantiatedConfig.getMetadata(
           target,
           "selector",

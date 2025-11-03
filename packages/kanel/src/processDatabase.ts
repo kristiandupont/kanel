@@ -16,6 +16,7 @@ import domainsGenerator from "./generators/domainsGenerator";
 import enumsGenerator from "./generators/enumsGenerator";
 import rangesGenerator from "./generators/rangesGenerator";
 import makeRoutineGenerator from "./generators/makeRoutineGenerator";
+import applyTaggedComments from "./hooks/applyTaggedComments";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
 import renderTsFile from "./ts-utilities/renderTsFile";
@@ -93,7 +94,10 @@ const processDatabase = async (
       });
     });
 
-    const preRenderHooks: PreRenderHook[] = config.preRenderHooks ?? [];
+    const preRenderHooks: PreRenderHook[] = [
+      applyTaggedComments,
+      ...(config.preRenderHooks ?? []),
+    ];
     for (const hook of preRenderHooks) {
       output = await hook(output, instantiatedConfig);
     }
