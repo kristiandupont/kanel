@@ -26,7 +26,7 @@ const defaultZodTypeMap: TypeMap = {
   "pg_catalog.bpchar": "z.string()",
   "pg_catalog.varchar": "z.string()",
   "pg_catalog.text": "z.string()",
-  "pg_catalog.uuid": "z.string()",
+  "pg_catalog.uuid": "z.uuid()",
   "pg_catalog.inet": "z.string()",
   "pg_catalog.date": "z.date()",
   "pg_catalog.time": "z.date()",
