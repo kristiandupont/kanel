@@ -25,11 +25,11 @@ const visitedStorage = new AsyncLocalStorage<
  * Gets the current visited map from AsyncLocalStorage.
  * This should always be called within a resolution context.
  */
-const getVisited = (): Map<CompositeProperty, TypeDefinition> => {
+const useVisited = (): Map<CompositeProperty, TypeDefinition> => {
   const store = visitedStorage.getStore();
   if (!store) {
     throw new Error(
-      "getVisited() called outside of resolution context. This is a bug.",
+      "useVisited() called outside of resolution context. This is a bug.",
     );
   }
   return store;
@@ -133,7 +133,7 @@ const resolveTypeInternal = (
   originCompositeDetails: CompositeDetails = d,
 ): TypeDefinition => {
   const { instantiatedConfig } = useKanelContext();
-  const visited = getVisited();
+  const visited = useVisited();
 
   // Check to see if we have already tried to resolve this column before.
   // This is to prevent infinite loops when there are circular references.
@@ -184,7 +184,10 @@ const resolveTypeInternal = (
 
     // 2) If there are references, try to resolve the type from the targets
     if ("references" in c && c.references.length > 0) {
-      const typeFromReferences = getTypeFromReferences(c, originCompositeDetails);
+      const typeFromReferences = getTypeFromReferences(
+        c,
+        originCompositeDetails,
+      );
       if (typeFromReferences) {
         return typeFromReferences;
       }
@@ -376,7 +379,12 @@ const resolveType = (
 
   // We're at the top level - initialize a new visited map for this resolution tree
   return visitedStorage.run(new Map(), () =>
-    resolveTypeInternal(c, d, retainInnerIdentifierType, originCompositeDetails),
+    resolveTypeInternal(
+      c,
+      d,
+      retainInnerIdentifierType,
+      originCompositeDetails,
+    ),
   );
 };
 
