@@ -8,7 +8,7 @@ import type {
 
 import resolveType from "./resolveType";
 import { useKanelContext } from "../context";
-import type { InstantiatedConfig } from "../Config";
+import type { InstantiatedConfig } from "../config-types";
 
 // Mock the context module
 import { vi } from "vitest";
@@ -18,6 +18,60 @@ vi.mock("../context", () => ({
 }));
 
 const mockUseKanelContext = vi.mocked(useKanelContext);
+
+// Factory functions for test fixtures
+const createTableColumn = (
+  overrides: Partial<TableColumn> & Pick<TableColumn, "name" | "type">,
+): TableColumn => ({
+  isPrimaryKey: false,
+  isNullable: false,
+  isArray: false,
+  comment: null,
+  defaultValue: null,
+  isGenerated: false,
+  isIdentity: false,
+  indices: [],
+  maxLength: null,
+  ordinalPosition: 1,
+  references: [],
+  ...overrides,
+} as unknown as TableColumn);
+
+const createTableDetails = (
+  name: string,
+  schemaName: string = "public",
+  columns: TableColumn[] = [],
+): TableDetails => ({
+  name,
+  schemaName,
+  columns,
+} as any);
+
+const createSchema = (
+  name: string,
+  tables: TableDetails[] = [],
+): Schema => ({
+  name,
+  tables,
+  views: [],
+  materializedViews: [],
+  compositeTypes: [],
+  enums: [],
+  domains: [],
+  ranges: [],
+} as any);
+
+const createReference = (
+  tableName: string,
+  columnName: string,
+  schemaName: string = "public",
+): ColumnReference => ({
+  schemaName,
+  tableName,
+  columnName,
+} as ColumnReference);
+
+const mockWarn = () => vi.spyOn(console, "warn").mockImplementation(() => {});
 
 describe("resolveType", () => {
   let mockConfig: InstantiatedConfig;
@@ -47,83 +101,41 @@ describe("resolveType", () => {
 
   describe("basic type resolution", () => {
     test("should resolve primitive types from typeMap", () => {
-      const column: TableColumn = {
+      const column = createTableColumn({
         name: "id",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
         isPrimaryKey: true,
-        isNullable: false,
-        isArray: false,
-        comment: null,
-        defaultValue: null,
-        isGenerated: false,
-        isIdentity: false,
-        indices: [],
-        maxLength: null,
-        ordinalPosition: 1,
-        references: [],
-      } as TableColumn;
+      });
 
-      const details: TableDetails = {
-        name: "users",
-        schemaName: "public",
-        columns: [column],
-      } as any;
+      const details = createTableDetails("users", "public", [column]);
 
       const result = resolveType(column, details);
       expect(result).toBe("number");
     });
 
     test("should resolve string types from typeMap", () => {
-      const column: TableColumn = {
+      const column = createTableColumn({
         name: "email",
         type: { fullName: "pg_catalog.varchar", kind: "base" } as any,
-        isPrimaryKey: false,
-        isNullable: false,
-        isArray: false,
-        comment: null,
-        defaultValue: null,
-        isGenerated: false,
-        isIdentity: false,
-        indices: [],
         maxLength: 255,
         ordinalPosition: 2,
-        references: [],
-      } as TableColumn;
+      });
 
-      const details: TableDetails = {
-        name: "users",
-        schemaName: "public",
-        columns: [column],
-      } as any;
+      const details = createTableDetails("users", "public", [column]);
 
       const result = resolveType(column, details);
       expect(result).toBe("string");
     });
 
     test("should return unknown for unmapped types", () => {
-      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const warnSpy = mockWarn();
 
-      const column: TableColumn = {
+      const column = createTableColumn({
         name: "custom_col",
         type: { fullName: "public.unknown_type", kind: "base" } as any,
-        isPrimaryKey: false,
-        isNullable: false,
-        isArray: false,
-        comment: null,
-        defaultValue: null,
-        isGenerated: false,
-        isIdentity: false,
-        indices: [],
-        maxLength: null,
-        ordinalPosition: 1,
-        references: [],
-      } as TableColumn;
+      });
 
-      const details: TableDetails = {
-        name: "test_table",
-        schemaName: "public",
-        columns: [column],
-      } as any;
+      const details = createTableDetails("test_table", "public", [column]);
 
       const result = resolveType(column, details);
       expect(result).toBe("unknown");
@@ -137,98 +149,40 @@ describe("resolveType", () => {
 
   describe("reference resolution", () => {
     test("should resolve simple foreign key reference", () => {
-      const usersTable: TableDetails = {
-        name: "users",
-        schemaName: "public",
-        columns: [
-          {
-            name: "id",
-            type: { fullName: "pg_catalog.int4", kind: "base" } as any,
-            isPrimaryKey: true,
-            isNullable: false,
-            isArray: false,
-            references: [],
-          } as TableColumn,
-        ],
-      } as any;
+      const idColumn = createTableColumn({
+        name: "id",
+        type: { fullName: "pg_catalog.int4", kind: "base" } as any,
+        isPrimaryKey: true,
+      });
 
-      const postsTable: TableDetails = {
-        name: "posts",
-        schemaName: "public",
-        columns: [],
-      } as any;
+      const usersTable = createTableDetails("users", "public", [idColumn]);
+      const postsTable = createTableDetails("posts");
 
-      mockSchemas.public = {
-        name: "public",
-        tables: [usersTable, postsTable],
-        views: [],
-        materializedViews: [],
-        compositeTypes: [],
-        enums: [],
-        domains: [],
-        ranges: [],
-      } as any;
+      mockSchemas.public = createSchema("public", [usersTable, postsTable]);
 
-      const userIdColumn: TableColumn = {
+      const userIdColumn = createTableColumn({
         name: "user_id",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
-        isPrimaryKey: false,
-        isNullable: false,
-        isArray: false,
-        comment: null,
-        defaultValue: null,
-        isGenerated: false,
-        isIdentity: false,
-        indices: [],
-        maxLength: null,
         ordinalPosition: 2,
-        references: [
-          {
-            schemaName: "public",
-            tableName: "users",
-            columnName: "id",
-          } as ColumnReference,
-        ],
-      } as TableColumn;
+        references: [createReference("users", "id")],
+      });
 
       const result = resolveType(userIdColumn, postsTable);
       expect(result).toBe("number");
     });
 
     test("should handle missing reference gracefully", () => {
-      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const warnSpy = mockWarn();
 
-      mockSchemas.public = {
-        name: "public",
-        tables: [],
-        views: [],
-        materializedViews: [],
-        compositeTypes: [],
-        enums: [],
-        domains: [],
-        ranges: [],
-      } as any;
+      mockSchemas.public = createSchema("public");
 
-      const column: TableColumn = {
+      const column = createTableColumn({
         name: "user_id",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
-        isPrimaryKey: false,
-        isNullable: false,
-        isArray: false,
-        references: [
-          {
-            schemaName: "public",
-            tableName: "nonexistent",
-            columnName: "id",
-          } as ColumnReference,
-        ],
-      } as TableColumn;
+        references: [createReference("nonexistent", "id")],
+      });
 
-      const details: TableDetails = {
-        name: "posts",
-        schemaName: "public",
-        columns: [column],
-      } as any;
+      const details = createTableDetails("posts", "public", [column]);
 
       const result = resolveType(column, details);
       expect(result).toBe("number");
@@ -243,33 +197,15 @@ describe("resolveType", () => {
 
   describe("identifier type generation", () => {
     test("should use generateIdentifierType for primary keys when configured", () => {
-      const usersTable: TableDetails = {
-        name: "users",
-        schemaName: "public",
-        columns: [],
-      } as any;
-
-      const idColumn: TableColumn = {
+      const idColumn = createTableColumn({
         name: "id",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
         isPrimaryKey: true,
-        isNullable: false,
-        isArray: false,
-        references: [],
-      } as TableColumn;
+      });
 
-      usersTable.columns = [idColumn];
+      const usersTable = createTableDetails("users", "public", [idColumn]);
 
-      mockSchemas.public = {
-        name: "public",
-        tables: [usersTable],
-        views: [],
-        materializedViews: [],
-        compositeTypes: [],
-        enums: [],
-        domains: [],
-        ranges: [],
-      } as any;
+      mockSchemas.public = createSchema("public", [usersTable]);
 
       mockConfig.generateIdentifierType = (col, details, _config) => ({
         declarationType: "typeDeclaration" as const,
@@ -299,61 +235,24 @@ describe("resolveType", () => {
 
   describe("circular reference handling", () => {
     test("should handle direct circular reference (A->B->A)", () => {
-      const tableA: TableDetails = {
-        name: "table_a",
-        schemaName: "public",
-        columns: [],
-      } as any;
-
-      const tableB: TableDetails = {
-        name: "table_b",
-        schemaName: "public",
-        columns: [],
-      } as any;
-
-      const columnA: TableColumn = {
+      const columnA = createTableColumn({
         name: "id_a",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
         isPrimaryKey: true,
-        isNullable: false,
-        isArray: false,
-        references: [
-          {
-            schemaName: "public",
-            tableName: "table_b",
-            columnName: "id_b",
-          } as ColumnReference,
-        ],
-      } as TableColumn;
+        references: [createReference("table_b", "id_b")],
+      });
 
-      const columnB: TableColumn = {
+      const columnB = createTableColumn({
         name: "id_b",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
         isPrimaryKey: true,
-        isNullable: false,
-        isArray: false,
-        references: [
-          {
-            schemaName: "public",
-            tableName: "table_a",
-            columnName: "id_a",
-          } as ColumnReference,
-        ],
-      } as TableColumn;
+        references: [createReference("table_a", "id_a")],
+      });
 
-      tableA.columns = [columnA];
-      tableB.columns = [columnB];
+      const tableA = createTableDetails("table_a", "public", [columnA]);
+      const tableB = createTableDetails("table_b", "public", [columnB]);
 
-      mockSchemas.public = {
-        name: "public",
-        tables: [tableA, tableB],
-        views: [],
-        materializedViews: [],
-        compositeTypes: [],
-        enums: [],
-        domains: [],
-        ranges: [],
-      } as any;
+      mockSchemas.public = createSchema("public", [tableA, tableB]);
 
       // This should not cause a stack overflow
       const result = resolveType(columnA, tableA);
@@ -363,79 +262,42 @@ describe("resolveType", () => {
     });
 
     test("should handle composite circular reference (threads<->msgs)", () => {
-      const threadsTable: TableDetails = {
-        name: "threads",
-        schemaName: "test",
-        columns: [],
-      } as any;
-
-      const msgsTable: TableDetails = {
-        name: "msgs",
-        schemaName: "test",
-        columns: [],
-      } as any;
-
-      const threadIdCol: TableColumn = {
+      const threadIdCol = createTableColumn({
         name: "id",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
         isPrimaryKey: true,
-        isNullable: false,
-        isArray: false,
-        references: [],
-      } as TableColumn;
+      });
 
-      const lastMsgIdCol: TableColumn = {
+      const lastMsgIdCol = createTableColumn({
         name: "last_msg_id",
         type: { fullName: "pg_catalog.varchar", kind: "base" } as any,
-        isPrimaryKey: false,
         isNullable: true,
-        isArray: false,
-        references: [
-          {
-            schemaName: "test",
-            tableName: "msgs",
-            columnName: "id",
-          } as ColumnReference,
-        ],
-      } as TableColumn;
+        references: [createReference("msgs", "id", "test")],
+      });
 
-      const msgIdCol: TableColumn = {
+      const msgIdCol = createTableColumn({
         name: "id",
         type: { fullName: "pg_catalog.varchar", kind: "base" } as any,
         isPrimaryKey: true,
-        isNullable: false,
-        isArray: false,
-        references: [],
-      } as TableColumn;
+      });
 
-      const msgThreadIdCol: TableColumn = {
+      const msgThreadIdCol = createTableColumn({
         name: "thread_id",
         type: { fullName: "pg_catalog.int4", kind: "base" } as any,
         isPrimaryKey: true,
-        isNullable: false,
-        isArray: false,
-        references: [
-          {
-            schemaName: "test",
-            tableName: "threads",
-            columnName: "id",
-          } as ColumnReference,
-        ],
-      } as TableColumn;
+        references: [createReference("threads", "id", "test")],
+      });
 
-      threadsTable.columns = [threadIdCol, lastMsgIdCol];
-      msgsTable.columns = [msgIdCol, msgThreadIdCol];
+      const threadsTable = createTableDetails("threads", "test", [
+        threadIdCol,
+        lastMsgIdCol,
+      ]);
+      const msgsTable = createTableDetails("msgs", "test", [
+        msgIdCol,
+        msgThreadIdCol,
+      ]);
 
-      mockSchemas.test = {
-        name: "test",
-        tables: [threadsTable, msgsTable],
-        views: [],
-        materializedViews: [],
-        compositeTypes: [],
-        enums: [],
-        domains: [],
-        ranges: [],
-      } as any;
+      mockSchemas.test = createSchema("test", [threadsTable, msgsTable]);
 
       // This should not cause a stack overflow
       const result = resolveType(lastMsgIdCol, threadsTable);

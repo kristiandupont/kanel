@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import type {
   ColumnReference,
   MaterializedViewColumn,
@@ -13,6 +14,26 @@ import { useKanelContext } from "../context";
 import type Details from "../Details";
 import type TypeDefinition from "../ts-utilities/TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
+
+// AsyncLocalStorage to track visited columns during type resolution
+// This prevents infinite loops when resolving circular references
+const visitedStorage = new AsyncLocalStorage<
+  Map<CompositeProperty, TypeDefinition>
+>();
+
+/**
+ * Gets the current visited map from AsyncLocalStorage.
+ * This should always be called within a resolution context.
+ */
+const getVisited = (): Map<CompositeProperty, TypeDefinition> => {
+  const store = visitedStorage.getStore();
+  if (!store) {
+    throw new Error(
+      "getVisited() called outside of resolution context. This is a bug.",
+    );
+  }
+  return store;
+};
 
 const getColumnFromReference = (
   reference: ColumnReference,
@@ -49,7 +70,6 @@ const getColumnFromReference = (
 
 const getTypeFromReferences = (
   c: CompositeProperty,
-  visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails,
 ): TypeDefinition | undefined => {
   const { instantiatedConfig } = useKanelContext();
@@ -65,7 +85,7 @@ const getTypeFromReferences = (
       console.warn("Could not resolve reference", reference);
       return "unknown";
     }
-    return resolveType(column, details, false, visited, originCompositeDetails);
+    return resolveTypeInternal(column, details, false, originCompositeDetails);
   });
 
   const seenTypeNames = new Set<string>();
@@ -106,14 +126,14 @@ const getTypeFromReferences = (
   }
 };
 
-const resolveType = (
+const resolveTypeInternal = (
   c: CompositeProperty,
   d: CompositeDetails,
   retainInnerIdentifierType = false,
-  visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails = d,
 ): TypeDefinition => {
   const { instantiatedConfig } = useKanelContext();
+  const visited = getVisited();
 
   // Check to see if we have already tried to resolve this column before.
   // This is to prevent infinite loops when there are circular references.
@@ -127,13 +147,44 @@ const resolveType = (
   visited.set(c, "unknown");
 
   const type = (() => {
-    // 1) If there are references, try to resolve the type from the targets
-    if ("references" in c && c.references.length > 0) {
-      const typeFromReferences = getTypeFromReferences(
-        c,
-        visited,
-        originCompositeDetails,
+    // 1) if the column is a primary key and we're generating identifier types,
+    // do that first (before following any references)
+    if (
+      instantiatedConfig.generateIdentifierType &&
+      !retainInnerIdentifierType &&
+      (c as TableColumn).isPrimaryKey
+    ) {
+      const { path } = instantiatedConfig.getMetadata(
+        d,
+        "selector",
+        instantiatedConfig,
       );
+      const { name, exportAs } = instantiatedConfig.generateIdentifierType(
+        c as TableColumn,
+        d as TableDetails,
+        instantiatedConfig,
+      );
+      const sameSchema = originCompositeDetails.schemaName === d.schemaName;
+      const asName = sameSchema ? undefined : `${d.schemaName}_${name}`;
+
+      return {
+        name: asName ?? name,
+        typeImports: [
+          {
+            name,
+            asName,
+            path,
+            isAbsolute: false,
+            isDefault: exportAs === "default",
+            importAsType: true,
+          },
+        ],
+      };
+    }
+
+    // 2) If there are references, try to resolve the type from the targets
+    if ("references" in c && c.references.length > 0) {
+      const typeFromReferences = getTypeFromReferences(c, originCompositeDetails);
       if (typeFromReferences) {
         return typeFromReferences;
       }
@@ -190,56 +241,21 @@ const resolveType = (
       ).find((c) => c.name === source.column);
 
       if (column) {
-        return resolveType(
+        return resolveTypeInternal(
           column,
           target,
           retainInnerIdentifierType,
-          visited,
           originCompositeDetails,
         );
       }
     }
 
-    // 4) if the column is a primary key, use the generated type for it, if we do that
-    if (
-      instantiatedConfig.generateIdentifierType &&
-      !retainInnerIdentifierType &&
-      (c as TableColumn).isPrimaryKey
-    ) {
-      const { path } = instantiatedConfig.getMetadata(
-        d,
-        "selector",
-        instantiatedConfig,
-      );
-      const { name, exportAs } = instantiatedConfig.generateIdentifierType(
-        c as TableColumn,
-        d as TableDetails,
-        instantiatedConfig,
-      );
-      const sameSchema = originCompositeDetails.schemaName === d.schemaName;
-      const asName = sameSchema ? undefined : `${d.schemaName}_${name}`;
-
-      return {
-        name: asName ?? name,
-        typeImports: [
-          {
-            name,
-            asName,
-            path,
-            isAbsolute: false,
-            isDefault: exportAs === "default",
-            importAsType: true,
-          },
-        ],
-      };
-    }
-
-    // 5) If there is a typemap type, use that
+    // 4) If there is a typemap type, use that
     if (c.type.fullName in instantiatedConfig.typeMap) {
       return instantiatedConfig.typeMap[c.type.fullName];
     }
 
-    // 6) If the type is a composite, enum, range or domain, reference that.
+    // 5) If the type is a composite, enum, range or domain, reference that.
     if (["composite", "enum", "domain", "range"].includes(c.type.kind)) {
       const [schemaName, typeName] = c.type.fullName.split(".");
       let target: Details | undefined;
@@ -318,7 +334,7 @@ const resolveType = (
       }
     }
 
-    // 7) If not found, set to unknown and print a warning.
+    // 6) If not found, set to unknown and print a warning.
     console.warn(
       `Could not resolve type ${c.type.fullName} referenced in ${d.schemaName}.${c.name}`,
     );
@@ -329,6 +345,39 @@ const resolveType = (
   visited.set(c, type);
 
   return type;
+};
+
+/**
+ * Resolves the TypeScript type for a column property.
+ * This is the public entry point that initializes the visited map in AsyncLocalStorage.
+ * All nested calls will share the same visited map to prevent infinite loops.
+ */
+const resolveType = (
+  c: CompositeProperty,
+  d: CompositeDetails,
+  retainInnerIdentifierType = false,
+  originCompositeDetails: CompositeDetails = d,
+): TypeDefinition => {
+  // Check if we're already in a resolution context.
+  // This happens when generateIdentifierType() (or other hooks) call resolveType
+  // during an ongoing resolution. We must reuse the existing context to maintain
+  // circular reference tracking.
+  const existingVisited = visitedStorage.getStore();
+
+  if (existingVisited) {
+    // We're nested - reuse the existing visited map
+    return resolveTypeInternal(
+      c,
+      d,
+      retainInnerIdentifierType,
+      originCompositeDetails,
+    );
+  }
+
+  // We're at the top level - initialize a new visited map for this resolution tree
+  return visitedStorage.run(new Map(), () =>
+    resolveTypeInternal(c, d, retainInnerIdentifierType, originCompositeDetails),
+  );
 };
 
 export default resolveType;
