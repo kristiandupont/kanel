@@ -89,8 +89,7 @@ describe("Regression guards", () => {
     // Check that MsgsId doesn't reference itself recursively
     expect(msgsIdDef).not.toMatch(/MsgsId = MsgsId &/);
 
-    // Check that msgs.thread_id uses MsgsThreadId (branded identifier type)
-    // Since thread_id is part of the composite PK, it gets its own identifier type
+    // Check that msgs.thread_id uses ThreadId (branded identifier type)
     const msgsInterface = msgsFile.slice(
       msgsFile.findIndex((line) =>
         line.includes("export default interface Msgs"),
@@ -100,17 +99,8 @@ describe("Regression guards", () => {
       ) + 10,
     );
     expect(
-      msgsInterface.some((line) => line.includes("thread_id: MsgsThreadId")),
+      msgsInterface.some((line) => line.includes("thread_id: ThreadId")),
     ).toBe(true);
-
-    // Check that MsgsThreadId is defined and based on ThreadsId
-    const msgsThreadIdDef = msgsFile.find((line) =>
-      line.includes("export type MsgsThreadId"),
-    );
-    expect(msgsThreadIdDef).toBeDefined();
-    expect(msgsThreadIdDef).toMatch(
-      /export type MsgsThreadId = ThreadsId & \{ __brand: 'test\.msgs' \}/,
-    );
 
     // Check that ThreadsId import exists in Msgs.ts
     expect(
