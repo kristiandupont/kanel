@@ -104,6 +104,12 @@ const processDatabase = async (
 
     let filesToWrite = Object.keys(output).map((path) => {
       const file = output[path];
+
+      if (!file.fileType) {
+        // Hack for backwards compatibility.
+        file.fileType = "typescript";
+      }
+
       if (file.fileType === "typescript") {
         const lines = renderTsFile(file.declarations, path);
         return { fullPath: `${path}.ts`, lines };
