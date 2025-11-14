@@ -31,7 +31,7 @@
     "docs:build": "vitepress build docs-src"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.2.7",
+    "@eslint/compat": "^2.0.0",
     "@kristiandupont/dev-deps": "^2.32.0",
     "vitepress": "^1.6.3",
     "vue": "3.5.24"
