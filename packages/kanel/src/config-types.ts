@@ -30,6 +30,8 @@ export type InstantiatedConfig = {
   preDeleteOutputFolder: boolean;
   resolveViews: boolean;
   importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
+  tsModuleFormat?: "esm" | "commonjs" | "explicit-esm" | "explicit-commonjs";
+  fileExtension: ".ts" | ".mts" | ".cts";
 };
 
 export type PreRenderHook = (
@@ -64,6 +66,9 @@ export type Config = {
   preRenderHooks?: PreRenderHook[];
   postRenderHooks?: PostRenderHook[];
 
+  /** @deprecated Use tsModuleFormat instead */
   importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";
+
+  tsModuleFormat?: "esm" | "commonjs" | "explicit-esm" | "explicit-commonjs";
 };
 // #endregion Config

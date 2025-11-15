@@ -2,6 +2,44 @@ import { extractSchemas } from "extract-pg-schema";
 import { rimraf } from "rimraf";
 
 import type { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
+
+type DerivedExtensions = {
+  fileExtension: ".ts" | ".mts" | ".cts";
+  importsExtension: "" | ".js" | ".mjs" | ".cjs";
+};
+
+const deriveExtensions = (
+  tsModuleFormat:
+    | "esm"
+    | "commonjs"
+    | "explicit-esm"
+    | "explicit-commonjs"
+    | undefined,
+  importsExtension: string | undefined,
+): DerivedExtensions => {
+  // If importsExtension is explicitly set, use legacy behavior
+  if (importsExtension) {
+    return {
+      fileExtension: ".ts",
+      importsExtension: importsExtension as "" | ".js" | ".mjs" | ".cjs",
+    };
+  }
+
+  // Derive from tsModuleFormat
+  switch (tsModuleFormat) {
+    case "esm":
+      return { fileExtension: ".ts", importsExtension: ".js" };
+    case "commonjs":
+      return { fileExtension: ".ts", importsExtension: "" };
+    case "explicit-esm":
+      return { fileExtension: ".mts", importsExtension: ".mjs" };
+    case "explicit-commonjs":
+      return { fileExtension: ".cts", importsExtension: ".cjs" };
+    default:
+      // Default to .ts with no extension for backwards compatibility
+      return { fileExtension: ".ts", importsExtension: "" };
+  }
+};
 import { runWithContext } from "./context";
 import {
   defaultGenerateIdentifierType,
@@ -57,6 +95,17 @@ const processDatabase = async (
     ...config.customTypeMap,
   };
 
+  if (config.tsModuleFormat && config.importsExtension) {
+    throw new Error(
+      "Cannot use both tsModuleFormat and importsExtension at the same time",
+    );
+  }
+
+  const { fileExtension, importsExtension } = deriveExtensions(
+    config.tsModuleFormat,
+    config.importsExtension,
+  );
+
   const instantiatedConfig: InstantiatedConfig = {
     getMetadata: config.getMetadata,
     getPropertyMetadata: config.getPropertyMetadata,
@@ -70,7 +119,9 @@ const processDatabase = async (
     outputPath: config.outputPath,
     preDeleteOutputFolder: config.preDeleteOutputFolder,
     resolveViews: config.resolveViews,
-    importsExtension: config.importsExtension,
+    importsExtension: importsExtension || undefined,
+    tsModuleFormat: config.tsModuleFormat,
+    fileExtension,
   };
 
   await runWithContext({ instantiatedConfig }, async () => {
@@ -112,7 +163,10 @@ const processDatabase = async (
 
       if (file.fileType === "typescript") {
         const lines = renderTsFile(file.declarations, path);
-        return { fullPath: `${path}.ts`, lines };
+        return {
+          fullPath: `${path}${instantiatedConfig.fileExtension}`,
+          lines,
+        };
       } else if (file.fileType === "generic") {
         return { fullPath: path, lines: file.lines };
       }

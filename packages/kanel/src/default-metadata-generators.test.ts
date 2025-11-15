@@ -18,6 +18,7 @@ const instantiatedConfig: InstantiatedConfig = {
   outputPath: ".",
   preDeleteOutputFolder: false,
   resolveViews: true,
+  fileExtension: ".ts",
 };
 
 describe("defaultGenerateIdentifierType", () => {

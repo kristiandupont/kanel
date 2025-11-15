@@ -17,6 +17,7 @@ class ImportGenerator {
 
   /**
    * @param srcPath The path (including filename) of the module we're generating imports for.
+   * @param importsExtension The extension to append to relative imports (e.g., ".js", ".mjs", ".cjs", or empty string for no extension)
    */
   constructor(srcPath: string, importsExtension: string | undefined) {
     this.srcFolder = path.dirname(srcPath);

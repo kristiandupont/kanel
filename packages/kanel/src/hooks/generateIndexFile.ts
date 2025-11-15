@@ -95,6 +95,7 @@ export const makeGenerateIndexFile: (
     ],
   };
 
+  // Use the same base name "index" - the file extension will be added by processDatabase
   const path = join(instantiatedConfig.outputPath, "index");
 
   return {
