@@ -98,10 +98,10 @@ See the [postRenderHooks](./postRenderHooks.md) section for more info.
 
 The `tsModuleFormat` property can be set if you want to specify the module format for the output files. It can be one of the following values:
 
-- `esm`: Output files will have a `.ts` extension.
-- `commonjs`: Output files will have a `.ts` extension.
-- `explicit-esm`: Output files will have a `.mts` extension.
-- `explicit-commonjs`: Output files will have a `.cts` extension.
+- `esm`: Output files will have a `.ts` extension. Imports will use a `.js` extension.
+- `commonjs`: Output files will have a `.ts` extension. Imports won't have an extension.
+- `explicit-esm`: Output files will have a `.mts` extension. Imports will use a `.mjs` extension.
+- `explicit-commonjs`: Output files will have a `.cts` extension. Imports will use a `.cjs` extension.
 
 If no value is set, the default will be `commonjs`.
 
