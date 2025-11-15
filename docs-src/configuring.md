@@ -94,8 +94,19 @@ If you need to do something more brute-force like, you might prefer to create on
 
 See the [postRenderHooks](./postRenderHooks.md) section for more info.
 
-## importsExtension
+## tsModuleFormat
+
+The `tsModuleFormat` property can be set if you want to specify the module format for the output files. It can be one of the following values:
+
+- `esm`: Output files will have a `.ts` extension.
+- `commonjs`: Output files will have a `.ts` extension.
+- `explicit-esm`: Output files will have a `.mts` extension.
+- `explicit-commonjs`: Output files will have a `.cts` extension.
+
+If no value is set, the default will be `commonjs`.
+
+## [deprecated] importsExtension
+
+**Deprecated**: Use `tsModuleFormat` instead.
 
 To use a different file extension for project file import references, set `importsExtension` to `.ts`, `.js`, `.mjs`, or `.cjs`.
-
-If no value is set, no extension will be appended.
