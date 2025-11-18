@@ -14,12 +14,18 @@ const processEnum = (
     undefined,
     instantiatedConfig,
   );
-  const lines: string[] = [
+  const { name: typescriptTypeName } = instantiatedConfig.getMetadata(
+    e,
+    "selector",
+    instantiatedConfig,
+  );
+  const lines: string[] = instantiatedConfig.enumStyle === "type" ? [
     `z.enum([`,
     ...e.values.map((v) => `  '${v}',`),
     "])",
+  ] : [
+    `z.enum(${typescriptTypeName})`
   ];
-
   const declaration: ConstantDeclaration = {
     declarationType: "constant",
     comment: [`Zod schema for ${e.name}`],
