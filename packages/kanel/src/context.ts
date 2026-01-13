@@ -18,10 +18,6 @@ export const runWithContext = async <T>(
   fn: () => Promise<T>,
 ): Promise<T> => asyncLocalStorage.run(context, fn);
 
-// Test utility functions
-export const runWithContextSync = <T>(context: KanelContext, fn: () => T): T =>
-  asyncLocalStorage.run(context, fn);
-
 export const createTestContext = (
   instantiatedConfig: InstantiatedConfig,
 ): KanelContext => ({
