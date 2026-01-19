@@ -34,7 +34,7 @@
     "@eslint/compat": "^2.0.0",
     "@kristiandupont/dev-deps": "^2.32.0",
     "vitepress": "^1.6.3",
-    "vue": "3.5.24"
+    "vue": "3.5.27"
   },
   "engines": {
     "node": ">=16.0.0"
