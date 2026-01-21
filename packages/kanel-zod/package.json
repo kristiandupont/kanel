@@ -28,7 +28,7 @@
     "test": "echo TODO..."
   },
   "devDependencies": {
-    "extract-pg-schema": "^5.7.4",
+    "extract-pg-schema": "^5.8.1",
     "kanel": "*"
   },
   "dependencies": {
