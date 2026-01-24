@@ -19,7 +19,8 @@ Hooks and generators access configuration via AsyncLocalStorage context (using `
 2. **Conversion**: v3 config is converted to v4 config internally
 3. **Context**: v4 context is populated, including optional `instantiatedConfig` for v3 compatibility
 4. **Hooks**: v3 hooks are wrapped to inject `instantiatedConfig` parameter from context
-5. **Warning**: A deprecation warning is printed (suppressible via CLI option)
+5. **Defaults**: v3-specific defaults are applied (e.g., `enumStyle: "enum"`, `markAsGenerated` postRenderHook)
+6. **Warning**: A deprecation warning is printed (suppressible via CLI option)
 
 This allows v3 configs to run through v4 processing logic with minimal compatibility shims.
 
@@ -184,7 +185,12 @@ const context = useKanelContext();
 
 When a v3 config is detected:
 
-1. **Create v4 config structure**:
+1. **Apply v3 defaults**:
+   - `enumStyle: "enum"` (v3 default; v4 default will be `"literal"`)
+   - `postRenderHooks: [markAsGenerated]` (if not explicitly set)
+   - Other v3 defaults from current `defaultConfig`
+
+2. **Create v4 config structure**:
    - Extract `typescriptConfig` from top-level `enumStyle` and `tsModuleFormat`
    - Create `makePgTsGenerator()` with v3's metadata functions and `customTypeMap`
    - Wrap v3 hooks to inject `instantiatedConfig` parameter:
@@ -196,11 +202,11 @@ When a v3 config is detected:
      ```
    - Prepend `applyTaggedComments` hook to `preRenderHooks` (for backwards compatibility)
 
-2. **Create context**:
+3. **Create context**:
    - Populate v4 context fields (`typescriptConfig`, `config`, `schemas`)
    - Include `instantiatedConfig` for v3 hook compatibility
 
-3. **Print deprecation warning** (unless suppressed via CLI option)
+4. **Print deprecation warning** (unless suppressed via CLI option)
 
 ## Breaking Changes for V4
 
@@ -217,7 +223,7 @@ import { makePgTsGenerator, makeKyselyGenerator, makeZodGenerator } from 'kanel'
 const config: ConfigV4 = {
   connection: { /* ... */ },
   typescriptConfig: {
-    enumStyle: 'literal',
+    enumStyle: 'literal',  // v4 default (v3 was 'enum')
     tsModuleFormat: 'esm',
   },
   outputPath: './models',
@@ -231,60 +237,46 @@ const config: ConfigV4 = {
     makeKyselyGenerator(),
     makeZodGenerator(),
   ],
+  // Note: markAsGenerated is NOT added by default in v4
+  // Add explicitly if needed: postRenderHooks: [markAsGenerated]
 };
 ```
 
-## Open Design Questions
+## V4 Default Changes
+
+| Setting | V3 Default | V4 Default | Rationale |
+|---------|------------|------------|-----------|
+| `enumStyle` | `"enum"` | `"literal"` | Literal types are more modern and avoid TS compilation |
+| `postRenderHooks` | `[markAsGenerated]` | `[]` | Explicit opt-in for v4, less magic |
+
+## Implementation Decisions
 
 ### Generator vs PreRenderHook Semantics
 
-**Current thinking**:
-- **Generators**: Produce output that gets **merged** into the final result
-- **PreRenderHooks**: Can transform/remove/replace anything in the accumulated output
-
-Both Kysely and Zod generators add/merge declarations to files, while hooks like `generateIndexFile` modify the entire output structure.
-
-**Question**: Should generators receive accumulated output for reference?
-```ts
-type Generator = (outputSoFar?: Output) => Awaitable<Output>;  // Optional read access?
-```
-Or remain context-only:
+**Decision**: Keep generators simple and context-only:
 ```ts
 type Generator = () => Awaitable<Output>;  // Access schemas via useKanelContext()
 ```
 
-**Recommendation**: Keep generators simple (context-only). If a generator needs to read previous output, that's a smell—it should probably be a PreRenderHook instead.
+**Rationale**:
+- **Generators**: Produce output that gets merged into the final result. Access database schemas via context.
+- **PreRenderHooks**: Transform/remove/replace anything in accumulated output (receive `outputAcc` parameter)
 
-### The applyTaggedComments Problem
+If a generator needs previous output, it should be a PreRenderHook instead. This keeps the mental model clean.
 
-**Context**: Type overrides currently happen in multiple places:
-1. `customTypeMap` - Override by PostgreSQL type name
-2. `@type` tags in DB comments - Override via `applyTaggedComments` hook (automatically applied in v3)
-3. `getPropertyMetadata` - Can return `typeOverride` for individual properties
+### The applyTaggedComments Migration
 
-In v4, `applyTaggedComments` is no longer automatic. We need a clean migration path.
+**Decision**: For v4, provide composable getter pattern (to be implemented later).
 
-**Leading option: Composable getter pattern**
-- Provide `composePropertyMetadata` utility for chaining metadata functions
-- Convert `applyTaggedComments` to `taggedCommentsGetPropertyMetadata` getter
-- Example:
-  ```ts
-  getPropertyMetadata: composePropertyMetadata(
-    defaultGetPropertyMetadata,
-    taggedCommentsGetPropertyMetadata,
-    makeCustomTypesGetter({ 'public.users.metadata': 'JsonValue' }),
-  )
-  ```
-- **Benefits**: No new concepts, clean composition, flexible
-- **For v3→v4 conversion**: Automatically prepend wrapped `applyTaggedComments` hook to maintain compatibility
+**v3 compatibility**: In v3→v4 conversion, automatically prepend the existing `applyTaggedComments` hook (wrapped) to `preRenderHooks` to maintain backwards compatibility.
 
-**Decision**: Evaluate ergonomics during implementation. May need refinement based on actual usage patterns.
+**Future v4 pattern** (TBD during implementation):
+```ts
+getPropertyMetadata: composePropertyMetadata(
+  defaultGetPropertyMetadata,
+  taggedCommentsGetPropertyMetadata,
+  makeCustomTypesGetter({ 'public.users.metadata': 'JsonValue' }),
+)
+```
 
-### Code Cleanup: resolveType Complexity
-
-**Analysis**: Complexity in `resolveType` comes from:
-1. Circular reference tracking (necessary)
-2. Repetitive schema lookups across tables/views/materialized views
-3. Deep nesting
-
-**Action item**: Extract schema lookup utilities (`findComposite`, `findTable`) to reduce repetition and improve readability. This is independent of v4 architecture changes.
+This converts the hook approach to a composable getter approach. Exact API to be refined during implementation.
