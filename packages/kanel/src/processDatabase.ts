@@ -124,76 +124,87 @@ const processDatabase = async (
     fileExtension,
   };
 
-  await runWithContext({ instantiatedConfig }, async () => {
-    const generators = [
-      makeCompositeGenerator("table"),
-      makeCompositeGenerator("foreignTable"),
-      makeCompositeGenerator("view"),
-      makeCompositeGenerator("materializedView"),
-      makeCompositeGenerator("compositeType"),
-      enumsGenerator,
-      rangesGenerator,
-      domainsGenerator,
-      makeRoutineGenerator("function"),
-      makeRoutineGenerator("procedure"),
-    ];
+  await runWithContext(
+    {
+      typescriptConfig: {
+        enumStyle: config.enumStyle === "type" ? "literal" : "enum",
+        tsModuleFormat: config.tsModuleFormat,
+      },
+      config: cfg,
+      schemas,
+      instantiatedConfig,
+    },
+    async () => {
+      const generators = [
+        makeCompositeGenerator("table"),
+        makeCompositeGenerator("foreignTable"),
+        makeCompositeGenerator("view"),
+        makeCompositeGenerator("materializedView"),
+        makeCompositeGenerator("compositeType"),
+        enumsGenerator,
+        rangesGenerator,
+        domainsGenerator,
+        makeRoutineGenerator("function"),
+        makeRoutineGenerator("procedure"),
+      ];
 
-    let output: Output = {};
-    Object.values(schemas).forEach((schema) => {
-      generators.forEach((generator) => {
-        output = generator(schema, output);
+      let output: Output = {};
+      Object.values(schemas).forEach((schema) => {
+        generators.forEach((generator) => {
+          output = generator(schema, output);
+        });
       });
-    });
 
-    const preRenderHooks: PreRenderHook[] = [
-      applyTaggedComments,
-      ...(config.preRenderHooks ?? []),
-    ];
-    for (const hook of preRenderHooks) {
-      output = await hook(output, instantiatedConfig);
-    }
-
-    let filesToWrite = Object.keys(output).map((path) => {
-      const file = output[path];
-
-      if (!file.fileType) {
-        // Hack for backwards compatibility.
-        file.fileType = "typescript";
+      const preRenderHooks: PreRenderHook[] = [
+        applyTaggedComments,
+        ...(config.preRenderHooks ?? []),
+      ];
+      for (const hook of preRenderHooks) {
+        output = await hook(output, instantiatedConfig);
       }
 
-      if (file.fileType === "typescript") {
-        const lines = renderTsFile(file.declarations, path);
-        return {
-          fullPath: `${path}${instantiatedConfig.fileExtension}`,
-          lines,
-        };
-      } else if (file.fileType === "generic") {
-        return { fullPath: path, lines: file.lines };
+      let filesToWrite = Object.keys(output).map((path) => {
+        const file = output[path];
+
+        if (!file.fileType) {
+          // Hack for backwards compatibility.
+          file.fileType = "typescript";
+        }
+
+        if (file.fileType === "typescript") {
+          const lines = renderTsFile(file.declarations, path);
+          return {
+            fullPath: `${path}${instantiatedConfig.fileExtension}`,
+            lines,
+          };
+        } else if (file.fileType === "generic") {
+          return { fullPath: path, lines: file.lines };
+        }
+        throw new Error(`Path ${path} is an unknown file type`);
+      });
+
+      const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
+      for (const hook of postRenderHooks) {
+        filesToWrite = await Promise.all(
+          filesToWrite.map(async (file) => {
+            const lines = await hook(
+              file.fullPath,
+              file.lines,
+              instantiatedConfig,
+            );
+            return { ...file, lines };
+          }),
+        );
       }
-      throw new Error(`Path ${path} is an unknown file type`);
-    });
 
-    const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
-    for (const hook of postRenderHooks) {
-      filesToWrite = await Promise.all(
-        filesToWrite.map(async (file) => {
-          const lines = await hook(
-            file.fullPath,
-            file.lines,
-            instantiatedConfig,
-          );
-          return { ...file, lines };
-        }),
-      );
-    }
+      if (instantiatedConfig.preDeleteOutputFolder) {
+        console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
+        await rimraf(instantiatedConfig.outputPath, { glob: true });
+      }
 
-    if (instantiatedConfig.preDeleteOutputFolder) {
-      console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
-      await rimraf(instantiatedConfig.outputPath, { glob: true });
-    }
-
-    filesToWrite.forEach((file) => writeFile(file));
-  });
+      filesToWrite.forEach((file) => writeFile(file));
+    },
+  );
 };
 
 export default processDatabase;

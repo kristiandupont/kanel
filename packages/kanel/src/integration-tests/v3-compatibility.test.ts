@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { recase } from "@kristiandupont/recase";
 import { join } from "path";
 
-import type { Config, InstantiatedConfig } from "../config-types";
+import type { Config } from "../config-types";
 import processDatabase from "../processDatabase";
 import useTestKnex from "../test-helpers/useTestKnex";
 import useSchema from "../test-helpers/useSchema";
