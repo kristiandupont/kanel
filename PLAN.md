@@ -109,12 +109,21 @@ function isV3Config(config: Config): config is ConfigV3 {
 }
 ```
 
-### V4 Metadata Types (no instantiatedConfig parameter)
+### V4 Metadata Types (composable with defaults)
+
+V4 metadata functions receive the default metadata as their last parameter, enabling easy composition:
 
 ```ts
-type GetMetadataV4 = (details: Details, variant: Variant) => Metadata;
-type GetPropertyMetadataV4 = (property: Property, details: Details) => PropertyMetadata;
-// ... etc
+type GetMetadataV4 = (details: Details, variant: Variant, defaultMetadata: Metadata) => Metadata;
+type GetPropertyMetadataV4 = (property: Property, details: Details, defaultMetadata: PropertyMetadata) => PropertyMetadata;
+type GenerateIdentifierTypeV4 = (column: Column, details: Details, defaultType: TypeDeclaration) => TypeDeclaration;
+type GetRoutineMetadataV4 = (routineDetails: RoutineDetails, defaultMetadata: RoutineMetadata) => RoutineMetadata;
+
+// Example usage - just override what you need:
+getMetadata: (details, variant, defaultMetadata) => ({
+  ...defaultMetadata,
+  comment: ['My custom comment'],
+})
 ```
 
 ## PgTsGenerator
@@ -127,12 +136,12 @@ Configuration that was previously at the top level (like `getMetadata`, `customT
 type PgTsGeneratorConfig = {
   customTypeMap?: TypeMap;
 
-  // V4 metadata functions (no instantiatedConfig parameter)
-  getMetadata: GetMetadataV4;
-  getPropertyMetadata: GetPropertyMetadataV4;
+  // V4 metadata functions (composable with defaults)
+  getMetadata?: GetMetadataV4;
+  getPropertyMetadata?: GetPropertyMetadataV4;
   generateIdentifierType?: GenerateIdentifierTypeV4;
   getRoutineMetadata?: GetRoutineMetadataV4;
-  propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
+  propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
 };
 
 function makePgTsGenerator(config: PgTsGeneratorConfig): Generator {
@@ -211,7 +220,8 @@ When a v3 config is detected:
 ## Breaking Changes for V4
 
 - `getMetadata`, `getPropertyMetadata`, `generateIdentifierType`, `getRoutineMetadata`, `propertySortFunction`, and `customTypeMap` move from top-level `Config` to `PgTsGeneratorConfig`
-- V4 hooks and metadata functions no longer receive `instantiatedConfig` parameter - use `useKanelContext()` instead
+- V4 hooks no longer receive `instantiatedConfig` parameter - use `useKanelContext()` instead
+- V4 metadata functions receive a `defaultMetadata`/`defaultType` parameter as their last argument (for composition)
 - Pre-render hooks that modify TS output (Kysely, Zod, Knex) become generators
 - `applyTaggedComments` is no longer automatically applied - users must use composable getter pattern instead (details TBD in design questions below)
 
@@ -229,10 +239,16 @@ const config: ConfigV4 = {
   outputPath: './models',
   generators: [
     makePgTsGenerator({
-      getMetadata: myGetMetadata,
-      getPropertyMetadata: myGetPropertyMetadata,
+      // Composable metadata functions - receive defaults as last parameter
+      getMetadata: (details, generateFor, defaultMetadata) => ({
+        ...defaultMetadata,
+        comment: ['My custom comment'],
+      }),
+      getPropertyMetadata: (property, details, generateFor, defaultMetadata) => ({
+        ...defaultMetadata,
+        comment: [...(defaultMetadata.comment || []), 'Extra info'],
+      }),
       customTypeMap: { /* ... */ },
-      propertySortFunction: mySort,
     }),
     makeKyselyGenerator(),
     makeZodGenerator(),
