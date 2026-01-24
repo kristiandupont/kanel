@@ -7,11 +7,25 @@ The configuration is being rearranged to better separate concerns:
 - **TypescriptConfig**: General TypeScript output settings (module format, enum style) - affects all TS output
 - **PgTsGeneratorConfig**: Specific configuration for transforming PostgreSQL types to TypeScript (name transformation, metadata, etc.)
 
-The current "generators" (composite, enum, domains, etc.) are actually sub-generators that will be moved into a `PgTsGenerator` folder. The term "Generator" is now a top-level concept.
+The current "generators" (composite, enum, domains, etc.) are actually sub-generators that will be moved into a `PgTsGenerator` folder as implementation details. The term "Generator" is now a top-level concept.
 
 Hooks and generators access configuration via AsyncLocalStorage context (using `useKanelContext()`) instead of having it passed as parameters.
 
-## New config types
+## Backwards Compatibility Strategy
+
+**v3 configs will continue to be supported** using a heuristic-based detection (presence/absence of `generators` field):
+
+1. **Detection**: If config lacks `generators` field → v3 config
+2. **Conversion**: v3 config is converted to v4 config internally
+3. **Context**: v4 context is populated, including optional `instantiatedConfig` for v3 compatibility
+4. **Hooks**: v3 hooks are wrapped to inject `instantiatedConfig` parameter from context
+5. **Warning**: A deprecation warning is printed (suppressible via CLI option)
+
+This allows v3 configs to run through v4 processing logic with minimal compatibility shims.
+
+## Type Definitions
+
+### V4 Config Types
 
 ```ts
 // General TypeScript output configuration - affects all TypeScript generators
@@ -21,19 +35,13 @@ type TypescriptConfig = {
 };
 
 // A generator produces output files. Generators run sequentially.
-// Last to write wins - generators should NOT depend on output from previous generators.
-// If you need to transform output from another generator, use a PreRenderHook instead.
 type Generator = () => Awaitable<Output>;
 
-// Hooks access context via useKanelContext() instead of parameters
-export type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
+// V4 hooks access context via useKanelContext() instead of parameters
+type PreRenderHookV4 = (outputAcc: Output) => Awaitable<Output>;
+type PostRenderHookV4 = (path: string, lines: string[]) => Awaitable<string[]>;
 
-export type PostRenderHook = (
-  path: string,
-  lines: string[],
-) => Awaitable<string[]>;
-
-type Config = {
+type ConfigV4 = {
   // Database connection settings
   connection: string | ConnectionConfig;
   schemaNames?: string[];
@@ -49,14 +57,68 @@ type Config = {
 
   // Top-level generators and hooks
   generators: Generator[];
-  preRenderHooks?: PreRenderHook[];
-  postRenderHooks?: PostRenderHook[];
+  preRenderHooks?: PreRenderHookV4[];
+  postRenderHooks?: PostRenderHookV4[];
 };
+```
+
+### V3 Config Types (for backwards compatibility)
+
+```ts
+// V3 metadata functions receive instantiatedConfig as final parameter
+type GetMetadataV3 = (details: Details, variant: Variant, instantiatedConfig: InstantiatedConfig) => Metadata;
+type GetPropertyMetadataV3 = (property: Property, details: Details, instantiatedConfig: InstantiatedConfig) => PropertyMetadata;
+// ... etc for other metadata functions
+
+// V3 hooks receive instantiatedConfig
+type PreRenderHookV3 = (outputAcc: Output, instantiatedConfig: InstantiatedConfig) => Awaitable<Output>;
+type PostRenderHookV3 = (path: string, lines: string[], instantiatedConfig: InstantiatedConfig) => Awaitable<string[]>;
+
+type ConfigV3 = {
+  connection: string | ConnectionConfig;
+  schemas?: string[];
+  typeFilter?: (pgType: PgType) => boolean;
+
+  // V3 has metadata functions at top level
+  getMetadata?: GetMetadataV3;
+  getPropertyMetadata?: GetPropertyMetadataV3;
+  generateIdentifierType?: GenerateIdentifierTypeV3;
+  getRoutineMetadata?: GetRoutineMetadataV3;
+  propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
+
+  customTypeMap?: TypeMap;
+  enumStyle?: "enum" | "type";
+  outputPath?: string;
+  preDeleteOutputFolder?: boolean;
+  resolveViews?: boolean;
+
+  preRenderHooks?: PreRenderHookV3[];
+  postRenderHooks?: PostRenderHookV3[];
+
+  // V3 does NOT have generators field
+  // ... other v3 fields
+};
+
+// Union type for config detection
+type Config = ConfigV3 | ConfigV4;
+
+// Type guard
+function isV3Config(config: Config): config is ConfigV3 {
+  return !('generators' in config);
+}
+```
+
+### V4 Metadata Types (no instantiatedConfig parameter)
+
+```ts
+type GetMetadataV4 = (details: Details, variant: Variant) => Metadata;
+type GetPropertyMetadataV4 = (property: Property, details: Details) => PropertyMetadata;
+// ... etc
 ```
 
 ## PgTsGenerator
 
-This generator transforms PostgreSQL types into TypeScript types. The current "generators" (composite, enum, domains, ranges, routines) are actually sub-generators that will live inside the PgTsGenerator folder.
+This generator transforms PostgreSQL types into TypeScript types. The current "generators" (composite, enum, domains, ranges, routines) become internal sub-generators (implementation details) within the PgTsGenerator.
 
 Configuration that was previously at the top level (like `getMetadata`, `customTypeMap`) is now specific to this generator.
 
@@ -64,18 +126,19 @@ Configuration that was previously at the top level (like `getMetadata`, `customT
 type PgTsGeneratorConfig = {
   customTypeMap?: TypeMap;
 
-  // Metadata functions control name transformation and documentation
-  getMetadata: GetMetadata;
-  getPropertyMetadata: GetPropertyMetadata;
-  generateIdentifierType?: GenerateIdentifierType;
-  getRoutineMetadata?: GetRoutineMetadata;
+  // V4 metadata functions (no instantiatedConfig parameter)
+  getMetadata: GetMetadataV4;
+  getPropertyMetadata: GetPropertyMetadataV4;
+  generateIdentifierType?: GenerateIdentifierTypeV4;
+  getRoutineMetadata?: GetRoutineMetadataV4;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 };
 
 function makePgTsGenerator(config: PgTsGeneratorConfig): Generator {
   return async () => {
     const context = useKanelContext();
-    // Run sub-generators: composite, enum, domains, ranges, routines
+    // Internal sub-generators (hardcoded): composite, enum, domains, ranges, routines
+    // These are NOT exposed to users, just implementation details
     // Return Output
   };
 }
@@ -96,43 +159,62 @@ New generator:
 
 ## Context
 
-Instead of containing a single "instantiated config", the context will now contain clearly separated concerns:
-
-- **TypescriptConfig**: Where `tsModuleFormat`, if not provided, will be derived from package.json and TypeScript config files
-- **Original config**: As passed to the processDatabase function
-- **Schemas**: The extracted database schemas
+The context now contains clearly separated concerns, with an optional backwards-compatibility field:
 
 ```ts
 type KanelContext = {
-  typescriptConfig: TypescriptConfig;
-  config: Config;
-  schemas: Record<string, Schema>;
+  typescriptConfig: TypescriptConfig;  // tsModuleFormat derived from package.json/tsconfig if not provided
+  config: Config;                      // Original config as passed to processDatabase
+  schemas: Record<string, Schema>;     // Extracted database schemas
+
+  /** @deprecated Only present when running v3 configs for backwards compatibility */
+  instantiatedConfig?: InstantiatedConfig;
 };
 ```
+
+**Note on intersection vs union**: Using an intersection type with optional `instantiatedConfig` is simpler than a union, since AsyncLocalStorage doesn't preserve type narrowing. The optional field approach provides type safety while supporting both v3 and v4 configs.
 
 Access via:
 ```ts
 const context = useKanelContext();
-// Or potentially more specific accessors:
-// useTypescriptConfig(), useSchemas(), etc.
+// Context always has v4 shape, with optional instantiatedConfig for v3 compatibility
 ```
 
-## Migration notes
+## V3 to V4 Conversion
 
-### Code organization
-- Move existing generators (composite, enum, domains, ranges, routines) into `src/PgTsGenerator/`
-- These become internal sub-generators of PgTsGenerator
+When a v3 config is detected:
 
-### Breaking changes
-- `getMetadata`, `getPropertyMetadata`, `generateIdentifierType`, `getRoutineMetadata`, `propertySortFunction`, and `customTypeMap` move from top-level Config to PgTsGeneratorConfig
-- Hooks no longer receive `instantiatedConfig` as a parameter - must use `useKanelContext()` instead
-- Pre-render hooks that currently modify TS output (Kysely, Zod, Knex) become generators
+1. **Create v4 config structure**:
+   - Extract `typescriptConfig` from top-level `enumStyle` and `tsModuleFormat`
+   - Create `makePgTsGenerator()` with v3's metadata functions and `customTypeMap`
+   - Wrap v3 hooks to inject `instantiatedConfig` parameter:
+     ```ts
+     const wrappedPreRenderHook: PreRenderHookV4 = (output) => {
+       const { instantiatedConfig } = useKanelContext();
+       return v3Hook(output, instantiatedConfig!);
+     };
+     ```
+   - Prepend `applyTaggedComments` hook to `preRenderHooks` (for backwards compatibility)
 
-### Example V4 config
+2. **Create context**:
+   - Populate v4 context fields (`typescriptConfig`, `config`, `schemas`)
+   - Include `instantiatedConfig` for v3 hook compatibility
+
+3. **Print deprecation warning** (unless suppressed via CLI option)
+
+## Breaking Changes for V4
+
+- `getMetadata`, `getPropertyMetadata`, `generateIdentifierType`, `getRoutineMetadata`, `propertySortFunction`, and `customTypeMap` move from top-level `Config` to `PgTsGeneratorConfig`
+- V4 hooks and metadata functions no longer receive `instantiatedConfig` parameter - use `useKanelContext()` instead
+- Pre-render hooks that modify TS output (Kysely, Zod, Knex) become generators
+- `applyTaggedComments` is no longer automatically applied - users must use composable getter pattern instead (details TBD in design questions below)
+
+## Example V4 Config
+
 ```ts
 import { makePgTsGenerator, makeKyselyGenerator, makeZodGenerator } from 'kanel';
 
-const config: Config = {
+const config: ConfigV4 = {
   connection: { /* ... */ },
   typescriptConfig: {
     enumStyle: 'literal',
@@ -144,7 +226,7 @@ const config: Config = {
       getMetadata: myGetMetadata,
       getPropertyMetadata: myGetPropertyMetadata,
       customTypeMap: { /* ... */ },
-      // ...
+      propertySortFunction: mySort,
     }),
     makeKyselyGenerator(),
     makeZodGenerator(),
@@ -152,58 +234,40 @@ const config: Config = {
 };
 ```
 
-## Open design questions
+## Open Design Questions
 
-### Generator vs PreRenderHook semantics
-
-**Decision needed**: Clarify the distinction between generators and pre-render hooks.
+### Generator vs PreRenderHook Semantics
 
 **Current thinking**:
-- **Generators**: Produce output that gets **merged** into the final result. Can optionally receive accumulated output for reference (read-only use).
-  ```ts
-  type Generator = (outputSoFar?: Output) => Awaitable<Output>;
-  ```
-- **PreRenderHooks**: Can transform/remove/replace anything in the accumulated output.
-  ```ts
-  type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
-  ```
+- **Generators**: Produce output that gets **merged** into the final result
+- **PreRenderHooks**: Can transform/remove/replace anything in the accumulated output
 
-This allows Kysely and Zod to remain as generators (they add/merge declarations to files), while hooks like `generateIndexFile` can modify/add to the entire output.
+Both Kysely and Zod generators add/merge declarations to files, while hooks like `generateIndexFile` modify the entire output structure.
 
-### The applyTaggedComments problem
+**Question**: Should generators receive accumulated output for reference?
+```ts
+type Generator = (outputSoFar?: Output) => Awaitable<Output>;  // Optional read access?
+```
+Or remain context-only:
+```ts
+type Generator = () => Awaitable<Output>;  // Access schemas via useKanelContext()
+```
 
-**Problem**: The `applyTaggedComments` hook currently:
-- Reads `@type` tags from database comments
-- Overrides type resolution for specific columns/types
-- Requires access to `getMetadata` (which is moving to PgTsGeneratorConfig)
-- Is essentially an extension to the PgTs generator's behavior
+**Recommendation**: Keep generators simple (context-only). If a generator needs to read previous output, that's a smell—it should probably be a PreRenderHook instead.
 
-This is really about **type override configuration**. Currently, type overrides can happen in multiple places:
+### The applyTaggedComments Problem
+
+**Context**: Type overrides currently happen in multiple places:
 1. `customTypeMap` - Override by PostgreSQL type name
-2. `@type` tags in DB comments - Override via `applyTaggedComments` hook
+2. `@type` tags in DB comments - Override via `applyTaggedComments` hook (automatically applied in v3)
 3. `getPropertyMetadata` - Can return `typeOverride` for individual properties
 
-**Options being considered**:
+In v4, `applyTaggedComments` is no longer automatic. We need a clean migration path.
 
-**Option 1: Generator-specific hooks**
-- Add `postProcessHooks` to `PgTsGeneratorConfig`
-- Hooks run after sub-generators, have access to config via closure
-- Clear ownership, flexible
-- Downside: Another concept to learn
-
-**Option 2: Make it built-in to PgTsGenerator**
-- Add `processTaggedComments?: boolean` to config
-- Downside: Hardcoded, less flexible
-
-**Option 3: Composable getter utilities**
-- Provide pre-built getters that compose: `withTaggedComments`, `withCustomTypes`, etc.
-- Users compose them: `getPropertyMetadata: withTaggedComments(withCustomTypes(...))`
-- Downside: Nested function calls get ugly, not very ergonomic
-
-**Option 4: Powerful getters + composition helper** ⭐ *Current favorite*
-- Make getters more powerful and provide a `composePropertyMetadata` utility
-- Provide pre-built getters: `taggedCommentsGetPropertyMetadata`, `makeCustomTypesGetter`, etc.
-- Clean composition:
+**Leading option: Composable getter pattern**
+- Provide `composePropertyMetadata` utility for chaining metadata functions
+- Convert `applyTaggedComments` to `taggedCommentsGetPropertyMetadata` getter
+- Example:
   ```ts
   getPropertyMetadata: composePropertyMetadata(
     defaultGetPropertyMetadata,
@@ -211,23 +275,16 @@ This is really about **type override configuration**. Currently, type overrides 
     makeCustomTypesGetter({ 'public.users.metadata': 'JsonValue' }),
   )
   ```
-- Pros: No new concepts, backwards compatible, clean, flexible
-- `applyTaggedComments` becomes `taggedCommentsGetPropertyMetadata` - a getter instead of a hook
+- **Benefits**: No new concepts, clean composition, flexible
+- **For v3→v4 conversion**: Automatically prepend wrapped `applyTaggedComments` hook to maintain compatibility
 
-**Decision**: TBD - need to evaluate composability and ergonomics further.
+**Decision**: Evaluate ergonomics during implementation. May need refinement based on actual usage patterns.
 
-### resolveType complexity
+### Code Cleanup: resolveType Complexity
 
-**Question**: Could moving `customTypeMap` to a composable getter simplify the `resolveType` function?
+**Analysis**: Complexity in `resolveType` comes from:
+1. Circular reference tracking (necessary)
+2. Repetitive schema lookups across tables/views/materialized views
+3. Deep nesting
 
-**Analysis**: The complexity in `resolveType` is NOT from `customTypeMap` (which is just one check on line 238). The real complexity comes from:
-1. Circular reference tracking (necessary complexity)
-2. Repetitive schema lookups - searching tables/views/materialized views in multiple places (~50-100 lines of repetition)
-3. Deep nesting and multiple responsibilities
-
-**Recommendation**:
-- **Don't** move `customTypeMap` to a getter - it's in the right place conceptually (after structural resolution, before DB type resolution)
-- **Do** extract schema lookup utilities (e.g., `findComposite`, `findTable`) to eliminate repetitive code
-- This would make `resolveType` much more readable without architectural changes
-
-Moving `customTypeMap` to a getter would add complexity (performance hit, less clear semantics) without meaningfully simplifying `resolveType`.
+**Action item**: Extract schema lookup utilities (`findComposite`, `findTable`) to reduce repetition and improve readability. This is independent of v4 architecture changes.
