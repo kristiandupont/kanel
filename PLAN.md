@@ -109,22 +109,28 @@ function isV3Config(config: Config): config is ConfigV3 {
 }
 ```
 
-### V4 Metadata Types (composable with defaults)
+### V4 Metadata Types (composable with builtins)
 
-V4 metadata functions receive the default metadata as their last parameter, enabling easy composition:
+V4 metadata functions receive the builtin metadata as their last parameter, enabling easy composition:
 
 ```ts
-type GetMetadataV4 = (details: Details, variant: Variant, defaultMetadata: Metadata) => Metadata;
-type GetPropertyMetadataV4 = (property: Property, details: Details, defaultMetadata: PropertyMetadata) => PropertyMetadata;
-type GenerateIdentifierTypeV4 = (column: Column, details: Details, defaultType: TypeDeclaration) => TypeDeclaration;
-type GetRoutineMetadataV4 = (routineDetails: RoutineDetails, defaultMetadata: RoutineMetadata) => RoutineMetadata;
+type GetMetadataV4 = (details: Details, variant: Variant, builtinMetadata: Metadata) => Metadata;
+type GetPropertyMetadataV4 = (property: Property, details: Details, builtinMetadata: PropertyMetadata) => PropertyMetadata;
+type GenerateIdentifierTypeV4 = (column: Column, details: Details, builtinType: TypeDeclaration) => TypeDeclaration;
+type GetRoutineMetadataV4 = (routineDetails: RoutineDetails, builtinMetadata: RoutineMetadata) => RoutineMetadata;
 
 // Example usage - just override what you need:
-getMetadata: (details, variant, defaultMetadata) => ({
-  ...defaultMetadata,
+getMetadata: (details, variant, builtinMetadata) => ({
+  ...builtinMetadata,
   comment: ['My custom comment'],
 })
 ```
+
+**Note on "builtin" vs "default":**
+- The third parameter is the **builtin** implementation (Kanel's internal implementation)
+- It's NOT a "default" from user config - user config is optional
+- The old `defaultGetMetadata` functions are deprecated and internal-only
+- Users should use the `builtinMetadata` parameter instead of importing default functions
 
 ## PgTsGenerator
 
@@ -136,7 +142,8 @@ Configuration that was previously at the top level (like `getMetadata`, `customT
 type PgTsGeneratorConfig = {
   customTypeMap?: TypeMap;
 
-  // V4 metadata functions (composable with defaults)
+  // V4 metadata functions (composable with builtins)
+  // All optional - if not provided, builtin implementations are used
   getMetadata?: GetMetadataV4;
   getPropertyMetadata?: GetPropertyMetadataV4;
   generateIdentifierType?: GenerateIdentifierTypeV4;
@@ -221,7 +228,12 @@ When a v3 config is detected:
 
 - `getMetadata`, `getPropertyMetadata`, `generateIdentifierType`, `getRoutineMetadata`, `propertySortFunction`, and `customTypeMap` move from top-level `Config` to `PgTsGeneratorConfig`
 - V4 hooks no longer receive `instantiatedConfig` parameter - use `useKanelContext()` instead
-- V4 metadata functions receive a `defaultMetadata`/`defaultType` parameter as their last argument (for composition)
+- V4 metadata functions receive a `builtinMetadata`/`builtinType` parameter as their last argument (for composition)
+- `defaultGetMetadata`, `defaultGetPropertyMetadata`, `defaultGenerateIdentifierType`, and `defaultGetRoutineMetadata` are **deprecated** and will be removed in a future version
+  - These were V3's "default" implementations that users could import and call
+  - In V4, use the `builtinMetadata` parameter passed to your custom functions instead
+  - They remain exported for V3 compatibility only (marked with `@deprecated`)
+  - **Migration:** Instead of importing and calling `defaultGetMetadata(...)`, use the third parameter: `(details, generateFor, builtinMetadata) => ({ ...builtinMetadata, ... })`
 - Pre-render hooks that modify TS output (Kysely, Zod, Knex) become generators
 - `applyTaggedComments` is no longer automatically applied - users must use composable getter pattern instead (details TBD in design questions below)
 
@@ -239,14 +251,14 @@ const config: ConfigV4 = {
   outputPath: './models',
   generators: [
     makePgTsGenerator({
-      // Composable metadata functions - receive defaults as last parameter
-      getMetadata: (details, generateFor, defaultMetadata) => ({
-        ...defaultMetadata,
+      // Composable metadata functions - receive builtins as last parameter
+      getMetadata: (details, generateFor, builtinMetadata) => ({
+        ...builtinMetadata,
         comment: ['My custom comment'],
       }),
-      getPropertyMetadata: (property, details, generateFor, defaultMetadata) => ({
-        ...defaultMetadata,
-        comment: [...(defaultMetadata.comment || []), 'Extra info'],
+      getPropertyMetadata: (property, details, generateFor, builtinMetadata) => ({
+        ...builtinMetadata,
+        comment: [...(builtinMetadata.comment || []), 'Extra info'],
       }),
       customTypeMap: { /* ... */ },
     }),
@@ -266,6 +278,38 @@ const config: ConfigV4 = {
 | `postRenderHooks` | `[markAsGenerated]` | `[]` | Explicit opt-in for v4, less magic |
 
 ## Implementation Decisions
+
+### Terminology: "builtin" vs "default"
+
+**Decision**: V4 metadata functions receive `builtinMetadata` (not `defaultMetadata`) as their third parameter.
+
+**Rationale**:
+- **"builtin"** = Kanel's internal implementation (the base layer)
+- **"default"** = What the user configuration defaults to (which is `undefined` in V4)
+- The V3 `defaultGetMetadata` functions were confusingly named - they're not "defaults" but "builtins"
+- In V4, if user doesn't provide `getMetadata`, the builtin is used directly
+- If user does provide `getMetadata`, they receive the builtin result to compose on
+
+**V3 Compatibility**:
+- `defaultGetMetadata`, `defaultGetPropertyMetadata`, etc. remain exported
+- Marked with `@deprecated` JSDoc
+- Will be removed in a future version
+- Users should migrate to using the `builtinMetadata` parameter
+
+**Migration Example**:
+```ts
+// V3 pattern (deprecated):
+import { defaultGetMetadata } from 'kanel';
+getMetadata: (details, generateFor, instantiatedConfig) => {
+  const defaults = defaultGetMetadata(details, generateFor, instantiatedConfig);
+  return { ...defaults, comment: ['Custom'] };
+}
+
+// V4 pattern (recommended):
+getMetadata: (details, generateFor, builtinMetadata) => {
+  return { ...builtinMetadata, comment: ['Custom'] };
+}
+```
 
 ### Generator vs PreRenderHook Semantics
 

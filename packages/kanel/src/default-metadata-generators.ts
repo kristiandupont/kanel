@@ -16,6 +16,25 @@ import type {
 const toPascalCase = recase(null, "pascal");
 
 // #region defaultGetMetadata
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
+ * passed to your custom getMetadata function instead of importing this.
+ *
+ * Migration example:
+ * ```ts
+ * // V3 (deprecated):
+ * import { defaultGetMetadata } from 'kanel';
+ * getMetadata: (details, generateFor, instantiatedConfig) => {
+ *   const defaults = defaultGetMetadata(details, generateFor, instantiatedConfig);
+ *   return { ...defaults, comment: ['Custom'] };
+ * }
+ *
+ * // V4 (recommended):
+ * getMetadata: (details, generateFor, builtinMetadata) => {
+ *   return { ...builtinMetadata, comment: ['Custom'] };
+ * }
+ * ```
+ */
 export const defaultGetMetadata: GetMetadata = (
   details,
   generateFor,
@@ -43,6 +62,10 @@ export const defaultGetMetadata: GetMetadata = (
 // #endregion defaultGetMetadata
 
 // #region defaultGetPropertyMetadata
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
+ * passed to your custom getPropertyMetadata function instead of importing this.
+ */
 export const defaultGetPropertyMetadata: GetPropertyMetadata = (
   property,
   _details,
@@ -64,6 +87,10 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
 // #endregion defaultGetPropertyMetadata
 
 // #region defaultGenerateIdentifierType
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinType parameter
+ * passed to your custom generateIdentifierType function instead of importing this.
+ */
 export const defaultGenerateIdentifierType: GenerateIdentifierType = (
   column,
   details,
@@ -96,6 +123,10 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
 // #endregion defaultGenerateIdentifierType
 
 // #region defaultPropertySortFunction
+/**
+ * @deprecated This is a V3 compatibility export. In V4, this is an internal builtin.
+ * If you need custom sorting, provide your own propertySortFunction in PgTsGeneratorConfig.
+ */
 export const defaultPropertySortFunction = (
   a: CompositeProperty,
   b: CompositeProperty,
@@ -115,6 +146,10 @@ export const defaultPropertySortFunction = (
 // #endregion defaultPropertySortFunction
 
 // #region defaultGetRoutineMetadata
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
+ * passed to your custom getRoutineMetadata function instead of importing this.
+ */
 export const defaultGetRoutineMetadata: GetRoutineMetadata = (
   details,
   instantiatedConfig,

@@ -73,20 +73,20 @@ export type TypeMetadataV4 = {
 };
 
 /**
- * V4 GetMetadata - receives the default metadata as the last parameter.
- * This allows composing custom metadata on top of defaults.
+ * V4 GetMetadata - receives the builtin metadata as the last parameter.
+ * This allows composing custom metadata on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
  * @example
- * getMetadata: (details, generateFor, defaultMetadata) => ({
- *   ...defaultMetadata,
+ * getMetadata: (details, generateFor, builtinMetadata) => ({
+ *   ...builtinMetadata,
  *   comment: ['My custom comment'],
  * })
  */
 export type GetMetadataV4 = (
   details: Details,
   generateFor: "selector" | "initializer" | "mutator" | undefined,
-  defaultMetadata: TypeMetadataV4,
+  builtinMetadata: TypeMetadataV4,
 ) => TypeMetadataV4;
 
 /**
@@ -101,38 +101,38 @@ export type PropertyMetadataV4 = {
 };
 
 /**
- * V4 GetPropertyMetadata - receives the default metadata as the last parameter.
- * This allows composing custom property metadata on top of defaults.
+ * V4 GetPropertyMetadata - receives the builtin metadata as the last parameter.
+ * This allows composing custom property metadata on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
  * @example
- * getPropertyMetadata: (property, details, generateFor, defaultMetadata) => ({
- *   ...defaultMetadata,
- *   comment: [...(defaultMetadata.comment || []), 'Custom note'],
+ * getPropertyMetadata: (property, details, generateFor, builtinMetadata) => ({
+ *   ...builtinMetadata,
+ *   comment: [...(builtinMetadata.comment || []), 'Custom note'],
  * })
  */
 export type GetPropertyMetadataV4 = (
   property: CompositeProperty,
   details: CompositeDetails,
   generateFor: "selector" | "initializer" | "mutator",
-  defaultMetadata: PropertyMetadataV4,
+  builtinMetadata: PropertyMetadataV4,
 ) => PropertyMetadataV4;
 
 /**
- * V4 GenerateIdentifierType - receives the default identifier type as the last parameter.
- * This allows composing custom identifier types on top of defaults.
+ * V4 GenerateIdentifierType - receives the builtin identifier type as the last parameter.
+ * This allows composing custom identifier types on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
  * @example
- * generateIdentifierType: (column, details, defaultType) => ({
- *   ...defaultType,
+ * generateIdentifierType: (column, details, builtinType) => ({
+ *   ...builtinType,
  *   comment: ['Custom ID type comment'],
  * })
  */
 export type GenerateIdentifierTypeV4 = (
   column: TableColumn | ForeignTableColumn,
   details: TableDetails | ForeignTableDetails,
-  defaultType: TypeDeclaration,
+  builtinType: TypeDeclaration,
 ) => TypeDeclaration;
 
 /**
@@ -148,19 +148,19 @@ export type RoutineMetadataV4 = {
 };
 
 /**
- * V4 GetRoutineMetadata - receives the default metadata as the last parameter.
- * This allows composing custom routine metadata on top of defaults.
+ * V4 GetRoutineMetadata - receives the builtin metadata as the last parameter.
+ * This allows composing custom routine metadata on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
  * @example
- * getRoutineMetadata: (routineDetails, defaultMetadata) => ({
- *   ...defaultMetadata,
+ * getRoutineMetadata: (routineDetails, builtinMetadata) => ({
+ *   ...builtinMetadata,
  *   returnTypeComment: ['Custom return type comment'],
  * })
  */
 export type GetRoutineMetadataV4 = (
   routineDetails: RoutineDetails,
-  defaultMetadata: RoutineMetadataV4,
+  builtinMetadata: RoutineMetadataV4,
 ) => RoutineMetadataV4;
 
 // #endregion V4 Metadata Types

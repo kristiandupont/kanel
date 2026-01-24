@@ -183,27 +183,19 @@ const processV4Config = async (
       instantiatedConfig, // Only present for V3 compatibility
     },
     async () => {
-      // TODO Phase 4: Replace with v4Config.generators when we have makePgTsGenerator
-      // For now, use old V3-style generators
-      const generators = [
-        makeCompositeGenerator("table"),
-        makeCompositeGenerator("foreignTable"),
-        makeCompositeGenerator("view"),
-        makeCompositeGenerator("materializedView"),
-        makeCompositeGenerator("compositeType"),
-        enumsGenerator,
-        rangesGenerator,
-        domainsGenerator,
-        makeRoutineGenerator("function"),
-        makeRoutineGenerator("procedure"),
-      ];
+      // Run V4 generators from config
+      if (!("generators" in v4Config)) {
+        throw new Error("V4 config must have generators field");
+      }
 
       let output: Output = {};
-      Object.values(schemas).forEach((schema: any) => {
-        generators.forEach((generator) => {
-          output = generator(schema, output);
-        });
-      });
+
+      // Execute each generator sequentially
+      for (const generator of v4Config.generators) {
+        const generatorOutput = await generator();
+        // Merge generator output into accumulated output
+        output = { ...output, ...generatorOutput };
+      }
 
       // V4 pre-render hooks (no instantiatedConfig parameter)
       const preRenderHooks = v4Config.preRenderHooks ?? [];

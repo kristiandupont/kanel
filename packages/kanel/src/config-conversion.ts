@@ -26,6 +26,7 @@ import { useKanelContext } from "./context";
 import applyTaggedComments from "./hooks/applyTaggedComments";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
+import makePgTsGenerator from "./generators/makePgTsGenerator";
 
 /**
  * Options for V3 config conversion
@@ -213,16 +214,13 @@ export function convertV3ConfigToV4(
   // Wrap V3 metadata functions to work as V4 functions
   const wrappedMetadata = wrapV3MetadataFunctions(v3Config, instantiatedConfig);
 
-  // Create a dummy V4 generator that will be replaced by processDatabase
-  // We can't create the real PgTsGenerator here because it doesn't exist yet
-  // This will be handled in processDatabase
+  // Create PgTsGenerator with wrapped V3 metadata and config
   const generators = [
-    async (): Promise<Output> => {
-      throw new Error(
-        "V3 compatibility generator should have been replaced by processDatabase. " +
-          "This is a bug in the V3 compatibility layer.",
-      );
-    },
+    makePgTsGenerator({
+      customTypeMap: v3Config.customTypeMap,
+      ...wrappedMetadata,
+      propertySortFunction: v3Config.propertySortFunction,
+    }),
   ];
 
   // Build V4 config

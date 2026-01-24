@@ -1,5 +1,7 @@
 export type * from "./config-types";
+export type * from "./config-types-v4";
 export * from "./default-metadata-generators";
+export { default as makePgTsGenerator } from "./generators/makePgTsGenerator";
 export type { default as Details } from "./Details";
 export type {
   CompositeDetails,
