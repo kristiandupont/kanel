@@ -1,7 +1,9 @@
 import { extractSchemas } from "extract-pg-schema";
 import { rimraf } from "rimraf";
 
-import type { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
+import type { Config, ConfigV3, InstantiatedConfig, PreRenderHook } from "./config-types";
+import { isV3Config as detectV3Config } from "./config-types";
+import { convertV3ConfigToV4 } from "./config-conversion";
 
 type DerivedExtensions = {
   fileExtension: ".ts" | ".mts" | ".cts";
@@ -83,58 +85,106 @@ const processDatabase = async (
   cfg: Config,
   progress?: Progress,
 ): Promise<void> => {
-  const config = { ...defaultConfig, ...cfg };
-  const schemas = await extractSchemas(config.connection, {
-    schemas: config.schemas,
-    typeFilter: config.typeFilter,
-    ...progress,
-  });
+  // If V3 config, convert to V4 first
+  let v4Config = cfg;
+  let instantiatedConfig: InstantiatedConfig | undefined;
 
-  const typeMap: TypeMap = {
-    ...defaultTypeMap,
-    ...config.customTypeMap,
-  };
+  if (detectV3Config(cfg)) {
+    // Extract schemas early for V3 conversion
+    const v3ConfigWithDefaults = { ...defaultConfig, ...cfg };
+    const schemas = await extractSchemas(v3ConfigWithDefaults.connection, {
+      schemas: v3ConfigWithDefaults.schemas,
+      typeFilter: v3ConfigWithDefaults.typeFilter,
+      ...progress,
+    });
 
-  if (config.tsModuleFormat && config.importsExtension) {
+    const typeMap: TypeMap = {
+      ...defaultTypeMap,
+      ...v3ConfigWithDefaults.customTypeMap,
+    };
+
+    if (v3ConfigWithDefaults.tsModuleFormat && v3ConfigWithDefaults.importsExtension) {
+      throw new Error(
+        "Cannot use both tsModuleFormat and importsExtension at the same time",
+      );
+    }
+
+    const { fileExtension, importsExtension } = deriveExtensions(
+      v3ConfigWithDefaults.tsModuleFormat,
+      v3ConfigWithDefaults.importsExtension,
+    );
+
+    instantiatedConfig = {
+      getMetadata: v3ConfigWithDefaults.getMetadata,
+      getPropertyMetadata: v3ConfigWithDefaults.getPropertyMetadata,
+      generateIdentifierType: v3ConfigWithDefaults.generateIdentifierType,
+      propertySortFunction: v3ConfigWithDefaults.propertySortFunction,
+      getRoutineMetadata: v3ConfigWithDefaults.getRoutineMetadata,
+      enumStyle: v3ConfigWithDefaults.enumStyle,
+      typeMap,
+      schemas,
+      connection: v3ConfigWithDefaults.connection,
+      outputPath: v3ConfigWithDefaults.outputPath,
+      preDeleteOutputFolder: v3ConfigWithDefaults.preDeleteOutputFolder,
+      resolveViews: v3ConfigWithDefaults.resolveViews,
+      importsExtension: importsExtension || undefined,
+      tsModuleFormat: v3ConfigWithDefaults.tsModuleFormat,
+      fileExtension,
+    };
+
+    // Convert V3 → V4
+    v4Config = convertV3ConfigToV4(cfg, instantiatedConfig, schemas);
+  }
+
+  // From here on, only V4 processing
+  await processV4Config(v4Config, instantiatedConfig, progress);
+};
+
+/**
+ * Process a V4 config.
+ * If instantiatedConfig is provided, we're in V3 compatibility mode.
+ *
+ * Note: Full V4 implementation (with makePgTsGenerator) will be in Phase 4.
+ * For now, this runs the old V3-style generators but uses V4 hooks.
+ */
+const processV4Config = async (
+  v4Config: Config,
+  instantiatedConfig: InstantiatedConfig | undefined,
+  progress?: Progress,
+): Promise<void> => {
+  // For V3 compatibility mode, schemas were already extracted during conversion
+  // For pure V4 configs (future), we'll need to extract them here
+  let schemas;
+  let fileExtension: ".ts" | ".mts" | ".cts";
+
+  if (instantiatedConfig) {
+    // V3 compatibility mode - use already extracted data
+    schemas = instantiatedConfig.schemas;
+    fileExtension = instantiatedConfig.fileExtension;
+  } else {
+    // Pure V4 mode (not yet implemented)
     throw new Error(
-      "Cannot use both tsModuleFormat and importsExtension at the same time",
+      "Pure V4 config format is not yet fully implemented. " +
+      "V4 will be available in a future release. " +
+      "For now, please use V3 config format (without the 'generators' field)."
     );
   }
 
-  const { fileExtension, importsExtension } = deriveExtensions(
-    config.tsModuleFormat,
-    config.importsExtension,
-  );
-
-  const instantiatedConfig: InstantiatedConfig = {
-    getMetadata: config.getMetadata,
-    getPropertyMetadata: config.getPropertyMetadata,
-    generateIdentifierType: config.generateIdentifierType,
-    propertySortFunction: config.propertySortFunction,
-    getRoutineMetadata: config.getRoutineMetadata,
-    enumStyle: config.enumStyle,
-    typeMap,
-    schemas,
-    connection: config.connection,
-    outputPath: config.outputPath,
-    preDeleteOutputFolder: config.preDeleteOutputFolder,
-    resolveViews: config.resolveViews,
-    importsExtension: importsExtension || undefined,
-    tsModuleFormat: config.tsModuleFormat,
-    fileExtension,
-  };
+  // Type guard to ensure we have typescriptConfig
+  if (!("typescriptConfig" in v4Config)) {
+    throw new Error("Invalid V4 config: missing typescriptConfig");
+  }
 
   await runWithContext(
     {
-      typescriptConfig: {
-        enumStyle: config.enumStyle === "type" ? "literal" : "enum",
-        tsModuleFormat: config.tsModuleFormat,
-      },
-      config: cfg,
+      typescriptConfig: v4Config.typescriptConfig,
+      config: v4Config,
       schemas,
-      instantiatedConfig,
+      instantiatedConfig, // Only present for V3 compatibility
     },
     async () => {
+      // TODO Phase 4: Replace with v4Config.generators when we have makePgTsGenerator
+      // For now, use old V3-style generators
       const generators = [
         makeCompositeGenerator("table"),
         makeCompositeGenerator("foreignTable"),
@@ -149,18 +199,16 @@ const processDatabase = async (
       ];
 
       let output: Output = {};
-      Object.values(schemas).forEach((schema) => {
+      Object.values(schemas).forEach((schema: any) => {
         generators.forEach((generator) => {
           output = generator(schema, output);
         });
       });
 
-      const preRenderHooks: PreRenderHook[] = [
-        applyTaggedComments,
-        ...(config.preRenderHooks ?? []),
-      ];
+      // V4 pre-render hooks (no instantiatedConfig parameter)
+      const preRenderHooks = v4Config.preRenderHooks ?? [];
       for (const hook of preRenderHooks) {
-        output = await hook(output, instantiatedConfig);
+        output = await hook(output);
       }
 
       let filesToWrite = Object.keys(output).map((path) => {
@@ -174,7 +222,7 @@ const processDatabase = async (
         if (file.fileType === "typescript") {
           const lines = renderTsFile(file.declarations, path);
           return {
-            fullPath: `${path}${instantiatedConfig.fileExtension}`,
+            fullPath: `${path}${fileExtension}`,
             lines,
           };
         } else if (file.fileType === "generic") {
@@ -183,23 +231,23 @@ const processDatabase = async (
         throw new Error(`Path ${path} is an unknown file type`);
       });
 
-      const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
+      // V4 post-render hooks (no instantiatedConfig parameter)
+      const postRenderHooks = v4Config.postRenderHooks ?? [];
       for (const hook of postRenderHooks) {
         filesToWrite = await Promise.all(
           filesToWrite.map(async (file) => {
-            const lines = await hook(
-              file.fullPath,
-              file.lines,
-              instantiatedConfig,
-            );
+            const lines = await hook(file.fullPath, file.lines);
             return { ...file, lines };
           }),
         );
       }
 
-      if (instantiatedConfig.preDeleteOutputFolder) {
-        console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
-        await rimraf(instantiatedConfig.outputPath, { glob: true });
+      const outputPath = v4Config.outputPath || ".";
+      const preDeleteOutputFolder = v4Config.preDeleteOutputFolder ?? false;
+
+      if (preDeleteOutputFolder) {
+        console.info(`Clearing old files in ${outputPath}`);
+        await rimraf(outputPath, { glob: true });
       }
 
       filesToWrite.forEach((file) => writeFile(file));
