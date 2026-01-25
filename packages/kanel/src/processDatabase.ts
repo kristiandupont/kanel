@@ -1,9 +1,22 @@
 import { extractSchemas } from "extract-pg-schema";
 import { rimraf } from "rimraf";
 
-import type { Config, ConfigV3, InstantiatedConfig, PreRenderHook } from "./config-types";
+import type { Config, InstantiatedConfig } from "./config-types";
 import { isV3Config as detectV3Config } from "./config-types";
 import { convertV3ConfigToV4 } from "./config-conversion";
+import { runWithContext } from "./context";
+import {
+  defaultGenerateIdentifierType,
+  defaultGetMetadata,
+  defaultGetPropertyMetadata,
+  defaultGetRoutineMetadata,
+  defaultPropertySortFunction,
+} from "./default-metadata-generators";
+import defaultTypeMap from "./defaultTypeMap";
+import type Output from "./Output";
+import renderTsFile from "./ts-utilities/renderTsFile";
+import type TypeMap from "./TypeMap";
+import writeFile from "./writeFile";
 
 type DerivedExtensions = {
   fileExtension: ".ts" | ".mts" | ".cts";
@@ -42,32 +55,6 @@ const deriveExtensions = (
       return { fileExtension: ".ts", importsExtension: "" };
   }
 };
-import { runWithContext } from "./context";
-import {
-  defaultGenerateIdentifierType,
-  defaultGetMetadata,
-  defaultGetPropertyMetadata,
-  defaultGetRoutineMetadata,
-  defaultPropertySortFunction,
-} from "./default-metadata-generators";
-import defaultTypeMap from "./defaultTypeMap";
-import makeCompositeGenerator from "./generators/makeCompositeGenerator";
-import domainsGenerator from "./generators/domainsGenerator";
-import enumsGenerator from "./generators/enumsGenerator";
-import rangesGenerator from "./generators/rangesGenerator";
-import makeRoutineGenerator from "./generators/makeRoutineGenerator";
-import applyTaggedComments from "./hooks/applyTaggedComments";
-import markAsGenerated from "./hooks/markAsGenerated";
-import type Output from "./Output";
-import renderTsFile from "./ts-utilities/renderTsFile";
-import type TypeMap from "./TypeMap";
-import writeFile from "./writeFile";
-
-type Progress = {
-  onProgressStart?: (total: number) => void;
-  onProgress?: () => void;
-  onProgressEnd?: () => void;
-};
 
 const defaultConfig: Partial<Config> = {
   getMetadata: defaultGetMetadata,
@@ -81,10 +68,7 @@ const defaultConfig: Partial<Config> = {
   preDeleteOutputFolder: false,
 };
 
-const processDatabase = async (
-  cfg: Config,
-  progress?: Progress,
-): Promise<void> => {
+const processDatabase = async (cfg: Config): Promise<void> => {
   // If V3 config, convert to V4 first
   let v4Config = cfg;
   let instantiatedConfig: InstantiatedConfig | undefined;
@@ -95,7 +79,6 @@ const processDatabase = async (
     const schemas = await extractSchemas(v3ConfigWithDefaults.connection, {
       schemas: v3ConfigWithDefaults.schemas,
       typeFilter: v3ConfigWithDefaults.typeFilter,
-      ...progress,
     });
 
     const typeMap: TypeMap = {
@@ -103,7 +86,10 @@ const processDatabase = async (
       ...v3ConfigWithDefaults.customTypeMap,
     };
 
-    if (v3ConfigWithDefaults.tsModuleFormat && v3ConfigWithDefaults.importsExtension) {
+    if (
+      v3ConfigWithDefaults.tsModuleFormat &&
+      v3ConfigWithDefaults.importsExtension
+    ) {
       throw new Error(
         "Cannot use both tsModuleFormat and importsExtension at the same time",
       );
@@ -137,7 +123,7 @@ const processDatabase = async (
   }
 
   // From here on, only V4 processing
-  await processV4Config(v4Config, instantiatedConfig, progress);
+  await processV4Config(v4Config, instantiatedConfig);
 };
 
 /**
@@ -150,7 +136,6 @@ const processDatabase = async (
 const processV4Config = async (
   v4Config: Config,
   instantiatedConfig: InstantiatedConfig | undefined,
-  progress?: Progress,
 ): Promise<void> => {
   // For V3 compatibility mode, schemas were already extracted during conversion
   // For pure V4 configs (future), we'll need to extract them here
@@ -165,8 +150,8 @@ const processV4Config = async (
     // Pure V4 mode (not yet implemented)
     throw new Error(
       "Pure V4 config format is not yet fully implemented. " +
-      "V4 will be available in a future release. " +
-      "For now, please use V3 config format (without the 'generators' field)."
+        "V4 will be available in a future release. " +
+        "For now, please use V3 config format (without the 'generators' field).",
     );
   }
 

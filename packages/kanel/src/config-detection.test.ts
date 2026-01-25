@@ -38,7 +38,12 @@ describe("Config Detection", () => {
           comment: [],
           path: `./${details.name}`,
         }),
-        getPropertyMetadata: (property, _details, _generateFor, _instantiatedConfig) => ({
+        getPropertyMetadata: (
+          property,
+          _details,
+          _generateFor,
+          _instantiatedConfig,
+        ) => ({
           name: property.name,
           comment: [],
         }),
@@ -91,9 +96,7 @@ describe("Config Detection", () => {
           enumStyle: "literal",
           tsModuleFormat: "esm",
         },
-        generators: [
-          async () => ({}),
-        ],
+        generators: [async () => ({})],
         preRenderHooks: [],
         postRenderHooks: [],
         resolveViews: true,

@@ -27,6 +27,8 @@ import applyTaggedComments from "./hooks/applyTaggedComments";
 import markAsGenerated from "./hooks/markAsGenerated";
 import type Output from "./Output";
 import makePgTsGenerator from "./generators/makePgTsGenerator";
+import type { CompositeProperty } from "./generators/composite-types";
+import type TypeMap from "./TypeMap";
 
 /**
  * Options for V3 config conversion
@@ -254,7 +256,17 @@ export function convertV3ConfigToV4(
 export function createV3CompatibilityData(
   v3Config: ConfigV3,
   instantiatedConfig: InstantiatedConfig,
-) {
+): {
+  wrappedMetadata: Pick<
+    PgTsGeneratorConfig,
+    | "getMetadata"
+    | "getPropertyMetadata"
+    | "generateIdentifierType"
+    | "getRoutineMetadata"
+  >;
+  propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
+  customTypeMap: TypeMap;
+} {
   return {
     wrappedMetadata: wrapV3MetadataFunctions(v3Config, instantiatedConfig),
     propertySortFunction: v3Config.propertySortFunction,

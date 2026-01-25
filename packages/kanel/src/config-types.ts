@@ -102,9 +102,7 @@ export function isV3Config(config: Config): config is ConfigV3 {
  * Type guard to check if a config is a V4 config.
  * V4 configs are identified by the presence of the `generators` field.
  */
-export function isV4Config(
-  config: Config,
-): config is ConfigV4 {
+export function isV4Config(config: Config): config is ConfigV4 {
   return "generators" in config;
 }
 

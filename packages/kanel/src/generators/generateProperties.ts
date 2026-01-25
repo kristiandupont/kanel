@@ -9,6 +9,7 @@ import type {
 import * as R from "ramda";
 
 import { useKanelContext } from "../context";
+import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import type { InterfacePropertyDeclaration } from "../ts-utilities/ts-declaration-types";
 import type TypeImport from "../ts-utilities/TypeImport";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
@@ -18,13 +19,14 @@ const generateProperties = <D extends CompositeDetails>(
   details: D,
   generateFor: "selector" | "initializer" | "mutator",
 ): InterfacePropertyDeclaration[] => {
-  const { instantiatedConfig } = useKanelContext();
+  const { schemas } = useKanelContext();
+  const { getPropertyMetadata, propertySortFunction } = usePgTsGeneratorContext();
 
   const ps =
     details.kind === "compositeType" ? details.attributes : details.columns;
 
-  const sortedPs = instantiatedConfig.propertySortFunction
-    ? R.sort(instantiatedConfig.propertySortFunction, ps as any)
+  const sortedPs = propertySortFunction
+    ? R.sort(propertySortFunction, ps as any)
     : ps;
 
   const result: InterfacePropertyDeclaration[] = sortedPs
@@ -35,7 +37,7 @@ const generateProperties = <D extends CompositeDetails>(
       if ((p as ViewColumn | MaterializedViewColumn).source) {
         const source = (p as ViewColumn | MaterializedViewColumn).source;
         const target: TableDetails | ViewDetails | MaterializedViewDetails =
-          instantiatedConfig.schemas[source.schema].tables.find(
+          schemas[source.schema].tables.find(
             (t) => t.name === source.table,
           );
 
@@ -57,11 +59,10 @@ const generateProperties = <D extends CompositeDetails>(
         typeOverride,
         nullableOverride,
         optionalOverride,
-      } = instantiatedConfig.getPropertyMetadata(
+      } = getPropertyMetadata(
         p,
         details,
         generateFor,
-        instantiatedConfig,
       );
 
       const canBeOptional: boolean =

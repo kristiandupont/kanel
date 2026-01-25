@@ -4,9 +4,7 @@ import type { ConnectionConfig } from "pg";
 import type { CompositeProperty } from "./generators/composite-types";
 import type { TypeDeclaration } from "./ts-utilities/ts-declaration-types";
 import type Details from "./Details";
-import type {
-  CompositeDetails,
-} from "./generators/composite-types";
+import type { CompositeDetails } from "./generators/composite-types";
 import type { RoutineDetails } from "./generators/routine-types";
 import type TypeDefinition from "./ts-utilities/TypeDefinition";
 import type Output from "./Output";
