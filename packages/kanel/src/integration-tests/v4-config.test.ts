@@ -113,7 +113,7 @@ describe("V4 Config", () => {
               property,
               details,
               generateFor,
-              builtinMetadata
+              builtinMetadata,
             ) => {
               propertyCalls.push(property.name);
 
@@ -175,10 +175,9 @@ describe("V4 Config", () => {
         },
         generators: [
           makePgTsGenerator({
-            propertySortFunction: (a, b) => {
+            propertySortFunction: (a, b) =>
               // Sort by name in reverse alphabetical order
-              return b.name.localeCompare(a.name);
-            },
+              b.name.localeCompare(a.name),
           }),
         ],
       };
@@ -293,35 +292,30 @@ describe("V4 Config", () => {
         },
         generators: [
           makePgTsGenerator({
-            getMetadata: (details, generateFor, builtinMetadata) => {
+            getMetadata: (details, generateFor, builtinMetadata) =>
               // Full composition: spread builtin, override specific fields
-              return {
+              ({
                 ...builtinMetadata,
                 name:
                   generateFor === "initializer"
                     ? `New${builtinMetadata.name}`
                     : builtinMetadata.name,
-                comment: [
-                  "Custom header",
-                  ...(builtinMetadata.comment || []),
-                ],
-              };
-            },
+                comment: ["Custom header", ...(builtinMetadata.comment || [])],
+              }),
             getPropertyMetadata: (
               property,
               details,
               generateFor,
-              builtinMetadata
-            ) => {
+              builtinMetadata,
+            ) =>
               // Spread builtin, conditionally override
-              return {
+              ({
                 ...builtinMetadata,
                 comment:
                   property.name === "last_update"
                     ? ["Timestamp of last modification"]
                     : builtinMetadata.comment,
-              };
-            },
+              }),
           }),
         ],
       };
