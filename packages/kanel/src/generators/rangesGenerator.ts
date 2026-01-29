@@ -1,6 +1,6 @@
 import type { RangeDetails, Schema } from "extract-pg-schema";
 
-import { useKanelContext } from "../context";
+import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import type {
   TsDeclaration,
   TypeDeclaration,
@@ -11,12 +11,11 @@ import type Output from "../Output";
 const makeMapper =
   () =>
   (rangeDetails: RangeDetails): { path: Path; declaration: TsDeclaration } => {
-    const { instantiatedConfig } = useKanelContext();
+    const generatorContext = usePgTsGeneratorContext();
 
-    const { name, comment, path } = instantiatedConfig.getMetadata(
+    const { name, comment, path } = generatorContext.getMetadata(
       rangeDetails,
       undefined,
-      instantiatedConfig,
     );
 
     // let rType: string;

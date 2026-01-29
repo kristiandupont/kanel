@@ -1,6 +1,6 @@
 import type { DomainDetails, Schema } from "extract-pg-schema";
 
-import { useKanelContext } from "../context";
+import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import {
   registerTsDeclaration,
   type TsDeclaration,
@@ -16,19 +16,18 @@ const makeMapper =
   (
     domainDetails: DomainDetails,
   ): { path: Path; declaration: TsDeclaration } => {
-    const { instantiatedConfig } = useKanelContext();
+    const generatorContext = usePgTsGeneratorContext();
 
-    const { name, comment, path } = instantiatedConfig.getMetadata(
+    const { name, comment, path } = generatorContext.getMetadata(
       domainDetails,
       undefined,
-      instantiatedConfig,
     );
 
     let typeDefinition: string[] = [];
     const typeImports: TypeImport[] = [];
 
     const mapped: TypeDefinition =
-      instantiatedConfig.typeMap[domainDetails.innerType];
+      generatorContext.typeMap[domainDetails.innerType];
     if (!mapped) {
       typeDefinition = ["unknown"];
       console.warn(

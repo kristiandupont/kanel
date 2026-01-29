@@ -32,26 +32,17 @@ import { useKanelContext } from "../context";
  * Returns an InternalGetMetadata function (without the builtinMetadata parameter).
  */
 export function wrapGetMetadata(
-  userFunction: GetMetadataV4 | undefined
+  userFunction: GetMetadataV4 | undefined,
 ): InternalGetMetadata {
   return (details, generateFor) => {
     const context = useKanelContext();
 
-    // For V3 compat, we need instantiatedConfig
-    // For pure V4, we'd build this from context
-    const instantiatedConfig = context.instantiatedConfig;
-    if (!instantiatedConfig) {
-      throw new Error(
-        "Cannot call builtin metadata functions without instantiatedConfig. " +
-          "This should not happen - V4 pure mode is not yet implemented."
-      );
-    }
-
-    // Call builtin to get base result
+    // Call builtin - it will get outputPath from context itself
+    // Pass instantiatedConfig for V3 compat (it's optional/undefined in V4)
     const builtinResult = defaultGetMetadata(
       details,
       generateFor,
-      instantiatedConfig
+      context.instantiatedConfig as any,
     );
 
     // If user provided a function, call it with builtin result
@@ -69,22 +60,17 @@ export function wrapGetMetadata(
  * Returns an InternalGetPropertyMetadata function (without the builtinMetadata parameter).
  */
 export function wrapGetPropertyMetadata(
-  userFunction: GetPropertyMetadataV4 | undefined
+  userFunction: GetPropertyMetadataV4 | undefined,
 ): InternalGetPropertyMetadata {
   return (property, details, generateFor) => {
     const context = useKanelContext();
-    const instantiatedConfig = context.instantiatedConfig;
-    if (!instantiatedConfig) {
-      throw new Error(
-        "Cannot call builtin metadata functions without instantiatedConfig."
-      );
-    }
 
+    // Call builtin - pass instantiatedConfig for V3 compat (it's optional/undefined in V4)
     const builtinResult = defaultGetPropertyMetadata(
       property,
       details,
       generateFor,
-      instantiatedConfig
+      context.instantiatedConfig,
     );
 
     if (userFunction) {
@@ -100,36 +86,28 @@ export function wrapGetPropertyMetadata(
  * Returns an InternalGenerateIdentifierType function (without the builtinType parameter).
  */
 export function wrapGenerateIdentifierType(
-  userFunction: GenerateIdentifierTypeV4 | undefined
+  userFunction: GenerateIdentifierTypeV4 | undefined,
 ): InternalGenerateIdentifierType | undefined {
   if (!userFunction) {
     // Return a wrapper around the builtin
     return (column, details) => {
       const context = useKanelContext();
-      const instantiatedConfig = context.instantiatedConfig;
-      if (!instantiatedConfig) {
-        throw new Error(
-          "Cannot call builtin metadata functions without instantiatedConfig."
-        );
-      }
 
-      return defaultGenerateIdentifierType(column, details, instantiatedConfig);
+      return defaultGenerateIdentifierType(
+        column,
+        details,
+        context.instantiatedConfig as any,
+      );
     };
   }
 
   return (column, details) => {
     const context = useKanelContext();
-    const instantiatedConfig = context.instantiatedConfig;
-    if (!instantiatedConfig) {
-      throw new Error(
-        "Cannot call builtin metadata functions without instantiatedConfig."
-      );
-    }
 
     const builtinResult = defaultGenerateIdentifierType(
       column,
       details,
-      instantiatedConfig
+      context.instantiatedConfig,
     );
 
     return userFunction(column, details, builtinResult);
@@ -141,35 +119,27 @@ export function wrapGenerateIdentifierType(
  * Returns an InternalGetRoutineMetadata function (without the builtinMetadata parameter).
  */
 export function wrapGetRoutineMetadata(
-  userFunction: GetRoutineMetadataV4 | undefined
+  userFunction: GetRoutineMetadataV4 | undefined,
 ): InternalGetRoutineMetadata | undefined {
   if (!userFunction) {
     // Return a wrapper around the builtin
     return (routineDetails) => {
       const context = useKanelContext();
-      const instantiatedConfig = context.instantiatedConfig;
-      if (!instantiatedConfig) {
-        throw new Error(
-          "Cannot call builtin metadata functions without instantiatedConfig."
-        );
-      }
 
-      return defaultGetRoutineMetadata(routineDetails, instantiatedConfig);
+      // Call builtin - it will get outputPath from context itself
+      return defaultGetRoutineMetadata(
+        routineDetails,
+        context.instantiatedConfig,
+      );
     };
   }
 
   return (routineDetails) => {
     const context = useKanelContext();
-    const instantiatedConfig = context.instantiatedConfig;
-    if (!instantiatedConfig) {
-      throw new Error(
-        "Cannot call builtin metadata functions without instantiatedConfig."
-      );
-    }
 
     const builtinResult = defaultGetRoutineMetadata(
       routineDetails,
-      instantiatedConfig
+      context.instantiatedConfig,
     );
 
     return userFunction(routineDetails, builtinResult);

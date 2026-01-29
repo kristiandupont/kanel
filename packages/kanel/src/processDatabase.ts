@@ -137,35 +137,49 @@ const processV4Config = async (
   v4Config: Config,
   instantiatedConfig: InstantiatedConfig | undefined,
 ): Promise<void> => {
+  // Type guard to ensure we have V4 config
+  if (!("typescriptConfig" in v4Config)) {
+    throw new Error("Invalid config passed to processV4Config");
+  }
+
   // For V3 compatibility mode, schemas were already extracted during conversion
-  // For pure V4 configs (future), we'll need to extract them here
+  // For pure V4 configs, we need to extract them here
   let schemas;
   let fileExtension: ".ts" | ".mts" | ".cts";
+  let importsExtension: "" | ".js" | ".mjs" | ".cjs";
 
   if (instantiatedConfig) {
     // V3 compatibility mode - use already extracted data
     schemas = instantiatedConfig.schemas;
     fileExtension = instantiatedConfig.fileExtension;
+    importsExtension = instantiatedConfig.importsExtension;
   } else {
-    // Pure V4 mode (not yet implemented)
-    throw new Error(
-      "Pure V4 config format is not yet fully implemented. " +
-        "V4 will be available in a future release. " +
-        "For now, please use V3 config format (without the 'generators' field).",
+    // Pure V4 mode - extract schemas directly
+    const schemasList = v4Config.typescriptConfig.schemas || ["public"];
+    schemas = await extractSchemas(v4Config.connection, {
+      schemas: schemasList,
+    });
+
+    const derivedExtensions = deriveExtensions(
+      v4Config.typescriptConfig.tsModuleFormat,
+      v4Config.typescriptConfig.importsExtension,
     );
+    fileExtension = derivedExtensions.fileExtension;
+    importsExtension = derivedExtensions.importsExtension;
   }
 
-  // Type guard to ensure we have typescriptConfig
-  if (!("typescriptConfig" in v4Config)) {
-    throw new Error("Invalid V4 config: missing typescriptConfig");
-  }
+  // For pure V4 mode, create a minimal instantiatedConfig for backwards compat with renderTsFile
+  // TODO: Refactor renderTsFile to not need instantiatedConfig
+  const renderCompatConfig = instantiatedConfig || {
+    importsExtension,
+  };
 
   await runWithContext(
     {
       typescriptConfig: v4Config.typescriptConfig,
       config: v4Config,
       schemas,
-      instantiatedConfig, // Only present for V3 compatibility
+      instantiatedConfig: renderCompatConfig as any, // Cast for V4 compat
     },
     async () => {
       // Run V4 generators from config

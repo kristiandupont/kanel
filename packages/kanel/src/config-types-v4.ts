@@ -25,11 +25,17 @@ type Awaitable<T> = T | PromiseLike<T>;
  * Affects all TypeScript generators.
  */
 export type TypescriptConfig = {
+  /** Which database schemas to process (can also be specified at V3 config level) */
+  schemas?: string[];
+
   /** How to generate enums: 'literal' (type unions) or 'enum' (TS enums) */
   enumStyle: "literal" | "enum";
 
   /** Module format for TypeScript output */
   tsModuleFormat?: "esm" | "commonjs" | "explicit-esm" | "explicit-commonjs";
+
+  /** Optional explicit imports extension (legacy, use tsModuleFormat instead) */
+  importsExtension?: string;
 };
 
 /**

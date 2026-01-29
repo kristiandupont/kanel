@@ -12,6 +12,7 @@ import type {
   GetPropertyMetadata,
   GetRoutineMetadata,
 } from "./metadata-types";
+import { useKanelContext } from "./context";
 
 const toPascalCase = recase(null, "pascal");
 
@@ -35,11 +36,7 @@ const toPascalCase = recase(null, "pascal");
  * }
  * ```
  */
-export const defaultGetMetadata: GetMetadata = (
-  details,
-  generateFor,
-  instantiatedConfig,
-) => {
+export const defaultGetMetadata: GetMetadata = (details, generateFor) => {
   const { comment: strippedComment } = tryParse(details.comment);
   const isAgentNoun = ["initializer", "mutator"].includes(generateFor);
 
@@ -49,14 +46,13 @@ export const defaultGetMetadata: GetMetadata = (
 
   const suffix = isAgentNoun ? `_${generateFor}` : "";
 
+  const context = useKanelContext();
+  const outputPath = context.config.outputPath || ".";
+
   return {
     name: toPascalCase(details.name + suffix),
     comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
-    path: join(
-      instantiatedConfig.outputPath,
-      details.schemaName,
-      toPascalCase(details.name),
-    ),
+    path: join(outputPath, details.schemaName, toPascalCase(details.name)),
   };
 };
 // #endregion defaultGetMetadata
@@ -150,19 +146,21 @@ export const defaultPropertySortFunction = (
  * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
  * passed to your custom getRoutineMetadata function instead of importing this.
  */
-export const defaultGetRoutineMetadata: GetRoutineMetadata = (
-  details,
-  instantiatedConfig,
-) => ({
-  parametersName: `${details.name}_params`,
-  parameters: details.parameters.map(({ name }) => ({
-    name,
-    comment: [],
-  })),
+export const defaultGetRoutineMetadata: GetRoutineMetadata = (details) => {
+  const context = useKanelContext();
+  const outputPath = context.config.outputPath || ".";
 
-  returnTypeName: `${details.name}_return_type`,
-  returnTypeComment: [`Return type for ${details.name}`],
+  return {
+    parametersName: `${details.name}_params`,
+    parameters: details.parameters.map(({ name }) => ({
+      name,
+      comment: [],
+    })),
 
-  path: join(instantiatedConfig.outputPath, details.schemaName, details.name),
-});
+    returnTypeName: `${details.name}_return_type`,
+    returnTypeComment: [`Return type for ${details.name}`],
+
+    path: join(outputPath, details.schemaName, details.name),
+  };
+};
 // #endregion defaultGetRoutineMetadata
