@@ -5,28 +5,47 @@
  * including the composable metadata pattern and generator architecture.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import type { ConfigV4 } from "../config-types-v4";
 import { makePgTsGenerator } from "../generators/makePgTsGenerator";
 import processDatabase from "../processDatabase";
+import useTestKnex from "../test-helpers/useTestKnex";
+import useSchema from "../test-helpers/useSchema";
 
-const testConnection = {
-  host: "localhost",
-  user: "postgres",
-  password: "postgres",
-  database: "dvdrental",
-  port: 54321,
-};
+vi.mock("../writeFile", () => ({ default: vi.fn() }));
+
+import writeFile from "../writeFile";
+const mockedWriteFile = vi.mocked(writeFile);
+
+function getResults(): { [fullPath: string]: string[] } {
+  return mockedWriteFile.mock.calls.reduce(
+    (acc, [args]) => {
+      acc[args.fullPath] = args.lines;
+      return acc;
+    },
+    {} as Record<string, string[]>,
+  );
+}
 
 describe("V4 Config", () => {
+  const [getKnex, _, getConnection] = useTestKnex();
+  useSchema(getKnex, "v4test");
   describe("Basic V4 Config", () => {
     it("should work with minimal V4 config using generator", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.users (
+          id serial primary key,
+          name text not null
+        );
+      `);
+
       const generatorCalls: string[] = [];
 
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -50,28 +69,44 @@ describe("V4 Config", () => {
     });
 
     it("should use literal enum style from typescriptConfig", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create type v4test.status as enum ('active', 'inactive');
+      `);
+
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "literal",
         },
         generators: [makePgTsGenerator()],
       };
 
-      // Just verify it runs without error
       await processDatabase(config);
+
+      // Verify it generated files
+      const results = getResults();
+      expect(Object.keys(results).length).toBeGreaterThan(0);
     });
   });
 
   describe("Composable Metadata Functions", () => {
     it("should allow composing getMetadata with builtin", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.products (
+          id serial primary key,
+          name text not null
+        );
+      `);
+
       const metadataCalls: string[] = [];
 
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -99,12 +134,20 @@ describe("V4 Config", () => {
     });
 
     it("should allow composing getPropertyMetadata with builtin", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.actors (
+          actor_id serial primary key,
+          name text not null
+        );
+      `);
+
       const propertyCalls: string[] = [];
 
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -144,10 +187,18 @@ describe("V4 Config", () => {
 
   describe("Custom Type Map", () => {
     it("should respect customTypeMap in generator config", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.items (
+          id serial primary key,
+          description text
+        );
+      `);
+
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -168,9 +219,9 @@ describe("V4 Config", () => {
   describe("Property Sorting", () => {
     it("should use custom propertySortFunction", async () => {
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -190,13 +241,21 @@ describe("V4 Config", () => {
 
   describe("Multiple Generators", () => {
     it("should support multiple generators in config", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.categories (
+          id serial primary key,
+          name text not null
+        );
+      `);
+
       const generator1Calls: string[] = [];
       const generator2Calls: string[] = [];
 
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -239,9 +298,9 @@ describe("V4 Config", () => {
       const hookCalls: string[] = [];
 
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [makePgTsGenerator()],
@@ -259,12 +318,20 @@ describe("V4 Config", () => {
     });
 
     it("should support V4 postRenderHooks", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.reviews (
+          id serial primary key,
+          rating int not null
+        );
+      `);
+
       const hookCalls: string[] = [];
 
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [makePgTsGenerator()],
@@ -285,9 +352,9 @@ describe("V4 Config", () => {
   describe("Advanced Composition", () => {
     it("should allow full composition pattern with spreading builtin result", async () => {
       const config: ConfigV4 = {
-        connection: testConnection,
+        connection: getConnection(),
         typescriptConfig: {
-          schemas: ["public"],
+          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
