@@ -6,12 +6,18 @@ export type {
   CompositeDetails,
   CompositeProperty,
 } from "./generators/composite-types";
+export {
+  default as makeMarkdownGenerator,
+  type MarkdownGeneratorConfig,
+  type MarkdownTarget,
+} from "./generators/makeMarkdownGenerator";
 export { default as makePgTsGenerator } from "./generators/makePgTsGenerator";
 export { default as resolveType } from "./generators/resolveType";
 export * from "./hooks";
 export type * from "./metadata-types";
 export type {
   FileContents,
+  MarkdownContents,
   default as Output,
   Path,
   TsFileContents,

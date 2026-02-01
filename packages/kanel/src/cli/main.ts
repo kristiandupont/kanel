@@ -82,9 +82,11 @@ export async function main(): Promise<void> {
     }
   } else {
     if (options.config) {
+      console.error(`Configuration file (${options.config}) not found`);
+    } else {
       console.error("Configuration file (kanel.config.*) not found");
-      process.exit(1);
     }
+    process.exit(1);
   }
 
   try {

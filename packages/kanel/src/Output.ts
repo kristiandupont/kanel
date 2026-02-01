@@ -11,7 +11,13 @@ export type GenericContents = {
   lines: string[];
 };
 
-export type FileContents = TsFileContents | GenericContents;
+export type MarkdownContents = {
+  fileType: "markdown";
+  template: string;
+  context: any;
+};
+
+export type FileContents = TsFileContents | GenericContents | MarkdownContents;
 
 type Output = Record<Path, FileContents>;
 

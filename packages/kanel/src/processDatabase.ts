@@ -15,6 +15,7 @@ import {
 import defaultTypeMap from "./defaultTypeMap";
 import type Output from "./Output";
 import renderTsFile from "./ts-utilities/renderTsFile";
+import renderMarkdownFile from "./renderMarkdownFile";
 import type TypeMap from "./TypeMap";
 import writeFile from "./writeFile";
 
@@ -152,7 +153,7 @@ const processV4Config = async (
     // V3 compatibility mode - use already extracted data
     schemas = instantiatedConfig.schemas;
     fileExtension = instantiatedConfig.fileExtension;
-    importsExtension = instantiatedConfig.importsExtension;
+    importsExtension = instantiatedConfig.importsExtension as any;
   } else {
     // Pure V4 mode - extract schemas directly
     const schemasList = v4Config.schemaNames || ["public"];
@@ -217,6 +218,9 @@ const processV4Config = async (
             fullPath: `${path}${fileExtension}`,
             lines,
           };
+        } else if (file.fileType === "markdown") {
+          const lines = renderMarkdownFile(file.template, file.context);
+          return { fullPath: path, lines };
         } else if (file.fileType === "generic") {
           return { fullPath: path, lines: file.lines };
         }
