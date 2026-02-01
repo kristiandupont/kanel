@@ -141,8 +141,12 @@ describe("V3 to V4 Config Conversion", () => {
         { suppressDeprecationWarning: true },
       );
 
-      // Should have applyTaggedComments + user hook
-      expect(v4Config.preRenderHooks).toHaveLength(2);
+      // V3 pre-render hooks are moved to PgTsGenerator-specific hooks
+      expect(v4Config.preRenderHooks).toBeUndefined();
+
+      // Should have a PgTsGenerator with applyTaggedComments + user hook
+      expect(v4Config.generators).toHaveLength(1);
+      // We can't directly inspect the generator config, but we can verify it exists
     });
 
     it("should wrap post-render hooks", () => {

@@ -25,9 +25,6 @@ type Awaitable<T> = T | PromiseLike<T>;
  * Affects all TypeScript generators.
  */
 export type TypescriptConfig = {
-  /** Which database schemas to process (can also be specified at V3 config level) */
-  schemas?: string[];
-
   /** How to generate enums: 'literal' (type unions) or 'enum' (TS enums) */
   enumStyle: "literal" | "enum";
 
@@ -187,6 +184,12 @@ export type PgTsGeneratorConfig = {
 
   /** Function to sort properties in generated interfaces */
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
+
+  /** Filter which PostgreSQL types this generator should process */
+  filter?: (pgType: PgType) => boolean;
+
+  /** Pre-render hooks specific to this generator. Run within the generator's context. */
+  preRenderHooks?: PreRenderHookV4[];
 };
 
 // #endregion PgTsGeneratorConfig
@@ -204,8 +207,8 @@ export type ConfigV4 = {
   /** Schema names to process. If not provided, all schemas are processed. */
   schemaNames?: string[];
 
-  /** Filter which PostgreSQL types to process */
-  typeFilter?: (pgType: PgType) => boolean;
+  /** Filter which PostgreSQL types to extract from the database */
+  filter?: (pgType: PgType) => boolean;
 
   /** Whether to resolve view definitions */
   resolveViews?: boolean;

@@ -198,15 +198,17 @@ export function convertV3ConfigToV4(
   }
 
   // Wrap V3 hooks to inject instantiatedConfig
-  const preRenderHooks: PreRenderHookV4[] = [];
+  const pgTsPreRenderHooks: PreRenderHookV4[] = [];
   const postRenderHooks: PostRenderHookV4[] = [];
 
   // V3 always applies applyTaggedComments by default (prepended to user hooks)
-  preRenderHooks.push(wrapV3PreRenderHook(applyTaggedComments));
+  pgTsPreRenderHooks.push(wrapV3PreRenderHook(applyTaggedComments));
 
-  // Add user's pre-render hooks
+  // Add user's pre-render hooks (these become PgTsGenerator-specific in V4)
   if (v3Config.preRenderHooks) {
-    preRenderHooks.push(...v3Config.preRenderHooks.map(wrapV3PreRenderHook));
+    pgTsPreRenderHooks.push(
+      ...v3Config.preRenderHooks.map(wrapV3PreRenderHook),
+    );
   }
 
   // Add user's post-render hooks, or default to [markAsGenerated]
@@ -217,11 +219,14 @@ export function convertV3ConfigToV4(
   const wrappedMetadata = wrapV3MetadataFunctions(v3Config, instantiatedConfig);
 
   // Create PgTsGenerator with wrapped V3 metadata and config
+  // In V3, all pre-render hooks were global, but they all operated on PgTs output
+  // In V4, they become PgTsGenerator-specific hooks
   const generators = [
     makePgTsGenerator({
       customTypeMap: v3Config.customTypeMap,
       ...wrappedMetadata,
       propertySortFunction: v3Config.propertySortFunction,
+      preRenderHooks: pgTsPreRenderHooks,
     }),
   ];
 
@@ -229,7 +234,7 @@ export function convertV3ConfigToV4(
   const v4Config: ConfigV4 = {
     connection: v3Config.connection,
     schemaNames: v3Config.schemas,
-    typeFilter: v3Config.typeFilter,
+    filter: v3Config.typeFilter, // V3 typeFilter -> V4 filter
     resolveViews: v3Config.resolveViews ?? true,
 
     typescriptConfig: {
@@ -242,7 +247,9 @@ export function convertV3ConfigToV4(
     preDeleteOutputFolder: v3Config.preDeleteOutputFolder,
 
     generators,
-    preRenderHooks,
+    // V3 pre-render hooks are moved to PgTsGenerator-specific hooks
+    // No global pre-render hooks in converted config
+    preRenderHooks: undefined,
     postRenderHooks,
   };
 

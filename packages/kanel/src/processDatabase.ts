@@ -78,7 +78,7 @@ const processDatabase = async (cfg: Config): Promise<void> => {
     const v3ConfigWithDefaults = { ...defaultConfig, ...cfg };
     const schemas = await extractSchemas(v3ConfigWithDefaults.connection, {
       schemas: v3ConfigWithDefaults.schemas,
-      typeFilter: v3ConfigWithDefaults.typeFilter,
+      typeFilter: v3ConfigWithDefaults.typeFilter, // V3 uses typeFilter
     });
 
     const typeMap: TypeMap = {
@@ -146,7 +146,7 @@ const processV4Config = async (
   // For pure V4 configs, we need to extract them here
   let schemas;
   let fileExtension: ".ts" | ".mts" | ".cts";
-  let importsExtension: "" | ".js" | ".mjs" | ".cjs";
+  let importsExtension: "" | ".ts" | ".js" | ".mjs" | ".cjs" | undefined;
 
   if (instantiatedConfig) {
     // V3 compatibility mode - use already extracted data
@@ -155,9 +155,10 @@ const processV4Config = async (
     importsExtension = instantiatedConfig.importsExtension;
   } else {
     // Pure V4 mode - extract schemas directly
-    const schemasList = v4Config.typescriptConfig.schemas || ["public"];
+    const schemasList = v4Config.schemaNames || ["public"];
     schemas = await extractSchemas(v4Config.connection, {
       schemas: schemasList,
+      typeFilter: v4Config.filter, // V4 uses filter
     });
 
     const derivedExtensions = deriveExtensions(

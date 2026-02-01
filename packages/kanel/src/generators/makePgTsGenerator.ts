@@ -69,6 +69,32 @@ export function makePgTsGenerator(config: PgTsGeneratorConfig = {}): Generator {
 
     // Run sub-generators within the PgTsGenerator context
     return await runWithPgTsGeneratorContext(generatorContext, async () => {
+      // Apply generator-specific filter if provided
+      let schemas = kanelContext.schemas;
+      if (config.filter) {
+        schemas = Object.fromEntries(
+          Object.entries(schemas).map(([schemaName, schema]) => {
+            // Filter each type array in the schema
+            const filteredSchema = {
+              ...schema,
+              tables: schema.tables?.filter(config.filter) ?? [],
+              foreignTables: schema.foreignTables?.filter(config.filter) ?? [],
+              views: schema.views?.filter(config.filter) ?? [],
+              materializedViews:
+                schema.materializedViews?.filter(config.filter) ?? [],
+              compositeTypes:
+                schema.compositeTypes?.filter(config.filter) ?? [],
+              enums: schema.enums?.filter(config.filter) ?? [],
+              ranges: schema.ranges?.filter(config.filter) ?? [],
+              domains: schema.domains?.filter(config.filter) ?? [],
+              functions: schema.functions?.filter(config.filter) ?? [],
+              procedures: schema.procedures?.filter(config.filter) ?? [],
+            };
+            return [schemaName, filteredSchema];
+          }),
+        );
+      }
+
       // Internal sub-generators (these are implementation details, not exposed to users)
       // These generators now use usePgTsGeneratorContext() instead of instantiatedConfig
       const subGenerators = [
@@ -87,11 +113,18 @@ export function makePgTsGenerator(config: PgTsGeneratorConfig = {}): Generator {
       let output: Output = {};
 
       // Run all sub-generators on each schema
-      Object.values(kanelContext.schemas).forEach((schema) => {
+      Object.values(schemas).forEach((schema) => {
         subGenerators.forEach((generator) => {
           output = generator(schema, output);
         });
       });
+
+      // Run generator-specific pre-render hooks
+      if (config.preRenderHooks) {
+        for (const hook of config.preRenderHooks) {
+          output = await hook(output);
+        }
+      }
 
       return output;
     });

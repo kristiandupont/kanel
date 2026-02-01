@@ -46,7 +46,7 @@ type ConfigV4 = {
   // Database connection settings
   connection: string | ConnectionConfig;
   schemaNames?: string[];
-  typeFilter?: (pgType: PgType) => boolean;
+  filter?: (pgType: PgType) => boolean;  // Global filter applied during database extraction
   resolveViews?: boolean;
 
   // General TypeScript settings (affects all TS generators)
@@ -58,7 +58,7 @@ type ConfigV4 = {
 
   // Top-level generators and hooks
   generators: Generator[];
-  preRenderHooks?: PreRenderHookV4[];
+  preRenderHooks?: PreRenderHookV4[];  // Global hooks (run after all generators)
   postRenderHooks?: PostRenderHookV4[];
 };
 ```
@@ -149,6 +149,12 @@ type PgTsGeneratorConfig = {
   generateIdentifierType?: GenerateIdentifierTypeV4;
   getRoutineMetadata?: GetRoutineMetadataV4;
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
+
+  // Generator-specific filter - further filters types already extracted from database
+  filter?: (pgType: PgType) => boolean;
+
+  // Generator-specific pre-render hooks - run within generator context
+  preRenderHooks?: PreRenderHookV4[];
 };
 
 function makePgTsGenerator(config: PgTsGeneratorConfig): Generator {
@@ -209,6 +215,10 @@ When a v3 config is detected:
 2. **Create v4 config structure**:
    - Extract `typescriptConfig` from top-level `enumStyle` and `tsModuleFormat`
    - Create `makePgTsGenerator()` with v3's metadata functions and `customTypeMap`
+   - **Move v3 pre-render hooks to PgTsGenerator-specific hooks**:
+     - V3 pre-render hooks operated on PgTs output and used PgTs context
+     - In V4, these become `preRenderHooks` in `PgTsGeneratorConfig`
+     - This allows them to run within the PgTsGenerator context
    - Wrap v3 hooks to inject `instantiatedConfig` parameter:
      ```ts
      const wrappedPreRenderHook: PreRenderHookV4 = (output) => {
@@ -216,7 +226,7 @@ When a v3 config is detected:
        return v3Hook(output, instantiatedConfig!);
      };
      ```
-   - Prepend `applyTaggedComments` hook to `preRenderHooks` (for backwards compatibility)
+   - Prepend `applyTaggedComments` hook to PgTsGenerator `preRenderHooks` (for backwards compatibility)
 
 3. **Create context**:
    - Populate v4 context fields (`typescriptConfig`, `config`, `schemas`)
@@ -227,6 +237,7 @@ When a v3 config is detected:
 ## Breaking Changes for V4
 
 - `getMetadata`, `getPropertyMetadata`, `generateIdentifierType`, `getRoutineMetadata`, `propertySortFunction`, and `customTypeMap` move from top-level `Config` to `PgTsGeneratorConfig`
+- `typeFilter` renamed to `filter` (both at global and generator level)
 - V4 hooks no longer receive `instantiatedConfig` parameter - use `useKanelContext()` instead
 - V4 metadata functions receive a `builtinMetadata`/`builtinType` parameter as their last argument (for composition)
 - `defaultGetMetadata`, `defaultGetPropertyMetadata`, `defaultGenerateIdentifierType`, and `defaultGetRoutineMetadata` are **deprecated** and will be removed in a future version
@@ -236,6 +247,10 @@ When a v3 config is detected:
   - **Migration:** Instead of importing and calling `defaultGetMetadata(...)`, use the third parameter: `(details, generateFor, builtinMetadata) => ({ ...builtinMetadata, ... })`
 - Pre-render hooks that modify TS output (Kysely, Zod, Knex) become generators
 - `applyTaggedComments` is no longer automatically applied - users must use composable getter pattern instead (details TBD in design questions below)
+- **Pre-render hooks are now generator-specific**:
+  - Global `preRenderHooks` run after all generators complete
+  - Generator-specific `preRenderHooks` (e.g., in `PgTsGeneratorConfig`) run within that generator's context
+  - This allows hooks to access generator-specific context like `usePgTsGeneratorContext()`
 
 ## Example V4 Config
 
@@ -244,6 +259,7 @@ import { makePgTsGenerator, makeKyselyGenerator, makeZodGenerator } from 'kanel'
 
 const config: ConfigV4 = {
   connection: { /* ... */ },
+  filter: (type) => type.schemaName === 'public',  // Global filter at extraction level
   typescriptConfig: {
     enumStyle: 'literal',  // v4 default (v3 was 'enum')
     tsModuleFormat: 'esm',
@@ -261,10 +277,15 @@ const config: ConfigV4 = {
         comment: [...(builtinMetadata.comment || []), 'Extra info'],
       }),
       customTypeMap: { /* ... */ },
+      // Generator-specific filter - further filters within this generator
+      filter: (type) => !type.name.startsWith('_'),
+      // Generator-specific pre-render hooks - run within PgTsGenerator context
+      preRenderHooks: [makeZodSchemaHook()],  // Can access usePgTsGeneratorContext()
     }),
     makeKyselyGenerator(),
-    makeZodGenerator(),
   ],
+  // Global pre-render hooks run after all generators (optional)
+  preRenderHooks: [addTimestampToAllFiles],
   // Note: markAsGenerated is NOT added by default in v4
   // Add explicitly if needed: postRenderHooks: [markAsGenerated]
 };
@@ -320,9 +341,22 @@ type Generator = () => Awaitable<Output>;  // Access schemas via useKanelContext
 
 **Rationale**:
 - **Generators**: Produce output that gets merged into the final result. Access database schemas via context.
-- **PreRenderHooks**: Transform/remove/replace anything in accumulated output (receive `outputAcc` parameter)
+- **Generator-specific PreRenderHooks**: Transform the output of a specific generator, running within that generator's execution context
+  - Example: Zod schema generation hooks run within PgTsGenerator context, can call `usePgTsGeneratorContext()`
+  - Run immediately after their generator produces output, before output is merged
+- **Global PreRenderHooks**: Transform/remove/replace anything in accumulated output from all generators
+  - Receive `outputAcc` parameter with all generator output
+  - Run after all generators complete
 
-If a generator needs previous output, it should be a PreRenderHook instead. This keeps the mental model clean.
+**Execution flow**:
+1. Generator 1 produces output
+2. Generator 1's pre-render hooks transform its output
+3. Generator 2 produces output
+4. Generator 2's pre-render hooks transform its output
+5. All output is accumulated
+6. Global pre-render hooks run on everything
+
+If a generator needs to see previous generators' output, it should be a global PreRenderHook instead.
 
 ### The applyTaggedComments Migration
 

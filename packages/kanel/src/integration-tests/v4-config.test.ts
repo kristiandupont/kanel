@@ -44,8 +44,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -76,8 +76,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "literal",
         },
         generators: [makePgTsGenerator()],
@@ -105,8 +105,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -146,8 +146,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -197,8 +197,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -220,8 +220,8 @@ describe("V4 Config", () => {
     it("should use custom propertySortFunction", async () => {
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -254,8 +254,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
@@ -299,8 +299,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [makePgTsGenerator()],
@@ -330,8 +330,8 @@ describe("V4 Config", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [makePgTsGenerator()],
@@ -353,8 +353,8 @@ describe("V4 Config", () => {
     it("should allow full composition pattern with spreading builtin result", async () => {
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["v4test"],
         typescriptConfig: {
-          schemas: ["v4test"],
           enumStyle: "enum",
         },
         generators: [
