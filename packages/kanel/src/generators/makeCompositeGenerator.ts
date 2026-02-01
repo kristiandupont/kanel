@@ -43,7 +43,9 @@ const makeMapper =
           return type.typeImports.some((i) => i.path === path);
         })
         .forEach((c) =>
-          declarations.push(generatorContext.generateIdentifierType(c, details)),
+          declarations.push(
+            generatorContext.generateIdentifierType(c, details),
+          ),
         );
     }
 

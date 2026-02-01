@@ -58,7 +58,7 @@ export function makePgTsGenerator(config: PgTsGeneratorConfig = {}): Generator {
       getMetadata: wrapGetMetadata(config.getMetadata),
       getPropertyMetadata: wrapGetPropertyMetadata(config.getPropertyMetadata),
       generateIdentifierType: wrapGenerateIdentifierType(
-        config.generateIdentifierType
+        config.generateIdentifierType,
       ),
       getRoutineMetadata: wrapGetRoutineMetadata(config.getRoutineMetadata),
 

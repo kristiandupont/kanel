@@ -260,9 +260,7 @@ const resolveType = (
           break;
         }
         case "domain": {
-          target = schemas[schemaName].domains.find(
-            (t) => t.name === typeName,
-          );
+          target = schemas[schemaName].domains.find((t) => t.name === typeName);
 
           break;
         }

@@ -32,7 +32,7 @@ import type {
  */
 export type InternalGetMetadata = (
   details: Details,
-  generateFor: "selector" | "initializer" | "mutator" | undefined
+  generateFor: "selector" | "initializer" | "mutator" | undefined,
 ) => TypeMetadataV4;
 
 /**
@@ -43,7 +43,7 @@ export type InternalGetMetadata = (
 export type InternalGetPropertyMetadata = (
   property: CompositeProperty,
   details: CompositeDetails,
-  generateFor: "selector" | "initializer" | "mutator"
+  generateFor: "selector" | "initializer" | "mutator",
 ) => PropertyMetadataV4;
 
 /**
@@ -53,7 +53,7 @@ export type InternalGetPropertyMetadata = (
  */
 export type InternalGenerateIdentifierType = (
   column: TableColumn | ForeignTableColumn,
-  details: TableDetails | ForeignTableDetails
+  details: TableDetails | ForeignTableDetails,
 ) => TypeDeclaration;
 
 /**
@@ -62,7 +62,7 @@ export type InternalGenerateIdentifierType = (
  * This is what sub-generators actually call.
  */
 export type InternalGetRoutineMetadata = (
-  routineDetails: RoutineDetails
+  routineDetails: RoutineDetails,
 ) => RoutineMetadataV4;
 
 /**
@@ -100,7 +100,7 @@ export const usePgTsGeneratorContext = (): PgTsGeneratorContext => {
   if (!context) {
     throw new Error(
       "PgTsGenerator context not available. " +
-        "This function must be called within a PgTsGenerator execution."
+        "This function must be called within a PgTsGenerator execution.",
     );
   }
   return context;
@@ -111,7 +111,5 @@ export const usePgTsGeneratorContext = (): PgTsGeneratorContext => {
  */
 export const runWithPgTsGeneratorContext = async <T>(
   context: PgTsGeneratorContext,
-  fn: () => Promise<T>
-): Promise<T> => {
-  return pgTsGeneratorStorage.run(context, fn);
-};
+  fn: () => Promise<T>,
+): Promise<T> => pgTsGeneratorStorage.run(context, fn);
