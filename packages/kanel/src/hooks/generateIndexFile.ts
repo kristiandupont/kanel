@@ -1,6 +1,5 @@
 import { join, relative, sep } from "path";
 
-import type { PreRenderHook } from "../config-types";
 import type {
   ConstantDeclaration,
   EnumDeclaration,
@@ -8,6 +7,8 @@ import type {
   TypeDeclaration,
 } from "../ts-utilities/ts-declaration-types";
 import type { TsFileContents } from "../Output";
+import type { PreRenderHookV4 } from "../config-types-v4";
+import { useKanelContext } from "../context";
 
 type GenerateIndexFileConfig = {
   filter?: (
@@ -34,7 +35,8 @@ function stringifyExportItem(item: ExportsItem): string {
 
 export const makeGenerateIndexFile: (
   config: GenerateIndexFileConfig,
-) => PreRenderHook = (config) => (outputAcc, instantiatedConfig) => {
+) => PreRenderHookV4 = (config) => (outputAcc) => {
+  const context = useKanelContext();
   const allExports: Record<string, ExportsItem[]> = {};
 
   for (const path of Object.keys(outputAcc)) {
@@ -71,13 +73,13 @@ export const makeGenerateIndexFile: (
       return "";
     }
 
-    let relativePath = relative(instantiatedConfig.outputPath, path);
+    let relativePath = relative(context.config.outputPath, path);
     // Fix Windows-style paths in import line
     if (sep === "\\") {
       relativePath = relativePath.replaceAll("\\", "/");
     }
 
-    const extension = instantiatedConfig.importsExtension ?? "";
+    const extension = context.typescriptConfig.importsExtension ?? "";
     const line = `export { ${exports
       .map(stringifyExportItem)
       .join(", ")} } from './${relativePath}${extension}';`;
@@ -96,7 +98,7 @@ export const makeGenerateIndexFile: (
   };
 
   // Use the same base name "index" - the file extension will be added by processDatabase
-  const path = join(instantiatedConfig.outputPath, "index");
+  const path = join(context.config.outputPath, "index");
 
   return {
     ...outputAcc,

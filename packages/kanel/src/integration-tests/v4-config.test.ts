@@ -78,7 +78,7 @@ describe("V4 Config", () => {
         connection: getConnection(),
         schemaNames: ["v4test"],
         typescriptConfig: {
-          enumStyle: "literal",
+          enumStyle: "literal-union",
         },
         generators: [makePgTsGenerator()],
       };
@@ -390,6 +390,199 @@ describe("V4 Config", () => {
       await processDatabase(config);
 
       // Just verify the composition pattern runs without error
+    });
+  });
+
+  describe("Output Merging", () => {
+    it("should merge TypeScript declarations from multiple generators to same file", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.users (
+          id serial primary key,
+          name text not null
+        );
+      `);
+
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["v4test"],
+        typescriptConfig: {
+          enumStyle: "enum",
+        },
+        generators: [
+          // Generator 1: Creates the base types
+          makePgTsGenerator(),
+          // Generator 2: Adds constants to the same file
+          async () => ({
+            "v4test/Users": {
+              fileType: "typescript" as const,
+              declarations: [
+                {
+                  declarationType: "constant" as const,
+                  name: "USERS_TABLE_NAME",
+                  type: "string",
+                  value: '"users"',
+                  exportAs: "named" as const,
+                },
+              ],
+            },
+          }),
+        ],
+      };
+
+      await processDatabase(config);
+
+      const results = getResults();
+      const usersFile = results["v4test/Users.ts"];
+
+      expect(usersFile).toBeDefined();
+      // Should contain both the interface from PgTsGenerator and the constant from second generator
+      const content = usersFile.join("\n");
+      expect(content).toContain("interface Users");
+      expect(content).toContain("USERS_TABLE_NAME");
+    });
+
+    it("should concatenate generic file lines from multiple generators", async () => {
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["v4test"],
+        typescriptConfig: {
+          enumStyle: "enum",
+        },
+        generators: [
+          async () => ({
+            "output.txt": {
+              fileType: "generic" as const,
+              lines: ["Line 1 from generator 1", "Line 2 from generator 1"],
+            },
+          }),
+          async () => ({
+            "output.txt": {
+              fileType: "generic" as const,
+              lines: ["Line 1 from generator 2", "Line 2 from generator 2"],
+            },
+          }),
+        ],
+      };
+
+      await processDatabase(config);
+
+      const results = getResults();
+      const outputFile = results["output.txt"];
+
+      expect(outputFile).toBeDefined();
+      expect(outputFile).toEqual([
+        "Line 1 from generator 1",
+        "Line 2 from generator 1",
+        "Line 1 from generator 2",
+        "Line 2 from generator 2",
+      ]);
+    });
+
+    it("should error when multiple generators write to same markdown file", async () => {
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["v4test"],
+        typescriptConfig: {
+          enumStyle: "enum",
+        },
+        generators: [
+          async () => ({
+            "docs.md": {
+              fileType: "markdown" as const,
+              template: "template1.hbs",
+              context: {},
+            },
+          }),
+          async () => ({
+            "docs.md": {
+              fileType: "markdown" as const,
+              template: "template2.hbs",
+              context: {},
+            },
+          }),
+        ],
+      };
+
+      await expect(processDatabase(config)).rejects.toThrow(
+        /Cannot merge markdown output.*docs\.md/,
+      );
+    });
+
+    it("should error when generators output different file types to same path", async () => {
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["v4test"],
+        typescriptConfig: {
+          enumStyle: "enum",
+        },
+        generators: [
+          async () => ({
+            "output": {
+              fileType: "typescript" as const,
+              declarations: [],
+            },
+          }),
+          async () => ({
+            "output": {
+              fileType: "generic" as const,
+              lines: ["test"],
+            },
+          }),
+        ],
+      };
+
+      await expect(processDatabase(config)).rejects.toThrow(
+        /Cannot merge output.*file type mismatch/,
+      );
+    });
+
+    it("should allow TypeScript files with multiple default exports to merge (TypeScript will validate)", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.products (
+          id serial primary key
+        );
+      `);
+
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["v4test"],
+        typescriptConfig: {
+          enumStyle: "enum",
+        },
+        generators: [
+          // Generator 1: Creates default export interface
+          makePgTsGenerator(),
+          // Generator 2: Tries to add another default export (bad practice, but should merge)
+          async () => ({
+            "v4test/Products": {
+              fileType: "typescript" as const,
+              declarations: [
+                {
+                  declarationType: "constant" as const,
+                  name: "defaultProduct",
+                  type: undefined,
+                  value: "{ id: 1 }",
+                  exportAs: "default" as const,
+                },
+              ],
+            },
+          }),
+        ],
+      };
+
+      // Should not throw during generation - TypeScript compiler will catch the error
+      await processDatabase(config);
+
+      const results = getResults();
+      const productsFile = results["v4test/Products.ts"];
+
+      expect(productsFile).toBeDefined();
+      // File should contain both default exports (invalid TS, but generated successfully)
+      const content = productsFile.join("\n");
+      expect(content).toContain("export default interface Products");
+      expect(content).toContain("export default const defaultProduct");
     });
   });
 });

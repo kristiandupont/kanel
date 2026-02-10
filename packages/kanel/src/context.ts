@@ -49,8 +49,9 @@ export const createTestContext = (
   instantiatedConfig: InstantiatedConfig,
 ): KanelContext => ({
   typescriptConfig: {
-    // V3's "type" maps to V4's "literal"
-    enumStyle: instantiatedConfig.enumStyle === "type" ? "literal" : "enum",
+    // V3's "type" maps to V4's "literal-union"
+    enumStyle:
+      instantiatedConfig.enumStyle === "type" ? "literal-union" : "enum",
     tsModuleFormat: instantiatedConfig.tsModuleFormat,
   },
   config: {

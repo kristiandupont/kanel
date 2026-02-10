@@ -166,7 +166,7 @@ export function makeMarkdownGenerator(
     const output: Output = {};
 
     // Prepare full metadata context that all templates can access
-    const metadata = {
+    const sharedContext = {
       schemas: kanelContext.schemas,
       entities: extractEntities(kanelContext.schemas),
     };
@@ -176,8 +176,8 @@ export function makeMarkdownGenerator(
       if (target.perEntity) {
         // Generate one file per entity
         const entities = target.filter
-          ? metadata.entities.filter(target.filter)
-          : metadata.entities;
+          ? sharedContext.entities.filter(target.filter)
+          : sharedContext.entities;
 
         entities.forEach((entity) => {
           const outputPath = interpolate(target.output, { entity });
@@ -185,7 +185,7 @@ export function makeMarkdownGenerator(
             fileType: "markdown",
             template: target.template,
             context: {
-              metadata,
+              ...sharedContext,
               entity,
             },
           };
@@ -201,7 +201,7 @@ export function makeMarkdownGenerator(
               fileType: "markdown",
               template: target.template,
               context: {
-                metadata,
+                ...sharedContext,
                 schema,
               },
             };
@@ -213,9 +213,7 @@ export function makeMarkdownGenerator(
         const markdownContent: MarkdownContents = {
           fileType: "markdown",
           template: target.template,
-          context: {
-            metadata,
-          },
+          context: sharedContext,
         };
         output[target.output] = markdownContent;
       }

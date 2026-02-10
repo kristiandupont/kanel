@@ -1,9 +1,9 @@
 import { recase } from "@kristiandupont/recase";
-import type { PreRenderHook } from "kanel";
+import type { PreRenderHookV4 } from "kanel/build/config-types-v4";
 
 const toCamelCase = recase(null, "camel");
 
-export const zodCamelCaseHook: PreRenderHook = (output) => {
+export const zodCamelCaseHook: PreRenderHookV4 = (output) => {
   const transformInterfaceDeclaration = (declaration) => ({
     ...declaration,
     properties: declaration.properties.map((property) => ({
@@ -41,7 +41,7 @@ export const zodCamelCaseHook: PreRenderHook = (output) => {
       return [
         path,
         {
-          ...fileContents,
+          fileType: "typescript" as const,
           declarations: transformDeclarations(fileContents.declarations),
         },
       ];

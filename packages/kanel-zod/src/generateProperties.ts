@@ -1,13 +1,12 @@
 import type {
   CompositeDetails,
   CompositeProperty,
-  InstantiatedConfig,
   TypeImport,
+  TypeMap,
 } from "kanel";
 import { resolveType } from "kanel";
+import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext";
 import * as R from "ramda";
-
-import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
 
 export type ZodPropertyDeclaration = {
   name: string;
@@ -21,25 +20,21 @@ const generateProperties = <D extends CompositeDetails>(
   nonCompositeTypeImports: Record<string, TypeImport>,
   compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
-  config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig,
+  zodTypeMap: TypeMap,
 ): ZodPropertyDeclaration[] => {
+  const pgTsContext = usePgTsGeneratorContext();
+
   const ps =
     details.kind === "compositeType" ? details.attributes : details.columns;
 
-  const sortedPs = instantiatedConfig.propertySortFunction
-    ? R.sort(instantiatedConfig.propertySortFunction, ps as any)
+  const sortedPs = pgTsContext.propertySortFunction
+    ? R.sort(pgTsContext.propertySortFunction, ps as any)
     : ps;
 
   const result: ZodPropertyDeclaration[] = sortedPs.map(
     (p: CompositeProperty): ZodPropertyDeclaration => {
       const { name, typeOverride, nullableOverride, optionalOverride } =
-        instantiatedConfig.getPropertyMetadata(
-          p,
-          details,
-          generateFor,
-          instantiatedConfig,
-        );
+        pgTsContext.getPropertyMetadata(p, details, generateFor);
       const canBeOptional: boolean =
         p.isNullable || p.defaultValue || p.isIdentity;
 
@@ -55,8 +50,8 @@ const generateProperties = <D extends CompositeDetails>(
         const x = identifierTypeImports[`${details.schemaName}.${t.name}`];
         typeImports.push(x);
         zodType = x.name;
-      } else if (p.type.fullName in config.zodTypeMap) {
-        const x = config.zodTypeMap[p.type.fullName];
+      } else if (p.type.fullName in zodTypeMap) {
+        const x = zodTypeMap[p.type.fullName];
         if (typeof x === "string") {
           zodType = x;
           if ("dimensions" in p) {

@@ -11,7 +11,7 @@ import {
 import type { Path } from "../Output";
 import type Output from "../Output";
 
-type EnumStyle = "enum" | "literal";
+type EnumStyle = "enum" | "literal-union";
 
 const makeMapper =
   (style: EnumStyle) =>
@@ -23,7 +23,7 @@ const makeMapper =
       undefined,
     );
 
-    if (style === "literal") {
+    if (style === "literal-union") {
       const declaration: TypeDeclaration = {
         declarationType: "typeDeclaration",
         name,

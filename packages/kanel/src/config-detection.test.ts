@@ -78,7 +78,7 @@ describe("Config Detection", () => {
       const config: Config = {
         connection: "postgres://localhost/test",
         typescriptConfig: {
-          enumStyle: "literal",
+          enumStyle: "literal-union",
         },
         generators: [],
       };
@@ -93,7 +93,7 @@ describe("Config Detection", () => {
         schemaNames: ["public"],
         outputPath: "./models",
         typescriptConfig: {
-          enumStyle: "literal",
+          enumStyle: "literal-union",
           tsModuleFormat: "esm",
         },
         generators: [async () => ({})],
@@ -110,7 +110,7 @@ describe("Config Detection", () => {
       const config: Config = {
         connection: "postgres://localhost/test",
         typescriptConfig: {
-          enumStyle: "literal",
+          enumStyle: "literal-union",
         },
         generators: [],
       };
@@ -118,7 +118,7 @@ describe("Config Detection", () => {
       if (isV4Config(config)) {
         // TypeScript should know this is ConfigV4
         const enumStyle = config.typescriptConfig.enumStyle;
-        expect(enumStyle).toBe("literal");
+        expect(enumStyle).toBe("literal-union");
 
         // This should be accessible on ConfigV4
         const generators = config.generators;
@@ -139,7 +139,7 @@ describe("Config Detection", () => {
       const config: Config = {
         connection: "postgres://localhost/test",
         enumStyle: "enum", // V3-style
-        typescriptConfig: { enumStyle: "literal" }, // V4-style
+        typescriptConfig: { enumStyle: "literal-union" }, // V4-style
         generators: [], // This makes it V4
       };
 
@@ -151,7 +151,7 @@ describe("Config Detection", () => {
       const config: Config = {
         connection: "postgres://localhost/test",
         typescriptConfig: {
-          enumStyle: "literal",
+          enumStyle: "literal-union",
         },
         generators: [],
       };
@@ -171,7 +171,7 @@ describe("Config Detection", () => {
         // V4 configs
         {
           connection: "test",
-          typescriptConfig: { enumStyle: "literal" },
+          typescriptConfig: { enumStyle: "literal-union" },
           generators: [],
         },
         {
@@ -209,13 +209,13 @@ describe("Config Detection", () => {
       const config: ConfigV4 = {
         connection: "test",
         typescriptConfig: {
-          enumStyle: "literal",
+          enumStyle: "literal-union",
         },
         generators: [],
       };
 
       // These should all be valid accesses
-      expect(config.typescriptConfig.enumStyle).toBe("literal");
+      expect(config.typescriptConfig.enumStyle).toBe("literal-union");
       expect(config.generators).toEqual([]);
       expect(config.schemaNames).toBeUndefined();
     });

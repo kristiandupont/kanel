@@ -9,8 +9,8 @@ import type { Schema } from "extract-pg-schema";
 import type {
   ConfigV3,
   InstantiatedConfig,
-  PreRenderHook,
-  PostRenderHook,
+  PreRenderHookV3,
+  PostRenderHookV3,
 } from "./config-types";
 import type {
   ConfigV4,
@@ -42,7 +42,7 @@ export type V3ConversionOptions = {
  * Wraps a V3 PreRenderHook to work as a V4 hook.
  * Injects the instantiatedConfig from context.
  */
-function wrapV3PreRenderHook(v3Hook: PreRenderHook): PreRenderHookV4 {
+function wrapV3PreRenderHook(v3Hook: PreRenderHookV3): PreRenderHookV4 {
   return async (output: Output): Promise<Output> => {
     const context = useKanelContext();
 
@@ -61,7 +61,7 @@ function wrapV3PreRenderHook(v3Hook: PreRenderHook): PreRenderHookV4 {
  * Wraps a V3 PostRenderHook to work as a V4 hook.
  * Injects the instantiatedConfig from context.
  */
-function wrapV3PostRenderHook(v3Hook: PostRenderHook): PostRenderHookV4 {
+function wrapV3PostRenderHook(v3Hook: PostRenderHookV3): PostRenderHookV4 {
   return async (path: string, lines: string[]): Promise<string[]> => {
     const context = useKanelContext();
 
@@ -238,8 +238,9 @@ export function convertV3ConfigToV4(
     resolveViews: v3Config.resolveViews ?? true,
 
     typescriptConfig: {
-      // V3's "type" maps to V4's "literal"
-      enumStyle: instantiatedConfig.enumStyle === "type" ? "literal" : "enum",
+      // V3's "type" maps to V4's "literal-union"
+      enumStyle:
+        instantiatedConfig.enumStyle === "type" ? "literal-union" : "enum",
       tsModuleFormat: v3Config.tsModuleFormat,
     },
 

@@ -14,6 +14,7 @@ import {
 } from "./default-metadata-generators";
 import defaultTypeMap from "./defaultTypeMap";
 import type Output from "./Output";
+import type { TsFileContents, GenericContents } from "./Output";
 import renderTsFile from "./ts-utilities/renderTsFile";
 import renderMarkdownFile from "./renderMarkdownFile";
 import type TypeMap from "./TypeMap";
@@ -23,6 +24,65 @@ type DerivedExtensions = {
   fileExtension: ".ts" | ".mts" | ".cts";
   importsExtension: "" | ".js" | ".mjs" | ".cjs";
 };
+
+/**
+ * Merges generator output intelligently based on file type.
+ * - TypeScript files: merge declarations arrays
+ * - Generic files: concatenate lines arrays
+ * - Markdown files: error on conflict (cannot merge template-based files)
+ */
+function mergeOutput(base: Output, incoming: Output): Output {
+  const result = { ...base };
+
+  for (const [path, incomingFile] of Object.entries(incoming)) {
+    const existingFile = result[path];
+
+    if (!existingFile) {
+      // New file, just add it
+      result[path] = incomingFile;
+      continue;
+    }
+
+    // File exists, need to merge
+    if (existingFile.fileType !== incomingFile.fileType) {
+      throw new Error(
+        `Cannot merge output at path "${path}": ` +
+          `file type mismatch (${existingFile.fileType} vs ${incomingFile.fileType})`,
+      );
+    }
+
+    switch (incomingFile.fileType) {
+      case "typescript": {
+        const tsExisting = existingFile as TsFileContents;
+        const tsIncoming = incomingFile as TsFileContents;
+        result[path] = {
+          fileType: "typescript",
+          declarations: [...tsExisting.declarations, ...tsIncoming.declarations],
+        };
+        break;
+      }
+
+      case "generic": {
+        const genericExisting = existingFile as GenericContents;
+        const genericIncoming = incomingFile as GenericContents;
+        result[path] = {
+          fileType: "generic",
+          lines: [...genericExisting.lines, ...genericIncoming.lines],
+        };
+        break;
+      }
+
+      case "markdown":
+        throw new Error(
+          `Cannot merge markdown output at path "${path}": ` +
+            `Multiple generators are attempting to write to the same markdown file. ` +
+            `Each markdown generator should use a unique output path.`,
+        );
+    }
+  }
+
+  return result;
+}
 
 const deriveExtensions = (
   tsModuleFormat:
@@ -195,7 +255,7 @@ const processV4Config = async (
       for (const generator of v4Config.generators) {
         const generatorOutput = await generator();
         // Merge generator output into accumulated output
-        output = { ...output, ...generatorOutput };
+        output = mergeOutput(output, generatorOutput);
       }
 
       // V4 pre-render hooks (no instantiatedConfig parameter)

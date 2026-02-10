@@ -5,6 +5,18 @@
 
 Generate Typescript types from a live Postgres database.
 
+---
+
+**This is a pre-release version of Kanel 4.0.0.**
+
+```bash
+$ npm i -D kanel@4.0.0-alpha.0
+```
+
+This version contains a major restructuring of the configuration format, but attempts to maintain backwards compatibility with the existing configuration format.
+
+---
+
 This is for people who don't like ORM's but who do like intellisense and type checking for their database access code.
 
 See the documentation [here](https://kristiandupont.github.io/kanel)

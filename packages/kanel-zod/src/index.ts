@@ -3,7 +3,11 @@ export {
   default as generateZodSchemas,
   makeGenerateZodSchemas,
 } from "./generateZodSchemas";
-export type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+export type {
+  GenerateZodSchemasConfig,
+  GetZodSchemaMetadata,
+  GetZodIdentifierMetadata,
+} from "./GenerateZodSchemasConfig";
 export {
   defaultGetZodIdentifierMetadata,
   defaultGetZodSchemaMetadata,

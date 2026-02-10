@@ -4,13 +4,12 @@
 import { z } from 'zod';
 
 /** Represents the enum public.mpaa_rating */
-enum MpaaRating {
-  G = 'G',
-  PG = 'PG',
-  'PG-13' = 'PG-13',
-  R = 'R',
-  'NC-17' = 'NC-17',
-};
+type MpaaRating = 
+  | 'G'
+  | 'PG'
+  | 'PG-13'
+  | 'R'
+  | 'NC-17';
 
 export default MpaaRating;
 

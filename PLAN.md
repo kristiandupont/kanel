@@ -3,6 +3,7 @@
 ## Overview
 
 The configuration is being rearranged to better separate concerns:
+
 - **Core config**: Connection and general database extraction settings
 - **TypescriptConfig**: General TypeScript output settings (module format, enum style) - affects all TS output
 - **PgTsGeneratorConfig**: Specific configuration for transforming PostgreSQL types to TypeScript (name transformation, metadata, etc.)
@@ -31,7 +32,7 @@ This allows v3 configs to run through v4 processing logic with minimal compatibi
 ```ts
 // General TypeScript output configuration - affects all TypeScript generators
 type TypescriptConfig = {
-  enumStyle: "literal" | "enum";  // Affects type stripping vs compilation
+  enumStyle: "literal-union" | "enum"; // Affects type stripping vs compilation
   tsModuleFormat?: "esm" | "commonjs" | "explicit-esm" | "explicit-commonjs";
 };
 
@@ -46,7 +47,7 @@ type ConfigV4 = {
   // Database connection settings
   connection: string | ConnectionConfig;
   schemaNames?: string[];
-  filter?: (pgType: PgType) => boolean;  // Global filter applied during database extraction
+  filter?: (pgType: PgType) => boolean; // Global filter applied during database extraction
   resolveViews?: boolean;
 
   // General TypeScript settings (affects all TS generators)
@@ -58,7 +59,7 @@ type ConfigV4 = {
 
   // Top-level generators and hooks
   generators: Generator[];
-  preRenderHooks?: PreRenderHookV4[];  // Global hooks (run after all generators)
+  preRenderHooks?: PreRenderHookV4[]; // Global hooks (run after all generators)
   postRenderHooks?: PostRenderHookV4[];
 };
 ```
@@ -67,13 +68,28 @@ type ConfigV4 = {
 
 ```ts
 // V3 metadata functions receive instantiatedConfig as final parameter
-type GetMetadataV3 = (details: Details, variant: Variant, instantiatedConfig: InstantiatedConfig) => Metadata;
-type GetPropertyMetadataV3 = (property: Property, details: Details, instantiatedConfig: InstantiatedConfig) => PropertyMetadata;
+type GetMetadataV3 = (
+  details: Details,
+  variant: Variant,
+  instantiatedConfig: InstantiatedConfig,
+) => Metadata;
+type GetPropertyMetadataV3 = (
+  property: Property,
+  details: Details,
+  instantiatedConfig: InstantiatedConfig,
+) => PropertyMetadata;
 // ... etc for other metadata functions
 
 // V3 hooks receive instantiatedConfig
-type PreRenderHookV3 = (outputAcc: Output, instantiatedConfig: InstantiatedConfig) => Awaitable<Output>;
-type PostRenderHookV3 = (path: string, lines: string[], instantiatedConfig: InstantiatedConfig) => Awaitable<string[]>;
+type PreRenderHookV3 = (
+  outputAcc: Output,
+  instantiatedConfig: InstantiatedConfig,
+) => Awaitable<Output>;
+type PostRenderHookV3 = (
+  path: string,
+  lines: string[],
+  instantiatedConfig: InstantiatedConfig,
+) => Awaitable<string[]>;
 
 type ConfigV3 = {
   connection: string | ConnectionConfig;
@@ -105,7 +121,7 @@ type Config = ConfigV3 | ConfigV4;
 
 // Type guard
 function isV3Config(config: Config): config is ConfigV3 {
-  return !('generators' in config);
+  return !("generators" in config);
 }
 ```
 
@@ -114,19 +130,35 @@ function isV3Config(config: Config): config is ConfigV3 {
 V4 metadata functions receive the builtin metadata as their last parameter, enabling easy composition:
 
 ```ts
-type GetMetadataV4 = (details: Details, variant: Variant, builtinMetadata: Metadata) => Metadata;
-type GetPropertyMetadataV4 = (property: Property, details: Details, builtinMetadata: PropertyMetadata) => PropertyMetadata;
-type GenerateIdentifierTypeV4 = (column: Column, details: Details, builtinType: TypeDeclaration) => TypeDeclaration;
-type GetRoutineMetadataV4 = (routineDetails: RoutineDetails, builtinMetadata: RoutineMetadata) => RoutineMetadata;
+type GetMetadataV4 = (
+  details: Details,
+  variant: Variant,
+  builtinMetadata: Metadata,
+) => Metadata;
+type GetPropertyMetadataV4 = (
+  property: Property,
+  details: Details,
+  builtinMetadata: PropertyMetadata,
+) => PropertyMetadata;
+type GenerateIdentifierTypeV4 = (
+  column: Column,
+  details: Details,
+  builtinType: TypeDeclaration,
+) => TypeDeclaration;
+type GetRoutineMetadataV4 = (
+  routineDetails: RoutineDetails,
+  builtinMetadata: RoutineMetadata,
+) => RoutineMetadata;
 
 // Example usage - just override what you need:
 getMetadata: (details, variant, builtinMetadata) => ({
   ...builtinMetadata,
-  comment: ['My custom comment'],
-})
+  comment: ["My custom comment"],
+});
 ```
 
 **Note on "builtin" vs "default":**
+
 - The third parameter is the **builtin** implementation (Kanel's internal implementation)
 - It's NOT a "default" from user config - user config is optional
 - The old `defaultGetMetadata` functions are deprecated and internal-only
@@ -178,6 +210,7 @@ These currently exist as pre-render hooks but will be converted to generators:
 Each will access context via `useKanelContext()` and can read the schemas directly.
 
 New generator:
+
 - **MarkdownGenerator**: Generates LLM- and human-friendly markdown documentation of the database (details TBD)
 
 ## Context
@@ -186,9 +219,9 @@ The context now contains clearly separated concerns, with an optional backwards-
 
 ```ts
 type KanelContext = {
-  typescriptConfig: TypescriptConfig;  // tsModuleFormat derived from package.json/tsconfig if not provided
-  config: Config;                      // Original config as passed to processDatabase
-  schemas: Record<string, Schema>;     // Extracted database schemas
+  typescriptConfig: TypescriptConfig; // tsModuleFormat derived from package.json/tsconfig if not provided
+  config: Config; // Original config as passed to processDatabase
+  schemas: Record<string, Schema>; // Extracted database schemas
 
   /** @deprecated Only present when running v3 configs for backwards compatibility */
   instantiatedConfig?: InstantiatedConfig;
@@ -198,6 +231,7 @@ type KanelContext = {
 **Note on intersection vs union**: Using an intersection type with optional `instantiatedConfig` is simpler than a union, since AsyncLocalStorage doesn't preserve type narrowing. The optional field approach provides type safety while supporting both v3 and v4 configs.
 
 Access via:
+
 ```ts
 const context = useKanelContext();
 // Context always has v4 shape, with optional instantiatedConfig for v3 compatibility
@@ -208,7 +242,7 @@ const context = useKanelContext();
 When a v3 config is detected:
 
 1. **Apply v3 defaults**:
-   - `enumStyle: "enum"` (v3 default; v4 default will be `"literal"`)
+   - `enumStyle: "enum"` (v3 default; v4 default will be `"literal-union"`)
    - `postRenderHooks: [markAsGenerated]` (if not explicitly set)
    - Other v3 defaults from current `defaultConfig`
 
@@ -255,32 +289,45 @@ When a v3 config is detected:
 ## Example V4 Config
 
 ```ts
-import { makePgTsGenerator, makeKyselyGenerator, makeZodGenerator } from 'kanel';
+import {
+  makePgTsGenerator,
+  makeKyselyGenerator,
+  makeZodGenerator,
+} from "kanel";
 
 const config: ConfigV4 = {
-  connection: { /* ... */ },
-  filter: (type) => type.schemaName === 'public',  // Global filter at extraction level
-  typescriptConfig: {
-    enumStyle: 'literal',  // v4 default (v3 was 'enum')
-    tsModuleFormat: 'esm',
+  connection: {
+    /* ... */
   },
-  outputPath: './models',
+  filter: (type) => type.schemaName === "public", // Global filter at extraction level
+  typescriptConfig: {
+    enumStyle: "literal", // v4 default (v3 was 'enum')
+    tsModuleFormat: "esm",
+  },
+  outputPath: "./models",
   generators: [
     makePgTsGenerator({
       // Composable metadata functions - receive builtins as last parameter
       getMetadata: (details, generateFor, builtinMetadata) => ({
         ...builtinMetadata,
-        comment: ['My custom comment'],
+        comment: ["My custom comment"],
       }),
-      getPropertyMetadata: (property, details, generateFor, builtinMetadata) => ({
+      getPropertyMetadata: (
+        property,
+        details,
+        generateFor,
+        builtinMetadata,
+      ) => ({
         ...builtinMetadata,
-        comment: [...(builtinMetadata.comment || []), 'Extra info'],
+        comment: [...(builtinMetadata.comment || []), "Extra info"],
       }),
-      customTypeMap: { /* ... */ },
+      customTypeMap: {
+        /* ... */
+      },
       // Generator-specific filter - further filters within this generator
-      filter: (type) => !type.name.startsWith('_'),
+      filter: (type) => !type.name.startsWith("_"),
       // Generator-specific pre-render hooks - run within PgTsGenerator context
-      preRenderHooks: [makeZodSchemaHook()],  // Can access usePgTsGeneratorContext()
+      preRenderHooks: [makeZodSchemaHook()], // Can access usePgTsGeneratorContext()
     }),
     makeKyselyGenerator(),
   ],
@@ -293,10 +340,10 @@ const config: ConfigV4 = {
 
 ## V4 Default Changes
 
-| Setting | V3 Default | V4 Default | Rationale |
-|---------|------------|------------|-----------|
-| `enumStyle` | `"enum"` | `"literal"` | Literal types are more modern and avoid TS compilation |
-| `postRenderHooks` | `[markAsGenerated]` | `[]` | Explicit opt-in for v4, less magic |
+| Setting           | V3 Default          | V4 Default        | Rationale                                              |
+| ----------------- | ------------------- | ----------------- | ------------------------------------------------------ |
+| `enumStyle`       | `"enum"`            | `"literal-union"` | Literal types are more modern and avoid TS compilation |
+| `postRenderHooks` | `[markAsGenerated]` | `[]`              | Explicit opt-in for v4, less magic                     |
 
 ## Implementation Decisions
 
@@ -305,6 +352,7 @@ const config: ConfigV4 = {
 **Decision**: V4 metadata functions receive `builtinMetadata` (not `defaultMetadata`) as their third parameter.
 
 **Rationale**:
+
 - **"builtin"** = Kanel's internal implementation (the base layer)
 - **"default"** = What the user configuration defaults to (which is `undefined` in V4)
 - The V3 `defaultGetMetadata` functions were confusingly named - they're not "defaults" but "builtins"
@@ -312,34 +360,38 @@ const config: ConfigV4 = {
 - If user does provide `getMetadata`, they receive the builtin result to compose on
 
 **V3 Compatibility**:
+
 - `defaultGetMetadata`, `defaultGetPropertyMetadata`, etc. remain exported
 - Marked with `@deprecated` JSDoc
 - Will be removed in a future version
 - Users should migrate to using the `builtinMetadata` parameter
 
 **Migration Example**:
+
 ```ts
 // V3 pattern (deprecated):
-import { defaultGetMetadata } from 'kanel';
+import { defaultGetMetadata } from "kanel";
 getMetadata: (details, generateFor, instantiatedConfig) => {
   const defaults = defaultGetMetadata(details, generateFor, instantiatedConfig);
-  return { ...defaults, comment: ['Custom'] };
-}
+  return { ...defaults, comment: ["Custom"] };
+};
 
 // V4 pattern (recommended):
 getMetadata: (details, generateFor, builtinMetadata) => {
-  return { ...builtinMetadata, comment: ['Custom'] };
-}
+  return { ...builtinMetadata, comment: ["Custom"] };
+};
 ```
 
 ### Generator vs PreRenderHook Semantics
 
 **Decision**: Keep generators simple and context-only:
+
 ```ts
-type Generator = () => Awaitable<Output>;  // Access schemas via useKanelContext()
+type Generator = () => Awaitable<Output>; // Access schemas via useKanelContext()
 ```
 
 **Rationale**:
+
 - **Generators**: Produce output that gets merged into the final result. Access database schemas via context.
 - **Generator-specific PreRenderHooks**: Transform the output of a specific generator, running within that generator's execution context
   - Example: Zod schema generation hooks run within PgTsGenerator context, can call `usePgTsGeneratorContext()`
@@ -349,6 +401,7 @@ type Generator = () => Awaitable<Output>;  // Access schemas via useKanelContext
   - Run after all generators complete
 
 **Execution flow**:
+
 1. Generator 1 produces output
 2. Generator 1's pre-render hooks transform its output
 3. Generator 2 produces output
@@ -365,12 +418,13 @@ If a generator needs to see previous generators' output, it should be a global P
 **v3 compatibility**: In v3→v4 conversion, automatically prepend the existing `applyTaggedComments` hook (wrapped) to `preRenderHooks` to maintain backwards compatibility.
 
 **Future v4 pattern** (TBD during implementation):
+
 ```ts
 getPropertyMetadata: composePropertyMetadata(
   defaultGetPropertyMetadata,
   taggedCommentsGetPropertyMetadata,
-  makeCustomTypesGetter({ 'public.users.metadata': 'JsonValue' }),
-)
+  makeCustomTypesGetter({ "public.users.metadata": "JsonValue" }),
+);
 ```
 
 This converts the hook approach to a composable getter approach. Exact API to be refined during implementation.

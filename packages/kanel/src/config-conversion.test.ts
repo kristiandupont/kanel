@@ -51,7 +51,7 @@ describe("V3 to V4 Config Conversion", () => {
       expect(v4Config.generators).toHaveLength(1);
     });
 
-    it("should map V3 enumStyle 'type' to V4 'literal'", () => {
+    it("should map V3 enumStyle 'type' to V4 'literal-union'", () => {
       const v3Config: ConfigV3 = {
         connection: "postgres://localhost/test",
         enumStyle: "type",
@@ -69,7 +69,7 @@ describe("V3 to V4 Config Conversion", () => {
         { suppressDeprecationWarning: true },
       );
 
-      expect(v4Config.typescriptConfig.enumStyle).toBe("literal");
+      expect(v4Config.typescriptConfig.enumStyle).toBe("literal-union");
     });
 
     it("should map V3 enumStyle 'enum' to V4 'enum'", () => {

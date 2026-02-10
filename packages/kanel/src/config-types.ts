@@ -35,12 +35,12 @@ export type InstantiatedConfig = {
   fileExtension: ".ts" | ".mts" | ".cts";
 };
 
-export type PreRenderHook = (
+export type PreRenderHookV3 = (
   outputAcc: Output,
   instantiatedConfig: InstantiatedConfig,
 ) => Awaitable<Output>;
 
-export type PostRenderHook = (
+export type PostRenderHookV3 = (
   path: string,
   lines: string[],
   instantiatedConfig: InstantiatedConfig,
@@ -69,8 +69,8 @@ export type ConfigV3 = {
   customTypeMap?: TypeMap;
   resolveViews?: boolean;
 
-  preRenderHooks?: PreRenderHook[];
-  postRenderHooks?: PostRenderHook[];
+  preRenderHooks?: PreRenderHookV3[];
+  postRenderHooks?: PostRenderHookV3[];
 
   /** @deprecated Use tsModuleFormat instead */
   importsExtension?: ".ts" | ".js" | ".mjs" | ".cjs";

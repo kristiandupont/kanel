@@ -23,7 +23,7 @@ export { type default as SalesByFilmCategory, salesByFilmCategory } from './Sale
 export { type default as SalesByStore, salesByStore } from './SalesByStore';
 export { type default as CustomerList, customerList } from './CustomerList';
 export { type default as NicerButSlowerFilmList, nicerButSlowerFilmList } from './NicerButSlowerFilmList';
-export { default as MpaaRating, mpaaRating } from './MpaaRating';
+export { type default as MpaaRating, mpaaRating } from './MpaaRating';
 export { type default as Year, year } from './Year';
 export { type inventory_in_stock_params, type inventory_in_stock_return_type } from './inventory_in_stock';
 export { type inventory_held_by_customer_params, type inventory_held_by_customer_return_type } from './inventory_held_by_customer';

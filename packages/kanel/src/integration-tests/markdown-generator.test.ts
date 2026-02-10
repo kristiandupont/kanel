@@ -70,8 +70,8 @@ describe("Markdown Generator", () => {
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["mdtest"],
         typescriptConfig: {
-          schemas: ["mdtest"],
           enumStyle: "enum",
         },
         generators: [
@@ -128,8 +128,8 @@ Schema: {{entity.schema}}
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["mdtest"],
         typescriptConfig: {
-          schemas: ["mdtest"],
           enumStyle: "enum",
         },
         generators: [
@@ -184,8 +184,8 @@ Schema: {{entity.schema}}
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["mdtest"],
         typescriptConfig: {
-          schemas: ["mdtest"],
           enumStyle: "enum",
         },
         generators: [
@@ -237,8 +237,8 @@ Schema: {{entity.schema}}
 
       const config: ConfigV4 = {
         connection: getConnection(),
+        schemaNames: ["mdtest"],
         typescriptConfig: {
-          schemas: ["mdtest"],
           enumStyle: "enum",
         },
         generators: [
