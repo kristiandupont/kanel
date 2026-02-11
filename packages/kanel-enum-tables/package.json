@@ -2,6 +2,7 @@
   "name": "kanel-enum-tables",
   "version": "1.0.0-alpha.1",
   "keywords": [
+    "enum",
     "postgresql",
     "schema",
     "typescript"
@@ -33,8 +34,5 @@
   "devDependencies": {
     "extract-pg-schema": "^5.8.1",
     "kanel": "*"
-  },
-  "peerDependencies": {
-    "kanel": "^3.0.0"
   }
 }
