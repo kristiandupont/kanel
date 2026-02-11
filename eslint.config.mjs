@@ -41,6 +41,7 @@ export default [
       parserOptions: {
         project: [
           "./packages/kanel/tsconfig.json",
+          "./packages/kanel-enum-tables/tsconfig.json",
           "./packages/kanel-knex/tsconfig.json",
           "./packages/kanel-kysely/tsconfig.json",
           "./packages/kanel-seeder/tsconfig.json",

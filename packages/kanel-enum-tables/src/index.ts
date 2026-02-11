@@ -1,1 +1,1 @@
-export { default as enumTablesPreRenderHook } from "./generateEnumTypesFromTableValuesPreRenderHook";
+export { default as enumTablesPreRenderHook } from "./enumTablesPreRenderHook";
