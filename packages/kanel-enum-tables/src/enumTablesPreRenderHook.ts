@@ -1,6 +1,7 @@
 import type { TableDetails } from "extract-pg-schema";
 import type {
   EnumDeclaration,
+  GenericDeclaration,
   InterfaceDeclaration,
   Output,
   PreRenderHook,
@@ -23,7 +24,7 @@ import { tryParse } from "tagged-comment-parser";
  * Since tagged-comment-parser doesn't support newline-separated tags,
  * we parse each line individually and merge the results.
  */
-const parseSmartTags = (
+export const parseSmartTags = (
   comment: string | null,
 ): Record<string, string | boolean> => {
   if (!comment) return {};
@@ -49,7 +50,7 @@ const parseSmartTags = (
  * it parses `enumName` as `true` and puts "TypeOfAnimal" in the comment.
  * We fall back to regex extraction from the raw comment in that case.
  */
-const resolveTagValue = (
+export const resolveTagValue = (
   tags: Record<string, string | boolean>,
   tagName: string,
   rawComment: string,
@@ -76,7 +77,7 @@ const resolveTagValue = (
  * that use ColumnType<> wrappers, and removes initializer/mutator interfaces.
  * We detect this by looking for ColumnType in type imports.
  */
-const isKyselyProcessed = (declarations: unknown[]): boolean =>
+export const isKyselyProcessed = (declarations: unknown[]): boolean =>
   declarations.some(
     (d: any) =>
       d?.declarationType === "interface" &&
@@ -89,7 +90,7 @@ const isKyselyProcessed = (declarations: unknown[]): boolean =>
  * Update a ColumnType<S, I, M> string by replacing all occurrences of
  * the old type name with the new enum type name.
  */
-const updateColumnType = (
+export const updateColumnType = (
   typeName: string,
   oldName: string,
   newName: string,
@@ -97,6 +98,23 @@ const updateColumnType = (
   if (!typeName.startsWith("ColumnType<")) return typeName;
 
   return typeName.replaceAll(oldName, newName);
+};
+
+/**
+ * Find the column name marked with @enumDescription in the table's column comments.
+ * Returns the column name if found, undefined otherwise.
+ */
+export const findDescriptionColumn = (
+  table: TableDetails,
+): string | undefined => {
+  for (const column of table.columns) {
+    const tags = parseSmartTags(column.comment ?? null);
+    if (tags.enumDescription) {
+      return column.name;
+    }
+  }
+
+  return undefined;
 };
 
 const enumTablesPreRenderHook: PreRenderHook = async (
@@ -114,6 +132,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
   const enumTables: Array<{
     table: TableDetails;
     enumName: string | undefined;
+    descriptionColumn: string | undefined;
   }> = [];
 
   for (const schema of Object.values(instantiatedConfig.schemas)) {
@@ -124,6 +143,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
         enumTables.push({
           table,
           enumName: resolveTagValue(tags, "enumName", table.comment!),
+          descriptionColumn: findDescriptionColumn(table),
         });
       }
     }
@@ -139,7 +159,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
   try {
     const overrides: Output = {};
 
-    for (const { table, enumName } of enumTables) {
+    for (const { table, enumName, descriptionColumn } of enumTables) {
       const primaryKeyColumn = table.columns.find(
         (column) => column.isPrimaryKey,
       );
@@ -186,13 +206,19 @@ const enumTablesPreRenderHook: PreRenderHook = async (
         instantiatedConfig,
       );
 
-      // TODO: There is currently no good way to support @enumDescription because
-      // we can't provide a comment per enum value in the EnumDeclaration declaration.
-      // We could support this when enumStyle is "type".
+      // @enumDescription marks a column whose values provide per-enum-value descriptions.
+      // When enumStyle is "type", descriptions are rendered as inline JSDoc comments.
+      // When enumStyle is "enum", we use a GenericDeclaration to emit hand-crafted
+      // enum lines with per-value JSDoc comments (since EnumDeclaration.values is string-only).
+
+      const selectColumns = [primaryKeyColumn.name];
+      if (descriptionColumn) {
+        selectColumns.push(descriptionColumn);
+      }
 
       const rows = await db
         .withSchema(table.schemaName)
-        .select(primaryKeyColumn.name)
+        .select(...selectColumns)
         .from(table.name)
         .orderBy(primaryKeyColumn.name);
 
@@ -211,17 +237,69 @@ const enumTablesPreRenderHook: PreRenderHook = async (
           declaration.name === primaryKeyTypeDeclaration.name
         ) {
           if (instantiatedConfig.enumStyle === "type") {
+            const typeLines: string[] = [""];
+            for (const row of rows) {
+              const desc =
+                descriptionColumn && row[descriptionColumn]
+                  ? String(row[descriptionColumn])
+                  : undefined;
+              if (desc) {
+                typeLines.push(`/** ${desc} */`);
+              }
+              typeLines.push(`| '${row[primaryKeyColumn.name]}'`);
+            }
+
             const newDeclaration: TypeDeclaration = {
               ...declaration,
               name: finalEnumName,
-              typeDefinition: [
-                "", // Start definition on new line
-                ...rows.map((row) => `| '${row[primaryKeyColumn.name]}'`),
-              ],
+              typeDefinition: typeLines,
             };
 
             return newDeclaration;
           } else if (instantiatedConfig.enumStyle === "enum") {
+            if (descriptionColumn) {
+              // Use GenericDeclaration to emit per-value JSDoc comments
+              const lines: string[] = [];
+
+              if (declaration.exportAs === "named") {
+                lines.push(`export enum ${finalEnumName} {`);
+              } else {
+                lines.push(`enum ${finalEnumName} {`);
+              }
+
+              for (const row of rows) {
+                const value = String(row[primaryKeyColumn.name]);
+                const desc = row[descriptionColumn]
+                  ? String(row[descriptionColumn])
+                  : undefined;
+                if (desc) {
+                  lines.push(`  /** ${desc} */`);
+                }
+                // Quote the field name if it contains special characters
+                const needsQuote =
+                  value.length === 0 ||
+                  value.trim() !== value ||
+                  !/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(value);
+                const fieldName = needsQuote ? `'${value}'` : value;
+                lines.push(`  ${fieldName} = '${value}',`);
+              }
+
+              lines.push("};");
+
+              if (declaration.exportAs === "default") {
+                lines.push("", `export default ${finalEnumName};`);
+              }
+
+              const newDeclaration: GenericDeclaration = {
+                declarationType: "generic",
+                comment: declaration.comment,
+                typeImports: declaration.typeImports,
+                lines,
+              };
+
+              return newDeclaration;
+            }
+
             const newDeclaration: EnumDeclaration = {
               declarationType: "enum",
               name: finalEnumName,

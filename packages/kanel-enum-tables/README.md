@@ -23,7 +23,44 @@ Both Postgraphile's space format and the colon format used by other Kanel extens
 - `@enumName TypeOfAnimal` (Postgraphile convention)
 - `@enumName:TypeOfAnimal` (tagged-comment-parser convention)
 
-> **Note:** `@enumDescription` is not supported at this time.
+### `@enumDescription`
+
+You can add per-value descriptions to your enum by tagging a column with `@enumDescription`. The values in that column will be rendered as JSDoc comments on each enum member.
+
+```sql
+CREATE TABLE animal_type (
+  type text PRIMARY KEY,
+  description text NOT NULL
+);
+
+COMMENT ON TABLE animal_type IS '@enum';
+COMMENT ON COLUMN animal_type.description IS '@enumDescription';
+
+INSERT INTO animal_type VALUES
+  ('cat', 'A small domesticated feline'),
+  ('dog', 'A loyal canine companion');
+```
+
+With `enumStyle: "enum"` this generates:
+
+```typescript
+export enum AnimalType {
+  /** A small domesticated feline */
+  cat = 'cat',
+  /** A loyal canine companion */
+  dog = 'dog',
+}
+```
+
+With `enumStyle: "type"` (the default) this generates:
+
+```typescript
+export type AnimalType =
+  /** A small domesticated feline */
+  | 'cat'
+  /** A loyal canine companion */
+  | 'dog';
+```
 
 ## Installation
 

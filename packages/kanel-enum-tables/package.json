@@ -25,7 +25,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf ./build && tsc",
-    "test": "echo TODO.."
+    "test": "vitest run"
   },
   "dependencies": {
     "knex": "^3.0.0",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "extract-pg-schema": "^5.8.1",
-    "kanel": "*"
+    "kanel": "*",
+    "vitest": "^4.0.0"
   }
 }
