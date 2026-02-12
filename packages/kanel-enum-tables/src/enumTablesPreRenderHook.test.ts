@@ -160,9 +160,13 @@ describe("isKyselyProcessed", () => {
 
 describe("updateColumnType", () => {
   it("should replace type name inside ColumnType<>", () => {
-    expect(updateColumnType("ColumnType<MemberId, MemberId, MemberId>", "MemberId", "MemberType")).toBe(
-      "ColumnType<MemberType, MemberType, MemberType>",
-    );
+    expect(
+      updateColumnType(
+        "ColumnType<MemberId, MemberId, MemberId>",
+        "MemberId",
+        "MemberType",
+      ),
+    ).toBe("ColumnType<MemberType, MemberType, MemberType>");
   });
 
   it("should handle ColumnType with different inner types", () => {
@@ -192,10 +196,7 @@ describe("updateColumnType", () => {
 // findDescriptionColumn
 // ---------------------------------------------------------------------------
 
-const makeColumn = (
-  name: string,
-  comment: string | null = null,
-): TableColumn =>
+const makeColumn = (name: string, comment: string | null = null): TableColumn =>
   ({
     name,
     comment,

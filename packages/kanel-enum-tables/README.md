@@ -46,9 +46,9 @@ With `enumStyle: "enum"` this generates:
 ```typescript
 export enum AnimalType {
   /** A small domesticated feline */
-  cat = 'cat',
+  cat = "cat",
   /** A loyal canine companion */
-  dog = 'dog',
+  dog = "dog",
 }
 ```
 
@@ -57,9 +57,9 @@ With `enumStyle: "type"` (the default) this generates:
 ```typescript
 export type AnimalType =
   /** A small domesticated feline */
-  | 'cat'
+  | "cat"
   /** A loyal canine companion */
-  | 'dog';
+  | "dog";
 ```
 
 ## Installation
