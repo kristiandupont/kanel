@@ -1,38 +1,49 @@
-const { join } = require('path');
-const { recase } = require('@kristiandupont/recase');
-const { tryParse } = require('tagged-comment-parser')
+const { join } = require("path");
+const { recase } = require("@kristiandupont/recase");
+const { tryParse } = require("tagged-comment-parser");
 
-const { generateIndexFile, makePgTsGenerator } = require('kanel');
-const { 
-  makeGenerateZodSchemas, 
-  defaultGetZodSchemaMetadata, 
-  defaultGetZodIdentifierMetadata, 
-  defaultZodTypeMap 
-} = require('kanel-zod');
-const { markAsGenerated } = require('kanel/build/hooks/index.js');
+const { generateIndexFile, makePgTsGenerator } = require("kanel");
+const {
+  makeGenerateZodSchemas,
+  defaultGetZodSchemaMetadata,
+  defaultGetZodIdentifierMetadata,
+  defaultZodTypeMap,
+} = require("kanel-zod");
+const { markAsGenerated } = require("kanel/build/hooks/index.js");
 
-const toPascalCase = recase('snake', 'pascal');
-const outputPath = './example/models';
+const toPascalCase = recase("snake", "pascal");
+const outputPath = "./models";
 
 const generateZodSchemas = makeGenerateZodSchemas({
   getZodSchemaMetadata: defaultGetZodSchemaMetadata,
   getZodIdentifierMetadata: defaultGetZodIdentifierMetadata,
   zodTypeMap: {
     ...defaultZodTypeMap,
-    'pg_catalog.tsvector': 'z.set(z.string())',
-    'pg_catalog.bytea': { name:'z.custom<Bytea>(v => v)', typeImports: [{ name: 'Bytea', path: 'postgres-bytea', isAbsolute: true, isDefault: false }] }
+    "pg_catalog.tsvector": "z.set(z.string())",
+    "pg_catalog.bytea": {
+      name: "z.custom<Bytea>(v => v)",
+      typeImports: [
+        {
+          name: "Bytea",
+          path: "postgres-bytea",
+          isAbsolute: true,
+          isDefault: false,
+          importAsType: true,
+        },
+      ],
+    },
   },
-  castToSchema: true
-})
+  castToSchema: true,
+});
 
-/** @type {import('../packages/kanel/src/config-types.ts').Config} */
+/** @type {import('kanel/src/config-types.js').Config} */
 module.exports = {
   connection: {
-    host: 'localhost',
-    user: 'postgres',
-    password: 'postgres',
-    database: 'dvdrental',
-    charset: 'utf8',
+    host: "localhost",
+    user: "postgres",
+    password: "postgres",
+    database: "dvdrental",
+    charset: "utf8",
     port: 54321,
   },
 
@@ -41,8 +52,8 @@ module.exports = {
   preDeleteOutputFolder: true,
 
   typescriptConfig: {
-    enumStyle: 'literal-union',
-    tsModuleFormat: 'commonjs',
+    enumStyle: "literal-union",
+    tsModuleFormat: "commonjs",
   },
 
   generators: [
@@ -50,17 +61,20 @@ module.exports = {
       // Add a comment about the entity that the type represents above each type.
       getMetadata: (details, generateFor) => {
         const { comment: strippedComment } = tryParse(details.comment);
-        const isAgentNoun = ['initializer', 'mutator'].includes(generateFor);
+        const isAgentNoun = ["initializer", "mutator"].includes(generateFor);
 
         const relationComment = isAgentNoun
           ? `Represents the ${generateFor} for the ${details.kind} ${details.schemaName}.${details.name}`
           : `Represents the ${details.kind} ${details.schemaName}.${details.name}`;
 
-        const suffix = isAgentNoun ? `_${generateFor}` : '';
+        const suffix = isAgentNoun ? `_${generateFor}` : "";
 
         return {
           name: toPascalCase(details.name + suffix),
-          comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
+          comment: [
+            relationComment,
+            ...(strippedComment ? [strippedComment] : []),
+          ],
           path: join(outputPath, toPascalCase(details.name)),
         };
       },
@@ -73,12 +87,12 @@ module.exports = {
           name: property.name,
           comment: [
             `Database type: ${property.expandedType}`,
-            ...(generateFor === 'initializer' && property.defaultValue
+            ...(generateFor === "initializer" && property.defaultValue
               ? [`Default value: ${property.defaultValue}`]
               : []),
             ...(strippedComment ? [strippedComment] : []),
-          ]
-        }
+          ],
+        };
       },
 
       getRoutineMetadata: (details) => ({
@@ -92,7 +106,6 @@ module.exports = {
         path: join(outputPath, details.name),
       }),
 
-
       // This implementation will generate flavored instead of branded types.
       // See: https://spin.atomicobject.com/2018/01/15/typescript-flexible-nominal-typing/
       generateIdentifierType: (c, d) => {
@@ -100,9 +113,9 @@ module.exports = {
         const name = toPascalCase(c.name);
 
         return {
-          declarationType: 'typeDeclaration',
+          declarationType: "typeDeclaration",
           name,
-          exportAs: 'named',
+          exportAs: "named",
           typeDefinition: [`number & { __flavor?: '${name}' }`],
           comment: [`Identifier type for ${d.name}`],
         };
@@ -113,20 +126,31 @@ module.exports = {
 
       customTypeMap: {
         // A text search vector could be stored as a set of strings. See Film.ts for an example.
-        'pg_catalog.tsvector': 'Set<string>',
+        "pg_catalog.tsvector": "Set<string>",
 
         // The bytea package (https://www.npmjs.com/package/postgres-bytea) could be used for byte arrays.
         // See Staff.ts for an example.
-        'pg_catalog.bytea': { name: 'bytea', typeImports: [{ name: 'bytea', path: 'postgres-bytea', isAbsolute: true, isDefault: true }] },
+        "pg_catalog.bytea": {
+          name: "bytea",
+          typeImports: [
+            {
+              name: "bytea",
+              path: "postgres-bytea",
+              isAbsolute: true,
+              isDefault: true,
+              importAsType: true,
+            },
+          ],
+        },
 
         // If you want to use BigInt for bigserial columns, you can use the following.
-        'pg_catalog.int8': 'BigInt',
+        "pg_catalog.int8": "BigInt",
 
         // Columns with the following types would probably just be strings in TypeScript.
-        'pg_catalog.bpchar': 'string',
-        'public.citext': 'string'
+        "pg_catalog.bpchar": "string",
+        "public.citext": "string",
       },
-    })
+    }),
   ],
 
   postRenderHooks: [markAsGenerated],
