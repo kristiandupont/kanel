@@ -2,10 +2,12 @@ import { recase } from "@kristiandupont/recase";
 import type {
   InterfaceDeclaration,
   InterfacePropertyDeclaration,
-  PreRenderHook,
+  PreRenderHookV4,
   TypeDeclaration,
   TypeImport,
 } from "kanel";
+import { useKanelContext } from "kanel/build/context";
+import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext";
 import { dirname, join } from "path";
 
 import type MakeKyselyConfig from "./MakeKyselyConfig";
@@ -14,8 +16,11 @@ import processFile from "./processFile";
 
 const toPascalCase = recase(null, "pascal");
 
-const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
-  (makeKyselyConfig_) => async (outputAcc, instantiatedConfig) => {
+const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHookV4 =
+  (makeKyselyConfig_) => async (outputAcc) => {
+    const { schemas, config } = useKanelContext();
+    const pgTsContext = usePgTsGeneratorContext();
+
     const makeKyselyConfig = {
       ...defaultConfig,
       ...makeKyselyConfig_,
@@ -25,13 +30,13 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
 
     const schemaImports: TypeImport[] = [];
 
-    for (const schemaName of Object.keys(instantiatedConfig.schemas)) {
-      const schema = instantiatedConfig.schemas[schemaName];
+    for (const schemaName of Object.keys(schemas)) {
+      const schema = schemas[schemaName];
       const composites = [
-        ...schema.tables,
-        ...schema.views,
-        ...schema.materializedViews,
-        ...schema.compositeTypes,
+        ...(schema.tables ?? []),
+        ...(schema.views ?? []),
+        ...(schema.materializedViews ?? []),
+        ...(schema.compositeTypes ?? []),
       ];
       if (composites.length === 0) {
         continue;
@@ -43,11 +48,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
       const tableProps: InterfacePropertyDeclaration[] = [];
 
       composites.forEach((compositeDetails) => {
-        const { path } = instantiatedConfig.getMetadata(
-          compositeDetails,
-          "selector",
-          instantiatedConfig,
-        );
+        const { path } = pgTsContext.getMetadata(compositeDetails, "selector");
         if (output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }
@@ -55,7 +56,6 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
           processFile(
             output[path].declarations,
             compositeDetails,
-            instantiatedConfig,
             path,
             makeKyselyConfig,
           );
@@ -99,7 +99,7 @@ const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
     }
 
     const dbPath = join(
-      instantiatedConfig.outputPath,
+      config.outputPath ?? ".",
       makeKyselyConfig.databaseFilename,
     );
 

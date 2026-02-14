@@ -1,4 +1,3 @@
-import type { InstantiatedConfig } from "kanel";
 import { expect, it } from "vitest";
 
 import { kyselyCamelCaseHook } from "./kyselyCamelCaseHook.js";
@@ -73,7 +72,6 @@ it("Should transform all properties to camelCase", async () => {
         ],
       },
     },
-    undefined as InstantiatedConfig,
   );
 
   const foo = output.foo as any;
