@@ -1,2 +1,43 @@
-# Documentation
+# Database Documentation
 
+{{#with schemas.public}}
+
+## Films
+{{#find tables "film"}}
+
+The film table is the central table in the database. It has the following columns:
+
+| name | type | description |
+| ---- | ---- | ----------- |
+{{#each columns}}
+  | {{name}} | {{type.fullName}} | {{comment}} |
+{{/each}}
+
+It's linked to the following tables:
+{{#each references}}
+  - {{schemaName}}.{{tableName}}
+{{/each}}
+
+It's referenced by the following tables:
+{{#each referencedBy}}
+  - {{schemaName}}.{{tableName}}
+{{/each}}
+
+{{/find}}
+
+
+## Tables
+{{#each tables}}
+### {{schemaName}}.{{name}}
+
+{{comment}}
+
+| name | type | description |
+| ---- | ---- | ----------- |
+{{#each columns}}
+  | {{name}} | {{type.fullName}} | {{comment}} |
+{{/each}}
+
+{{/each}}
+
+{{/with}}
