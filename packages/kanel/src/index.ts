@@ -1,5 +1,7 @@
 export type * from "./config-types";
 export type * from "./config-types-v4";
+export type { KanelContext } from "./context";
+export { useKanelContext } from "./context";
 export * from "./default-metadata-generators";
 export type { default as Details } from "./Details";
 export type {
@@ -12,6 +14,8 @@ export {
   type MarkdownTarget,
 } from "./generators/makeMarkdownGenerator";
 export { default as makePgTsGenerator } from "./generators/makePgTsGenerator";
+export type { PgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
+export { usePgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
 export { default as resolveType } from "./generators/resolveType";
 export * from "./hooks";
 export type * from "./metadata-types";

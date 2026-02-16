@@ -4,11 +4,11 @@ import type {
   GenericDeclaration,
   InterfaceDeclaration,
   Output,
-  PreRenderHook,
+  PreRenderHookV4,
   TsFileContents,
   TypeDeclaration,
 } from "kanel";
-import { resolveType } from "kanel";
+import { resolveType, useKanelContext, usePgTsGeneratorContext } from "kanel";
 import knex from "knex";
 import { tryParse } from "tagged-comment-parser";
 
@@ -117,11 +117,13 @@ export const findDescriptionColumn = (
   return undefined;
 };
 
-const enumTablesPreRenderHook: PreRenderHook = async (
+const enumTablesPreRenderHook: PreRenderHookV4 = async (
   outputAccumulator,
-  instantiatedConfig,
 ) => {
-  if (!instantiatedConfig.generateIdentifierType) {
+  const { schemas, config, typescriptConfig } = useKanelContext();
+  const pgTsContext = usePgTsGeneratorContext();
+
+  if (!pgTsContext.generateIdentifierType) {
     console.warn(
       "kanel-enum-tables: generateIdentifierType is not configured, skipping enum table generation",
     );
@@ -135,7 +137,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
     descriptionColumn: string | undefined;
   }> = [];
 
-  for (const schema of Object.values(instantiatedConfig.schemas)) {
+  for (const schema of Object.values(schemas)) {
     for (const table of schema.tables) {
       const tags = parseSmartTags(table.comment);
 
@@ -153,8 +155,12 @@ const enumTablesPreRenderHook: PreRenderHook = async (
     return outputAccumulator;
   }
 
-  const connection = instantiatedConfig.connection;
+  const connection = config.connection;
   const db = knex({ client: "postgres", connection });
+
+  // Normalize enumStyle: v4 uses "literal-union", v3 used "type" - treat both as non-enum
+  const enumStyle =
+    typescriptConfig.enumStyle === "enum" ? "enum" : "type";
 
   try {
     const overrides: Output = {};
@@ -171,11 +177,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
       }
 
       const primaryKeyTypeDeclaration =
-        instantiatedConfig.generateIdentifierType(
-          primaryKeyColumn,
-          table,
-          instantiatedConfig,
-        );
+        pgTsContext.generateIdentifierType(primaryKeyColumn, table);
 
       // Get the resolved type for the primary key column.
       // Pass `true` for retainInnerIdentifierType to skip identifier type
@@ -188,26 +190,15 @@ const enumTablesPreRenderHook: PreRenderHook = async (
         );
       }
 
-      const selectorMetadata = instantiatedConfig.getMetadata(
-        table,
-        "selector",
-        instantiatedConfig,
-      );
-
-      const initializerMetadata = instantiatedConfig.getMetadata(
+      const selectorMetadata = pgTsContext.getMetadata(table, "selector");
+      const initializerMetadata = pgTsContext.getMetadata(
         table,
         "initializer",
-        instantiatedConfig,
       );
-
-      const mutatorMetadata = instantiatedConfig.getMetadata(
-        table,
-        "mutator",
-        instantiatedConfig,
-      );
+      const mutatorMetadata = pgTsContext.getMetadata(table, "mutator");
 
       // @enumDescription marks a column whose values provide per-enum-value descriptions.
-      // When enumStyle is "type", descriptions are rendered as inline JSDoc comments.
+      // When enumStyle is "type"/"literal-union", descriptions are rendered as inline JSDoc comments.
       // When enumStyle is "enum", we use a GenericDeclaration to emit hand-crafted
       // enum lines with per-value JSDoc comments (since EnumDeclaration.values is string-only).
 
@@ -236,7 +227,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
           declaration.declarationType === "typeDeclaration" &&
           declaration.name === primaryKeyTypeDeclaration.name
         ) {
-          if (instantiatedConfig.enumStyle === "type") {
+          if (enumStyle === "type") {
             const typeLines: string[] = [""];
             for (const row of rows) {
               const desc =
@@ -256,7 +247,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
             };
 
             return newDeclaration;
-          } else if (instantiatedConfig.enumStyle === "enum") {
+          } else if (enumStyle === "enum") {
             if (descriptionColumn) {
               // Use GenericDeclaration to emit per-value JSDoc comments
               const lines: string[] = [];
@@ -312,7 +303,7 @@ const enumTablesPreRenderHook: PreRenderHook = async (
             return newDeclaration;
           } else {
             console.warn(
-              `Unsupported enumStyle "${instantiatedConfig.enumStyle}" for enum table ${table.schemaName}.${table.name}`,
+              `Unsupported enumStyle "${enumStyle}" for enum table ${table.schemaName}.${table.name}`,
             );
           }
         }
