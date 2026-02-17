@@ -35,7 +35,10 @@ const getIdentifierDeclaration = (
     );
 
     identifierColumns.forEach((c) => {
-      const typescriptDeclaration = pgTsContext.generateIdentifierType!(c, details);
+      const typescriptDeclaration = pgTsContext.generateIdentifierType!(
+        c,
+        details,
+      );
 
       const { name, comment } = getZodIdentifierMetadata(c, details);
 

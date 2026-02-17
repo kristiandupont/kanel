@@ -17,7 +17,7 @@ export default [
   {
     ignores: [
       "**/build",
-      "**/example",
+      "**/examples",
       "**/vitest.config.ts",
       "**/docs",
       "**/docs-src",

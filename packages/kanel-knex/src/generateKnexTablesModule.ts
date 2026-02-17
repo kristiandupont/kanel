@@ -114,18 +114,15 @@ const generateKnexTablesModule: PreRenderHookV4 = async (outputAcc) => {
     ] as TypeImport[],
   );
 
-  const declarationLines = Object.values(schemas).reduce(
-    (acc, schema) => {
-      const tableLines = schema.tables.map((table) => getLine(table));
-      const viewLines = schema.views.map((view) => getLine(view));
-      const materializedViewLines = schema.materializedViews.map(
-        (materializedView) => getLine(materializedView),
-      );
+  const declarationLines = Object.values(schemas).reduce((acc, schema) => {
+    const tableLines = schema.tables.map((table) => getLine(table));
+    const viewLines = schema.views.map((view) => getLine(view));
+    const materializedViewLines = schema.materializedViews.map(
+      (materializedView) => getLine(materializedView),
+    );
 
-      return [...acc, ...tableLines, ...viewLines, ...materializedViewLines];
-    },
-    [] as string[],
-  );
+    return [...acc, ...tableLines, ...viewLines, ...materializedViewLines];
+  }, [] as string[]);
 
   const lines: string[] = [
     "declare module 'knex/types/tables' {",

@@ -5,8 +5,8 @@ export {
 } from "./generateZodSchemas";
 export type {
   GenerateZodSchemasConfig,
-  GetZodSchemaMetadata,
   GetZodIdentifierMetadata,
+  GetZodSchemaMetadata,
 } from "./GenerateZodSchemasConfig";
 export {
   defaultGetZodIdentifierMetadata,

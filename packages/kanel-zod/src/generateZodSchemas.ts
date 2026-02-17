@@ -6,7 +6,7 @@
  * TypeScript files created by the PgTsGenerator.
  */
 
-import { useKanelContext, type Output, type Path, type PreRenderHookV4, type TypeImport } from "kanel";
+import { useKanelContext, type PreRenderHookV4, type TypeImport } from "kanel";
 
 import defaultZodTypeMap from "./defaultZodTypeMap";
 import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
@@ -34,7 +34,7 @@ export const makeGenerateZodSchemas =
   (config: GenerateZodSchemasConfig = {}): PreRenderHookV4 =>
   async (outputAcc) => {
     const kanelContext = useKanelContext();
-    let output = { ...outputAcc };
+    const output = { ...outputAcc };
 
     // Resolve configuration with defaults
     const getZodSchemaMetadata =
@@ -104,7 +104,7 @@ export const makeGenerateZodSchemas =
 
       // #region domains
       schema.domains?.forEach((domainDetails) => {
-        const { name, path} = getZodSchemaMetadata(domainDetails, undefined);
+        const { name, path } = getZodSchemaMetadata(domainDetails, undefined);
         if (!output[path] || output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }

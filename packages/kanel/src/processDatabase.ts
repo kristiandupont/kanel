@@ -58,7 +58,10 @@ function mergeOutput(base: Output, incoming: Output): Output {
         const tsIncoming = incomingFile as TsFileContents;
         result[path] = {
           fileType: "typescript",
-          declarations: [...tsExisting.declarations, ...tsIncoming.declarations],
+          declarations: [
+            ...tsExisting.declarations,
+            ...tsIncoming.declarations,
+          ],
         };
         break;
       }

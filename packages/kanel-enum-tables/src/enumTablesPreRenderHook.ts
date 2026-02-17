@@ -117,9 +117,7 @@ export const findDescriptionColumn = (
   return undefined;
 };
 
-const enumTablesPreRenderHook: PreRenderHookV4 = async (
-  outputAccumulator,
-) => {
+const enumTablesPreRenderHook: PreRenderHookV4 = async (outputAccumulator) => {
   const { schemas, config, typescriptConfig } = useKanelContext();
   const pgTsContext = usePgTsGeneratorContext();
 
@@ -159,8 +157,7 @@ const enumTablesPreRenderHook: PreRenderHookV4 = async (
   const db = knex({ client: "postgres", connection });
 
   // Normalize enumStyle: v4 uses "literal-union", v3 used "type" - treat both as non-enum
-  const enumStyle =
-    typescriptConfig.enumStyle === "enum" ? "enum" : "type";
+  const enumStyle = typescriptConfig.enumStyle === "enum" ? "enum" : "type";
 
   try {
     const overrides: Output = {};
@@ -176,8 +173,10 @@ const enumTablesPreRenderHook: PreRenderHookV4 = async (
         );
       }
 
-      const primaryKeyTypeDeclaration =
-        pgTsContext.generateIdentifierType(primaryKeyColumn, table);
+      const primaryKeyTypeDeclaration = pgTsContext.generateIdentifierType(
+        primaryKeyColumn,
+        table,
+      );
 
       // Get the resolved type for the primary key column.
       // Pass `true` for retainInnerIdentifierType to skip identifier type
@@ -191,10 +190,7 @@ const enumTablesPreRenderHook: PreRenderHookV4 = async (
       }
 
       const selectorMetadata = pgTsContext.getMetadata(table, "selector");
-      const initializerMetadata = pgTsContext.getMetadata(
-        table,
-        "initializer",
-      );
+      const initializerMetadata = pgTsContext.getMetadata(table, "initializer");
       const mutatorMetadata = pgTsContext.getMetadata(table, "mutator");
 
       // @enumDescription marks a column whose values provide per-enum-value descriptions.

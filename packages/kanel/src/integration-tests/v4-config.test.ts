@@ -518,13 +518,13 @@ describe("V4 Config", () => {
         },
         generators: [
           async () => ({
-            "output": {
+            output: {
               fileType: "typescript" as const,
               declarations: [],
             },
           }),
           async () => ({
-            "output": {
+            output: {
               fileType: "generic" as const,
               lines: ["test"],
             },
