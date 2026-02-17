@@ -6,9 +6,7 @@
  * TypeScript files created by the PgTsGenerator.
  */
 
-import type { Output, Path, TypeImport } from "kanel";
-import type { PreRenderHookV4 } from "kanel/build/config-types-v4";
-import { useKanelContext } from "kanel/build/context";
+import { useKanelContext, type Output, type Path, type PreRenderHookV4, type TypeImport } from "kanel";
 
 import defaultZodTypeMap from "./defaultZodTypeMap";
 import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";

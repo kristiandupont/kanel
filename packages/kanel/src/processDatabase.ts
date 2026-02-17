@@ -4,6 +4,7 @@ import { rimraf } from "rimraf";
 import type { Config, InstantiatedConfig } from "./config-types";
 import { isV3Config as detectV3Config } from "./config-types";
 import { convertV3ConfigToV4 } from "./config-conversion";
+import type { ConfigV4, TypescriptConfig } from "./config-types-v4";
 import { runWithContext } from "./context";
 import {
   defaultGenerateIdentifierType,
@@ -184,24 +185,22 @@ const processDatabase = async (cfg: Config): Promise<void> => {
   }
 
   // From here on, only V4 processing
-  await processV4Config(v4Config, instantiatedConfig);
+  await processV4Config(v4Config as ConfigV4, instantiatedConfig);
 };
 
 /**
  * Process a V4 config.
  * If instantiatedConfig is provided, we're in V3 compatibility mode.
- *
- * Note: Full V4 implementation (with makePgTsGenerator) will be in Phase 4.
- * For now, this runs the old V3-style generators but uses V4 hooks.
  */
 const processV4Config = async (
-  v4Config: Config,
+  v4Config: ConfigV4,
   instantiatedConfig: InstantiatedConfig | undefined,
 ): Promise<void> => {
-  // Type guard to ensure we have V4 config
-  if (!("typescriptConfig" in v4Config)) {
-    throw new Error("Invalid config passed to processV4Config");
-  }
+  // Resolve typescriptConfig with defaults
+  const resolvedTypescriptConfig: TypescriptConfig = {
+    enumStyle: "literal-union",
+    ...v4Config.typescriptConfig,
+  };
 
   // For V3 compatibility mode, schemas were already extracted during conversion
   // For pure V4 configs, we need to extract them here
@@ -223,32 +222,27 @@ const processV4Config = async (
     });
 
     const derivedExtensions = deriveExtensions(
-      v4Config.typescriptConfig.tsModuleFormat,
-      v4Config.typescriptConfig.importsExtension,
+      resolvedTypescriptConfig.tsModuleFormat,
+      resolvedTypescriptConfig.importsExtension,
     );
     fileExtension = derivedExtensions.fileExtension;
     importsExtension = derivedExtensions.importsExtension;
   }
 
-  // For pure V4 mode, create a minimal instantiatedConfig for backwards compat with renderTsFile
-  // TODO: Refactor renderTsFile to not need instantiatedConfig
-  const renderCompatConfig = instantiatedConfig || {
+  // Store the resolved importsExtension on typescriptConfig so renderTsFile can use it
+  const typescriptConfigWithExtension: TypescriptConfig = {
+    ...resolvedTypescriptConfig,
     importsExtension,
   };
 
   await runWithContext(
     {
-      typescriptConfig: v4Config.typescriptConfig,
+      typescriptConfig: typescriptConfigWithExtension,
       config: v4Config,
       schemas,
-      instantiatedConfig: renderCompatConfig as any, // Cast for V4 compat
+      instantiatedConfig: instantiatedConfig as any,
     },
     async () => {
-      // Run V4 generators from config
-      if (!("generators" in v4Config)) {
-        throw new Error("V4 config must have generators field");
-      }
-
       let output: Output = {};
 
       // Execute each generator sequentially

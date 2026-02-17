@@ -214,7 +214,7 @@ export type ConfigV4 = {
   resolveViews?: boolean;
 
   // General TypeScript settings (affects all TS generators)
-  typescriptConfig: TypescriptConfig;
+  typescriptConfig?: TypescriptConfig;
 
   // Output settings
   outputPath?: string;

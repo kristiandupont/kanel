@@ -1,5 +1,5 @@
 import { recase } from "@kristiandupont/recase";
-import type { PreRenderHookV4 } from "kanel/build/config-types-v4";
+import type { PreRenderHookV4 } from "kanel";
 
 const toCamelCase = recase(null, "camel");
 
@@ -36,7 +36,7 @@ export const zodCamelCaseHook: PreRenderHookV4 = (output) => {
   const outputWithCamelCase = Object.fromEntries(
     Object.entries(output).map(([path, fileContents]) => {
       if (fileContents.fileType !== "typescript") {
-        throw new Error(`Path ${path} is not a typescript file`);
+        return [path, fileContents];
       }
       return [
         path,

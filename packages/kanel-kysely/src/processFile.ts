@@ -1,11 +1,11 @@
-import type {
-  CompositeDetails,
-  CompositeProperty,
-  InterfacePropertyDeclaration,
-  TsFileContents,
-  TypeImport,
+import {
+  usePgTsGeneratorContext,
+  type CompositeDetails,
+  type CompositeProperty,
+  type InterfacePropertyDeclaration,
+  type TsFileContents,
+  type TypeImport,
 } from "kanel";
-import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext";
 
 import type MakeKyselyConfig from "./MakeKyselyConfig";
 

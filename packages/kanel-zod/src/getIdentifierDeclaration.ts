@@ -1,6 +1,10 @@
 import type { TableDetails } from "extract-pg-schema";
-import type { ConstantDeclaration, TypeImport, TypeMap } from "kanel";
-import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext";
+import {
+  usePgTsGeneratorContext,
+  type ConstantDeclaration,
+  type TypeImport,
+  type TypeMap,
+} from "kanel";
 
 import type { GetZodIdentifierMetadata } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";

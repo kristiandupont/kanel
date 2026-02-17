@@ -1,13 +1,13 @@
 import { recase } from "@kristiandupont/recase";
-import type {
-  InterfaceDeclaration,
-  InterfacePropertyDeclaration,
-  PreRenderHookV4,
-  TypeDeclaration,
-  TypeImport,
+import {
+  useKanelContext,
+  usePgTsGeneratorContext,
+  type InterfaceDeclaration,
+  type InterfacePropertyDeclaration,
+  type PreRenderHookV4,
+  type TypeDeclaration,
+  type TypeImport,
 } from "kanel";
-import { useKanelContext } from "kanel/build/context";
-import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext";
 import { dirname, join } from "path";
 
 import type MakeKyselyConfig from "./MakeKyselyConfig";

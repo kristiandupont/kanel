@@ -1,11 +1,11 @@
-import type {
-  CompositeDetails,
-  CompositeProperty,
-  TypeImport,
-  TypeMap,
+import {
+  resolveType,
+  usePgTsGeneratorContext,
+  type CompositeDetails,
+  type CompositeProperty,
+  type TypeImport,
+  type TypeMap,
 } from "kanel";
-import { resolveType } from "kanel";
-import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext";
 import * as R from "ramda";
 
 export type ZodPropertyDeclaration = {

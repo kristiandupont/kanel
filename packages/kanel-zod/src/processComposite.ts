@@ -1,7 +1,11 @@
-import type { ConstantDeclaration, TypeImport, TypeMap } from "kanel";
-import { escapeName } from "kanel";
-import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext";
-import type { CompositeDetails } from "kanel/build/generators/composite-types";
+import {
+  escapeName,
+  usePgTsGeneratorContext,
+  type CompositeDetails,
+  type ConstantDeclaration,
+  type TypeImport,
+  type TypeMap,
+} from "kanel";
 
 import generateProperties from "./generateProperties";
 import type { GetZodSchemaMetadata } from "./GenerateZodSchemasConfig";
