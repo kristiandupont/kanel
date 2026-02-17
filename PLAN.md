@@ -39,55 +39,26 @@ Currently the V4 public types carry a `V4` suffix which will be confusing as V3 
 
 **Note**: `ConfigV3` / `ConfigV4` may need to stay as-is as union members since the union `Config = ConfigV3 | ConfigV4` is structural. Evaluate carefully.
 
-### 2. Make TypescriptConfig Optional (with defaults)
+### 2. Make TypescriptConfig Optional (with defaults) ✅
 
-`typescriptConfig` is currently required on `ConfigV4`. It should have a sensible default so a minimal config just works:
+`typescriptConfig` is now optional on `ConfigV4`. A minimal config just works:
 
 ```ts
-// Should work:
 const config: Config = {
   connection: "...",
   generators: [makePgTsGenerator()],
 };
 ```
 
-Default `TypescriptConfig`:
-```ts
-const defaultTypescriptConfig: TypescriptConfig = {
-  enumStyle: "literal-union",
-  // tsModuleFormat: derived from package.json/tsconfig if not provided
-};
-```
+Default: `{ enumStyle: "literal-union" }`. The derived `importsExtension` is stored on `typescriptConfig` in context, and `renderTsFile` reads from it directly (no more `instantiatedConfig` cast hack).
 
-This also resolves the current `renderTsFile` issue — `renderTsFile` reads `instantiatedConfig.importsExtension` from context via a cast hack. The proper fix is:
-1. Make `TypescriptConfig` optional on `ConfigV4`
-2. In `processV4Config`, use the derived `importsExtension` from `deriveExtensions()` and store it on `typescriptConfig` (or in a separate derived context field)
-3. Update `renderTsFile` to read from `typescriptConfig` directly, removing the `instantiatedConfig` dependency
+### 3. Fix Deep Imports in kanel-kysely and kanel-zod ✅
 
-### 3. Fix Deep Imports in kanel-kysely and kanel-zod
+All deep imports from internal build paths (`kanel/build/...`) in kanel-kysely and kanel-zod have been replaced with public API imports from `"kanel"`.
 
-Both packages import from internal build paths instead of the public API:
+### 4. Fix zodCamelCaseHook throwing on non-TS files ✅
 
-**kanel-kysely:**
-- `import { useKanelContext } from "kanel/build/context"` → `from "kanel"`
-- `import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext"` → `from "kanel"`
-
-**kanel-zod:**
-- `import type { PreRenderHookV4 } from "kanel/build/config-types-v4"` → `from "kanel"`
-- `import { useKanelContext } from "kanel/build/context"` → `from "kanel"`
-- `import { usePgTsGeneratorContext } from "kanel/build/generators/pgTsGeneratorContext"` → `from "kanel"`
-- `import type { CompositeDetails } from "kanel/build/generators/composite-types"` → `from "kanel"`
-
-All these symbols are already exported from the public `kanel` index.
-
-### 4. Fix zodCamelCaseHook throwing on non-TS files
-
-`zodCamelCaseHook` currently throws if any non-typescript file is in the output:
-```ts
-throw new Error(`Path ${path} is not a typescript file`);
-```
-
-This will break if used alongside `makeMarkdownGenerator`. Should skip non-typescript files instead.
+`zodCamelCaseHook` now skips non-typescript files instead of throwing, making it safe to use alongside `makeMarkdownGenerator`.
 
 ### 5. Update Documentation
 
@@ -106,14 +77,9 @@ All documentation is V3-era and needs V4 updates:
 
 **Important**: The deprecation warning in `config-conversion.ts` points to `https://kristiandupont.github.io/kanel/v4-migration`. This page must exist before beta.
 
-### 6. Remove/Clean stale comment in processDatabase.ts
+### 6. Remove/Clean stale comment in processDatabase.ts ✅
 
-Lines 194–195 contain:
-```
-* Note: Full V4 implementation (with makePgTsGenerator) will be in Phase 4.
-* For now, this runs the old V3-style generators but uses V4 hooks.
-```
-This is now false — the full V4 implementation is complete. Remove.
+The stale "Phase 4" comment has been removed from `processV4Config`.
 
 ### 7. Add `exportAs` to `TypeMetadata` (returned by `getMetadata`)
 
