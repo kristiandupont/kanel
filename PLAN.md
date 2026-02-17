@@ -20,43 +20,7 @@ Hooks and generators access configuration via AsyncLocalStorage context (using `
 
 ## Beta Release Checklist
 
-### 1. Type Naming Cleanup — Remove \*V4 suffixes from public API
-
-Currently the V4 public types carry a `V4` suffix which will be confusing as V3 fades out. These should be renamed:
-
-| Current Name               | Should Become            | Notes                                                                                 |
-| -------------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
-| `PreRenderHookV4`          | `PreRenderHook`          | V3's `PreRenderHookV3` stays as-is (deprecated)                                       |
-| `PostRenderHookV4`         | `PostRenderHook`         | V3's `PostRenderHookV3` stays as-is (deprecated)                                      |
-| `TypeMetadataV4`           | `TypeMetadata`           | Old `TypeMetadata` in metadata-types.ts gets renamed to `TypeMetadataV3` (deprecated) |
-| `PropertyMetadataV4`       | `PropertyMetadata`       | Same treatment                                                                        |
-| `RoutineMetadataV4`        | `RoutineMetadata`        | Same treatment                                                                        |
-| `GetMetadataV4`            | `GetMetadata`            | Old V3 `GetMetadata` renamed to `GetMetadataV3` (deprecated)                          |
-| `GetPropertyMetadataV4`    | `GetPropertyMetadata`    | Same                                                                                  |
-| `GenerateIdentifierTypeV4` | `GenerateIdentifierType` | Same                                                                                  |
-| `GetRoutineMetadataV4`     | `GetRoutineMetadata`     | Same                                                                                  |
-| `ConfigV4`                 | `Config`                 | Old union `Config` becomes `AnyConfig`, or just deprecated                            |
-
-**Note**: `ConfigV3` / `ConfigV4` may need to stay as-is as union members since the union `Config = ConfigV3 | ConfigV4` is structural. Evaluate carefully.
-
-### 2. Update Documentation
-
-All documentation is V3-era and needs V4 updates:
-
-- `docs-src/getting-started.md` — show V4 config format
-- `docs-src/configuring.md` — V4 config API (generators, typescriptConfig, etc.)
-- `docs-src/preRenderHooks.md` — V4 hook signature, placement in `PgTsGeneratorConfig.preRenderHooks` vs global
-- `docs-src/postRenderHooks.md` — V4 hook signature
-- `docs-src/getMetadata.md` — V4 composable pattern with `builtinMetadata`
-- `docs-src/getPropertyMetadata.md` — same
-- `docs-src/generateIdentifierType.md` — same
-- `docs-src/getRoutineMetadata.md` — same
-- `docs-src/migration.md` — add V3→V4 migration guide (currently only covers V2→V3)
-- Package READMEs (kanel-kysely, kanel-zod, kanel-knex, kanel-enum-tables) — show V4 usage
-
-**Important**: The deprecation warning in `config-conversion.ts` points to `https://kristiandupont.github.io/kanel/v4-migration`. This page must exist before beta.
-
-### 3. Add `exportAs` to `TypeMetadata` (returned by `getMetadata`)
+### 1. Add `exportAs` to `TypeMetadata` (returned by `getMetadata`)
 
 Currently `TypeMetadataV4` (to be renamed `TypeMetadata`) only has `{ name, comment, path }`. The `exportAs` for generated declarations is hardcoded in the sub-generators:
 
@@ -79,7 +43,7 @@ Each sub-generator that currently hardcodes `exportAs` should instead read it fr
 
 **Scope**: `makeCompositeGenerator.ts`, `enumsGenerator.ts`, `domainsGenerator.ts`, `rangesGenerator.ts`. Also update `default-metadata-generators.ts` (builtin `getMetadata`) to set the appropriate defaults explicitly so users composing on top of `builtinMetadata` get the right values for free.
 
-### 4. applyTaggedComments and markAsGenerated hook types
+### 2. applyTaggedComments and markAsGenerated hook types
 
 `applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. V4 users cannot use them directly in a V4 config's `preRenderHooks`/`postRenderHooks` without wrapping. Options:
 
@@ -89,6 +53,42 @@ Each sub-generator that currently hardcodes `exportAs` should instead read it fr
 `markAsGenerated` in particular is commonly used — users will expect to be able to add it to V4 post-render hooks.
 
 ---
+
+### 3. Type Naming Cleanup — Remove \*V4 suffixes from public API
+
+Currently the V4 public types carry a `V4` suffix which will be confusing as V3 fades out. These should be renamed:
+
+| Current Name               | Should Become            | Notes                                                                                 |
+| -------------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
+| `PreRenderHookV4`          | `PreRenderHook`          | V3's `PreRenderHookV3` stays as-is (deprecated)                                       |
+| `PostRenderHookV4`         | `PostRenderHook`         | V3's `PostRenderHookV3` stays as-is (deprecated)                                      |
+| `TypeMetadataV4`           | `TypeMetadata`           | Old `TypeMetadata` in metadata-types.ts gets renamed to `TypeMetadataV3` (deprecated) |
+| `PropertyMetadataV4`       | `PropertyMetadata`       | Same treatment                                                                        |
+| `RoutineMetadataV4`        | `RoutineMetadata`        | Same treatment                                                                        |
+| `GetMetadataV4`            | `GetMetadata`            | Old V3 `GetMetadata` renamed to `GetMetadataV3` (deprecated)                          |
+| `GetPropertyMetadataV4`    | `GetPropertyMetadata`    | Same                                                                                  |
+| `GenerateIdentifierTypeV4` | `GenerateIdentifierType` | Same                                                                                  |
+| `GetRoutineMetadataV4`     | `GetRoutineMetadata`     | Same                                                                                  |
+| `ConfigV4`                 | `Config`                 | Old union `Config` becomes `AnyConfig`, or just deprecated                            |
+
+**Note**: `ConfigV3` / `ConfigV4` may need to stay as-is as union members since the union `Config = ConfigV3 | ConfigV4` is structural. Evaluate carefully.
+
+### 4. Update Documentation
+
+All documentation is V3-era and needs V4 updates:
+
+- `docs-src/getting-started.md` — show V4 config format
+- `docs-src/configuring.md` — V4 config API (generators, typescriptConfig, etc.)
+- `docs-src/preRenderHooks.md` — V4 hook signature, placement in `PgTsGeneratorConfig.preRenderHooks` vs global
+- `docs-src/postRenderHooks.md` — V4 hook signature
+- `docs-src/getMetadata.md` — V4 composable pattern with `builtinMetadata`
+- `docs-src/getPropertyMetadata.md` — same
+- `docs-src/generateIdentifierType.md` — same
+- `docs-src/getRoutineMetadata.md` — same
+- `docs-src/migration.md` — add V3→V4 migration guide (currently only covers V2→V3)
+- Package READMEs (kanel-kysely, kanel-zod, kanel-knex, kanel-enum-tables) — show V4 usage
+
+**Important**: The deprecation warning in `config-conversion.ts` points to `https://kristiandupont.github.io/kanel/v4-migration`. This page must exist before beta.
 
 ## Backwards Compatibility Strategy
 
