@@ -20,47 +20,26 @@ Hooks and generators access configuration via AsyncLocalStorage context (using `
 
 ## Beta Release Checklist
 
-### 1. Type Naming Cleanup — Remove *V4 suffixes from public API
+### 1. Type Naming Cleanup — Remove \*V4 suffixes from public API
 
 Currently the V4 public types carry a `V4` suffix which will be confusing as V3 fades out. These should be renamed:
 
-| Current Name | Should Become | Notes |
-|---|---|---|
-| `PreRenderHookV4` | `PreRenderHook` | V3's `PreRenderHookV3` stays as-is (deprecated) |
-| `PostRenderHookV4` | `PostRenderHook` | V3's `PostRenderHookV3` stays as-is (deprecated) |
-| `TypeMetadataV4` | `TypeMetadata` | Old `TypeMetadata` in metadata-types.ts gets renamed to `TypeMetadataV3` (deprecated) |
-| `PropertyMetadataV4` | `PropertyMetadata` | Same treatment |
-| `RoutineMetadataV4` | `RoutineMetadata` | Same treatment |
-| `GetMetadataV4` | `GetMetadata` | Old V3 `GetMetadata` renamed to `GetMetadataV3` (deprecated) |
-| `GetPropertyMetadataV4` | `GetPropertyMetadata` | Same |
-| `GenerateIdentifierTypeV4` | `GenerateIdentifierType` | Same |
-| `GetRoutineMetadataV4` | `GetRoutineMetadata` | Same |
-| `ConfigV4` | `Config` | Old union `Config` becomes `AnyConfig`, or just deprecated |
+| Current Name               | Should Become            | Notes                                                                                 |
+| -------------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
+| `PreRenderHookV4`          | `PreRenderHook`          | V3's `PreRenderHookV3` stays as-is (deprecated)                                       |
+| `PostRenderHookV4`         | `PostRenderHook`         | V3's `PostRenderHookV3` stays as-is (deprecated)                                      |
+| `TypeMetadataV4`           | `TypeMetadata`           | Old `TypeMetadata` in metadata-types.ts gets renamed to `TypeMetadataV3` (deprecated) |
+| `PropertyMetadataV4`       | `PropertyMetadata`       | Same treatment                                                                        |
+| `RoutineMetadataV4`        | `RoutineMetadata`        | Same treatment                                                                        |
+| `GetMetadataV4`            | `GetMetadata`            | Old V3 `GetMetadata` renamed to `GetMetadataV3` (deprecated)                          |
+| `GetPropertyMetadataV4`    | `GetPropertyMetadata`    | Same                                                                                  |
+| `GenerateIdentifierTypeV4` | `GenerateIdentifierType` | Same                                                                                  |
+| `GetRoutineMetadataV4`     | `GetRoutineMetadata`     | Same                                                                                  |
+| `ConfigV4`                 | `Config`                 | Old union `Config` becomes `AnyConfig`, or just deprecated                            |
 
 **Note**: `ConfigV3` / `ConfigV4` may need to stay as-is as union members since the union `Config = ConfigV3 | ConfigV4` is structural. Evaluate carefully.
 
-### 2. Make TypescriptConfig Optional (with defaults) ✅
-
-`typescriptConfig` is now optional on `ConfigV4`. A minimal config just works:
-
-```ts
-const config: Config = {
-  connection: "...",
-  generators: [makePgTsGenerator()],
-};
-```
-
-Default: `{ enumStyle: "literal-union" }`. The derived `importsExtension` is stored on `typescriptConfig` in context, and `renderTsFile` reads from it directly (no more `instantiatedConfig` cast hack).
-
-### 3. Fix Deep Imports in kanel-kysely and kanel-zod ✅
-
-All deep imports from internal build paths (`kanel/build/...`) in kanel-kysely and kanel-zod have been replaced with public API imports from `"kanel"`.
-
-### 4. Fix zodCamelCaseHook throwing on non-TS files ✅
-
-`zodCamelCaseHook` now skips non-typescript files instead of throwing, making it safe to use alongside `makeMarkdownGenerator`.
-
-### 5. Update Documentation
+### 2. Update Documentation
 
 All documentation is V3-era and needs V4 updates:
 
@@ -77,13 +56,10 @@ All documentation is V3-era and needs V4 updates:
 
 **Important**: The deprecation warning in `config-conversion.ts` points to `https://kristiandupont.github.io/kanel/v4-migration`. This page must exist before beta.
 
-### 6. Remove/Clean stale comment in processDatabase.ts ✅
-
-The stale "Phase 4" comment has been removed from `processV4Config`.
-
-### 7. Add `exportAs` to `TypeMetadata` (returned by `getMetadata`)
+### 3. Add `exportAs` to `TypeMetadata` (returned by `getMetadata`)
 
 Currently `TypeMetadataV4` (to be renamed `TypeMetadata`) only has `{ name, comment, path }`. The `exportAs` for generated declarations is hardcoded in the sub-generators:
+
 - Selector interface: `"default"`
 - Initializer/mutator interfaces: `"named"`
 - Enums, domains, ranges: `"default"`
@@ -103,9 +79,10 @@ Each sub-generator that currently hardcodes `exportAs` should instead read it fr
 
 **Scope**: `makeCompositeGenerator.ts`, `enumsGenerator.ts`, `domainsGenerator.ts`, `rangesGenerator.ts`. Also update `default-metadata-generators.ts` (builtin `getMetadata`) to set the appropriate defaults explicitly so users composing on top of `builtinMetadata` get the right values for free.
 
-### 8. applyTaggedComments and markAsGenerated hook types
+### 4. applyTaggedComments and markAsGenerated hook types
 
 `applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. V4 users cannot use them directly in a V4 config's `preRenderHooks`/`postRenderHooks` without wrapping. Options:
+
 - Upgrade them to V4 signatures (they can use `useKanelContext()` for any config they need)
 - Or at minimum, clearly document that they require wrapping in V4 configs
 
@@ -166,9 +143,17 @@ type Config = {
 ### V3 Config Types (for backwards compatibility)
 
 V3 types retain the `V3` suffix or are deprecated:
+
 ```ts
-type PreRenderHookV3 = (outputAcc: Output, instantiatedConfig: InstantiatedConfig) => Awaitable<Output>;
-type PostRenderHookV3 = (path: string, lines: string[], instantiatedConfig: InstantiatedConfig) => Awaitable<string[]>;
+type PreRenderHookV3 = (
+  outputAcc: Output,
+  instantiatedConfig: InstantiatedConfig,
+) => Awaitable<Output>;
+type PostRenderHookV3 = (
+  path: string,
+  lines: string[],
+  instantiatedConfig: InstantiatedConfig,
+) => Awaitable<string[]>;
 // ... etc
 ```
 
@@ -204,6 +189,7 @@ type GetRoutineMetadata = (
 ```
 
 **Note on "builtin" vs "default":**
+
 - The third parameter is the **builtin** implementation (Kanel's internal implementation)
 - It's NOT a "default" from user config - user config is optional
 - The old `defaultGetMetadata` functions are deprecated and internal-only
@@ -219,7 +205,7 @@ This generator transforms PostgreSQL types into TypeScript types. The previous t
 type PgTsGeneratorConfig = {
   customTypeMap?: TypeMap;
 
-  getMetadata?: GetMetadata;         // (formerly GetMetadataV4)
+  getMetadata?: GetMetadata; // (formerly GetMetadataV4)
   getPropertyMetadata?: GetPropertyMetadata;
   generateIdentifierType?: GenerateIdentifierType;
   getRoutineMetadata?: GetRoutineMetadata;
@@ -265,6 +251,7 @@ These exist as pre-render hooks specific to the PgTsGenerator context (must be p
 All of the above are fully upgraded to V4 and use `usePgTsGeneratorContext()` / `useKanelContext()`.
 
 New standalone generator:
+
 - **MarkdownGenerator** (`makeMarkdownGenerator`): Generates human/LLM-friendly markdown docs
 
 ---
@@ -318,17 +305,15 @@ When a V3 config is detected:
 ## Example V4 Config
 
 ```ts
-import {
-  makePgTsGenerator,
-  markAsGenerated,
-  generateIndexFile,
-} from "kanel";
+import { makePgTsGenerator, markAsGenerated, generateIndexFile } from "kanel";
 import { makeKyselyHook } from "kanel-kysely";
 import { generateZodSchemas } from "kanel-zod";
 import { generateKnexTablesModule } from "kanel-knex";
 
 const config = {
-  connection: { /* pg connection */ },
+  connection: {
+    /* pg connection */
+  },
   typescriptConfig: {
     enumStyle: "literal-union",
     tsModuleFormat: "esm",
@@ -340,7 +325,9 @@ const config = {
         ...builtinMetadata,
         comment: ["My custom comment"],
       }),
-      customTypeMap: { /* ... */ },
+      customTypeMap: {
+        /* ... */
+      },
       // Hooks that need PgTs context go here:
       preRenderHooks: [
         makeKyselyHook(),
@@ -357,11 +344,11 @@ const config = {
 
 ## V4 Default Changes
 
-| Setting           | V3 Default          | V4 Default        | Rationale                                              |
-| ----------------- | ------------------- | ----------------- | ------------------------------------------------------ |
-| `enumStyle`       | `"enum"`            | `"literal-union"` | Literal types are more modern and avoid TS compilation |
-| `postRenderHooks` | `[markAsGenerated]` | `[]`              | Explicit opt-in for V4, less magic                     |
-| `typescriptConfig`| N/A (top-level)     | `{ enumStyle: "literal-union" }` | Optional with defaults |
+| Setting            | V3 Default          | V4 Default                       | Rationale                                              |
+| ------------------ | ------------------- | -------------------------------- | ------------------------------------------------------ |
+| `enumStyle`        | `"enum"`            | `"literal-union"`                | Literal types are more modern and avoid TS compilation |
+| `postRenderHooks`  | `[markAsGenerated]` | `[]`                             | Explicit opt-in for V4, less magic                     |
+| `typescriptConfig` | N/A (top-level)     | `{ enumStyle: "literal-union" }` | Optional with defaults                                 |
 
 ---
 
@@ -397,15 +384,18 @@ getMetadata: (details, generateFor, builtinMetadata) => ({
 **Generators**: Produce output by reading schemas from context. Run sequentially.
 
 **Generator-specific PreRenderHooks** (in `PgTsGeneratorConfig.preRenderHooks`):
+
 - Transform the output of that specific generator
 - Run within that generator's execution context — can call `usePgTsGeneratorContext()`
 - Run immediately after their generator, before output is merged
 
 **Global PreRenderHooks** (in `Config.preRenderHooks`):
+
 - Run after all generators complete, on the accumulated output
 - Can only use `useKanelContext()` (no generator-specific context available)
 
 **Execution flow**:
+
 1. Generator 1 runs → produces output
 2. Generator 1's `preRenderHooks` run on its output
 3. Generator 2 runs → produces output
