@@ -151,24 +151,10 @@ function wrapV3MetadataFunctions(
  */
 function printDeprecationWarning(): void {
   console.warn(
-    "\n" +
-      "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-      "⚠️  DEPRECATION WARNING: V3 Config Format Detected\n" +
-      "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-      "\n" +
-      "You are using the legacy V3 configuration format.\n" +
-      "While V3 configs continue to work, please consider migrating to V4.\n" +
-      "\n" +
-      "V4 Benefits:\n" +
-      "  • Composable metadata functions (spread defaults, override what you need)\n" +
-      "  • Cleaner separation of concerns (generators, hooks, config)\n" +
-      "  • Better TypeScript support with useKanelContext()\n" +
-      "  • More flexible generator architecture\n" +
-      "\n" +
-      "Migration Guide: https://kristiandupont.github.io/kanel/v4-migration\n" +
-      "\n" +
-      "To suppress this warning, use the --no-deprecation-warning flag.\n" +
-      "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n",
+    [
+      "Warning: deprecated V3 config format detected.",
+      "While V3 configs continue to work for now, please consider migrating to V4.",
+    ].join("\n"),
   );
 }
 
