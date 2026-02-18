@@ -13,7 +13,7 @@ const makeMapper =
   (rangeDetails: RangeDetails): { path: Path; declaration: TsDeclaration } => {
     const generatorContext = usePgTsGeneratorContext();
 
-    const { name, comment, path } = generatorContext.getMetadata(
+    const { name, comment, path, exportAs } = generatorContext.getMetadata(
       rangeDetails,
       undefined,
     );
@@ -38,7 +38,7 @@ const makeMapper =
       declarationType: "typeDeclaration",
       name,
       comment,
-      exportAs: "default",
+      exportAs: exportAs ?? "default",
       // typeDefinition: [`[lowerBound: ${rType}, upperBound: ${rType}]`],
       typeDefinition: ["string"],
       typeImports: [],

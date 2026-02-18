@@ -22,6 +22,7 @@ const makeMapper =
       name: selectorName,
       comment: selectorComment,
       path,
+      exportAs: selectorExportAs,
     } = generatorContext.getMetadata(details, "selector");
 
     if (
@@ -55,34 +56,40 @@ const makeMapper =
       declarationType: "interface",
       name: selectorName,
       comment: selectorComment,
-      exportAs: "default",
+      exportAs: selectorExportAs ?? "default",
       properties: selectorProperties,
     };
     declarations.push(selectorDeclaration);
 
     if (details.kind === "table") {
-      const { name: initializerName, comment: initializerComment } =
-        generatorContext.getMetadata(details, "initializer");
+      const {
+        name: initializerName,
+        comment: initializerComment,
+        exportAs: initializerExportAs,
+      } = generatorContext.getMetadata(details, "initializer");
       const initializerProperties = generateProperties(details, "initializer");
 
       const initializerDeclaration: InterfaceDeclaration = {
         declarationType: "interface",
         name: initializerName,
         comment: initializerComment,
-        exportAs: "named",
+        exportAs: initializerExportAs ?? "named",
         properties: initializerProperties,
       };
       declarations.push(initializerDeclaration);
 
-      const { name: mutatorName, comment: mutatorComment } =
-        generatorContext.getMetadata(details, "mutator");
+      const {
+        name: mutatorName,
+        comment: mutatorComment,
+        exportAs: mutatorExportAs,
+      } = generatorContext.getMetadata(details, "mutator");
       const mutatorProperties = generateProperties(details, "mutator");
 
       const mutatorDeclaration: InterfaceDeclaration = {
         declarationType: "interface",
         name: mutatorName,
         comment: mutatorComment,
-        exportAs: "named",
+        exportAs: mutatorExportAs ?? "named",
         properties: mutatorProperties,
       };
       declarations.push(mutatorDeclaration);

@@ -65,12 +65,14 @@ export type PostRenderHookV4 = (
 // #region V4 Metadata Types
 
 /**
- * V4 metadata result type (unchanged from V3)
+ * V4 metadata result type
  */
 export type TypeMetadataV4 = {
   name: string;
   comment: string[] | undefined;
   path: string;
+  /** How to export this declaration. Defaults to "default" if not provided. */
+  exportAs?: "named" | "default";
 };
 
 /**

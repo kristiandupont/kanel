@@ -53,6 +53,7 @@ export const defaultGetMetadata: GetMetadata = (details, generateFor) => {
     name: toPascalCase(details.name + suffix),
     comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
     path: join(outputPath, details.schemaName, toPascalCase(details.name)),
+    exportAs: isAgentNoun ? "named" : "default",
   };
 };
 // #endregion defaultGetMetadata

@@ -18,7 +18,7 @@ const makeMapper =
   (enumDetails: EnumDetails): { path: Path; declaration: TsDeclaration } => {
     const generatorContext = usePgTsGeneratorContext();
 
-    const { name, comment, path } = generatorContext.getMetadata(
+    const { name, comment, path, exportAs } = generatorContext.getMetadata(
       enumDetails,
       undefined,
     );
@@ -28,7 +28,7 @@ const makeMapper =
         declarationType: "typeDeclaration",
         name,
         comment,
-        exportAs: "default",
+        exportAs: exportAs ?? "default",
         typeDefinition: [
           "", // Start definition on new line
           ...enumDetails.values.map((value) => `| '${value}'`),
@@ -40,7 +40,7 @@ const makeMapper =
         declarationType: "enum",
         comment,
         name,
-        exportAs: "default",
+        exportAs: exportAs ?? "default",
         values: enumDetails.values,
       };
       return { path, declaration };

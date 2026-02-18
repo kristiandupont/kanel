@@ -18,7 +18,7 @@ const makeMapper =
   ): { path: Path; declaration: TsDeclaration } => {
     const generatorContext = usePgTsGeneratorContext();
 
-    const { name, comment, path } = generatorContext.getMetadata(
+    const { name, comment, path, exportAs } = generatorContext.getMetadata(
       domainDetails,
       undefined,
     );
@@ -44,7 +44,7 @@ const makeMapper =
       declarationType: "typeDeclaration",
       name,
       comment,
-      exportAs: "default",
+      exportAs: exportAs ?? "default",
       typeDefinition,
       typeImports,
     };
