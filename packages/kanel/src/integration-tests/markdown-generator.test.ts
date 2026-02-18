@@ -62,9 +62,11 @@ describe("Markdown Generator", () => {
         templatePath,
         `# Database Documentation
 
-{{#each metadata.entities}}
-- {{type}}: {{schema}}.{{name}}
+{{#with schemas.mdtest}}
+{{#each tables}}
+- {{schemaName}}.{{name}}
 {{/each}}
+{{/with}}
 `,
       );
 
@@ -92,7 +94,7 @@ describe("Markdown Generator", () => {
       expect(results["docs/database.md"]).toBeDefined();
       const content = results["docs/database.md"].join("\n");
       expect(content).toContain("# Database Documentation");
-      expect(content).toContain("table: mdtest.users");
+      expect(content).toContain("- mdtest.users");
     });
   });
 
