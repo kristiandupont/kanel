@@ -1,6 +1,6 @@
 import type { Kind, Schema, TableColumn } from "extract-pg-schema";
 
-import { useKanelContext } from "../context";
+import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import {
   type TsDeclaration,
   type InterfaceDeclaration,
@@ -15,25 +15,22 @@ import resolveType from "./resolveType";
 const makeMapper =
   <D extends CompositeDetails>() =>
   (details: D): { path: Path; declaration: TsDeclaration }[] => {
-    const { instantiatedConfig } = useKanelContext();
+    const generatorContext = usePgTsGeneratorContext();
 
     const declarations: TsDeclaration[] = [];
     const {
       name: selectorName,
       comment: selectorComment,
       path,
-    } = instantiatedConfig.getMetadata(details, "selector", instantiatedConfig);
+      exportAs: selectorExportAs,
+    } = generatorContext.getMetadata(details, "selector");
 
     if (
       (details.kind === "table" || details.kind === "foreignTable") &&
-      instantiatedConfig.generateIdentifierType
+      generatorContext.generateIdentifierType
     ) {
       const { columns } = details;
-      const { path } = instantiatedConfig.getMetadata(
-        details,
-        "selector",
-        instantiatedConfig,
-      );
+      const { path } = generatorContext.getMetadata(details, "selector");
       const identifierColumns = columns.filter((c) => c.isPrimaryKey);
 
       identifierColumns
@@ -48,11 +45,7 @@ const makeMapper =
         })
         .forEach((c) =>
           declarations.push(
-            instantiatedConfig.generateIdentifierType(
-              c,
-              details,
-              instantiatedConfig,
-            ),
+            generatorContext.generateIdentifierType(c, details),
           ),
         );
     }
@@ -63,38 +56,40 @@ const makeMapper =
       declarationType: "interface",
       name: selectorName,
       comment: selectorComment,
-      exportAs: "default",
+      exportAs: selectorExportAs ?? "default",
       properties: selectorProperties,
     };
     declarations.push(selectorDeclaration);
 
     if (details.kind === "table") {
-      const { name: initializerName, comment: initializerComment } =
-        instantiatedConfig.getMetadata(
-          details,
-          "initializer",
-          instantiatedConfig,
-        );
+      const {
+        name: initializerName,
+        comment: initializerComment,
+        exportAs: initializerExportAs,
+      } = generatorContext.getMetadata(details, "initializer");
       const initializerProperties = generateProperties(details, "initializer");
 
       const initializerDeclaration: InterfaceDeclaration = {
         declarationType: "interface",
         name: initializerName,
         comment: initializerComment,
-        exportAs: "named",
+        exportAs: initializerExportAs ?? "named",
         properties: initializerProperties,
       };
       declarations.push(initializerDeclaration);
 
-      const { name: mutatorName, comment: mutatorComment } =
-        instantiatedConfig.getMetadata(details, "mutator", instantiatedConfig);
+      const {
+        name: mutatorName,
+        comment: mutatorComment,
+        exportAs: mutatorExportAs,
+      } = generatorContext.getMetadata(details, "mutator");
       const mutatorProperties = generateProperties(details, "mutator");
 
       const mutatorDeclaration: InterfaceDeclaration = {
         declarationType: "interface",
         name: mutatorName,
         comment: mutatorComment,
-        exportAs: "named",
+        exportAs: mutatorExportAs ?? "named",
         properties: mutatorProperties,
       };
       declarations.push(mutatorDeclaration);

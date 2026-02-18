@@ -1,4 +1,4 @@
-import type { CompositeDetails, InstantiatedConfig } from "kanel";
+import type { CompositeDetails } from "kanel";
 import { escapeIdentifier } from "kanel";
 
 interface MakeKyselyConfig {
@@ -9,7 +9,6 @@ interface MakeKyselyConfig {
     selectorName: string,
     canInitialize: boolean,
     canMutate: boolean,
-    instantiatedConfig: InstantiatedConfig,
   ) => {
     tableInterfaceName: string;
     selectableName: string | undefined;

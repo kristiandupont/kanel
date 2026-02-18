@@ -1,10 +1,12 @@
 import { recase } from "@kristiandupont/recase";
-import type {
-  InterfaceDeclaration,
-  InterfacePropertyDeclaration,
-  PreRenderHook,
-  TypeDeclaration,
-  TypeImport,
+import {
+  useKanelContext,
+  usePgTsGeneratorContext,
+  type InterfaceDeclaration,
+  type InterfacePropertyDeclaration,
+  type PreRenderHookV4,
+  type TypeDeclaration,
+  type TypeImport,
 } from "kanel";
 import { dirname, join } from "path";
 
@@ -14,111 +16,109 @@ import processFile from "./processFile";
 
 const toPascalCase = recase(null, "pascal");
 
-const makeKyselyHook: (makeKyselyConfig?: MakeKyselyConfig) => PreRenderHook =
-  (makeKyselyConfig_) => async (outputAcc, instantiatedConfig) => {
-    const makeKyselyConfig = {
-      ...defaultConfig,
-      ...makeKyselyConfig_,
-    };
+const makeKyselyHook: (
+  makeKyselyConfig?: MakeKyselyConfig,
+) => PreRenderHookV4 = (makeKyselyConfig_) => async (outputAcc) => {
+  const { schemas, config } = useKanelContext();
+  const pgTsContext = usePgTsGeneratorContext();
 
-    const output = { ...outputAcc };
-
-    const schemaImports: TypeImport[] = [];
-
-    for (const schemaName of Object.keys(instantiatedConfig.schemas)) {
-      const schema = instantiatedConfig.schemas[schemaName];
-      const composites = [
-        ...schema.tables,
-        ...schema.views,
-        ...schema.materializedViews,
-        ...schema.compositeTypes,
-      ];
-      if (composites.length === 0) {
-        continue;
-      }
-      // Get the schema folder from the first known composite.
-      let schemaFolder: string | undefined;
-
-      const tableImports: TypeImport[] = [];
-      const tableProps: InterfacePropertyDeclaration[] = [];
-
-      composites.forEach((compositeDetails) => {
-        const { path } = instantiatedConfig.getMetadata(
-          compositeDetails,
-          "selector",
-          instantiatedConfig,
-        );
-        if (output[path].fileType !== "typescript") {
-          throw new Error(`Path ${path} is not a typescript file`);
-        }
-        const { modifiedDeclarations, tableImport, tableProperty } =
-          processFile(
-            output[path].declarations,
-            compositeDetails,
-            instantiatedConfig,
-            path,
-            makeKyselyConfig,
-          );
-        output[path].declarations = modifiedDeclarations;
-        if (makeKyselyConfig.includeSchemaNameInTableName)
-          tableProperty.name = `${schemaName}.${tableProperty.name}`;
-        tableImports.push(tableImport);
-        tableProps.push(tableProperty);
-
-        if (!schemaFolder) {
-          schemaFolder = dirname(path);
-        }
-      });
-
-      const schemaInterfaceName = `${toPascalCase(schemaName)}Schema`;
-      const schemaDeclaration: InterfaceDeclaration = {
-        declarationType: "interface",
-        name: schemaInterfaceName,
-        exportAs: "default",
-        typeImports: tableImports,
-        properties: tableProps,
-      };
-
-      const schemaPath = join(schemaFolder, schemaInterfaceName);
-
-      output[schemaPath] = {
-        fileType: "typescript",
-        declarations: [schemaDeclaration],
-      };
-
-      const schemaImport: TypeImport = {
-        name: schemaInterfaceName,
-        asName: undefined,
-        isDefault: true,
-        path: schemaPath,
-        isAbsolute: false,
-        importAsType: true,
-      };
-
-      schemaImports.push(schemaImport);
-    }
-
-    const dbPath = join(
-      instantiatedConfig.outputPath,
-      makeKyselyConfig.databaseFilename,
-    );
-
-    const dbDeclaration: TypeDeclaration = {
-      declarationType: "typeDeclaration",
-      name: "Database",
-      typeImports: schemaImports,
-      typeDefinition: [
-        schemaImports.map((dbImport) => dbImport.name).join(" & "),
-      ],
-      exportAs: "default",
-    };
-
-    output[dbPath] = {
-      fileType: "typescript",
-      declarations: [dbDeclaration],
-    };
-
-    return output;
+  const makeKyselyConfig = {
+    ...defaultConfig,
+    ...makeKyselyConfig_,
   };
+
+  const output = { ...outputAcc };
+
+  const schemaImports: TypeImport[] = [];
+
+  for (const schemaName of Object.keys(schemas)) {
+    const schema = schemas[schemaName];
+    const composites = [
+      ...(schema.tables ?? []),
+      ...(schema.views ?? []),
+      ...(schema.materializedViews ?? []),
+      ...(schema.compositeTypes ?? []),
+    ];
+    if (composites.length === 0) {
+      continue;
+    }
+    // Get the schema folder from the first known composite.
+    let schemaFolder: string | undefined;
+
+    const tableImports: TypeImport[] = [];
+    const tableProps: InterfacePropertyDeclaration[] = [];
+
+    composites.forEach((compositeDetails) => {
+      const { path } = pgTsContext.getMetadata(compositeDetails, "selector");
+      if (output[path].fileType !== "typescript") {
+        throw new Error(`Path ${path} is not a typescript file`);
+      }
+      const { modifiedDeclarations, tableImport, tableProperty } = processFile(
+        output[path].declarations,
+        compositeDetails,
+        path,
+        makeKyselyConfig,
+      );
+      output[path].declarations = modifiedDeclarations;
+      if (makeKyselyConfig.includeSchemaNameInTableName)
+        tableProperty.name = `${schemaName}.${tableProperty.name}`;
+      tableImports.push(tableImport);
+      tableProps.push(tableProperty);
+
+      if (!schemaFolder) {
+        schemaFolder = dirname(path);
+      }
+    });
+
+    const schemaInterfaceName = `${toPascalCase(schemaName)}Schema`;
+    const schemaDeclaration: InterfaceDeclaration = {
+      declarationType: "interface",
+      name: schemaInterfaceName,
+      exportAs: "default",
+      typeImports: tableImports,
+      properties: tableProps,
+    };
+
+    const schemaPath = join(schemaFolder, schemaInterfaceName);
+
+    output[schemaPath] = {
+      fileType: "typescript",
+      declarations: [schemaDeclaration],
+    };
+
+    const schemaImport: TypeImport = {
+      name: schemaInterfaceName,
+      asName: undefined,
+      isDefault: true,
+      path: schemaPath,
+      isAbsolute: false,
+      importAsType: true,
+    };
+
+    schemaImports.push(schemaImport);
+  }
+
+  const dbPath = join(
+    config.outputPath ?? ".",
+    makeKyselyConfig.databaseFilename,
+  );
+
+  const dbDeclaration: TypeDeclaration = {
+    declarationType: "typeDeclaration",
+    name: "Database",
+    typeImports: schemaImports,
+    typeDefinition: [
+      schemaImports.map((dbImport) => dbImport.name).join(" & "),
+    ],
+    exportAs: "default",
+  };
+
+  output[dbPath] = {
+    fileType: "typescript",
+    declarations: [dbDeclaration],
+  };
+
+  return output;
+};
 
 export default makeKyselyHook;

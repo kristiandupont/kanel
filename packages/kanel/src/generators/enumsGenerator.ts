@@ -1,6 +1,7 @@
 import type { EnumDetails, Schema } from "extract-pg-schema";
 
 import { useKanelContext } from "../context";
+import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import {
   type TsDeclaration,
   type EnumDeclaration,
@@ -10,25 +11,24 @@ import {
 import type { Path } from "../Output";
 import type Output from "../Output";
 
-type EnumStyle = "enum" | "type";
+type EnumStyle = "enum" | "literal-union";
 
 const makeMapper =
   (style: EnumStyle) =>
   (enumDetails: EnumDetails): { path: Path; declaration: TsDeclaration } => {
-    const { instantiatedConfig } = useKanelContext();
+    const generatorContext = usePgTsGeneratorContext();
 
-    const { name, comment, path } = instantiatedConfig.getMetadata(
+    const { name, comment, path, exportAs } = generatorContext.getMetadata(
       enumDetails,
       undefined,
-      instantiatedConfig,
     );
 
-    if (style === "type") {
+    if (style === "literal-union") {
       const declaration: TypeDeclaration = {
         declarationType: "typeDeclaration",
         name,
         comment,
-        exportAs: "default",
+        exportAs: exportAs ?? "default",
         typeDefinition: [
           "", // Start definition on new line
           ...enumDetails.values.map((value) => `| '${value}'`),
@@ -40,7 +40,7 @@ const makeMapper =
         declarationType: "enum",
         comment,
         name,
-        exportAs: "default",
+        exportAs: exportAs ?? "default",
         values: enumDetails.values,
       };
       return { path, declaration };
@@ -48,9 +48,9 @@ const makeMapper =
   };
 
 const enumsGenerator = (schema: Schema, outputAcc: Output): Output => {
-  const { instantiatedConfig } = useKanelContext();
+  const { typescriptConfig } = useKanelContext();
   const declarations =
-    schema.enums?.map(makeMapper(instantiatedConfig.enumStyle)) ?? [];
+    schema.enums?.map(makeMapper(typescriptConfig.enumStyle)) ?? [];
   return declarations.reduce(
     (acc, elem) => registerTsDeclaration(acc, elem.path, elem.declaration),
     outputAcc,

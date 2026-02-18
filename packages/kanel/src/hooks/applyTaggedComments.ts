@@ -6,7 +6,7 @@ import type {
 } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import type { PreRenderHook } from "../config-types";
+import type { PreRenderHookV3 } from "../config-types";
 import type {
   CompositeDetails,
   CompositeProperty,
@@ -64,7 +64,10 @@ const resolveTypeFromComment = (
  *
  * This is applied by default to maintain backward compatibility.
  */
-const applyTaggedComments: PreRenderHook = (outputAcc, instantiatedConfig) => {
+const applyTaggedComments: PreRenderHookV3 = (
+  outputAcc,
+  instantiatedConfig,
+) => {
   const newOutput = { ...outputAcc };
 
   // Build a map of type full names to their tagged TypeDefinition

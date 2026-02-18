@@ -1,10 +1,12 @@
-import type {
-  TsDeclaration,
-  Output,
-  Path,
-  PreRenderHook,
-  TypeImport,
-} from "kanel";
+/**
+ * V4 Zod Schema Generator
+ *
+ * This is a PreRenderHook designed to run within a PgTsGenerator context.
+ * It generates Zod schemas for all database types and appends them to the
+ * TypeScript files created by the PgTsGenerator.
+ */
+
+import { useKanelContext, type PreRenderHookV4, type TypeImport } from "kanel";
 
 import defaultZodTypeMap from "./defaultZodTypeMap";
 import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
@@ -18,27 +20,29 @@ import processDomain from "./processDomain";
 import processEnum from "./processEnum";
 import processRange from "./processRange";
 
-const createOrAppendFileContents = (
-  outputAcc: Output,
-  path: Path,
-  declaration: TsDeclaration,
-): Output => {
-  if (outputAcc[path].fileType !== "typescript") {
-    throw new Error(`Path ${path} is not a typescript file`);
-  }
-  return {
-    ...outputAcc,
-    [path]: {
-      ...outputAcc[path],
-      declarations: [...(outputAcc[path]?.declarations ?? []), declaration],
-    },
-  };
-};
-
+/**
+ * Creates a V4 PreRenderHook for generating Zod schemas.
+ *
+ * This hook runs within a PgTsGenerator context and accesses:
+ * - useKanelContext() for schemas
+ * - usePgTsGeneratorContext() for TypeScript type metadata (called internally by process functions)
+ *
+ * @param config - Configuration for Zod schema generation
+ * @returns A V4 PreRenderHook
+ */
 export const makeGenerateZodSchemas =
-  (config: GenerateZodSchemasConfig): PreRenderHook =>
-  async (outputAcc, instantiatedConfig) => {
-    let output = { ...outputAcc };
+  (config: GenerateZodSchemasConfig = {}): PreRenderHookV4 =>
+  async (outputAcc) => {
+    const kanelContext = useKanelContext();
+    const output = { ...outputAcc };
+
+    // Resolve configuration with defaults
+    const getZodSchemaMetadata =
+      config.getZodSchemaMetadata ?? defaultGetZodSchemaMetadata;
+    const getZodIdentifierMetadata =
+      config.getZodIdentifierMetadata ?? defaultGetZodIdentifierMetadata;
+    const zodTypeMap = { ...defaultZodTypeMap, ...(config.zodTypeMap ?? {}) };
+    const castToSchema = config.castToSchema ?? true;
 
     const nonCompositeTypeImports: Record<string, TypeImport> = {};
     const identifierTypeImports: Record<string, TypeImport> = {};
@@ -47,24 +51,16 @@ export const makeGenerateZodSchemas =
     // First, process the non-composite types. These may be imported by
     // the composed ones so we will generate them first and store them
     // in the nonCompositeTypeImports map.
-    for (const schemaName of Object.keys(instantiatedConfig.schemas)) {
-      const schema = instantiatedConfig.schemas[schemaName];
+    for (const schemaName of Object.keys(kanelContext.schemas)) {
+      const schema = kanelContext.schemas[schemaName];
 
       // #region enums
-      schema.enums.forEach((enumDetails) => {
-        const { name, path } = config.getZodSchemaMetadata(
-          enumDetails,
-          undefined,
-          instantiatedConfig,
-        );
-        if (output[path].fileType !== "typescript") {
+      schema.enums?.forEach((enumDetails) => {
+        const { name, path } = getZodSchemaMetadata(enumDetails, undefined);
+        if (!output[path] || output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }
-        const declaration = processEnum(
-          enumDetails,
-          config,
-          instantiatedConfig,
-        );
+        const declaration = processEnum(enumDetails, getZodSchemaMetadata);
         output[path] = {
           fileType: "typescript",
           declarations: [...output[path].declarations, declaration],
@@ -83,20 +79,12 @@ export const makeGenerateZodSchemas =
       // #endregion enums
 
       // #region ranges
-      schema.ranges.forEach((rangeDetails) => {
-        const { name, path } = config.getZodSchemaMetadata(
-          rangeDetails,
-          undefined,
-          instantiatedConfig,
-        );
-        if (output[path].fileType !== "typescript") {
+      schema.ranges?.forEach((rangeDetails) => {
+        const { name, path } = getZodSchemaMetadata(rangeDetails, undefined);
+        if (!output[path] || output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }
-        const declaration = processRange(
-          rangeDetails,
-          config,
-          instantiatedConfig,
-        );
+        const declaration = processRange(rangeDetails, getZodSchemaMetadata);
         output[path] = {
           fileType: "typescript",
           declarations: [...output[path].declarations, declaration],
@@ -115,19 +103,15 @@ export const makeGenerateZodSchemas =
       // #endregion ranges
 
       // #region domains
-      schema.domains.forEach((domainDetails) => {
-        const { name, path } = config.getZodSchemaMetadata(
-          domainDetails,
-          undefined,
-          instantiatedConfig,
-        );
-        if (output[path].fileType !== "typescript") {
+      schema.domains?.forEach((domainDetails) => {
+        const { name, path } = getZodSchemaMetadata(domainDetails, undefined);
+        if (!output[path] || output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }
         const declaration = processDomain(
           domainDetails,
-          config,
-          instantiatedConfig,
+          getZodSchemaMetadata,
+          zodTypeMap,
         );
         output[path] = {
           fileType: "typescript",
@@ -150,24 +134,26 @@ export const makeGenerateZodSchemas =
       // Run through all of the composites and make schemas for their
       // identifiers. This must be done first as they will be imported
       // by other composites.
-      schema.tables.forEach((tableDetails) => {
-        const { path } = config.getZodSchemaMetadata(
-          tableDetails,
-          undefined,
-          instantiatedConfig,
-        );
+      schema.tables?.forEach((tableDetails) => {
+        const { path } = getZodSchemaMetadata(tableDetails, undefined);
         const results = getIdentifierDeclaration(
           tableDetails,
-          config.getZodIdentifierMetadata,
-          config,
-          instantiatedConfig,
+          getZodIdentifierMetadata,
+          zodTypeMap,
+          castToSchema,
           nonCompositeTypeImports,
         );
 
         for (const result of results) {
           const { name, originalName, declaration } = result;
 
-          output = createOrAppendFileContents(output, path, declaration);
+          if (!output[path] || output[path].fileType !== "typescript") {
+            throw new Error(`Path ${path} is not a typescript file`);
+          }
+          output[path] = {
+            fileType: "typescript",
+            declarations: [...output[path].declarations, declaration],
+          };
           identifierTypeImports[`${schemaName}.${originalName}`] = {
             name,
             asName: undefined,
@@ -181,11 +167,10 @@ export const makeGenerateZodSchemas =
       // #endregion identifiers
 
       // #region composites
-      schema.compositeTypes.forEach((compositeDetails) => {
-        const { name, path } = config.getZodSchemaMetadata(
+      schema.compositeTypes?.forEach((compositeDetails) => {
+        const { name, path } = getZodSchemaMetadata(
           compositeDetails,
           undefined,
-          instantiatedConfig,
         );
         compositeTypeImports[
           `${compositeDetails.schemaName}.${compositeDetails.name}`
@@ -202,30 +187,33 @@ export const makeGenerateZodSchemas =
     }
 
     // #region composites
-    for (const schemaName of Object.keys(instantiatedConfig.schemas)) {
-      const schema = instantiatedConfig.schemas[schemaName];
+    for (const schemaName of Object.keys(kanelContext.schemas)) {
+      const schema = kanelContext.schemas[schemaName];
       const composites = [
-        ...schema.tables,
-        ...schema.views,
-        ...schema.materializedViews,
-        ...schema.compositeTypes,
+        ...(schema.tables ?? []),
+        ...(schema.views ?? []),
+        ...(schema.materializedViews ?? []),
+        ...(schema.compositeTypes ?? []),
       ];
       composites.forEach((compositeDetails) => {
-        const { path } = config.getZodSchemaMetadata(
-          compositeDetails,
-          undefined,
-          instantiatedConfig,
-        );
+        const { path } = getZodSchemaMetadata(compositeDetails, undefined);
         const declarations = processComposite(
           compositeDetails,
-          config,
-          instantiatedConfig,
+          getZodSchemaMetadata,
+          zodTypeMap,
+          castToSchema,
           nonCompositeTypeImports,
           compositeTypeImports,
           identifierTypeImports,
         );
         for (const declaration of declarations) {
-          output = createOrAppendFileContents(output, path, declaration);
+          if (!output[path] || output[path].fileType !== "typescript") {
+            throw new Error(`Path ${path} is not a typescript file`);
+          }
+          output[path] = {
+            fileType: "typescript",
+            declarations: [...output[path].declarations, declaration],
+          };
         }
       });
     }
@@ -234,6 +222,10 @@ export const makeGenerateZodSchemas =
     return output;
   };
 
+/**
+ * Default Zod schema generator with standard configuration.
+ * Use as a preRenderHook in PgTsGeneratorConfig.
+ */
 const generateZodSchemas = makeGenerateZodSchemas({
   getZodSchemaMetadata: defaultGetZodSchemaMetadata,
   getZodIdentifierMetadata: defaultGetZodIdentifierMetadata,

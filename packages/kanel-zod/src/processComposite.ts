@@ -1,35 +1,31 @@
-import type {
-  ConstantDeclaration,
-  InstantiatedConfig,
-  TypeImport,
+import {
+  escapeName,
+  usePgTsGeneratorContext,
+  type CompositeDetails,
+  type ConstantDeclaration,
+  type TypeImport,
+  type TypeMap,
 } from "kanel";
-import { escapeName } from "kanel";
-import type { CompositeDetails } from "kanel/build/generators/composite-types";
 
 import generateProperties from "./generateProperties";
-import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import type { GetZodSchemaMetadata } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";
 
 function makeDeclaration(
-  instantiatedConfig: InstantiatedConfig,
   c: CompositeDetails,
   generateFor: "selector" | "initializer" | "mutator",
   nonCompositeTypeImports: Record<string, TypeImport>,
   compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
-  config: GenerateZodSchemasConfig,
+  getZodSchemaMetadata: GetZodSchemaMetadata,
+  zodTypeMap: TypeMap,
+  castToSchema: boolean,
 ) {
-  const { name, comment } = config.getZodSchemaMetadata(
-    c,
-    generateFor,
-    instantiatedConfig,
-  );
+  const pgTsContext = usePgTsGeneratorContext();
 
-  const { name: typescriptTypeName } = instantiatedConfig.getMetadata(
-    c,
-    generateFor,
-    instantiatedConfig,
-  );
+  const { name, comment } = getZodSchemaMetadata(c, generateFor);
+
+  const { name: typescriptTypeName } = pgTsContext.getMetadata(c, generateFor);
 
   const properties = generateProperties(
     c,
@@ -37,14 +33,13 @@ function makeDeclaration(
     nonCompositeTypeImports,
     compositeTypeImports,
     identifierTypeImports,
-    config,
-    instantiatedConfig,
+    zodTypeMap,
   );
 
   const typeImports: TypeImport[] = [zImport];
 
   // "satisfies" still presents problems because of https://github.com/colinhacks/zod/issues/1628
-  // Casting works but removes the ability to use .extend, .omit, etc.
+  // Casting works but removes the ability to use .extend, .omit, .omit, etc.
   // A better solution (TODO) is to cast like this:
   // export const messageEmbedding =
   // z.object({
@@ -63,7 +58,7 @@ function makeDeclaration(
     "z.object({",
     ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
   ];
-  if (config.castToSchema) {
+  if (castToSchema) {
     value.push(`}) as unknown as z.Schema<${typescriptTypeName}>`);
   } else {
     value.push("})");
@@ -86,8 +81,9 @@ function makeDeclaration(
 
 const processComposite = (
   c: CompositeDetails,
-  config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig,
+  getZodSchemaMetadata: GetZodSchemaMetadata,
+  zodTypeMap: TypeMap,
+  castToSchema: boolean,
   nonCompositeTypeImports: Record<string, TypeImport>,
   compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
@@ -95,36 +91,39 @@ const processComposite = (
   const declarations: ConstantDeclaration[] = [];
 
   const selectorDeclaration: ConstantDeclaration = makeDeclaration(
-    instantiatedConfig,
     c,
     "selector",
     nonCompositeTypeImports,
     compositeTypeImports,
     identifierTypeImports,
-    config,
+    getZodSchemaMetadata,
+    zodTypeMap,
+    castToSchema,
   );
   declarations.push(selectorDeclaration);
 
   if (c.kind === "table") {
     const initializerDeclaration: ConstantDeclaration = makeDeclaration(
-      instantiatedConfig,
       c,
       "initializer",
       nonCompositeTypeImports,
       compositeTypeImports,
       identifierTypeImports,
-      config,
+      getZodSchemaMetadata,
+      zodTypeMap,
+      castToSchema,
     );
     declarations.push(initializerDeclaration);
 
     const mutatorDeclaration: ConstantDeclaration = makeDeclaration(
-      instantiatedConfig,
       c,
       "mutator",
       nonCompositeTypeImports,
       compositeTypeImports,
       identifierTypeImports,
-      config,
+      getZodSchemaMetadata,
+      zodTypeMap,
+      castToSchema,
     );
     declarations.push(mutatorDeclaration);
   }
