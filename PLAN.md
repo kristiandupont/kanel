@@ -20,30 +20,7 @@ Hooks and generators access configuration via AsyncLocalStorage context (using `
 
 ## Beta Release Checklist
 
-### 1. Add `exportAs` to `TypeMetadata` (returned by `getMetadata`)
-
-Currently `TypeMetadataV4` (to be renamed `TypeMetadata`) only has `{ name, comment, path }`. The `exportAs` for generated declarations is hardcoded in the sub-generators:
-
-- Selector interface: `"default"`
-- Initializer/mutator interfaces: `"named"`
-- Enums, domains, ranges: `"default"`
-
-Users should be able to control this via `getMetadata`. The fix is to add an optional `exportAs` field to `TypeMetadata` with `"default"` as the fallback:
-
-```ts
-type TypeMetadata = {
-  name: string;
-  comment: string[] | undefined;
-  path: string;
-  exportAs?: "named" | "default"; // defaults to "default" if not provided
-};
-```
-
-Each sub-generator that currently hardcodes `exportAs` should instead read it from `getMetadata(details, variant).exportAs ?? "default"`.
-
-**Scope**: `makeCompositeGenerator.ts`, `enumsGenerator.ts`, `domainsGenerator.ts`, `rangesGenerator.ts`. Also update `default-metadata-generators.ts` (builtin `getMetadata`) to set the appropriate defaults explicitly so users composing on top of `builtinMetadata` get the right values for free.
-
-### 2. applyTaggedComments and markAsGenerated hook types
+### 1. applyTaggedComments and markAsGenerated hook types
 
 `applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. V4 users cannot use them directly in a V4 config's `preRenderHooks`/`postRenderHooks` without wrapping. Options:
 
@@ -53,6 +30,13 @@ Each sub-generator that currently hardcodes `exportAs` should instead read it fr
 `markAsGenerated` in particular is commonly used — users will expect to be able to add it to V4 post-render hooks.
 
 ---
+
+### 2. Do something about kanel-seeder
+
+kanel-seeder is a standalone package that is not V4 compatible. It needs to be updated to V4.
+It's WIP anyway, so we can be a bit lax about it.
+
+It is currently a pre-render hook and it should most likely be a generator.
 
 ### 3. Type Naming Cleanup — Remove \*V4 suffixes from public API
 
