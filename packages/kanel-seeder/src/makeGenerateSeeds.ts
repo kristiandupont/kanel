@@ -1,6 +1,6 @@
 import { Dirent, promises as fs } from "fs";
 import { resolve } from "path";
-import { InstantiatedConfig, Output, PreRenderHook, writeFile } from "kanel";
+import { Generator, Output, useKanelContext } from "kanel";
 import parseMdconf from "@kristiandupont/mdconf";
 
 import seedInput, { SeedInput } from "./seedInput";
@@ -12,11 +12,11 @@ export type MakeGenerateSeedsConfig = {
 };
 
 const makeGenerateSeeds =
-  ({ srcPath, dstPath }: MakeGenerateSeedsConfig): PreRenderHook =>
-  async (
-    outputAcc: Output,
-    instantiatedConfig: InstantiatedConfig,
-  ): Promise<Output> => {
+  ({ srcPath, dstPath }: MakeGenerateSeedsConfig): Generator =>
+  async (): Promise<Output> => {
+    const context = useKanelContext();
+    const output: Output = {};
+
     const allFiles = await fs.readdir(srcPath, { withFileTypes: true });
     const mdconfFiles = allFiles.filter((file) =>
       file.name.endsWith(".mdconf"),
@@ -30,27 +30,29 @@ const makeGenerateSeeds =
         validator: seedInput,
       });
 
-      processSeedInput(parsed, instantiatedConfig, srcFilePath, dstPath, file);
+      const generatedFile = processSeedInput(parsed, context.schemas, srcFilePath, dstPath, file);
+      if (generatedFile) {
+        output[generatedFile.path] = generatedFile.content;
+      }
     }
 
-    // Return unchanged as we wrote the file manually
-    return outputAcc;
+    return output;
   };
 
 export default makeGenerateSeeds;
 
 function processSeedInput(
   parsed: SeedInput,
-  instantiatedConfig: InstantiatedConfig,
+  schemas: Record<string, import("extract-pg-schema").Schema>,
   srcFilePath: string,
   dstPath: string,
   file: Dirent,
-) {
+): { path: string; content: { fileType: "generic"; lines: string[] } } | null {
   const { config, defaults, data: inputData } = parsed;
 
   if (!config.schema) {
-    if (Object.keys(instantiatedConfig.schemas).length === 1) {
-      config.schema = Object.keys(instantiatedConfig.schemas)[0];
+    if (Object.keys(schemas).length === 1) {
+      config.schema = Object.keys(schemas)[0];
     } else {
       throw new Error(
         `No schema specified in ${srcFilePath} and no default schema found in config`,
@@ -64,7 +66,7 @@ function processSeedInput(
 
   const data = preprocessData(
     inputData,
-    instantiatedConfig.schemas[config.schema],
+    schemas[config.schema],
     defaults || {},
   );
 
@@ -81,5 +83,11 @@ function processSeedInput(
     "exports.seed = makeSeeder({ data });",
   ];
 
-  writeFile({ fullPath, lines, ensureFolder: true });
+  return {
+    path: fullPath,
+    content: {
+      fileType: "generic",
+      lines,
+    },
+  };
 }

@@ -14,7 +14,7 @@ import type {
 } from "./config-types";
 import type {
   ConfigV4,
-  PreRenderHookV4,
+  PgTsPreRenderHook,
   PostRenderHookV4,
   PgTsGeneratorConfig,
   GetMetadataV4,
@@ -42,7 +42,7 @@ export type V3ConversionOptions = {
  * Wraps a V3 PreRenderHook to work as a V4 hook.
  * Injects the instantiatedConfig from context.
  */
-function wrapV3PreRenderHook(v3Hook: PreRenderHookV3): PreRenderHookV4 {
+function wrapV3PreRenderHook(v3Hook: PreRenderHookV3): PgTsPreRenderHook {
   return async (output: Output): Promise<Output> => {
     const context = useKanelContext();
 
@@ -184,7 +184,7 @@ export function convertV3ConfigToV4(
   }
 
   // Wrap V3 hooks to inject instantiatedConfig
-  const pgTsPreRenderHooks: PreRenderHookV4[] = [];
+  const pgTsPreRenderHooks: PgTsPreRenderHook[] = [];
   const postRenderHooks: PostRenderHookV4[] = [];
 
   // V3 always applies applyTaggedComments by default (prepended to user hooks)

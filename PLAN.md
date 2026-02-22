@@ -22,21 +22,23 @@ Hooks and generators access configuration via AsyncLocalStorage context (using `
 
 ### 1. applyTaggedComments and markAsGenerated hook types
 
-`applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. V4 users cannot use them directly in a V4 config's `preRenderHooks`/`postRenderHooks` without wrapping. Options:
+`applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. They need to be upgraded to V4 signatures.
 
-- Upgrade them to V4 signatures (they can use `useKanelContext()` for any config they need)
-- Or at minimum, clearly document that they require wrapping in V4 configs
+- `markAsGenerated` is trivial — it already ignores `instantiatedConfig`, so it just needs retyping as `PostRenderHookV4`.
+- `applyTaggedComments` uses `instantiatedConfig.schemas` and `instantiatedConfig.getMetadata`, which map directly to `useKanelContext().schemas` and `usePgTsGeneratorContext().getMetadata`. It must live in `PgTsGeneratorConfig.preRenderHooks` since it needs `usePgTsGeneratorContext()`.
 
-`markAsGenerated` in particular is commonly used — users will expect to be able to add it to V4 post-render hooks.
+**Type distinction**: `PgTsGeneratorConfig.preRenderHooks` accepts hooks that may call `usePgTsGeneratorContext()`, whereas global `Config.preRenderHooks` hooks cannot. To make this clear, introduce a distinct `PgTsPreRenderHook` type (same signature as `PreRenderHookV4`, but semantically scoped to PgTs execution) for `PgTsGeneratorConfig.preRenderHooks`. This avoids users accidentally placing a PgTs-context-dependent hook in the global hooks array.
 
 ---
 
-### 2. Do something about kanel-seeder
+### 2. ~~Do something about kanel-seeder~~ ✅
 
-kanel-seeder is a standalone package that is not V4 compatible. It needs to be updated to V4.
-It's WIP anyway, so we can be a bit lax about it.
+**Status: Complete**
 
-It is currently a pre-render hook and it should most likely be a generator.
+kanel-seeder has been upgraded to V4. It is now a proper `Generator` that:
+- Uses `useKanelContext().schemas` instead of `instantiatedConfig.schemas`
+- Returns output using the `generic` file type (for `.js` Knex seed files)
+- Is placed in the `generators` array instead of being a pre-render hook
 
 ### 3. Type Naming Cleanup — Remove \*V4 suffixes from public API
 

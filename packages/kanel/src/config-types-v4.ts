@@ -60,6 +60,13 @@ export type PostRenderHookV4 = (
   lines: string[],
 ) => Awaitable<string[]>;
 
+/**
+ * Pre-render hook scoped to a PgTsGenerator execution.
+ * Same signature as PreRenderHookV4, but may also call usePgTsGeneratorContext().
+ * Must be placed in PgTsGeneratorConfig.preRenderHooks — not in the global Config.preRenderHooks.
+ */
+export type PgTsPreRenderHook = (outputAcc: Output) => Awaitable<Output>;
+
 // #endregion V4 Hooks
 
 // #region V4 Metadata Types
@@ -190,8 +197,8 @@ export type PgTsGeneratorConfig = {
   /** Filter which PostgreSQL types this generator should process */
   filter?: (pgType: PgType) => boolean;
 
-  /** Pre-render hooks specific to this generator. Run within the generator's context. */
-  preRenderHooks?: PreRenderHookV4[];
+  /** Pre-render hooks specific to this generator. Run within the generator's context. May call usePgTsGeneratorContext(). */
+  preRenderHooks?: PgTsPreRenderHook[];
 };
 
 // #endregion PgTsGeneratorConfig
