@@ -14,31 +14,56 @@ The configuration is arranged to better separate concerns:
 - **TypescriptConfig**: General TypeScript output settings (module format, enum style) - affects all TS output
 - **PgTsGeneratorConfig**: Specific configuration for transforming PostgreSQL types to TypeScript (name transformation, metadata, etc.)
 
-Hooks and generators access configuration via AsyncLocalStorage context (using `useKanelContext()` or `usePgTsGeneratorContext()`) instead of having it passed as parameters.
+Hooks and generators access configuration via AsyncLocalStorage context (using `useKanelContext()`). PgTs-specific hooks receive `PgTsGeneratorContext` as a parameter for type safety and explicitness.
 
 ---
 
 ## Beta Release Checklist
 
-### 1. applyTaggedComments and markAsGenerated hook types
+### 1. Make PgTsPreRenderHook receive context as parameter
+
+**Problem**: `PgTsPreRenderHook` and `PreRenderHookV4` currently share the same signature `(outputAcc: Output) => Awaitable<Output>`, differing only semantically. This creates a fragile situation where users could accidentally place a PgTs hook in the global hooks array, causing runtime errors when `usePgTsGeneratorContext()` is called.
+
+**Solution**: Make `PgTsPreRenderHook` receive `PgTsGeneratorContext` as a parameter instead of using `usePgTsGeneratorContext()`:
+
+```typescript
+// Before
+type PgTsPreRenderHook = (outputAcc: Output) => Awaitable<Output>;
+
+// After
+type PgTsPreRenderHook = (
+  outputAcc: Output,
+  context: PgTsGeneratorContext
+) => Awaitable<Output>;
+```
+
+**Benefits**:
+- Type system prevents mixing global and PgTs-specific hooks
+- More explicit and easier to understand
+- Consistent with V3 pattern (hooks received `instantiatedConfig` as parameter)
+- Users don't need to import/understand `usePgTsGeneratorContext()`
+
+**Updates required**:
+- Change `PgTsPreRenderHook` type signature in `config-types-v4.ts`
+- Update all PgTs hooks to receive context as parameter:
+  - `makeKyselyHook` and `kyselyCamelCaseHook` in kanel-kysely
+  - `makeGenerateZodSchemas` and `zodCamelCaseHook` in kanel-zod
+  - `generateKnexTablesModule` and `generateMigrationCheck` in kanel-knex
+  - `enumTablesPreRenderHook` in kanel-enum-tables
+- Update hook invocation in `makePgTsGenerator.ts` to pass context
+- Update V3 wrapper in `config-conversion.ts` to pass context
+- Remove `usePgTsGeneratorContext` from public exports (keep it internal for sub-generators)
+
+---
+
+### 2. applyTaggedComments and markAsGenerated hook types
 
 `applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. They need to be upgraded to V4 signatures.
 
 - `markAsGenerated` is trivial — it already ignores `instantiatedConfig`, so it just needs retyping as `PostRenderHookV4`.
-- `applyTaggedComments` uses `instantiatedConfig.schemas` and `instantiatedConfig.getMetadata`, which map directly to `useKanelContext().schemas` and `usePgTsGeneratorContext().getMetadata`. It must live in `PgTsGeneratorConfig.preRenderHooks` since it needs `usePgTsGeneratorContext()`.
-
-**Type distinction**: `PgTsGeneratorConfig.preRenderHooks` accepts hooks that may call `usePgTsGeneratorContext()`, whereas global `Config.preRenderHooks` hooks cannot. To make this clear, introduce a distinct `PgTsPreRenderHook` type (same signature as `PreRenderHookV4`, but semantically scoped to PgTs execution) for `PgTsGeneratorConfig.preRenderHooks`. This avoids users accidentally placing a PgTs-context-dependent hook in the global hooks array.
+- `applyTaggedComments` uses `instantiatedConfig.schemas` and `instantiatedConfig.getMetadata`, which map directly to `useKanelContext().schemas` and the `PgTsGeneratorContext` parameter. It must live in `PgTsGeneratorConfig.preRenderHooks` since it needs `PgTsGeneratorContext`.
 
 ---
-
-### 2. ~~Do something about kanel-seeder~~ ✅
-
-**Status: Complete**
-
-kanel-seeder has been upgraded to V4. It is now a proper `Generator` that:
-- Uses `useKanelContext().schemas` instead of `instantiatedConfig.schemas`
-- Returns output using the `generic` file type (for `.js` Knex seed files)
-- Is placed in the `generators` array instead of being a pre-render hook
 
 ### 3. Type Naming Cleanup — Remove \*V4 suffixes from public API
 
@@ -59,13 +84,13 @@ Currently the V4 public types carry a `V4` suffix which will be confusing as V3 
 
 **Note**: `ConfigV3` / `ConfigV4` may need to stay as-is as union members since the union `Config = ConfigV3 | ConfigV4` is structural. Evaluate carefully.
 
-### 4. Update Documentation
+### 3. Update Documentation
 
 All documentation is V3-era and needs V4 updates:
 
 - `docs-src/getting-started.md` — show V4 config format
 - `docs-src/configuring.md` — V4 config API (generators, typescriptConfig, etc.)
-- `docs-src/preRenderHooks.md` — V4 hook signature, placement in `PgTsGeneratorConfig.preRenderHooks` vs global
+- `docs-src/preRenderHooks.md` — V4 hook signatures, explain `PgTsPreRenderHook` receiving context parameter vs global `PreRenderHook`
 - `docs-src/postRenderHooks.md` — V4 hook signature
 - `docs-src/getMetadata.md` — V4 composable pattern with `builtinMetadata`
 - `docs-src/getPropertyMetadata.md` — same
@@ -83,7 +108,7 @@ All documentation is V3-era and needs V4 updates:
 1. **Detection**: If config lacks `generators` field → v3 config
 2. **Conversion**: V3 config is converted to V4 config internally via `convertV3ConfigToV4()`
 3. **Context**: V4 context is populated, including `instantiatedConfig` for V3 compatibility
-4. **Hooks**: V3 hooks are wrapped to inject `instantiatedConfig` from context
+4. **Hooks**: V3 pre-render hooks are wrapped to receive `PgTsGeneratorContext` and extract `instantiatedConfig` from Kanel context; V3 post-render hooks are wrapped to inject `instantiatedConfig` from Kanel context
 5. **Defaults**: V3-specific defaults are applied (`enumStyle: "enum"`, `markAsGenerated` postRenderHook, `applyTaggedComments` preRenderHook)
 6. **Warning**: A deprecation warning is printed (suppressible via `--no-deprecation-warning` CLI option)
 
@@ -104,9 +129,16 @@ type TypescriptConfig = {
 // A generator produces output files. Generators run sequentially.
 type Generator = () => Awaitable<Output>;
 
-// V4 hooks - access context via useKanelContext() instead of parameters
-// (Currently exported as PreRenderHookV4 / PostRenderHookV4 — to be renamed)
+// V4 hooks
+// (Currently exported as PreRenderHookV4 / PostRenderHookV4 / PgTsPreRenderHook — to be renamed)
+
+// Global pre-render hooks access context via useKanelContext()
 type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
+
+// PgTs-specific pre-render hooks receive PgTsGeneratorContext as a parameter
+type PgTsPreRenderHook = (outputAcc: Output, context: PgTsGeneratorContext) => Awaitable<Output>;
+
+// Post-render hooks access context via useKanelContext()
 type PostRenderHook = (path: string, lines: string[]) => Awaitable<string[]>;
 
 type Config = {
@@ -199,8 +231,8 @@ type PgTsGeneratorConfig = {
 
   filter?: (pgType: PgType) => boolean;
 
-  // Pre-render hooks running within PgTsGenerator context — can call usePgTsGeneratorContext()
-  preRenderHooks?: PreRenderHook[];
+  // Pre-render hooks specific to PgTsGenerator — receive PgTsGeneratorContext as a parameter
+  preRenderHooks?: PgTsPreRenderHook[];
 };
 
 function makePgTsGenerator(config?: PgTsGeneratorConfig): Generator;
@@ -208,7 +240,7 @@ function makePgTsGenerator(config?: PgTsGeneratorConfig): Generator;
 
 ### PgTsGenerator Context
 
-Available inside PgTsGenerator execution (generators and their `preRenderHooks`):
+Passed to `PgTsPreRenderHook` functions as a parameter. Also available internally to sub-generators via `usePgTsGeneratorContext()` (not exported publicly):
 
 ```ts
 type PgTsGeneratorContext = {
@@ -219,8 +251,6 @@ type PgTsGeneratorContext = {
   getRoutineMetadata?: (routineDetails: RoutineDetails) => RoutineMetadata;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 };
-
-const context = usePgTsGeneratorContext(); // throws outside PgTsGenerator execution
 ```
 
 ---
@@ -234,7 +264,7 @@ These exist as pre-render hooks specific to the PgTsGenerator context (must be p
 - **kanel-kysely** (`makeKyselyHook`, `kyselyCamelCaseHook`): Creates Kysely database interface types
 - **kanel-zod** (`generateZodSchemas`, `makeGenerateZodSchemas`, `zodCamelCaseHook`): Creates Zod schemas
 
-All of the above are fully upgraded to V4 and use `usePgTsGeneratorContext()` / `useKanelContext()`.
+All of the above are fully upgraded to V4 and receive `PgTsGeneratorContext` as a parameter, plus use `useKanelContext()` for global context.
 
 New standalone generator:
 
@@ -279,10 +309,12 @@ When a V3 config is detected:
 
 - `getMetadata`, `getPropertyMetadata`, `generateIdentifierType`, `getRoutineMetadata`, `propertySortFunction`, `customTypeMap` move from top-level `Config` to `PgTsGeneratorConfig`
 - `typeFilter` renamed to `filter` (both at global and generator level)
-- V4 hooks no longer receive `instantiatedConfig` parameter — use `useKanelContext()` instead
+- V4 global hooks no longer receive `instantiatedConfig` parameter — use `useKanelContext()` instead
+- `PgTsPreRenderHook` receives `PgTsGeneratorContext` as a parameter (type-safe separation from global hooks)
 - V4 metadata functions receive a `builtinMetadata`/`builtinType` parameter as their last argument
 - `defaultGetMetadata`, `defaultGetPropertyMetadata`, `defaultGenerateIdentifierType`, `defaultGetRoutineMetadata` are **deprecated**
-- Pre-render hooks that need `usePgTsGeneratorContext()` must be placed in `PgTsGeneratorConfig.preRenderHooks`
+- Pre-render hooks that need PgTs context must be placed in `PgTsGeneratorConfig.preRenderHooks` (not global `Config.preRenderHooks`)
+- `usePgTsGeneratorContext()` is no longer exported publicly (use the context parameter instead)
 - `applyTaggedComments` is no longer automatically applied in V4 configs
 - `markAsGenerated` is no longer a default post-render hook in V4 configs
 
@@ -372,24 +404,25 @@ getMetadata: (details, generateFor, builtinMetadata) => ({
 **Generator-specific PreRenderHooks** (in `PgTsGeneratorConfig.preRenderHooks`):
 
 - Transform the output of that specific generator
-- Run within that generator's execution context — can call `usePgTsGeneratorContext()`
+- Receive `PgTsGeneratorContext` as a parameter (type `PgTsPreRenderHook`)
 - Run immediately after their generator, before output is merged
 
 **Global PreRenderHooks** (in `Config.preRenderHooks`):
 
 - Run after all generators complete, on the accumulated output
-- Can only use `useKanelContext()` (no generator-specific context available)
+- Can only use `useKanelContext()` for global context (type `PreRenderHook`)
+- Do not receive generator-specific context
 
 **Execution flow**:
 
 1. Generator 1 runs → produces output
-2. Generator 1's `preRenderHooks` run on its output
+2. Generator 1's `preRenderHooks` run on its output (receive `PgTsGeneratorContext` as parameter)
 3. Generator 2 runs → produces output
-4. Generator 2's `preRenderHooks` run on its output
+4. Generator 2's `preRenderHooks` run on its output (receive `PgTsGeneratorContext` as parameter)
 5. All output is accumulated (merged)
-6. Global `preRenderHooks` run on everything
+6. Global `preRenderHooks` run on everything (receive only `outputAcc`, use `useKanelContext()`)
 7. Files are rendered (TS/markdown/generic)
-8. `postRenderHooks` run on rendered lines
+8. `postRenderHooks` run on rendered lines (receive `path` and `lines`, use `useKanelContext()`)
 
 ### The applyTaggedComments pattern
 
