@@ -1,11 +1,12 @@
 import type {
   Details,
   GenericDeclaration,
-  PreRenderHookV4,
+  PgTsGeneratorContext,
+  PgTsPreRenderHook,
   TypeImport,
   TypeMetadataV4,
 } from "kanel";
-import { useKanelContext, usePgTsGeneratorContext } from "kanel";
+import { useKanelContext } from "kanel";
 import { join } from "path";
 
 function getAsName(typeMetadata: TypeMetadataV4, schemaName: string) {
@@ -14,8 +15,11 @@ function getAsName(typeMetadata: TypeMetadataV4, schemaName: string) {
     : `${schemaName}_${typeMetadata.name}`;
 }
 
-const getTypeImports = (details: Details): TypeImport[] => {
-  const { getMetadata } = usePgTsGeneratorContext();
+const getTypeImports = (
+  details: Details,
+  context: PgTsGeneratorContext,
+): TypeImport[] => {
+  const { getMetadata } = context;
 
   const selector = getMetadata(details, "selector");
   const result: TypeImport[] = [
@@ -55,8 +59,8 @@ const getTypeImports = (details: Details): TypeImport[] => {
   return result;
 };
 
-const getLine = (details: Details): string => {
-  const { getMetadata } = usePgTsGeneratorContext();
+const getLine = (details: Details, context: PgTsGeneratorContext): string => {
+  const { getMetadata } = context;
 
   const selector = getMetadata(details, "selector");
   const selectorName = getAsName(selector, details.schemaName) ?? selector.name;
@@ -81,20 +85,23 @@ const getLine = (details: Details): string => {
   return `    '${name}': Knex.CompositeTableType<${selectorName}, ${initializerName}, ${mutatorName}>;`;
 };
 
-const generateKnexTablesModule: PreRenderHookV4 = async (outputAcc) => {
+const generateKnexTablesModule: PgTsPreRenderHook = async (
+  outputAcc,
+  context,
+) => {
   const { schemas, config } = useKanelContext();
 
   const typeImports = Object.values(schemas).reduce(
     (acc, schema) => {
       const tableTypeImports = schema.tables
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((table) => getTypeImports(table));
+        .map((table) => getTypeImports(table, context));
       const viewTypeImports = schema.views
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((view) => getTypeImports(view));
+        .map((view) => getTypeImports(view, context));
       const materializedViewTypeImports = schema.materializedViews
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((materializedView) => getTypeImports(materializedView));
+        .map((materializedView) => getTypeImports(materializedView, context));
 
       return [
         ...acc,
@@ -115,10 +122,10 @@ const generateKnexTablesModule: PreRenderHookV4 = async (outputAcc) => {
   );
 
   const declarationLines = Object.values(schemas).reduce((acc, schema) => {
-    const tableLines = schema.tables.map((table) => getLine(table));
-    const viewLines = schema.views.map((view) => getLine(view));
+    const tableLines = schema.tables.map((table) => getLine(table, context));
+    const viewLines = schema.views.map((view) => getLine(view, context));
     const materializedViewLines = schema.materializedViews.map(
-      (materializedView) => getLine(materializedView),
+      (materializedView) => getLine(materializedView, context),
     );
 
     return [...acc, ...tableLines, ...viewLines, ...materializedViewLines];

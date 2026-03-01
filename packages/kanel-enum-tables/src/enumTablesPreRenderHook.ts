@@ -4,11 +4,12 @@ import type {
   GenericDeclaration,
   InterfaceDeclaration,
   Output,
+  PgTsGeneratorContext,
   PreRenderHookV4,
   TsFileContents,
   TypeDeclaration,
 } from "kanel";
-import { resolveType, useKanelContext, usePgTsGeneratorContext } from "kanel";
+import { resolveType, useKanelContext } from "kanel";
 import knex from "knex";
 import { tryParse } from "tagged-comment-parser";
 
@@ -117,9 +118,8 @@ export const findDescriptionColumn = (
   return undefined;
 };
 
-const enumTablesPreRenderHook: PreRenderHookV4 = async (outputAccumulator) => {
+const enumTablesPreRenderHook: PreRenderHookV4 = async (outputAccumulator, pgTsContext) => {
   const { schemas, config, typescriptConfig } = useKanelContext();
-  const pgTsContext = usePgTsGeneratorContext();
 
   if (!pgTsContext.generateIdentifierType) {
     console.warn(

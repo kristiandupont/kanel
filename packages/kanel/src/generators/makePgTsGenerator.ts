@@ -122,7 +122,7 @@ export function makePgTsGenerator(config: PgTsGeneratorConfig = {}): Generator {
       // Run generator-specific pre-render hooks
       if (config.preRenderHooks) {
         for (const hook of config.preRenderHooks) {
-          output = await hook(output);
+          output = await hook(output, generatorContext);
         }
       }
 

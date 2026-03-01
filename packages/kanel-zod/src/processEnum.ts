@@ -1,5 +1,5 @@
 import type { EnumDetails } from "extract-pg-schema";
-import type { ConstantDeclaration } from "kanel";
+import type { ConstantDeclaration, PgTsGeneratorContext } from "kanel";
 
 import type { GetZodSchemaMetadata } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";
@@ -7,8 +7,9 @@ import zImport from "./zImport";
 const processEnum = (
   e: EnumDetails,
   getZodSchemaMetadata: GetZodSchemaMetadata,
+  context: PgTsGeneratorContext,
 ): ConstantDeclaration => {
-  const { name } = getZodSchemaMetadata(e, undefined);
+  const { name } = getZodSchemaMetadata(e, undefined, context);
   const lines: string[] = [
     `z.enum([`,
     ...e.values.map((v) => `  '${v}',`),

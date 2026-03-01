@@ -15,7 +15,6 @@ export {
 } from "./generators/makeMarkdownGenerator";
 export { default as makePgTsGenerator } from "./generators/makePgTsGenerator";
 export type { PgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
-export { usePgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
 export { default as resolveType } from "./generators/resolveType";
 export * from "./hooks";
 export type * from "./metadata-types";

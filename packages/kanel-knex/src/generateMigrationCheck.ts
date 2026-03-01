@@ -1,10 +1,13 @@
-import type { GenericDeclaration, PreRenderHookV4, TypeImport } from "kanel";
+import type { GenericDeclaration, PgTsPreRenderHook, TypeImport } from "kanel";
 import { useKanelContext } from "kanel";
 import knex from "knex";
 import { join } from "path";
 import knexImport from "./knexImport";
 
-const generateMigrationCheck: PreRenderHookV4 = async (outputAcc) => {
+const generateMigrationCheck: PgTsPreRenderHook = async (
+  outputAcc,
+  _context,
+) => {
   const { config } = useKanelContext();
 
   const connection = config.connection;

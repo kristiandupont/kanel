@@ -1,9 +1,9 @@
 import type { TableDetails } from "extract-pg-schema";
-import {
-  usePgTsGeneratorContext,
-  type ConstantDeclaration,
-  type TypeImport,
-  type TypeMap,
+import type {
+  ConstantDeclaration,
+  PgTsGeneratorContext,
+  TypeImport,
+  TypeMap,
 } from "kanel";
 
 import type { GetZodIdentifierMetadata } from "./GenerateZodSchemasConfig";
@@ -15,6 +15,7 @@ const getIdentifierDeclaration = (
   zodTypeMap: TypeMap,
   castToSchema: boolean,
   nonCompositeTypeImports: Record<string, TypeImport>,
+  context: PgTsGeneratorContext,
 ): {
   name: string;
   originalName: string;
@@ -26,7 +27,7 @@ const getIdentifierDeclaration = (
     declaration: ConstantDeclaration;
   }[] = [];
 
-  const pgTsContext = usePgTsGeneratorContext();
+  const pgTsContext = context;
 
   if (details.kind === "table" && pgTsContext.generateIdentifierType) {
     const { columns } = details;
@@ -40,7 +41,7 @@ const getIdentifierDeclaration = (
         details,
       );
 
-      const { name, comment } = getZodIdentifierMetadata(c, details);
+      const { name, comment } = getZodIdentifierMetadata(c, details, context);
 
       let zodType: string;
       const typeImports: TypeImport[] = [zImport];

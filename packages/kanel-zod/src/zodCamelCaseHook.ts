@@ -1,9 +1,9 @@
 import { recase } from "@kristiandupont/recase";
-import type { PreRenderHookV4 } from "kanel";
+import type { PgTsPreRenderHook } from "kanel";
 
 const toCamelCase = recase(null, "camel");
 
-export const zodCamelCaseHook: PreRenderHookV4 = (output) => {
+export const zodCamelCaseHook: PgTsPreRenderHook = (output, _context) => {
   const transformInterfaceDeclaration = (declaration) => ({
     ...declaration,
     properties: declaration.properties.map((property) => ({

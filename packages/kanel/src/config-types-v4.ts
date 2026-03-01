@@ -15,6 +15,7 @@ import type {
   TableColumn,
   TableDetails,
 } from "extract-pg-schema";
+import type { PgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
 
 type Awaitable<T> = T | PromiseLike<T>;
 
@@ -62,10 +63,13 @@ export type PostRenderHookV4 = (
 
 /**
  * Pre-render hook scoped to a PgTsGenerator execution.
- * Same signature as PreRenderHookV4, but may also call usePgTsGeneratorContext().
+ * Receives PgTsGeneratorContext as a parameter for type safety.
  * Must be placed in PgTsGeneratorConfig.preRenderHooks — not in the global Config.preRenderHooks.
  */
-export type PgTsPreRenderHook = (outputAcc: Output) => Awaitable<Output>;
+export type PgTsPreRenderHook = (
+  outputAcc: Output,
+  context: PgTsGeneratorContext,
+) => Awaitable<Output>;
 
 // #endregion V4 Hooks
 

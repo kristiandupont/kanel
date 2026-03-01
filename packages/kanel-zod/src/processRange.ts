@@ -1,5 +1,5 @@
 import type { RangeDetails } from "extract-pg-schema";
-import type { ConstantDeclaration } from "kanel";
+import type { ConstantDeclaration, PgTsGeneratorContext } from "kanel";
 
 import type { GetZodSchemaMetadata } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";
@@ -7,8 +7,9 @@ import zImport from "./zImport";
 const processRange = (
   r: RangeDetails,
   getZodSchemaMetadata: GetZodSchemaMetadata,
+  context: PgTsGeneratorContext,
 ): ConstantDeclaration | undefined => {
-  const { name } = getZodSchemaMetadata(r, undefined);
+  const { name } = getZodSchemaMetadata(r, undefined, context);
 
   const declaration: ConstantDeclaration = {
     declarationType: "constant",

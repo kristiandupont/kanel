@@ -1,11 +1,11 @@
 import { recase } from "@kristiandupont/recase";
 import type { TableDetails } from "extract-pg-schema";
 import type { TableColumn } from "extract-pg-schema";
-import {
-  usePgTsGeneratorContext,
-  type Details,
-  type Path,
-  type TypeMap,
+import type {
+  Details,
+  Path,
+  PgTsGeneratorContext,
+  TypeMap,
 } from "kanel";
 
 export type GenerateZodSchemasConfig = {
@@ -17,30 +17,32 @@ export type GenerateZodSchemasConfig = {
 
 /**
  * V4 function to determine Zod schema metadata.
- * Uses PgTsGeneratorContext instead of instantiatedConfig.
+ * Receives PgTsGeneratorContext as a parameter.
  */
 export type GetZodSchemaMetadata = (
   d: Details,
   generateFor: "selector" | "initializer" | "mutator" | undefined,
+  context: PgTsGeneratorContext,
 ) => { name: string; comment?: string[]; path: Path };
 
 const toCamelCase = recase(null, "camel");
 
 /**
  * V4 function to determine Zod identifier metadata.
- * Uses PgTsGeneratorContext instead of instantiatedConfig.
+ * Receives PgTsGeneratorContext as a parameter.
  */
 export type GetZodIdentifierMetadata = (
   column: TableColumn,
   details: TableDetails,
+  context: PgTsGeneratorContext,
 ) => { name: string; comment?: string[] };
 
 export const defaultGetZodSchemaMetadata: GetZodSchemaMetadata = (
   details,
   generateFor,
+  context,
 ) => {
-  const pgTsContext = usePgTsGeneratorContext();
-  const { path, name: typescriptName } = pgTsContext.getMetadata(
+  const { path, name: typescriptName } = context.getMetadata(
     details,
     generateFor,
   );
@@ -51,14 +53,14 @@ export const defaultGetZodSchemaMetadata: GetZodSchemaMetadata = (
 export const defaultGetZodIdentifierMetadata: GetZodIdentifierMetadata = (
   column: TableColumn,
   details: TableDetails,
+  context,
 ) => {
-  const pgTsContext = usePgTsGeneratorContext();
-  if (!pgTsContext.generateIdentifierType) {
+  if (!context.generateIdentifierType) {
     throw new Error(
       "generateIdentifierType is not available in PgTsGeneratorContext",
     );
   }
-  const typescriptDeclaration = pgTsContext.generateIdentifierType(
+  const typescriptDeclaration = context.generateIdentifierType(
     column,
     details,
   );

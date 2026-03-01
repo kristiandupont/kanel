@@ -6,7 +6,8 @@
  * TypeScript files created by the PgTsGenerator.
  */
 
-import { useKanelContext, type PreRenderHookV4, type TypeImport } from "kanel";
+import type { PgTsPreRenderHook } from "kanel";
+import { useKanelContext, type TypeImport } from "kanel";
 
 import defaultZodTypeMap from "./defaultZodTypeMap";
 import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
@@ -23,16 +24,16 @@ import processRange from "./processRange";
 /**
  * Creates a V4 PreRenderHook for generating Zod schemas.
  *
- * This hook runs within a PgTsGenerator context and accesses:
- * - useKanelContext() for schemas
- * - usePgTsGeneratorContext() for TypeScript type metadata (called internally by process functions)
+ * This hook runs within a PgTsGenerator context and receives:
+ * - PgTsGeneratorContext as a parameter
+ * - KanelContext via useKanelContext()
  *
  * @param config - Configuration for Zod schema generation
  * @returns A V4 PreRenderHook
  */
 export const makeGenerateZodSchemas =
-  (config: GenerateZodSchemasConfig = {}): PreRenderHookV4 =>
-  async (outputAcc) => {
+  (config: GenerateZodSchemasConfig = {}): PgTsPreRenderHook =>
+  async (outputAcc, context) => {
     const kanelContext = useKanelContext();
     const output = { ...outputAcc };
 
@@ -56,11 +57,19 @@ export const makeGenerateZodSchemas =
 
       // #region enums
       schema.enums?.forEach((enumDetails) => {
-        const { name, path } = getZodSchemaMetadata(enumDetails, undefined);
+        const { name, path } = getZodSchemaMetadata(
+          enumDetails,
+          undefined,
+          context,
+        );
         if (!output[path] || output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }
-        const declaration = processEnum(enumDetails, getZodSchemaMetadata);
+        const declaration = processEnum(
+          enumDetails,
+          getZodSchemaMetadata,
+          context,
+        );
         output[path] = {
           fileType: "typescript",
           declarations: [...output[path].declarations, declaration],
@@ -80,11 +89,19 @@ export const makeGenerateZodSchemas =
 
       // #region ranges
       schema.ranges?.forEach((rangeDetails) => {
-        const { name, path } = getZodSchemaMetadata(rangeDetails, undefined);
+        const { name, path } = getZodSchemaMetadata(
+          rangeDetails,
+          undefined,
+          context,
+        );
         if (!output[path] || output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }
-        const declaration = processRange(rangeDetails, getZodSchemaMetadata);
+        const declaration = processRange(
+          rangeDetails,
+          getZodSchemaMetadata,
+          context,
+        );
         output[path] = {
           fileType: "typescript",
           declarations: [...output[path].declarations, declaration],
@@ -104,7 +121,11 @@ export const makeGenerateZodSchemas =
 
       // #region domains
       schema.domains?.forEach((domainDetails) => {
-        const { name, path } = getZodSchemaMetadata(domainDetails, undefined);
+        const { name, path } = getZodSchemaMetadata(
+          domainDetails,
+          undefined,
+          context,
+        );
         if (!output[path] || output[path].fileType !== "typescript") {
           throw new Error(`Path ${path} is not a typescript file`);
         }
@@ -112,6 +133,7 @@ export const makeGenerateZodSchemas =
           domainDetails,
           getZodSchemaMetadata,
           zodTypeMap,
+          context,
         );
         output[path] = {
           fileType: "typescript",
@@ -135,13 +157,14 @@ export const makeGenerateZodSchemas =
       // identifiers. This must be done first as they will be imported
       // by other composites.
       schema.tables?.forEach((tableDetails) => {
-        const { path } = getZodSchemaMetadata(tableDetails, undefined);
+        const { path } = getZodSchemaMetadata(tableDetails, undefined, context);
         const results = getIdentifierDeclaration(
           tableDetails,
           getZodIdentifierMetadata,
           zodTypeMap,
           castToSchema,
           nonCompositeTypeImports,
+          context,
         );
 
         for (const result of results) {
@@ -171,6 +194,7 @@ export const makeGenerateZodSchemas =
         const { name, path } = getZodSchemaMetadata(
           compositeDetails,
           undefined,
+          context,
         );
         compositeTypeImports[
           `${compositeDetails.schemaName}.${compositeDetails.name}`
@@ -196,7 +220,11 @@ export const makeGenerateZodSchemas =
         ...(schema.compositeTypes ?? []),
       ];
       composites.forEach((compositeDetails) => {
-        const { path } = getZodSchemaMetadata(compositeDetails, undefined);
+        const { path } = getZodSchemaMetadata(
+          compositeDetails,
+          undefined,
+          context,
+        );
         const declarations = processComposite(
           compositeDetails,
           getZodSchemaMetadata,
@@ -205,6 +233,7 @@ export const makeGenerateZodSchemas =
           nonCompositeTypeImports,
           compositeTypeImports,
           identifierTypeImports,
+          context,
         );
         for (const declaration of declarations) {
           if (!output[path] || output[path].fileType !== "typescript") {

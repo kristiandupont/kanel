@@ -1,9 +1,9 @@
 import { recase } from "@kristiandupont/recase";
-import type { PreRenderHookV4 } from "kanel";
+import type { PgTsPreRenderHook } from "kanel";
 
 const toCamelCase = recase(null, "camel");
 
-export const kyselyCamelCaseHook: PreRenderHookV4 = (output) =>
+export const kyselyCamelCaseHook: PgTsPreRenderHook = (output, _context) =>
   Object.fromEntries(
     Object.entries(output).map(([path, fileContents]) => {
       if (fileContents.fileType === "typescript") {

@@ -1,8 +1,8 @@
 import {
   escapeName,
-  usePgTsGeneratorContext,
   type CompositeDetails,
   type ConstantDeclaration,
+  type PgTsGeneratorContext,
   type TypeImport,
   type TypeMap,
 } from "kanel";
@@ -20,10 +20,11 @@ function makeDeclaration(
   getZodSchemaMetadata: GetZodSchemaMetadata,
   zodTypeMap: TypeMap,
   castToSchema: boolean,
+  context: PgTsGeneratorContext,
 ) {
-  const pgTsContext = usePgTsGeneratorContext();
+  const pgTsContext = context;
 
-  const { name, comment } = getZodSchemaMetadata(c, generateFor);
+  const { name, comment } = getZodSchemaMetadata(c, generateFor, context);
 
   const { name: typescriptTypeName } = pgTsContext.getMetadata(c, generateFor);
 
@@ -34,6 +35,7 @@ function makeDeclaration(
     compositeTypeImports,
     identifierTypeImports,
     zodTypeMap,
+    context,
   );
 
   const typeImports: TypeImport[] = [zImport];
@@ -87,6 +89,7 @@ const processComposite = (
   nonCompositeTypeImports: Record<string, TypeImport>,
   compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
+  context: PgTsGeneratorContext,
 ): ConstantDeclaration[] => {
   const declarations: ConstantDeclaration[] = [];
 
@@ -99,6 +102,7 @@ const processComposite = (
     getZodSchemaMetadata,
     zodTypeMap,
     castToSchema,
+    context,
   );
   declarations.push(selectorDeclaration);
 
@@ -112,6 +116,7 @@ const processComposite = (
       getZodSchemaMetadata,
       zodTypeMap,
       castToSchema,
+      context,
     );
     declarations.push(initializerDeclaration);
 
@@ -124,6 +129,7 @@ const processComposite = (
       getZodSchemaMetadata,
       zodTypeMap,
       castToSchema,
+      context,
     );
     declarations.push(mutatorDeclaration);
   }

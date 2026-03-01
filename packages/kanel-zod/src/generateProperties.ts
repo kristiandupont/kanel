@@ -1,8 +1,8 @@
 import {
   resolveType,
-  usePgTsGeneratorContext,
   type CompositeDetails,
   type CompositeProperty,
+  type PgTsGeneratorContext,
   type TypeImport,
   type TypeMap,
 } from "kanel";
@@ -21,8 +21,9 @@ const generateProperties = <D extends CompositeDetails>(
   compositeTypeImports: Record<string, TypeImport>,
   identifierTypeImports: Record<string, TypeImport>,
   zodTypeMap: TypeMap,
+  context: PgTsGeneratorContext,
 ): ZodPropertyDeclaration[] => {
-  const pgTsContext = usePgTsGeneratorContext();
+  const pgTsContext = context;
 
   const ps =
     details.kind === "compositeType" ? details.attributes : details.columns;

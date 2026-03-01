@@ -41,9 +41,10 @@ export type V3ConversionOptions = {
 /**
  * Wraps a V3 PreRenderHook to work as a V4 hook.
  * Injects the instantiatedConfig from context.
+ * The context parameter is ignored (V3 hooks don't use it).
  */
 function wrapV3PreRenderHook(v3Hook: PreRenderHookV3): PgTsPreRenderHook {
-  return async (output: Output): Promise<Output> => {
+  return async (output: Output, _context): Promise<Output> => {
     const context = useKanelContext();
 
     if (!context.instantiatedConfig) {
