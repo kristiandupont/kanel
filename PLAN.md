@@ -20,43 +20,7 @@ Hooks and generators access configuration via AsyncLocalStorage context (using `
 
 ## Beta Release Checklist
 
-### 1. Make PgTsPreRenderHook receive context as parameter
-
-**Problem**: `PgTsPreRenderHook` and `PreRenderHookV4` currently share the same signature `(outputAcc: Output) => Awaitable<Output>`, differing only semantically. This creates a fragile situation where users could accidentally place a PgTs hook in the global hooks array, causing runtime errors when `usePgTsGeneratorContext()` is called.
-
-**Solution**: Make `PgTsPreRenderHook` receive `PgTsGeneratorContext` as a parameter instead of using `usePgTsGeneratorContext()`:
-
-```typescript
-// Before
-type PgTsPreRenderHook = (outputAcc: Output) => Awaitable<Output>;
-
-// After
-type PgTsPreRenderHook = (
-  outputAcc: Output,
-  context: PgTsGeneratorContext
-) => Awaitable<Output>;
-```
-
-**Benefits**:
-- Type system prevents mixing global and PgTs-specific hooks
-- More explicit and easier to understand
-- Consistent with V3 pattern (hooks received `instantiatedConfig` as parameter)
-- Users don't need to import/understand `usePgTsGeneratorContext()`
-
-**Updates required**:
-- Change `PgTsPreRenderHook` type signature in `config-types-v4.ts`
-- Update all PgTs hooks to receive context as parameter:
-  - `makeKyselyHook` and `kyselyCamelCaseHook` in kanel-kysely
-  - `makeGenerateZodSchemas` and `zodCamelCaseHook` in kanel-zod
-  - `generateKnexTablesModule` and `generateMigrationCheck` in kanel-knex
-  - `enumTablesPreRenderHook` in kanel-enum-tables
-- Update hook invocation in `makePgTsGenerator.ts` to pass context
-- Update V3 wrapper in `config-conversion.ts` to pass context
-- Remove `usePgTsGeneratorContext` from public exports (keep it internal for sub-generators)
-
----
-
-### 2. applyTaggedComments and markAsGenerated hook types
+### 1. applyTaggedComments and markAsGenerated hook types
 
 `applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. They need to be upgraded to V4 signatures.
 
@@ -65,7 +29,7 @@ type PgTsPreRenderHook = (
 
 ---
 
-### 3. Type Naming Cleanup — Remove \*V4 suffixes from public API
+### 2. Type Naming Cleanup — Remove \*V4 suffixes from public API
 
 Currently the V4 public types carry a `V4` suffix which will be confusing as V3 fades out. These should be renamed:
 
@@ -136,7 +100,10 @@ type Generator = () => Awaitable<Output>;
 type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
 
 // PgTs-specific pre-render hooks receive PgTsGeneratorContext as a parameter
-type PgTsPreRenderHook = (outputAcc: Output, context: PgTsGeneratorContext) => Awaitable<Output>;
+type PgTsPreRenderHook = (
+  outputAcc: Output,
+  context: PgTsGeneratorContext,
+) => Awaitable<Output>;
 
 // Post-render hooks access context via useKanelContext()
 type PostRenderHook = (path: string, lines: string[]) => Awaitable<string[]>;
