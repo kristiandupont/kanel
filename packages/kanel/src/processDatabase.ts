@@ -1,12 +1,92 @@
 import { extractSchemas } from "extract-pg-schema";
 import { rimraf } from "rimraf";
 
-import type { Config, InstantiatedConfig, PreRenderHook } from "./config-types";
+import type { Config, InstantiatedConfig } from "./config-types";
+import { isV3Config as detectV3Config } from "./config-types";
+import { convertV3ConfigToV4 } from "./config-conversion";
+import type { ConfigV4, TypescriptConfig } from "./config-types-v4";
+import { runWithContext } from "./context";
+import {
+  defaultGenerateIdentifierType,
+  defaultGetMetadata,
+  defaultGetPropertyMetadata,
+  defaultGetRoutineMetadata,
+  defaultPropertySortFunction,
+} from "./default-metadata-generators";
+import defaultTypeMap from "./defaultTypeMap";
+import type Output from "./Output";
+import type { TsFileContents, GenericContents } from "./Output";
+import renderTsFile from "./ts-utilities/renderTsFile";
+import renderMarkdownFile from "./renderMarkdownFile";
+import type TypeMap from "./TypeMap";
+import writeFile from "./writeFile";
 
 type DerivedExtensions = {
   fileExtension: ".ts" | ".mts" | ".cts";
   importsExtension: "" | ".js" | ".mjs" | ".cjs";
 };
+
+/**
+ * Merges generator output intelligently based on file type.
+ * - TypeScript files: merge declarations arrays
+ * - Generic files: concatenate lines arrays
+ * - Markdown files: error on conflict (cannot merge template-based files)
+ */
+function mergeOutput(base: Output, incoming: Output): Output {
+  const result = { ...base };
+
+  for (const [path, incomingFile] of Object.entries(incoming)) {
+    const existingFile = result[path];
+
+    if (!existingFile) {
+      // New file, just add it
+      result[path] = incomingFile;
+      continue;
+    }
+
+    // File exists, need to merge
+    if (existingFile.fileType !== incomingFile.fileType) {
+      throw new Error(
+        `Cannot merge output at path "${path}": ` +
+          `file type mismatch (${existingFile.fileType} vs ${incomingFile.fileType})`,
+      );
+    }
+
+    switch (incomingFile.fileType) {
+      case "typescript": {
+        const tsExisting = existingFile as TsFileContents;
+        const tsIncoming = incomingFile as TsFileContents;
+        result[path] = {
+          fileType: "typescript",
+          declarations: [
+            ...tsExisting.declarations,
+            ...tsIncoming.declarations,
+          ],
+        };
+        break;
+      }
+
+      case "generic": {
+        const genericExisting = existingFile as GenericContents;
+        const genericIncoming = incomingFile as GenericContents;
+        result[path] = {
+          fileType: "generic",
+          lines: [...genericExisting.lines, ...genericIncoming.lines],
+        };
+        break;
+      }
+
+      case "markdown":
+        throw new Error(
+          `Cannot merge markdown output at path "${path}": ` +
+            `Multiple generators are attempting to write to the same markdown file. ` +
+            `Each markdown generator should use a unique output path.`,
+        );
+    }
+  }
+
+  return result;
+}
 
 const deriveExtensions = (
   tsModuleFormat:
@@ -40,32 +120,6 @@ const deriveExtensions = (
       return { fileExtension: ".ts", importsExtension: "" };
   }
 };
-import { runWithContext } from "./context";
-import {
-  defaultGenerateIdentifierType,
-  defaultGetMetadata,
-  defaultGetPropertyMetadata,
-  defaultGetRoutineMetadata,
-  defaultPropertySortFunction,
-} from "./default-metadata-generators";
-import defaultTypeMap from "./defaultTypeMap";
-import makeCompositeGenerator from "./generators/makeCompositeGenerator";
-import domainsGenerator from "./generators/domainsGenerator";
-import enumsGenerator from "./generators/enumsGenerator";
-import rangesGenerator from "./generators/rangesGenerator";
-import makeRoutineGenerator from "./generators/makeRoutineGenerator";
-import applyTaggedComments from "./hooks/applyTaggedComments";
-import markAsGenerated from "./hooks/markAsGenerated";
-import type Output from "./Output";
-import renderTsFile from "./ts-utilities/renderTsFile";
-import type TypeMap from "./TypeMap";
-import writeFile from "./writeFile";
-
-type Progress = {
-  onProgressStart?: (total: number) => void;
-  onProgress?: () => void;
-  onProgressEnd?: () => void;
-};
 
 const defaultConfig: Partial<Config> = {
   getMetadata: defaultGetMetadata,
@@ -79,121 +133,179 @@ const defaultConfig: Partial<Config> = {
   preDeleteOutputFolder: false,
 };
 
-const processDatabase = async (
-  cfg: Config,
-  progress?: Progress,
-): Promise<void> => {
-  const config = { ...defaultConfig, ...cfg };
-  const schemas = await extractSchemas(config.connection, {
-    schemas: config.schemas,
-    typeFilter: config.typeFilter,
-    ...progress,
-  });
+const processDatabase = async (cfg: Config): Promise<void> => {
+  // If V3 config, convert to V4 first
+  let v4Config = cfg;
+  let instantiatedConfig: InstantiatedConfig | undefined;
 
-  const typeMap: TypeMap = {
-    ...defaultTypeMap,
-    ...config.customTypeMap,
-  };
-
-  if (config.tsModuleFormat && config.importsExtension) {
-    throw new Error(
-      "Cannot use both tsModuleFormat and importsExtension at the same time",
-    );
-  }
-
-  const { fileExtension, importsExtension } = deriveExtensions(
-    config.tsModuleFormat,
-    config.importsExtension,
-  );
-
-  const instantiatedConfig: InstantiatedConfig = {
-    getMetadata: config.getMetadata,
-    getPropertyMetadata: config.getPropertyMetadata,
-    generateIdentifierType: config.generateIdentifierType,
-    propertySortFunction: config.propertySortFunction,
-    getRoutineMetadata: config.getRoutineMetadata,
-    enumStyle: config.enumStyle,
-    typeMap,
-    schemas,
-    connection: config.connection,
-    outputPath: config.outputPath,
-    preDeleteOutputFolder: config.preDeleteOutputFolder,
-    resolveViews: config.resolveViews,
-    importsExtension: importsExtension || undefined,
-    tsModuleFormat: config.tsModuleFormat,
-    fileExtension,
-  };
-
-  await runWithContext({ instantiatedConfig }, async () => {
-    const generators = [
-      makeCompositeGenerator("table"),
-      makeCompositeGenerator("foreignTable"),
-      makeCompositeGenerator("view"),
-      makeCompositeGenerator("materializedView"),
-      makeCompositeGenerator("compositeType"),
-      enumsGenerator,
-      rangesGenerator,
-      domainsGenerator,
-      makeRoutineGenerator("function"),
-      makeRoutineGenerator("procedure"),
-    ];
-
-    let output: Output = {};
-    Object.values(schemas).forEach((schema) => {
-      generators.forEach((generator) => {
-        output = generator(schema, output);
-      });
+  if (detectV3Config(cfg)) {
+    // Extract schemas early for V3 conversion
+    const v3ConfigWithDefaults = { ...defaultConfig, ...cfg };
+    const schemas = await extractSchemas(v3ConfigWithDefaults.connection, {
+      schemas: v3ConfigWithDefaults.schemas,
+      typeFilter: v3ConfigWithDefaults.typeFilter, // V3 uses typeFilter
     });
 
-    const preRenderHooks: PreRenderHook[] = [
-      applyTaggedComments,
-      ...(config.preRenderHooks ?? []),
-    ];
-    for (const hook of preRenderHooks) {
-      output = await hook(output, instantiatedConfig);
-    }
+    const typeMap: TypeMap = {
+      ...defaultTypeMap,
+      ...v3ConfigWithDefaults.customTypeMap,
+    };
 
-    let filesToWrite = Object.keys(output).map((path) => {
-      const file = output[path];
-
-      if (!file.fileType) {
-        // Hack for backwards compatibility.
-        file.fileType = "typescript";
-      }
-
-      if (file.fileType === "typescript") {
-        const lines = renderTsFile(file.declarations, path);
-        return {
-          fullPath: `${path}${instantiatedConfig.fileExtension}`,
-          lines,
-        };
-      } else if (file.fileType === "generic") {
-        return { fullPath: path, lines: file.lines };
-      }
-      throw new Error(`Path ${path} is an unknown file type`);
-    });
-
-    const postRenderHooks = config.postRenderHooks ?? [markAsGenerated];
-    for (const hook of postRenderHooks) {
-      filesToWrite = await Promise.all(
-        filesToWrite.map(async (file) => {
-          const lines = await hook(
-            file.fullPath,
-            file.lines,
-            instantiatedConfig,
-          );
-          return { ...file, lines };
-        }),
+    if (
+      v3ConfigWithDefaults.tsModuleFormat &&
+      v3ConfigWithDefaults.importsExtension
+    ) {
+      throw new Error(
+        "Cannot use both tsModuleFormat and importsExtension at the same time",
       );
     }
 
-    if (instantiatedConfig.preDeleteOutputFolder) {
-      console.info(`Clearing old files in ${instantiatedConfig.outputPath}`);
-      await rimraf(instantiatedConfig.outputPath, { glob: true });
-    }
+    const { fileExtension, importsExtension } = deriveExtensions(
+      v3ConfigWithDefaults.tsModuleFormat,
+      v3ConfigWithDefaults.importsExtension,
+    );
 
-    filesToWrite.forEach((file) => writeFile(file));
-  });
+    instantiatedConfig = {
+      getMetadata: v3ConfigWithDefaults.getMetadata,
+      getPropertyMetadata: v3ConfigWithDefaults.getPropertyMetadata,
+      generateIdentifierType: v3ConfigWithDefaults.generateIdentifierType,
+      propertySortFunction: v3ConfigWithDefaults.propertySortFunction,
+      getRoutineMetadata: v3ConfigWithDefaults.getRoutineMetadata,
+      enumStyle: v3ConfigWithDefaults.enumStyle,
+      typeMap,
+      schemas,
+      connection: v3ConfigWithDefaults.connection,
+      outputPath: v3ConfigWithDefaults.outputPath,
+      preDeleteOutputFolder: v3ConfigWithDefaults.preDeleteOutputFolder,
+      resolveViews: v3ConfigWithDefaults.resolveViews,
+      importsExtension: importsExtension || undefined,
+      tsModuleFormat: v3ConfigWithDefaults.tsModuleFormat,
+      fileExtension,
+    };
+
+    // Convert V3 → V4
+    v4Config = convertV3ConfigToV4(cfg, instantiatedConfig, schemas);
+  }
+
+  // From here on, only V4 processing
+  await processV4Config(v4Config as ConfigV4, instantiatedConfig);
+};
+
+/**
+ * Process a V4 config.
+ * If instantiatedConfig is provided, we're in V3 compatibility mode.
+ */
+const processV4Config = async (
+  v4Config: ConfigV4,
+  instantiatedConfig: InstantiatedConfig | undefined,
+): Promise<void> => {
+  // Resolve typescriptConfig with defaults
+  const resolvedTypescriptConfig: TypescriptConfig = {
+    enumStyle: "literal-union",
+    ...v4Config.typescriptConfig,
+  };
+
+  // For V3 compatibility mode, schemas were already extracted during conversion
+  // For pure V4 configs, we need to extract them here
+  let schemas;
+  let fileExtension: ".ts" | ".mts" | ".cts";
+  let importsExtension: "" | ".ts" | ".js" | ".mjs" | ".cjs" | undefined;
+
+  if (instantiatedConfig) {
+    // V3 compatibility mode - use already extracted data
+    schemas = instantiatedConfig.schemas;
+    fileExtension = instantiatedConfig.fileExtension;
+    importsExtension = instantiatedConfig.importsExtension as any;
+  } else {
+    // Pure V4 mode - extract schemas directly
+    const schemasList = v4Config.schemaNames || ["public"];
+    schemas = await extractSchemas(v4Config.connection, {
+      schemas: schemasList,
+      typeFilter: v4Config.filter, // V4 uses filter
+    });
+
+    const derivedExtensions = deriveExtensions(
+      resolvedTypescriptConfig.tsModuleFormat,
+      resolvedTypescriptConfig.importsExtension,
+    );
+    fileExtension = derivedExtensions.fileExtension;
+    importsExtension = derivedExtensions.importsExtension;
+  }
+
+  // Store the resolved importsExtension on typescriptConfig so renderTsFile can use it
+  const typescriptConfigWithExtension: TypescriptConfig = {
+    ...resolvedTypescriptConfig,
+    importsExtension,
+  };
+
+  await runWithContext(
+    {
+      typescriptConfig: typescriptConfigWithExtension,
+      config: v4Config,
+      schemas,
+      instantiatedConfig: instantiatedConfig as any,
+    },
+    async () => {
+      let output: Output = {};
+
+      // Execute each generator sequentially
+      for (const generator of v4Config.generators) {
+        const generatorOutput = await generator();
+        // Merge generator output into accumulated output
+        output = mergeOutput(output, generatorOutput);
+      }
+
+      // V4 pre-render hooks (no instantiatedConfig parameter)
+      const preRenderHooks = v4Config.preRenderHooks ?? [];
+      for (const hook of preRenderHooks) {
+        output = await hook(output);
+      }
+
+      let filesToWrite = Object.keys(output).map((path) => {
+        const file = output[path];
+
+        if (!file.fileType) {
+          // Hack for backwards compatibility.
+          file.fileType = "typescript";
+        }
+
+        if (file.fileType === "typescript") {
+          const lines = renderTsFile(file.declarations, path);
+          return {
+            fullPath: `${path}${fileExtension}`,
+            lines,
+          };
+        } else if (file.fileType === "markdown") {
+          const lines = renderMarkdownFile(file.template, file.context);
+          return { fullPath: path, lines };
+        } else if (file.fileType === "generic") {
+          return { fullPath: path, lines: file.lines };
+        }
+        throw new Error(`Path ${path} is an unknown file type`);
+      });
+
+      // V4 post-render hooks (no instantiatedConfig parameter)
+      const postRenderHooks = v4Config.postRenderHooks ?? [];
+      for (const hook of postRenderHooks) {
+        filesToWrite = await Promise.all(
+          filesToWrite.map(async (file) => {
+            const lines = await hook(file.fullPath, file.lines);
+            return { ...file, lines };
+          }),
+        );
+      }
+
+      const outputPath = v4Config.outputPath || ".";
+      const preDeleteOutputFolder = v4Config.preDeleteOutputFolder ?? false;
+
+      if (preDeleteOutputFolder) {
+        console.info(`Clearing old files in ${outputPath}`);
+        await rimraf(outputPath, { glob: true });
+      }
+
+      filesToWrite.forEach((file) => writeFile(file));
+    },
+  );
 };
 
 export default processDatabase;

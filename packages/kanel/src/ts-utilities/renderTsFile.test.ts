@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createTestContext, runWithContextSync } from "../context";
+import {
+  createTestContext,
+  type KanelContext,
+  runWithContext,
+} from "../context";
 import type { InstantiatedConfig } from "../config-types";
 import type { TsDeclaration } from "./ts-declaration-types";
 import renderTsFile from "./renderTsFile";
 
-// Mocked InstantiatedConfig
 const instantiatedConfig: InstantiatedConfig = {
   getMetadata: vi.fn(),
   getPropertyMetadata: vi.fn(),
@@ -21,14 +24,17 @@ const instantiatedConfig: InstantiatedConfig = {
   fileExtension: ".ts",
 };
 
-describe("processGenerationSetup", () => {
-  let testContext: ReturnType<typeof createTestContext>;
+describe("renderTsFile", () => {
+  let testContext: KanelContext;
+
+  const renderInContext = (declarations: TsDeclaration[]) =>
+    runWithContext(testContext, async () => renderTsFile(declarations, "./"));
 
   beforeEach(() => {
     testContext = createTestContext(instantiatedConfig);
   });
 
-  it("should process a type declaration", () => {
+  it("should process a type declaration", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
@@ -38,16 +44,14 @@ describe("processGenerationSetup", () => {
         typeDefinition: ["string"],
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([
       "/** This is just a string */",
       `export type MyString = string;`,
     ]);
   });
 
-  it("should work with multi-line type definitions", () => {
+  it("should work with multi-line type definitions", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
@@ -57,9 +61,7 @@ describe("processGenerationSetup", () => {
         typeDefinition: ["", "| 'apples'", "| 'oranges'", "| 'bananas'"],
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([
       `export type MyUnion = `,
       `  | 'apples'`,
@@ -68,7 +70,7 @@ describe("processGenerationSetup", () => {
     ]);
   });
 
-  it("should process an interface", () => {
+  it("should process an interface", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "interface" as const,
@@ -86,9 +88,7 @@ describe("processGenerationSetup", () => {
         ],
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([
       `export default interface Member {`,
       "  /**",
@@ -100,7 +100,7 @@ describe("processGenerationSetup", () => {
     ]);
   });
 
-  it("should process an enum", () => {
+  it("should process an enum", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "enum" as const,
@@ -109,9 +109,7 @@ describe("processGenerationSetup", () => {
         values: ["G", "PG", "PG-13", "R", "NC-17"],
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([
       `export enum MpaaRating {`,
       `  G = 'G',`,
@@ -123,7 +121,7 @@ describe("processGenerationSetup", () => {
     ]);
   });
 
-  it("should support a default exported enum", () => {
+  it("should support a default exported enum", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "enum" as const,
@@ -132,9 +130,7 @@ describe("processGenerationSetup", () => {
         values: ["apples", "oranges", "bananas"],
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([
       `enum Fruit {`,
       `  apples = 'apples',`,
@@ -146,7 +142,7 @@ describe("processGenerationSetup", () => {
     ]);
   });
 
-  it("should process a constant", () => {
+  it("should process a constant", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "constant" as const,
@@ -156,13 +152,11 @@ describe("processGenerationSetup", () => {
         value: "true",
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([`export const MyConstant: boolean = true;`]);
   });
 
-  it("should process a multi-line constant", () => {
+  it("should process a multi-line constant", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "constant" as const,
@@ -172,9 +166,7 @@ describe("processGenerationSetup", () => {
         value: ["z.object({", "  actor_id: actorId,", "})"],
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([
       "export const actor: z.Schema<Actor> = z.object({",
       `  actor_id: actorId,`,
@@ -182,7 +174,7 @@ describe("processGenerationSetup", () => {
     ]);
   });
 
-  it("should process a type declaration with special characters", () => {
+  it("should process a type declaration with special characters", async () => {
     const declarations: TsDeclaration[] = [
       {
         declarationType: "typeDeclaration" as const,
@@ -194,9 +186,7 @@ describe("processGenerationSetup", () => {
         ],
       },
     ];
-    const lines = runWithContextSync(testContext, () =>
-      renderTsFile(declarations, "./"),
-    );
+    const lines = await renderInContext(declarations);
     expect(lines).toEqual([
       "/**",
       " * This is a // * /* comment *\\/",

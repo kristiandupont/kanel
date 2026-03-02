@@ -1,13 +1,16 @@
-import type { GenericDeclaration, PreRenderHook, TypeImport } from "kanel";
+import type { GenericDeclaration, PgTsPreRenderHook, TypeImport } from "kanel";
+import { useKanelContext } from "kanel";
 import knex from "knex";
 import { join } from "path";
 import knexImport from "./knexImport";
 
-const generateMigrationCheck: PreRenderHook = async (
+const generateMigrationCheck: PgTsPreRenderHook = async (
   outputAcc,
-  instantiatedConfig,
+  _context,
 ) => {
-  const connection = instantiatedConfig.connection;
+  const { config } = useKanelContext();
+
+  const connection = config.connection;
   const db = knex({ client: "postgres", connection });
 
   const [{ name: sourceMigration }] = await db
@@ -49,7 +52,8 @@ const generateMigrationCheck: PreRenderHook = async (
     lines,
   };
 
-  const path = join(instantiatedConfig.outputPath, "migration-check");
+  const outputPath = config.outputPath ?? "";
+  const path = join(outputPath, "migration-check");
 
   return {
     ...outputAcc,

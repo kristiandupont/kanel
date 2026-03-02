@@ -10,6 +10,7 @@ import type {
 } from "extract-pg-schema";
 
 import { useKanelContext } from "../context";
+import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import type Details from "../Details";
 import type TypeDefinition from "../ts-utilities/TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
@@ -52,15 +53,13 @@ const getTypeFromReferences = (
   visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails,
 ): TypeDefinition | undefined => {
-  const { instantiatedConfig } = useKanelContext();
+  const { schemas } = useKanelContext();
+  const generatorContext = usePgTsGeneratorContext();
 
   const references = (c as TableColumn | ViewColumn | MaterializedViewColumn)
     .references as ColumnReference[];
   const referencedTypes = references.map((reference) => {
-    const { column, details } = getColumnFromReference(
-      reference,
-      instantiatedConfig.schemas,
-    );
+    const { column, details } = getColumnFromReference(reference, schemas);
     if (!column) {
       console.warn("Could not resolve reference", reference);
       return "unknown";
@@ -82,7 +81,7 @@ const getTypeFromReferences = (
 
   // Don't use the simple primitive type if we're generating identifier types
   if (
-    instantiatedConfig.generateIdentifierType &&
+    generatorContext.generateIdentifierType &&
     (c as TableColumn).isPrimaryKey
   ) {
     dedupedReferencedTypes = dedupedReferencedTypes.filter(
@@ -113,7 +112,8 @@ const resolveType = (
   visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails = d,
 ): TypeDefinition => {
-  const { instantiatedConfig } = useKanelContext();
+  const { schemas } = useKanelContext();
+  const generatorContext = usePgTsGeneratorContext();
 
   // Check to see if we have already tried to resolve this column before.
   // This is to prevent infinite loops when there are circular references.
@@ -143,36 +143,34 @@ const resolveType = (
     if ((c as ViewColumn | MaterializedViewColumn).source) {
       const source = (c as ViewColumn | MaterializedViewColumn).source;
       let target: TableDetails | ViewDetails | MaterializedViewDetails =
-        instantiatedConfig.schemas[source.schema].tables.find(
-          (t) => t.name === source.table,
-        );
+        schemas[source.schema].tables.find((t) => t.name === source.table);
 
       if (!target) {
-        target = instantiatedConfig.schemas[source.schema].views.find(
+        target = schemas[source.schema].views.find(
           (v) =>
             v.name === source.table &&
             v.name !== (d as ViewDetails).informationSchemaValue.table_name,
         );
       }
       if (!target) {
-        target = instantiatedConfig.schemas[
-          source.schema
-        ].materializedViews.find((v) => v.name === source.table);
+        target = schemas[source.schema].materializedViews.find(
+          (v) => v.name === source.table,
+        );
       }
       if (!target) {
-        target = instantiatedConfig.schemas["public"]?.tables?.find(
+        target = schemas["public"]?.tables?.find(
           (t) => t.name === source.table,
         );
       }
       if (!target) {
-        target = instantiatedConfig.schemas["public"]?.views?.find(
+        target = schemas["public"]?.views?.find(
           (v) =>
             v.name === source.table &&
             v.name !== (d as ViewDetails).informationSchemaValue.table_name,
         );
       }
       if (!target) {
-        target = instantiatedConfig.schemas["public"]?.materializedViews?.find(
+        target = schemas["public"]?.materializedViews?.find(
           (v) => v.name === source.table,
         );
       }
@@ -202,19 +200,14 @@ const resolveType = (
 
     // 4) if the column is a primary key, use the generated type for it, if we do that
     if (
-      instantiatedConfig.generateIdentifierType &&
+      generatorContext.generateIdentifierType &&
       !retainInnerIdentifierType &&
       (c as TableColumn).isPrimaryKey
     ) {
-      const { path } = instantiatedConfig.getMetadata(
-        d,
-        "selector",
-        instantiatedConfig,
-      );
-      const { name, exportAs } = instantiatedConfig.generateIdentifierType(
+      const { path } = generatorContext.getMetadata(d, "selector");
+      const { name, exportAs } = generatorContext.generateIdentifierType(
         c as TableColumn,
         d as TableDetails,
-        instantiatedConfig,
       );
       const sameSchema = originCompositeDetails.schemaName === d.schemaName;
       const asName = sameSchema ? undefined : `${d.schemaName}_${name}`;
@@ -235,8 +228,8 @@ const resolveType = (
     }
 
     // 5) If there is a typemap type, use that
-    if (c.type.fullName in instantiatedConfig.typeMap) {
-      return instantiatedConfig.typeMap[c.type.fullName];
+    if (c.type.fullName in generatorContext.typeMap) {
+      return generatorContext.typeMap[c.type.fullName];
     }
 
     // 6) If the type is a composite, enum, range or domain, reference that.
@@ -246,47 +239,33 @@ const resolveType = (
       switch (c.type.kind) {
         case "composite": {
           target =
-            instantiatedConfig.schemas[schemaName].compositeTypes.find(
+            schemas[schemaName].compositeTypes.find(
               (t) => t.name === typeName,
             ) ??
-            instantiatedConfig.schemas[schemaName].views?.find(
+            schemas[schemaName].views?.find((t) => t.name === typeName) ??
+            schemas[schemaName].materializedViews?.find(
               (t) => t.name === typeName,
             ) ??
-            instantiatedConfig.schemas[schemaName].materializedViews?.find(
+            schemas[schemaName].tables?.find((t) => t.name === typeName) ??
+            schemas["public"]?.views?.find((t) => t.name === typeName) ??
+            schemas["public"]?.materializedViews?.find(
               (t) => t.name === typeName,
             ) ??
-            instantiatedConfig.schemas[schemaName].tables?.find(
-              (t) => t.name === typeName,
-            ) ??
-            instantiatedConfig.schemas["public"]?.views?.find(
-              (t) => t.name === typeName,
-            ) ??
-            instantiatedConfig.schemas["public"]?.materializedViews?.find(
-              (t) => t.name === typeName,
-            ) ??
-            instantiatedConfig.schemas["public"]?.tables?.find(
-              (t) => t.name === typeName,
-            );
+            schemas["public"]?.tables?.find((t) => t.name === typeName);
           break;
         }
         case "enum": {
-          target = instantiatedConfig.schemas[schemaName].enums.find(
-            (t) => t.name === typeName,
-          );
+          target = schemas[schemaName].enums.find((t) => t.name === typeName);
 
           break;
         }
         case "domain": {
-          target = instantiatedConfig.schemas[schemaName].domains.find(
-            (t) => t.name === typeName,
-          );
+          target = schemas[schemaName].domains.find((t) => t.name === typeName);
 
           break;
         }
         case "range": {
-          target = instantiatedConfig.schemas[schemaName].ranges.find(
-            (t) => t.name === typeName,
-          );
+          target = schemas[schemaName].ranges.find((t) => t.name === typeName);
 
           break;
         }
@@ -294,11 +273,7 @@ const resolveType = (
       }
 
       if (target) {
-        const { name, path } = instantiatedConfig.getMetadata(
-          target,
-          "selector",
-          instantiatedConfig,
-        );
+        const { name, path } = generatorContext.getMetadata(target, "selector");
         const sameSchema =
           originCompositeDetails.schemaName === target.schemaName;
         const asName = sameSchema ? undefined : `${target.schemaName}_${name}`;
