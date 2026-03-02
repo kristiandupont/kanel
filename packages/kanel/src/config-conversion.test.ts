@@ -196,7 +196,9 @@ describe("V3 to V4 Config Conversion", () => {
       convertV3ConfigToV4(v3Config, baseInstantiatedConfig, mockSchemas);
 
       expect(consoleWarnSpy).toHaveBeenCalled();
-      expect(consoleWarnSpy.mock.calls[0][0]).toContain("DEPRECATION WARNING");
+      expect(consoleWarnSpy.mock.calls[0][0]).toContain(
+        "deprecated V3 config format detected",
+      );
 
       consoleWarnSpy.mockRestore();
     });
