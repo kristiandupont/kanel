@@ -6,13 +6,14 @@ import type {
 } from "extract-pg-schema";
 import { tryParse } from "tagged-comment-parser";
 
-import type { PreRenderHookV3 } from "../config-types";
+import type { PgTsPreRenderHook } from "../config-types-v4";
 import type {
   CompositeDetails,
   CompositeProperty,
 } from "../generators/composite-types";
 import type TypeDefinition from "../ts-utilities/TypeDefinition";
 import type { InterfaceDeclaration } from "../ts-utilities/ts-declaration-types";
+import { useKanelContext } from "../context";
 
 /**
  * Extracts TypeDefinition from a @type tag in a comment
@@ -62,12 +63,13 @@ const resolveTypeFromComment = (
  * 2. Column-level tags (on table/view columns):
  *    - Updates the property type in the generated interface
  *
- * This is applied by default to maintain backward compatibility.
+ * This is applied by default in V3 configs. In V4 configs, it must be explicitly
+ * added to PgTsGeneratorConfig.preRenderHooks.
  */
-const applyTaggedComments: PreRenderHookV3 = (
-  outputAcc,
-  instantiatedConfig,
-) => {
+const applyTaggedComments: PgTsPreRenderHook = (outputAcc, context) => {
+  const { schemas } = useKanelContext();
+  const { getMetadata } = context;
+
   const newOutput = { ...outputAcc };
 
   // Build a map of type full names to their tagged TypeDefinition
@@ -79,16 +81,12 @@ const applyTaggedComments: PreRenderHookV3 = (
   // Collect all entities that have @type tags
   const pathsToRemove = new Set<string>();
 
-  Object.values(instantiatedConfig.schemas).forEach((schema) => {
+  Object.values(schemas).forEach((schema) => {
     // Process domains
     schema.domains?.forEach((domain: DomainDetails) => {
       const typeFromComment = resolveTypeFromComment(domain.comment);
       if (typeFromComment) {
-        const { name, path } = instantiatedConfig.getMetadata(
-          domain,
-          undefined,
-          instantiatedConfig,
-        );
+        const { name, path } = getMetadata(domain, undefined);
         typeTagMap.set(name, typeFromComment);
         pathsToRemove.add(path);
       }
@@ -98,11 +96,7 @@ const applyTaggedComments: PreRenderHookV3 = (
     schema.ranges?.forEach((range: RangeDetails) => {
       const typeFromComment = resolveTypeFromComment(range.comment);
       if (typeFromComment) {
-        const { name, path } = instantiatedConfig.getMetadata(
-          range,
-          undefined,
-          instantiatedConfig,
-        );
+        const { name, path } = getMetadata(range, undefined);
         typeTagMap.set(name, typeFromComment);
         pathsToRemove.add(path);
       }
@@ -112,11 +106,7 @@ const applyTaggedComments: PreRenderHookV3 = (
     schema.enums?.forEach((enumDetails: EnumDetails) => {
       const typeFromComment = resolveTypeFromComment(enumDetails.comment);
       if (typeFromComment) {
-        const { name, path } = instantiatedConfig.getMetadata(
-          enumDetails,
-          undefined,
-          instantiatedConfig,
-        );
+        const { name, path } = getMetadata(enumDetails, undefined);
         typeTagMap.set(name, typeFromComment);
         pathsToRemove.add(path);
       }
@@ -126,11 +116,7 @@ const applyTaggedComments: PreRenderHookV3 = (
     schema.compositeTypes?.forEach((compositeType: CompositeTypeDetails) => {
       const typeFromComment = resolveTypeFromComment(compositeType.comment);
       if (typeFromComment) {
-        const { name, path } = instantiatedConfig.getMetadata(
-          compositeType,
-          undefined,
-          instantiatedConfig,
-        );
+        const { name, path } = getMetadata(compositeType, undefined);
         typeTagMap.set(name, typeFromComment);
         pathsToRemove.add(path);
       }
@@ -179,7 +165,7 @@ const applyTaggedComments: PreRenderHookV3 = (
     let currentEntityName: string | undefined;
 
     // Try to match the path to a schema entity to get context
-    Object.values(instantiatedConfig.schemas).forEach((schema) => {
+    Object.values(schemas).forEach((schema) => {
       const allEntities = [
         ...(schema.tables || []),
         ...(schema.foreignTables || []),
@@ -189,11 +175,7 @@ const applyTaggedComments: PreRenderHookV3 = (
       ];
 
       allEntities.forEach((entity) => {
-        const { path: entityPath } = instantiatedConfig.getMetadata(
-          entity,
-          "selector",
-          instantiatedConfig,
-        );
+        const { path: entityPath } = getMetadata(entity, "selector");
         if (entityPath === path) {
           currentSchemaName = entity.schemaName;
           currentEntityName = entity.name;

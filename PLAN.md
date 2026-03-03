@@ -20,16 +20,7 @@ Hooks and generators access configuration via AsyncLocalStorage context (using `
 
 ## Beta Release Checklist
 
-### 1. applyTaggedComments and markAsGenerated hook types
-
-`applyTaggedComments` and `markAsGenerated` are exported as `PreRenderHookV3` / `PostRenderHookV3`. They need to be upgraded to V4 signatures.
-
-- `markAsGenerated` is trivial — it already ignores `instantiatedConfig`, so it just needs retyping as `PostRenderHookV4`.
-- `applyTaggedComments` uses `instantiatedConfig.schemas` and `instantiatedConfig.getMetadata`, which map directly to `useKanelContext().schemas` and the `PgTsGeneratorContext` parameter. It must live in `PgTsGeneratorConfig.preRenderHooks` since it needs `PgTsGeneratorContext`.
-
----
-
-### 2. Type Naming Cleanup — Remove \*V4 suffixes from public API
+### 1. Type Naming Cleanup — Remove \*V4 suffixes from public API
 
 Currently the V4 public types carry a `V4` suffix which will be confusing as V3 fades out. These should be renamed:
 
@@ -48,7 +39,7 @@ Currently the V4 public types carry a `V4` suffix which will be confusing as V3 
 
 **Note**: `ConfigV3` / `ConfigV4` may need to stay as-is as union members since the union `Config = ConfigV3 | ConfigV4` is structural. Evaluate carefully.
 
-### 3. Update Documentation
+### 2. Update Documentation
 
 All documentation is V3-era and needs V4 updates:
 
