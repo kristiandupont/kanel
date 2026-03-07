@@ -9,9 +9,9 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import type {
-  TypeMetadataV4,
-  PropertyMetadataV4,
-  RoutineMetadataV4,
+  TypeMetadata,
+  PropertyMetadata,
+  RoutineMetadata,
 } from "../config-types-v4";
 import type { CompositeProperty, CompositeDetails } from "./composite-types";
 import type { RoutineDetails } from "./routine-types";
@@ -26,17 +26,17 @@ import type {
 } from "extract-pg-schema";
 
 /**
- * Internal version of GetMetadataV4.
+ * Internal version of GetMetadata.
  * Does NOT include the builtinMetadata parameter - that's handled by the wrapper.
  * This is what sub-generators actually call.
  */
 export type InternalGetMetadata = (
   details: Details,
   generateFor: "selector" | "initializer" | "mutator" | undefined,
-) => TypeMetadataV4;
+) => TypeMetadata;
 
 /**
- * Internal version of GetPropertyMetadataV4.
+ * Internal version of GetPropertyMetadata.
  * Does NOT include the builtinMetadata parameter - that's handled by the wrapper.
  * This is what sub-generators actually call.
  */
@@ -44,10 +44,10 @@ export type InternalGetPropertyMetadata = (
   property: CompositeProperty,
   details: CompositeDetails,
   generateFor: "selector" | "initializer" | "mutator",
-) => PropertyMetadataV4;
+) => PropertyMetadata;
 
 /**
- * Internal version of GenerateIdentifierTypeV4.
+ * Internal version of GenerateIdentifierType.
  * Does NOT include the builtinType parameter - that's handled by the wrapper.
  * This is what sub-generators actually call.
  */
@@ -57,13 +57,13 @@ export type InternalGenerateIdentifierType = (
 ) => TypeDeclaration;
 
 /**
- * Internal version of GetRoutineMetadataV4.
+ * Internal version of GetRoutineMetadata.
  * Does NOT include the builtinMetadata parameter - that's handled by the wrapper.
  * This is what sub-generators actually call.
  */
 export type InternalGetRoutineMetadata = (
   routineDetails: RoutineDetails,
-) => RoutineMetadataV4;
+) => RoutineMetadata;
 
 /**
  * Context specific to the PgTsGenerator.

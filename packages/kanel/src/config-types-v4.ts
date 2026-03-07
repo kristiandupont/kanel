@@ -47,19 +47,25 @@ export type Generator = () => Awaitable<Output>;
 // #region V4 Hooks
 
 /**
- * V4 pre-render hook - transforms accumulated output.
+ * Pre-render hook - transforms accumulated output.
  * Access context via useKanelContext() instead of receiving it as a parameter.
  */
-export type PreRenderHookV4 = (outputAcc: Output) => Awaitable<Output>;
+export type PreRenderHook = (outputAcc: Output) => Awaitable<Output>;
 
 /**
- * V4 post-render hook - transforms rendered file lines.
+ * Post-render hook - transforms rendered file lines.
  * Access context via useKanelContext() instead of receiving it as a parameter.
  */
-export type PostRenderHookV4 = (
+export type PostRenderHook = (
   path: string,
   lines: string[],
 ) => Awaitable<string[]>;
+
+/** @deprecated Use PreRenderHook instead */
+export type PreRenderHookV4 = PreRenderHook;
+
+/** @deprecated Use PostRenderHook instead */
+export type PostRenderHookV4 = PostRenderHook;
 
 /**
  * Pre-render hook scoped to a PgTsGenerator execution.
@@ -76,9 +82,9 @@ export type PgTsPreRenderHook = (
 // #region V4 Metadata Types
 
 /**
- * V4 metadata result type
+ * Metadata result type
  */
-export type TypeMetadataV4 = {
+export type TypeMetadata = {
   name: string;
   comment: string[] | undefined;
   path: string;
@@ -87,7 +93,7 @@ export type TypeMetadataV4 = {
 };
 
 /**
- * V4 GetMetadata - receives the builtin metadata as the last parameter.
+ * GetMetadata - receives the builtin metadata as the last parameter.
  * This allows composing custom metadata on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
@@ -97,16 +103,16 @@ export type TypeMetadataV4 = {
  *   comment: ['My custom comment'],
  * })
  */
-export type GetMetadataV4 = (
+export type GetMetadata = (
   details: Details,
   generateFor: "selector" | "initializer" | "mutator" | undefined,
-  builtinMetadata: TypeMetadataV4,
-) => TypeMetadataV4;
+  builtinMetadata: TypeMetadata,
+) => TypeMetadata;
 
 /**
- * V4 PropertyMetadata result type (unchanged from V3)
+ * PropertyMetadata result type
  */
-export type PropertyMetadataV4 = {
+export type PropertyMetadata = {
   name: string;
   comment: string[] | undefined;
   typeOverride?: TypeDefinition;
@@ -115,7 +121,7 @@ export type PropertyMetadataV4 = {
 };
 
 /**
- * V4 GetPropertyMetadata - receives the builtin metadata as the last parameter.
+ * GetPropertyMetadata - receives the builtin metadata as the last parameter.
  * This allows composing custom property metadata on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
@@ -125,15 +131,15 @@ export type PropertyMetadataV4 = {
  *   comment: [...(builtinMetadata.comment || []), 'Custom note'],
  * })
  */
-export type GetPropertyMetadataV4 = (
+export type GetPropertyMetadata = (
   property: CompositeProperty,
   details: CompositeDetails,
   generateFor: "selector" | "initializer" | "mutator",
-  builtinMetadata: PropertyMetadataV4,
-) => PropertyMetadataV4;
+  builtinMetadata: PropertyMetadata,
+) => PropertyMetadata;
 
 /**
- * V4 GenerateIdentifierType - receives the builtin identifier type as the last parameter.
+ * GenerateIdentifierType - receives the builtin identifier type as the last parameter.
  * This allows composing custom identifier types on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
@@ -143,26 +149,26 @@ export type GetPropertyMetadataV4 = (
  *   comment: ['Custom ID type comment'],
  * })
  */
-export type GenerateIdentifierTypeV4 = (
+export type GenerateIdentifierType = (
   column: TableColumn | ForeignTableColumn,
   details: TableDetails | ForeignTableDetails,
   builtinType: TypeDeclaration,
 ) => TypeDeclaration;
 
 /**
- * V4 RoutineMetadata result type (unchanged from V3)
+ * RoutineMetadata result type
  */
-export type RoutineMetadataV4 = {
+export type RoutineMetadata = {
   path: string;
   parametersName: string;
-  parameters: PropertyMetadataV4[];
+  parameters: PropertyMetadata[];
   returnTypeName?: string;
   returnTypeComment?: string[] | undefined;
   returnTypeOverride?: TypeDefinition;
 };
 
 /**
- * V4 GetRoutineMetadata - receives the builtin metadata as the last parameter.
+ * GetRoutineMetadata - receives the builtin metadata as the last parameter.
  * This allows composing custom routine metadata on top of Kanel's builtin implementation.
  * Access context via useKanelContext() instead of instantiatedConfig.
  *
@@ -172,10 +178,31 @@ export type RoutineMetadataV4 = {
  *   returnTypeComment: ['Custom return type comment'],
  * })
  */
-export type GetRoutineMetadataV4 = (
+export type GetRoutineMetadata = (
   routineDetails: RoutineDetails,
-  builtinMetadata: RoutineMetadataV4,
-) => RoutineMetadataV4;
+  builtinMetadata: RoutineMetadata,
+) => RoutineMetadata;
+
+/** @deprecated Use TypeMetadata instead */
+export type TypeMetadataV4 = TypeMetadata;
+
+/** @deprecated Use GetMetadata instead */
+export type GetMetadataV4 = GetMetadata;
+
+/** @deprecated Use PropertyMetadata instead */
+export type PropertyMetadataV4 = PropertyMetadata;
+
+/** @deprecated Use GetPropertyMetadata instead */
+export type GetPropertyMetadataV4 = GetPropertyMetadata;
+
+/** @deprecated Use GenerateIdentifierType instead */
+export type GenerateIdentifierTypeV4 = GenerateIdentifierType;
+
+/** @deprecated Use RoutineMetadata instead */
+export type RoutineMetadataV4 = RoutineMetadata;
+
+/** @deprecated Use GetRoutineMetadata instead */
+export type GetRoutineMetadataV4 = GetRoutineMetadata;
 
 // #endregion V4 Metadata Types
 
@@ -189,11 +216,11 @@ export type PgTsGeneratorConfig = {
   /** Custom type mappings from PostgreSQL types to TypeScript types */
   customTypeMap?: TypeMap;
 
-  /** V4 metadata functions (no instantiatedConfig parameter) */
-  getMetadata?: GetMetadataV4;
-  getPropertyMetadata?: GetPropertyMetadataV4;
-  generateIdentifierType?: GenerateIdentifierTypeV4;
-  getRoutineMetadata?: GetRoutineMetadataV4;
+  /** Metadata functions (no instantiatedConfig parameter) */
+  getMetadata?: GetMetadata;
+  getPropertyMetadata?: GetPropertyMetadata;
+  generateIdentifierType?: GenerateIdentifierType;
+  getRoutineMetadata?: GetRoutineMetadata;
 
   /** Function to sort properties in generated interfaces */
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
@@ -235,8 +262,8 @@ export type ConfigV4 = {
 
   // Top-level generators and hooks
   generators: Generator[];
-  preRenderHooks?: PreRenderHookV4[];
-  postRenderHooks?: PostRenderHookV4[];
+  preRenderHooks?: PreRenderHook[];
+  postRenderHooks?: PostRenderHook[];
 };
 
 // #endregion V4 Config

@@ -3,7 +3,8 @@ import { expect, it } from "vitest";
 import { kyselyCamelCaseHook } from "./kyselyCamelCaseHook.js";
 
 it("Should transform all properties to camelCase", async () => {
-  const output = await kyselyCamelCaseHook({
+  const output = await kyselyCamelCaseHook(
+    {
     foo: {
       fileType: "typescript",
       declarations: [
@@ -70,7 +71,9 @@ it("Should transform all properties to camelCase", async () => {
         },
       ],
     },
-  });
+    },
+    {} as any, // context parameter (not used by this hook)
+  );
 
   const foo = output.foo as any;
   const bar = output.bar as any;

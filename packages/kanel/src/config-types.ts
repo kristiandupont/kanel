@@ -3,10 +3,10 @@ import type { ConnectionConfig } from "pg";
 
 import type { CompositeProperty } from "./generators/composite-types";
 import type {
-  GenerateIdentifierType,
-  GetMetadata,
-  GetPropertyMetadata,
-  GetRoutineMetadata,
+  GenerateIdentifierTypeV3,
+  GetMetadataV3,
+  GetPropertyMetadataV3,
+  GetRoutineMetadataV3,
 } from "./metadata-types";
 import type Output from "./Output";
 import type TypeMap from "./TypeMap";
@@ -19,10 +19,10 @@ export type InstantiatedConfig = {
   schemas: Record<string, Schema>;
   typeMap: TypeMap;
 
-  getMetadata: GetMetadata;
-  getPropertyMetadata: GetPropertyMetadata;
-  generateIdentifierType?: GenerateIdentifierType;
-  getRoutineMetadata?: GetRoutineMetadata;
+  getMetadata: GetMetadataV3;
+  getPropertyMetadata: GetPropertyMetadataV3;
+  generateIdentifierType?: GenerateIdentifierTypeV3;
+  getRoutineMetadata?: GetRoutineMetadataV3;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 
   enumStyle: "enum" | "type";
@@ -56,11 +56,11 @@ export type ConfigV3 = {
   connection: string | ConnectionConfig;
   schemas?: string[];
   typeFilter?: (pgType: PgType) => boolean;
-  getMetadata?: GetMetadata;
-  getPropertyMetadata?: GetPropertyMetadata;
-  generateIdentifierType?: GenerateIdentifierType;
+  getMetadata?: GetMetadataV3;
+  getPropertyMetadata?: GetPropertyMetadataV3;
+  generateIdentifierType?: GenerateIdentifierTypeV3;
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
-  getRoutineMetadata?: GetRoutineMetadata;
+  getRoutineMetadata?: GetRoutineMetadataV3;
 
   enumStyle?: "enum" | "type";
 

@@ -7,7 +7,7 @@ import type {
   TypeDeclaration,
 } from "../ts-utilities/ts-declaration-types";
 import type { TsFileContents } from "../Output";
-import type { PreRenderHookV4 } from "../config-types-v4";
+import type { PreRenderHook } from "../config-types-v4";
 import { useKanelContext } from "../context";
 
 type GenerateIndexFileConfig = {
@@ -35,7 +35,7 @@ function stringifyExportItem(item: ExportsItem): string {
 
 export const makeGenerateIndexFile: (
   config: GenerateIndexFileConfig,
-) => PreRenderHookV4 = (config) => (outputAcc) => {
+) => PreRenderHook = (config) => (outputAcc) => {
   const context = useKanelContext();
   const allExports: Record<string, ExportsItem[]> = {};
 

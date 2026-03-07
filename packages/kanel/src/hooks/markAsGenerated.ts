@@ -1,6 +1,6 @@
-import { PostRenderHookV4 } from "../config-types-v4";
+import { PostRenderHook } from "../config-types-v4";
 
-const markAsGenerated: PostRenderHookV4 = (path, lines): string[] => {
+const markAsGenerated: PostRenderHook = (path, lines): string[] => {
   const extension = path.split(".").pop();
   if (["ts", "tsx", "js", "jsx"].includes(extension)) {
     return [

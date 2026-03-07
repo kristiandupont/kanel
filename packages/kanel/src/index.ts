@@ -17,6 +17,8 @@ export { default as makePgTsGenerator } from "./generators/makePgTsGenerator";
 export type { PgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
 export { default as resolveType } from "./generators/resolveType";
 export * from "./hooks";
+// metadata-types.ts contains deprecated V3 types - the V4 types are in config-types-v4.ts
+// We keep exporting them for backwards compatibility but they're marked as deprecated
 export type * from "./metadata-types";
 export type {
   FileContents,

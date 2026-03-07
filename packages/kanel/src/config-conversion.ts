@@ -15,12 +15,12 @@ import type {
 import type {
   ConfigV4,
   PgTsPreRenderHook,
-  PostRenderHookV4,
+  PostRenderHook,
   PgTsGeneratorConfig,
-  GetMetadataV4,
-  GetPropertyMetadataV4,
-  GenerateIdentifierTypeV4,
-  GetRoutineMetadataV4,
+  GetMetadata,
+  GetPropertyMetadata,
+  GenerateIdentifierType,
+  GetRoutineMetadata,
 } from "./config-types-v4";
 import { useKanelContext } from "./context";
 import applyTaggedComments from "./hooks/applyTaggedComments";
@@ -62,7 +62,7 @@ function wrapV3PreRenderHook(v3Hook: PreRenderHookV3): PgTsPreRenderHook {
  * Wraps a V3 PostRenderHook to work as a V4 hook.
  * Injects the instantiatedConfig from context.
  */
-function wrapV3PostRenderHook(v3Hook: PostRenderHookV3): PostRenderHookV4 {
+function wrapV3PostRenderHook(v3Hook: PostRenderHookV3): PostRenderHook {
   return async (path: string, lines: string[]): Promise<string[]> => {
     const context = useKanelContext();
 
@@ -103,7 +103,7 @@ function wrapV3MetadataFunctions(
   if (v3Config.getMetadata) {
     const v3GetMetadata = v3Config.getMetadata;
     result.getMetadata = ((details, generateFor, _defaultMetadata) =>
-      v3GetMetadata(details, generateFor, instantiatedConfig)) as GetMetadataV4;
+      v3GetMetadata(details, generateFor, instantiatedConfig)) as GetMetadata;
   }
 
   // Wrap getPropertyMetadata
@@ -120,7 +120,7 @@ function wrapV3MetadataFunctions(
         details,
         generateFor,
         instantiatedConfig,
-      )) as GetPropertyMetadataV4;
+      )) as GetPropertyMetadata;
   }
 
   // Wrap generateIdentifierType
@@ -131,7 +131,7 @@ function wrapV3MetadataFunctions(
         column,
         details,
         instantiatedConfig,
-      )) as GenerateIdentifierTypeV4;
+      )) as GenerateIdentifierType;
   }
 
   // Wrap getRoutineMetadata
@@ -141,7 +141,7 @@ function wrapV3MetadataFunctions(
       v3GetRoutineMetadata(
         routineDetails,
         instantiatedConfig,
-      )) as GetRoutineMetadataV4;
+      )) as GetRoutineMetadata;
   }
 
   return result;
@@ -186,10 +186,11 @@ export function convertV3ConfigToV4(
 
   // Wrap V3 hooks to inject instantiatedConfig
   const pgTsPreRenderHooks: PgTsPreRenderHook[] = [];
-  const postRenderHooks: PostRenderHookV4[] = [];
+  const postRenderHooks: PostRenderHook[] = [];
 
   // V3 always applies applyTaggedComments by default (prepended to user hooks)
-  pgTsPreRenderHooks.push(wrapV3PreRenderHook(applyTaggedComments));
+  // applyTaggedComments is already a V4 hook, so don't wrap it
+  pgTsPreRenderHooks.push(applyTaggedComments);
 
   // Add user's pre-render hooks (these become PgTsGenerator-specific in V4)
   if (v3Config.preRenderHooks) {

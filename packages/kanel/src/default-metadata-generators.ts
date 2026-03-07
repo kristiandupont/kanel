@@ -7,10 +7,10 @@ import escapeIdentifier from "./ts-utilities/escapeIdentifier";
 import type { CompositeProperty } from "./generators/composite-types";
 import resolveType from "./generators/resolveType";
 import type {
-  GenerateIdentifierType,
-  GetMetadata,
-  GetPropertyMetadata,
-  GetRoutineMetadata,
+  GenerateIdentifierTypeV3,
+  GetMetadataV3,
+  GetPropertyMetadataV3,
+  GetRoutineMetadataV3,
 } from "./metadata-types";
 import { useKanelContext } from "./context";
 
@@ -36,7 +36,7 @@ const toPascalCase = recase(null, "pascal");
  * }
  * ```
  */
-export const defaultGetMetadata: GetMetadata = (details, generateFor) => {
+export const defaultGetMetadata: GetMetadataV3 = (details, generateFor) => {
   const { comment: strippedComment } = tryParse(details.comment);
   const isAgentNoun = ["initializer", "mutator"].includes(generateFor);
 
@@ -63,7 +63,7 @@ export const defaultGetMetadata: GetMetadata = (details, generateFor) => {
  * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
  * passed to your custom getPropertyMetadata function instead of importing this.
  */
-export const defaultGetPropertyMetadata: GetPropertyMetadata = (
+export const defaultGetPropertyMetadata: GetPropertyMetadataV3 = (
   property,
   _details,
   generateFor,
@@ -88,7 +88,7 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
  * @deprecated This is a V3 compatibility export. In V4, use the builtinType parameter
  * passed to your custom generateIdentifierType function instead of importing this.
  */
-export const defaultGenerateIdentifierType: GenerateIdentifierType = (
+export const defaultGenerateIdentifierType: GenerateIdentifierTypeV3 = (
   column,
   details,
   _config,
@@ -147,7 +147,7 @@ export const defaultPropertySortFunction = (
  * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
  * passed to your custom getRoutineMetadata function instead of importing this.
  */
-export const defaultGetRoutineMetadata: GetRoutineMetadata = (details) => {
+export const defaultGetRoutineMetadata: GetRoutineMetadataV3 = (details) => {
   const context = useKanelContext();
   const outputPath = context.config.outputPath || ".";
 

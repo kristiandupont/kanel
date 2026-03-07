@@ -1,8 +1,8 @@
 import {
-  usePgTsGeneratorContext,
   type CompositeDetails,
   type CompositeProperty,
   type InterfacePropertyDeclaration,
+  type PgTsGeneratorContext,
   type TsFileContents,
   type TypeImport,
 } from "kanel";
@@ -23,12 +23,12 @@ const processFile = (
   compositeDetails: CompositeDetails,
   path: string,
   makeKyselyConfig: MakeKyselyConfig,
+  pgTsContext: PgTsGeneratorContext,
 ): {
   modifiedDeclarations: TsFileContents["declarations"];
   tableImport: TypeImport;
   tableProperty: InterfacePropertyDeclaration;
 } => {
-  const pgTsContext = usePgTsGeneratorContext();
 
   const { name: selectorName } = pgTsContext.getMetadata(
     compositeDetails,

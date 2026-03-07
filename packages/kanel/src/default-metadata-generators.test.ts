@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { defaultGenerateIdentifierType } from "./default-metadata-generators";
-import type { GenerateIdentifierType } from "./metadata-types";
+import type { GenerateIdentifierTypeV3 } from "./metadata-types";
 import type { InstantiatedConfig } from "./config-types";
 import { createTestContext } from "./context";
 
@@ -42,7 +42,7 @@ describe.skip("defaultGenerateIdentifierType", () => {
           { name: "thing_id", type: { kind: "base", fullName: "text" } },
           { name: "my_things", schemaName: "public" },
           { typeMap: {} },
-        ] as Parameters<GenerateIdentifierType>),
+        ] as Parameters<GenerateIdentifierTypeV3>),
       ),
     );
 
@@ -61,7 +61,7 @@ describe.skip("defaultGenerateIdentifierType", () => {
           { name: "special_col!'.", type: { kind: "base", fullName: "text" } },
           { name: "special_table!'.", schemaName: "special_schema!'." },
           { typeMap: {} },
-        ] as Parameters<GenerateIdentifierType>),
+        ] as Parameters<GenerateIdentifierTypeV3>),
       ),
     );
 

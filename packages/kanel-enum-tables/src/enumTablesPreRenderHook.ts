@@ -5,7 +5,7 @@ import type {
   InterfaceDeclaration,
   Output,
   PgTsGeneratorContext,
-  PreRenderHookV4,
+  PgTsPreRenderHook,
   TsFileContents,
   TypeDeclaration,
 } from "kanel";
@@ -118,7 +118,7 @@ export const findDescriptionColumn = (
   return undefined;
 };
 
-const enumTablesPreRenderHook: PreRenderHookV4 = async (outputAccumulator, pgTsContext) => {
+const enumTablesPreRenderHook: PgTsPreRenderHook = async (outputAccumulator, pgTsContext) => {
   const { schemas, config, typescriptConfig } = useKanelContext();
 
   if (!pgTsContext.generateIdentifierType) {

@@ -58,6 +58,7 @@ const makeKyselyHook: (
             compositeDetails,
             path,
             makeKyselyConfig,
+            pgTsContext,
           );
         output[path].declarations = modifiedDeclarations;
         if (makeKyselyConfig.includeSchemaNameInTableName)

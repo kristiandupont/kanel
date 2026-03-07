@@ -4,12 +4,12 @@ import type {
   PgTsGeneratorContext,
   PgTsPreRenderHook,
   TypeImport,
-  TypeMetadataV4,
+  TypeMetadata,
 } from "kanel";
 import { useKanelContext } from "kanel";
 import { join } from "path";
 
-function getAsName(typeMetadata: TypeMetadataV4, schemaName: string) {
+function getAsName(typeMetadata: TypeMetadata, schemaName: string) {
   return schemaName === "public"
     ? undefined
     : `${schemaName}_${typeMetadata.name}`;

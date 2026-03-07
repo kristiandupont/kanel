@@ -8,10 +8,10 @@
  */
 
 import type {
-  GetMetadataV4,
-  GetPropertyMetadataV4,
-  GenerateIdentifierTypeV4,
-  GetRoutineMetadataV4,
+  GetMetadata,
+  GetPropertyMetadata,
+  GenerateIdentifierType,
+  GetRoutineMetadata,
 } from "../config-types-v4";
 import type {
   InternalGetMetadata,
@@ -32,7 +32,7 @@ import { useKanelContext } from "../context";
  * Returns an InternalGetMetadata function (without the builtinMetadata parameter).
  */
 export function wrapGetMetadata(
-  userFunction: GetMetadataV4 | undefined,
+  userFunction: GetMetadata | undefined,
 ): InternalGetMetadata {
   return (details, generateFor) => {
     const context = useKanelContext();
@@ -60,7 +60,7 @@ export function wrapGetMetadata(
  * Returns an InternalGetPropertyMetadata function (without the builtinMetadata parameter).
  */
 export function wrapGetPropertyMetadata(
-  userFunction: GetPropertyMetadataV4 | undefined,
+  userFunction: GetPropertyMetadata | undefined,
 ): InternalGetPropertyMetadata {
   return (property, details, generateFor) => {
     const context = useKanelContext();
@@ -86,7 +86,7 @@ export function wrapGetPropertyMetadata(
  * Returns an InternalGenerateIdentifierType function (without the builtinType parameter).
  */
 export function wrapGenerateIdentifierType(
-  userFunction: GenerateIdentifierTypeV4 | undefined,
+  userFunction: GenerateIdentifierType | undefined,
 ): InternalGenerateIdentifierType | undefined {
   if (!userFunction) {
     // Return a wrapper around the builtin
@@ -119,7 +119,7 @@ export function wrapGenerateIdentifierType(
  * Returns an InternalGetRoutineMetadata function (without the builtinMetadata parameter).
  */
 export function wrapGetRoutineMetadata(
-  userFunction: GetRoutineMetadataV4 | undefined,
+  userFunction: GetRoutineMetadata | undefined,
 ): InternalGetRoutineMetadata | undefined {
   if (!userFunction) {
     // Return a wrapper around the builtin
