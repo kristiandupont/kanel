@@ -1,112 +1,430 @@
 # Configuring
 
-Here is a semi-complex example `.kanelrc.js` configuration file, taken from the [example](https://github.com/kristiandupont/kanel/tree/master/example):
+Kanel v4 is a **generator framework** that connects to PostgreSQL and runs generators to produce output. Understanding this architecture is key to configuring Kanel effectively.
 
-<<< @/../example/.kanelrc.js
+## Configuration Structure
 
-## Migrating from v2
+```javascript
+module.exports = {
+  // Core Kanel configuration (applies to all generators)
+  connection: /* ... */,
+  schemaNames: /* ... */,
+  generators: [/* ... */],
 
-The update to version 3 introduced several breaking changes. If you are doing this migration, check out the [guide](./migration.md) for help.
+  // TypeScript configuration (applies to TypeScript generators)
+  typescriptConfig: { /* ... */ },
+
+  // Global hooks (run after all generators)
+  preRenderHooks: [/* ... */],
+  postRenderHooks: [/* ... */],
+};
+```
+
+## Example Configurations
+
+Here are example V4 configurations from the [examples](https://github.com/kristiandupont/kanel/tree/main/examples) directory:
+
+**Simple Kysely setup:**
+<<< @/../examples/kysely/kanel.config.js
+
+**Advanced TypeScript + Zod with custom metadata:**
+<<< @/../examples/ts-plus-zod/kanel.config.js
+
+**Markdown documentation only:**
+<<< @/../examples/markdown/kanel.config.js
 
 ---
 
-# The Config type
+# Core Kanel Configuration
 
-The configuration type is defined in the [Config.ts](https://github.com/kristiandupont/kanel/blob/main/packages/kanel/src/config-types.ts) file:
+These options apply regardless of which generators you use.
 
-<<< @/../packages/kanel/src/config-types.ts#Config
+## connection (required)
 
-## connection
+The only required property. Specifies how to connect to your PostgreSQL database.
 
-The only required property in the config object is `connection`.
+Follows the [`client`](https://node-postgres.com/apis/client) constructor in [pg](https://www.npmjs.com/package/pg).
 
-This is the database connection object. It follows the [`client`](https://node-postgres.com/apis/client) constructor in [pg](https://www.npmjs.com/package/pg). As you will typically want to run Kanel on your development machine, you probably want a simple localhost connection as in the example above.
-
-The `connection` parameter can either be an object like shown above or a connection string. If the connection string starts with "file:" the specified path is opened using pglite. For example, when providing `file:my/pglite/db/folder`, the folder `'my/pglite/db/folder'` is opened using pglite.
-
-## schemas
-
-The `schemas` property can be an array of strings. This will be used as the list of schema names to include when generating types. If omitted, all the non-system schemas found in the database will be processed.
-
-## typeFilter
-
-The `typeFilter` property allows you to choose which types (be that tables, views, enums, or whatever else) to include.
-
-## getMetadata, getPropertyMetadata and generateIdentifierType
-
-If you really want to customize the behavior of Kanel, you can provide values for the [getMetaData](./getMetadata.md), the [getPropertyMetadata](./getPropertyMetadata.md) and/or the [generateIdentifierType](./generateIdentifierType.md) functions.
-
-## propertySortFunction
-
-The `propertySortFunction` can be supplied if you want to customize how the properties in types should be sorted. The default behavior is to put primary keys at the top and otherwise follow the ordinal order as is specified in the database.
-
-## enumStyle
-
-The `enumStyle` can be either `type` or `enum` (default). Postgres enums will then be turned into either string unions or Typescript enums.
-
-This, if you have an enum `Fruit` consisting of the values `apples`, `oranges` and `bananas`, you will get this type with `enumStyle === 'type'`:
-
-```typescript
-type Fruit = "apples" | "oranges" | "bananas";
-```
-
-..or, with `enumStyle === 'enum'`:
-
-```typescript
-enum Fruit {
-  apples = "apples",
-  oranges = "oranges",
-  bananas = "bananas",
+```javascript
+// Object format
+connection: {
+  host: 'localhost',
+  user: 'postgres',
+  password: 'postgres',
+  database: 'acme',
 }
+
+// String format
+connection: 'postgresql://postgres:postgres@localhost:5432/acme'
+
+// PGlite (embedded Postgres)
+connection: 'file:./my-pglite-db'
 ```
 
-## outputPath
+If the connection string starts with `"file:"`, the specified path is opened using [PGlite](https://github.com/electric-sql/pglite).
 
-The `outputPath` specifies the root for the output files. The default implementation of `getMetadata` will place files in `${outputPath}/${schemaName}/${typeName}.ts`.
+## generators (required)
 
-## preDeleteOutputFolder
+Array of generator functions that produce output. Each generator runs sequentially.
 
-If you set `preDeleteOutputFolder` to true, Kanel will delete _all_ contents in the folder before writing types. This is recommended as it will make sure you don't have old model files of no-longer-existing database entities sitting around. Obviously it means that you shouldn't mix in any manually written code in that same folder though.
+```javascript
+const { makePgTsGenerator, makeMarkdownGenerator } = require('kanel');
 
-## customTypeMap
-
-The `customTypeMap` property can be set if you want to specify what a given type should map to. It's a record of a postgres typename to a Typescript type. The key is qualified with schema name, which for built-in types means that they should be prefixed with `pg_catalog`. So for instance if you want to map `float8` to `number` (as opposed to the default `string`), you would set it like this:
-
-```typescript
-{
-  'pg_catalog.float8': 'number'
-}
+generators: [
+  makePgTsGenerator(),      // Generate TypeScript types
+  makeMarkdownGenerator(),  // Generate documentation
+]
 ```
+
+Available built-in generators:
+- **`makePgTsGenerator()`** - PostgreSQL → TypeScript types (most common)
+- **`makeMarkdownGenerator()`** - PostgreSQL → Markdown documentation
+
+You can also write custom generators for other languages or formats.
+
+## schemaNames
+
+Array of schema names to process. If omitted, all non-system schemas are processed.
+
+```javascript
+schemaNames: ['public', 'auth', 'api']
+```
+
+## filter
+
+Filter which PostgreSQL types to extract from the database (applies before generators run):
+
+```javascript
+filter: (pgType) => !pgType.name.startsWith('_'),  // Exclude underscore-prefixed types
+```
+
+Note: Individual generators can have their own `filter` option (e.g., `PgTsGeneratorConfig.filter`) to further filter which types they process.
 
 ## resolveViews
 
-If you set `resolveViews` to true, Kanel will attempt to give you better types for views. If a view returns, say, a column called `account_id` that represents a foreign key in the original table, we would like the resulting type to be `AccountId` or whatever we call our identifier types. Similarly, we would like to mark it as `nullable` only if the "source" column is nullable. Postgres will per default not give us these data about views, so Kanel attempts to infer them by parsing the SQL that defines the view. Obviously, this non-trivial and there are situations where it fails so use with slight caution.
+Attempt to provide better types for views by parsing view definition SQL:
 
-## preRenderHooks
+```javascript
+resolveViews: true
+```
 
-The `preRenderHooks` property can be set if you want to supply one or more hooks that will run before the render step. At this point, Kanel has gathered a record of file paths and corresponding `Declaration` arrays. A declaration is an abstract bit of Typescript like an interface or type definition.
+This helps determine:
+- Proper identifier types for foreign key columns
+- Accurate nullability based on source columns
 
-See the [preRenderHooks](./preRenderHooks.md) section for more info.
+Postgres doesn't provide this information by default for views, so Kanel infers it by parsing SQL. This is non-trivial and can fail in some cases, so use with caution.
 
-## postRenderHooks
+## outputPath
 
-If you need to do something more brute-force like, you might prefer to create one or more `postRenderHooks`, which will be called with a filename and an array of strings which are the raw contents, just before the file is written.
+Root directory for generated files. Defaults to current directory.
 
-See the [postRenderHooks](./postRenderHooks.md) section for more info.
+```javascript
+outputPath: './src/models'
+```
+
+How files are organized within `outputPath` depends on the generator. The default `PgTsGenerator` places files in `${outputPath}/${schemaName}/${typeName}.ts`.
+
+## preDeleteOutputFolder
+
+Delete all contents of `outputPath` before generating. **Recommended** to ensure no stale files remain.
+
+```javascript
+preDeleteOutputFolder: true
+```
+
+::: warning
+Don't put manually written code in your output folder if you enable this option!
+:::
+
+---
+
+# TypeScript Configuration
+
+The `typescriptConfig` section applies to **any TypeScript generator** (primarily `PgTsGenerator`, but also custom TS generators if you write them).
+
+```javascript
+typescriptConfig: {
+  enumStyle: 'literal-union',
+  tsModuleFormat: 'esm',
+}
+```
+
+## enumStyle
+
+How PostgreSQL enums are generated:
+
+- **`'literal-union'`** (V4 default): `type Fruit = "apples" | "oranges" | "bananas"`
+- **`'enum'`** (V3 default): `enum Fruit { apples = "apples", ... }`
+
+Literal unions are more modern and don't require TypeScript compilation, but enums can be more convenient in some cases.
 
 ## tsModuleFormat
 
-The `tsModuleFormat` property can be set if you want to specify the module format for the output files. It can be one of the following values:
+Module format for TypeScript output files:
 
-- `esm`: Output files will have a `.ts` extension. Imports will use a `.js` extension.
-- `commonjs`: Output files will have a `.ts` extension. Imports won't have an extension.
-- `explicit-esm`: Output files will have a `.mts` extension. Imports will use a `.mjs` extension.
-- `explicit-commonjs`: Output files will have a `.cts` extension. Imports will use a `.cjs` extension.
+- **`'commonjs'`** (default): `.ts` extension, no extension on imports
+- **`'esm'`**: `.ts` extension, `.js` extension on imports
+- **`'explicit-esm'`**: `.mts` extension, `.mjs` extension on imports
+- **`'explicit-commonjs'`**: `.cts` extension, `.cjs` extension on imports
 
-If no value is set, the default will be `commonjs`.
-
-## [deprecated] importsExtension
+## importsExtension (deprecated)
 
 **Deprecated**: Use `tsModuleFormat` instead.
 
-To use a different file extension for project file import references, set `importsExtension` to `.ts`, `.js`, `.mjs`, or `.cjs`.
+---
+
+# Global Hooks
+
+Global hooks run after all generators complete and operate on the accumulated output.
+
+## preRenderHooks
+
+Hooks that transform the accumulated `Output` before rendering to files:
+
+```javascript
+const { generateIndexFile } = require('kanel');
+
+preRenderHooks: [
+  generateIndexFile,  // Creates an index.ts that exports everything
+]
+```
+
+See [preRenderHooks](./preRenderHooks.md) for details.
+
+## postRenderHooks
+
+Hooks that modify rendered file contents just before writing to disk:
+
+```javascript
+const { markAsGenerated } = require('kanel');
+
+postRenderHooks: [
+  markAsGenerated,  // Adds @generated comment to files
+]
+```
+
+See [postRenderHooks](./postRenderHooks.md) for details.
+
+---
+
+# PgTsGenerator Configuration
+
+The `PgTsGenerator` is the primary generator that transforms PostgreSQL schemas into TypeScript types. Its configuration goes **inside `makePgTsGenerator()`**, not at the top level.
+
+```javascript
+const { makePgTsGenerator } = require('kanel');
+
+generators: [
+  makePgTsGenerator({
+    // All these options are PgTsGenerator-specific
+    customTypeMap: { /* ... */ },
+    getMetadata: (details, generateFor, builtinMetadata) => { /* ... */ },
+    // ... etc
+  }),
+]
+```
+
+## Why Separate PgTsGenerator Config?
+
+Because Kanel is a generator framework, not all generators need the same configuration. For example:
+
+- `customTypeMap` only makes sense for PostgreSQL → TypeScript conversion
+- `getMetadata` is specific to how TypeScript types are named and organized
+- A Python generator would have completely different configuration options
+
+This separation keeps the architecture clean and allows for other generators to exist alongside `PgTsGenerator`.
+
+## customTypeMap
+
+Map PostgreSQL types to TypeScript types. Keys must be schema-qualified (e.g., `pg_catalog.float8` for built-in types):
+
+```javascript
+makePgTsGenerator({
+  customTypeMap: {
+    'pg_catalog.float8': 'number',
+    'pg_catalog.tsvector': 'string',
+    'pg_catalog.bytea': {
+      name: 'bytea',
+      typeImports: [{
+        name: 'bytea',
+        path: 'postgres-bytea',
+        isAbsolute: true,
+        isDefault: true,
+        importAsType: true,
+      }],
+    },
+  },
+})
+```
+
+## Metadata Functions
+
+These functions control how PostgreSQL types are transformed into TypeScript. They're specific to `PgTsGenerator` because they deal with TypeScript-specific concerns (naming, file paths, branded types, etc.).
+
+Each function receives Kanel's builtin implementation as a parameter, making them composable:
+
+### getMetadata
+
+Customize type metadata (name, path, comments):
+
+```javascript
+makePgTsGenerator({
+  getMetadata: (details, generateFor, builtinMetadata) => ({
+    ...builtinMetadata,
+    comment: ['My custom comment'],
+  }),
+})
+```
+
+See [getMetadata](./getMetadata.md) for full details.
+
+### getPropertyMetadata
+
+Customize property/column metadata:
+
+```javascript
+makePgTsGenerator({
+  getPropertyMetadata: (property, details, generateFor, builtinMetadata) => ({
+    ...builtinMetadata,
+    comment: [`Database type: ${property.expandedType}`],
+  }),
+})
+```
+
+See [getPropertyMetadata](./getPropertyMetadata.md) for full details.
+
+### generateIdentifierType
+
+Customize how branded ID types are generated:
+
+```javascript
+makePgTsGenerator({
+  generateIdentifierType: (column, details, builtinType) => ({
+    ...builtinType,
+    comment: ['Custom ID type'],
+  }),
+})
+```
+
+See [generateIdentifierType](./generateIdentifierType.md) for full details.
+
+### getRoutineMetadata
+
+Customize metadata for database functions/procedures:
+
+```javascript
+makePgTsGenerator({
+  getRoutineMetadata: (routineDetails, builtinMetadata) => ({
+    ...builtinMetadata,
+    returnTypeComment: ['Custom return type docs'],
+  }),
+})
+```
+
+See [getRoutineMetadata](./getRoutineMetadata.md) for full details.
+
+## propertySortFunction
+
+Customize how properties are sorted in generated interfaces:
+
+```javascript
+makePgTsGenerator({
+  propertySortFunction: (a, b) => a.name.localeCompare(b.name),
+})
+```
+
+Default behavior: primary keys first, then database ordinal position.
+
+## filter
+
+Filter which PostgreSQL types this specific generator processes:
+
+```javascript
+makePgTsGenerator({
+  filter: (pgType) => pgType.schemaName === 'public',
+})
+```
+
+This is distinct from the top-level `filter` option. The execution order is:
+1. Top-level `filter` - Controls what's extracted from the database
+2. Generator `filter` - Controls what each generator processes
+
+## preRenderHooks
+
+Pre-render hooks specific to `PgTsGenerator`. These receive `PgTsGeneratorContext` as a parameter and run immediately after the generator produces output.
+
+**This is where extension hooks like Kysely, Zod, and Knex go:**
+
+```javascript
+const { makeKyselyHook } = require('kanel-kysely');
+const { generateZodSchemas } = require('kanel-zod');
+
+makePgTsGenerator({
+  preRenderHooks: [
+    makeKyselyHook(),
+    generateZodSchemas,
+  ],
+})
+```
+
+See [preRenderHooks](./preRenderHooks.md) for the difference between PgTs-specific and global hooks.
+
+---
+
+# Complete Example
+
+```javascript
+const { makePgTsGenerator, markAsGenerated } = require('kanel');
+const { makeKyselyHook, kyselyTypeFilter } = require('kanel-kysely');
+const { generateZodSchemas } = require('kanel-zod');
+
+/** @type {import('kanel').Config} */
+module.exports = {
+  // Core Kanel config
+  connection: {
+    host: 'localhost',
+    user: 'postgres',
+    password: 'postgres',
+    database: 'mydb',
+  },
+  outputPath: './src/models',
+  preDeleteOutputFolder: true,
+  resolveViews: true,
+  filter: kyselyTypeFilter,
+
+  // TypeScript config (applies to all TS generators)
+  typescriptConfig: {
+    enumStyle: 'literal-union',
+    tsModuleFormat: 'esm',
+  },
+
+  // Generators
+  generators: [
+    makePgTsGenerator({
+      // PgTsGenerator-specific config
+      customTypeMap: {
+        'pg_catalog.tsvector': 'string',
+        'pg_catalog.bpchar': 'string',
+      },
+      // PgTs-specific hooks (receive PgTsGeneratorContext)
+      preRenderHooks: [
+        makeKyselyHook(),
+        generateZodSchemas,
+      ],
+    }),
+  ],
+
+  // Global hooks (run after all generators)
+  postRenderHooks: [markAsGenerated],
+};
+```
+
+---
+
+## Migrating from V3
+
+The update to version 4 introduced several breaking changes. If you are migrating from V3, check out the [migration guide](./migration.md) for help.
+
+V3 configs continue to work with a deprecation warning, but it's recommended to migrate to V4 for better type safety and flexibility.
+
+For more examples, see the [examples directory](https://github.com/kristiandupont/kanel/tree/main/examples).

@@ -6,23 +6,30 @@ export default {
   themeConfig: {
     sidebar: [
       {
-        text: "Intro",
+        text: "Introduction",
         items: [
           { text: "Getting Started", link: "/getting-started" },
-          { text: "How to work with Kanel", link: "/workflow" },
+          { text: "How to Work with Kanel", link: "/workflow" },
           { text: "Data Types", link: "/dataTypes" },
+          { text: "Migration Guide", link: "/migration" },
         ],
       },
       {
-        text: "Configuration",
+        text: "Core Configuration",
         items: [
-          { text: "Configuring", link: "/configuring" },
+          { text: "Overview", link: "/configuring" },
+          { text: "useKanelContext", link: "/useKanelContext" },
+          { text: "preRenderHooks", link: "/preRenderHooks" },
+          { text: "postRenderHooks", link: "/postRenderHooks" },
+        ],
+      },
+      {
+        text: "PgTsGenerator",
+        items: [
           { text: "getMetadata", link: "/getMetadata" },
           { text: "getPropertyMetadata", link: "/getPropertyMetadata" },
           { text: "generateIdentifierType", link: "/generateIdentifierType" },
           { text: "getRoutineMetadata", link: "/getRoutineMetadata" },
-          { text: "preRenderHooks", link: "/preRenderHooks" },
-          { text: "postRenderHooks", link: "/postRenderHooks" },
         ],
       },
       {
