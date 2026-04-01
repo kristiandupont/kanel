@@ -18,11 +18,6 @@ module.exports = {
   resolveViews: true,
   preDeleteOutputFolder: true,
 
-  typescriptConfig: {
-    enumStyle: "literal-union",
-    tsModuleFormat: "commonjs",
-  },
-
   generators: [
     makeMarkdownGenerator({
       /**
