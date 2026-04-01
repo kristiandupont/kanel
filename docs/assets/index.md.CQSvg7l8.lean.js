@@ -1,1 +1,0 @@
-import{_ as i,o as a,c as n,ae as t}from"./chunks/framework.CtalExmA.js";const y=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"index.md","filePath":"index.md"}'),h={name:"index.md"};function l(p,s,e,k,r,E){return a(),n("div",null,[...s[0]||(s[0]=[t("",31)])])}const g=i(h,[["render",l]]);export{y as __pageData,g as default};
