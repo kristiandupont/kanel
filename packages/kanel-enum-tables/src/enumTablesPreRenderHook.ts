@@ -118,7 +118,10 @@ export const findDescriptionColumn = (
   return undefined;
 };
 
-const enumTablesPreRenderHook: PgTsPreRenderHook = async (outputAccumulator, pgTsContext) => {
+const enumTablesPreRenderHook: PgTsPreRenderHook = async (
+  outputAccumulator,
+  pgTsContext,
+) => {
   const { schemas, config, typescriptConfig } = useKanelContext();
 
   if (!pgTsContext.generateIdentifierType) {

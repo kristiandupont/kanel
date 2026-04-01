@@ -1,12 +1,7 @@
 import { recase } from "@kristiandupont/recase";
 import type { TableDetails } from "extract-pg-schema";
 import type { TableColumn } from "extract-pg-schema";
-import type {
-  Details,
-  Path,
-  PgTsGeneratorContext,
-  TypeMap,
-} from "kanel";
+import type { Details, Path, PgTsGeneratorContext, TypeMap } from "kanel";
 
 export type GenerateZodSchemasConfig = {
   getZodSchemaMetadata?: GetZodSchemaMetadata;
@@ -60,10 +55,7 @@ export const defaultGetZodIdentifierMetadata: GetZodIdentifierMetadata = (
       "generateIdentifierType is not available in PgTsGeneratorContext",
     );
   }
-  const typescriptDeclaration = context.generateIdentifierType(
-    column,
-    details,
-  );
+  const typescriptDeclaration = context.generateIdentifierType(column, details);
   const name = toCamelCase(typescriptDeclaration.name);
   return { name };
 };

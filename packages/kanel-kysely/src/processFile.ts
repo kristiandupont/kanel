@@ -29,7 +29,6 @@ const processFile = (
   tableImport: TypeImport;
   tableProperty: InterfacePropertyDeclaration;
 } => {
-
   const { name: selectorName } = pgTsContext.getMetadata(
     compositeDetails,
     "selector",

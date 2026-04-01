@@ -48,19 +48,21 @@ describe("V3 Config Compatibility", () => {
         );
       `);
 
-      const getMetadataSpy = vi.fn((details, generateFor, instantiatedConfig) => {
-        // Verify parameters are passed correctly
-        expect(details).toHaveProperty("name");
-        expect(details).toHaveProperty("schemaName", "v3test");
-        expect(instantiatedConfig).toHaveProperty("schemas");
-        expect(instantiatedConfig).toHaveProperty("typeMap");
+      const getMetadataSpy = vi.fn(
+        (details, generateFor, instantiatedConfig) => {
+          // Verify parameters are passed correctly
+          expect(details).toHaveProperty("name");
+          expect(details).toHaveProperty("schemaName", "v3test");
+          expect(instantiatedConfig).toHaveProperty("schemas");
+          expect(instantiatedConfig).toHaveProperty("typeMap");
 
-        return {
-          name: toPascalCase(details.name),
-          comment: [`Generated for ${generateFor || "type"}`],
-          path: join(outputPath, toPascalCase(details.name)),
-        };
-      });
+          return {
+            name: toPascalCase(details.name),
+            comment: [`Generated for ${generateFor || "type"}`],
+            path: join(outputPath, toPascalCase(details.name)),
+          };
+        },
+      );
 
       const config: Config = {
         connection: getConnection(),
@@ -124,19 +126,21 @@ describe("V3 Config Compatibility", () => {
         );
       `);
 
-      const generateIdentifierTypeSpy = vi.fn((property, details, instantiatedConfig) => {
-        expect(property).toHaveProperty("name", "id");
-        expect(details).toHaveProperty("name", "orders");
-        expect(instantiatedConfig).toHaveProperty("schemas");
+      const generateIdentifierTypeSpy = vi.fn(
+        (property, details, instantiatedConfig) => {
+          expect(property).toHaveProperty("name", "id");
+          expect(details).toHaveProperty("name", "orders");
+          expect(instantiatedConfig).toHaveProperty("schemas");
 
-        return {
-          declarationType: "typeDeclaration" as const,
-          name: `${toPascalCase(details.name)}Id`,
-          exportAs: "named" as const,
-          typeDefinition: ["number"],
-          comment: [],
-        };
-      });
+          return {
+            declarationType: "typeDeclaration" as const,
+            name: `${toPascalCase(details.name)}Id`,
+            exportAs: "named" as const,
+            typeDefinition: ["number"],
+            comment: [],
+          };
+        },
+      );
 
       const config: Config = {
         connection: getConnection(),
@@ -296,8 +300,8 @@ describe("V3 Config Compatibility", () => {
 
       // Domain file should not exist (removed by applyTaggedComments)
       // The domain is named "email", which becomes "Email" in pascal case
-      const emailDomain = Object.keys(results).find((p) =>
-        p.includes("v3test/Email.ts") && !p.includes("UsersWithEmail")
+      const emailDomain = Object.keys(results).find(
+        (p) => p.includes("v3test/Email.ts") && !p.includes("UsersWithEmail"),
       );
       expect(emailDomain).toBeUndefined();
 
@@ -492,7 +496,9 @@ describe("V3 Config Compatibility", () => {
       await processDatabase(config);
 
       const results = getResults();
-      const file = Object.keys(results).find((p) => p.includes("ImportedTypes"));
+      const file = Object.keys(results).find((p) =>
+        p.includes("ImportedTypes"),
+      );
       expect(file).toBeDefined();
 
       const content = results[file!].join("\n");
@@ -536,7 +542,12 @@ describe("V3 Config Compatibility", () => {
           };
         },
 
-        getPropertyMetadata: (property, _details, _generateFor, instantiatedConfig) => {
+        getPropertyMetadata: (
+          property,
+          _details,
+          _generateFor,
+          instantiatedConfig,
+        ) => {
           expect(instantiatedConfig).toBeDefined();
           return {
             name: property.name,

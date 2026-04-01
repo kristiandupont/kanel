@@ -276,7 +276,11 @@ const processV4Config = async (
             lines,
           };
         } else if (file.fileType === "markdown") {
-          const lines = renderMarkdownFile(file.template, file.context, file.helpers);
+          const lines = renderMarkdownFile(
+            file.template,
+            file.context,
+            file.helpers,
+          );
           return { fullPath: path, lines };
         } else if (file.fileType === "generic") {
           return { fullPath: path, lines: file.lines };

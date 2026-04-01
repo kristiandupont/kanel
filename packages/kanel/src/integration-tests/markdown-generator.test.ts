@@ -308,7 +308,10 @@ Schema: {{entity.schema}}
       `);
 
       const templatePath = join(tempDir, "isolation.md.hbs");
-      writeFileSync(templatePath, `{{#if (shout entity.name)}}has shout{{else}}no shout{{/if}}`);
+      writeFileSync(
+        templatePath,
+        `{{#if (shout entity.name)}}has shout{{else}}no shout{{/if}}`,
+      );
 
       // A second generator without the helper should not see helpers from
       // a previous invocation
