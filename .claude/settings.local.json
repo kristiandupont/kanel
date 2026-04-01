@@ -6,7 +6,8 @@
       "Bash(npm test:*)",
       "Bash(find:*)",
       "Bash(cat:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx kanel:*)"
     ],
     "deny": [],
     "ask": []
