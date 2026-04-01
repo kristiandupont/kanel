@@ -4,7 +4,6 @@ import type {
   GenericDeclaration,
   InterfaceDeclaration,
   Output,
-  PgTsGeneratorContext,
   PgTsPreRenderHook,
   TsFileContents,
   TypeDeclaration,

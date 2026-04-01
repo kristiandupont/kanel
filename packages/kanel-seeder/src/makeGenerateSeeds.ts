@@ -8,6 +8,7 @@ import parseMdconf from "@kristiandupont/mdconf";
 import type { SeedInput } from "./seedInput";
 import seedInput from "./seedInput";
 import preprocessData from "./preprocessData";
+import type { Schema } from "extract-pg-schema";
 
 export type MakeGenerateSeedsConfig = {
   srcPath: string;
@@ -52,7 +53,7 @@ export default makeGenerateSeeds;
 
 function processSeedInput(
   parsed: SeedInput,
-  schemas: Record<string, import("extract-pg-schema").Schema>,
+  schemas: Record<string, Schema>,
   srcFilePath: string,
   dstPath: string,
   file: Dirent,

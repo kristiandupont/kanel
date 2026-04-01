@@ -15,7 +15,6 @@ export type MarkdownContents = {
   fileType: "markdown";
   template: string;
   context: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   helpers?: Record<string, (...args: any[]) => any>;
 };
 
