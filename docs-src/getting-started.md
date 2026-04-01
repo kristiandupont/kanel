@@ -1,15 +1,6 @@
 # Getting Started
 
-If you have a Postgres server running locally with a database called, say, `acme`, you can run Kanel by simply typing:
-
-```bash
-$ npx kanel -d postgresql://localhost:5432/acme -o ./src/models
-```
-
-This will create a folder called `src/models` and generate a TypeScript file for each table in the database.
-This is a quick way to try things out and see what Kanel can do with your database.
-
-For real projects, you'll want to install Kanel as a devDependency:
+Install Kanel as a devDependency:
 
 ```bash
 $ npm i -D kanel
@@ -32,26 +23,26 @@ This architecture makes Kanel flexible: you can generate multiple outputs from o
 
 ## Creating a Configuration File
 
-Create a configuration file named `kanel.config.js` (or `.kanelrc.js` for V3 compatibility). Here's a minimal V4 configuration:
+Create a configuration file named `kanel.config.js`. Here's a minimal configuration:
 
 ```javascript
-const { makePgTsGenerator } = require('kanel');
+const { makePgTsGenerator } = require("kanel");
 
 /** @type {import('kanel').Config} */
 module.exports = {
   connection: {
-    host: 'localhost',
-    user: 'postgres',
-    password: 'postgres',
-    database: 'acme',
+    host: "localhost",
+    user: "postgres",
+    password: "postgres",
+    database: "acme",
   },
 
-  outputPath: './src/models',
+  outputPath: "./src/models",
   preDeleteOutputFolder: true,
 
   // The generators array is where you specify what to generate
   generators: [
-    makePgTsGenerator(),  // Generate TypeScript types
+    makePgTsGenerator(), // Generate TypeScript types
   ],
 };
 ```
@@ -95,6 +86,7 @@ module.exports = {
 ```
 
 Note the distinction:
+
 - **typescriptConfig** (top-level) - Applies to any TypeScript generator
 - **PgTsGenerator options** (inside `makePgTsGenerator()`) - Specific to PostgreSQL → TypeScript conversion
 
@@ -140,7 +132,7 @@ export default interface Users {
 }
 
 /** Identifier type for public.users */
-export type UserId = number & { __brand: 'UserId' };
+export type UserId = number & { __brand: "UserId" };
 
 /**
  * Represents the initializer for the table public.users

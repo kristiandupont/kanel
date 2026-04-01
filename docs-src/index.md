@@ -54,6 +54,7 @@ See [Getting Started](./getting-started.md) for a complete guide.
 ## Common Use Cases
 
 ### TypeScript + Kysely
+
 Generate TypeScript types with Kysely database interface:
 
 ```javascript
@@ -71,6 +72,7 @@ module.exports = {
 ```
 
 ### TypeScript + Zod Schemas
+
 Generate both TypeScript types and Zod validation schemas:
 
 ```javascript
@@ -88,6 +90,7 @@ module.exports = {
 ```
 
 ### Documentation Only
+
 Generate markdown documentation without TypeScript:
 
 ```javascript
@@ -104,8 +107,6 @@ See the [examples directory](https://github.com/kristiandupont/kanel/tree/main/e
 ## Learn More
 
 The idea was introduced in [this blog post](https://thoughts.kristiandupont.com/p/generating-typescript-types-from-postgres-48661868ef84).
-
-For a comprehensive guide on using Kanel with tRPC for end-to-end type safety, check out the [Fullstack TypeScript course on Newline](https://www.newline.co/courses/fullstack-typescript-with-tailwindcss-and-trpc-using-modern-features-of-postgresql).
 
 ---
 

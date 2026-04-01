@@ -151,16 +151,17 @@ module.exports = {
 
 #### 4. Update Hooks to Use useKanelContext()
 
-The biggest change for hooks: V3 hooks received \`instantiatedConfig\` as a parameter. **V4 hooks do not receive config** - instead, use \`useKanelContext()\` when you need access to context.
+The biggest change for hooks: V3 hooks received `instantiatedConfig` as a parameter. **V4 hooks do not receive config** - instead, use `useKanelContext()` when you need access to context.
 
 ::: warning Important
-In V4, hooks don't receive configuration as a parameter. The "two types of hooks" (global vs PgTs-specific) only exist in V3 compatibility mode. In pure V4, all hooks use \`useKanelContext()\` to access context.
+In V4, hooks don't receive configuration as a parameter. The "two types of hooks" (global vs PgTs-specific) only exist in V3 compatibility mode. In pure V4, all hooks use `useKanelContext()` to access context.
 :::
 
 **Pre-render hooks:**
 
 **V3:**
-\`\`\`javascript
+
+```javascript
 module.exports = {
   preRenderHooks: [
     makeKyselyHook(),
@@ -172,20 +173,18 @@ module.exports = {
     },
   ],
 };
-\`\`\`
+```
 
 **V4:**
-\`\`\`javascript
-const { makePgTsGenerator, useKanelContext } = require('kanel');
+
+```javascript
+const { makePgTsGenerator, useKanelContext } = require("kanel");
 
 module.exports = {
   generators: [
     makePgTsGenerator({
       // Extension hooks go here (Kysely, Zod, etc.)
-      preRenderHooks: [
-        makeKyselyHook(),
-        generateZodSchemas,
-      ],
+      preRenderHooks: [makeKyselyHook(), generateZodSchemas],
     }),
   ],
 
@@ -198,12 +197,13 @@ module.exports = {
     },
   ],
 };
-\`\`\`
+```
 
 **Post-render hooks:**
 
 **V3:**
-\`\`\`javascript
+
+```javascript
 module.exports = {
   postRenderHooks: [
     (path, lines, instantiatedConfig) => {
@@ -212,11 +212,12 @@ module.exports = {
     },
   ],
 };
-\`\`\`
+```
 
 **V4:**
-\`\`\`javascript
-const { useKanelContext } = require('kanel');
+
+```javascript
+const { useKanelContext } = require("kanel");
 
 module.exports = {
   postRenderHooks: [
@@ -227,7 +228,7 @@ module.exports = {
     },
   ],
 };
-\`\`\`
+```
 
 See [useKanelContext](./useKanelContext.md) for complete documentation on accessing context in V4.
 
