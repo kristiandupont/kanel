@@ -36,6 +36,12 @@ export type MarkdownTarget = {
 export type MarkdownGeneratorConfig = {
   /** List of generation targets */
   targets: MarkdownTarget[];
+
+  /**
+   * Additional Handlebars helpers available to all templates.
+   * Built-in helpers (find, findBy, shortType) are always registered.
+   */
+  helpers?: Record<string, (...args: any[]) => any>;
 };
 
 /**
@@ -188,6 +194,7 @@ export function makeMarkdownGenerator(
               ...sharedContext,
               entity,
             },
+            helpers: config.helpers,
           };
           output[outputPath] = markdownContent;
         });
@@ -204,6 +211,7 @@ export function makeMarkdownGenerator(
                 ...sharedContext,
                 schema,
               },
+              helpers: config.helpers,
             };
             output[outputPath] = markdownContent;
           },
@@ -214,6 +222,7 @@ export function makeMarkdownGenerator(
           fileType: "markdown",
           template: target.template,
           context: sharedContext,
+          helpers: config.helpers,
         };
         output[target.output] = markdownContent;
       }

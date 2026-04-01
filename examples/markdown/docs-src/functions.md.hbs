@@ -1,0 +1,55 @@
+# Functions & Procedures
+
+{{#each schemas.public.functions}}
+## {{name}}
+
+{{#if comment}}{{comment}}
+
+{{/if}}
+
+**Language:** `{{language}}` | **Volatility:** {{volatility}} | **Returns set:** {{returnsSet}}{{#if isStrict}} | Strict{{/if}}{{#if isSecurityDefiner}} | Security definer{{/if}}
+
+### Parameters
+
+{{#each parameters}}{{ordinalPosition}}. `{{name}}` `{{shortType type}}`{{#if hasDefault}} _(has default)_{{/if}} — mode: {{mode}}
+{{else}}_None_
+{{/each}}
+
+### Returns
+
+{{#if returnType.columns}}Table:
+{{#each returnType.columns}}- `{{name}}` `{{type}}`
+{{/each}}{{else}}`{{returnType}}`{{/if}}
+
+### Definition
+
+```sql
+{{{definition}}}
+```
+
+{{/each}}
+
+---
+
+{{#each schemas.public.procedures}}
+## {{name}} _(procedure)_
+
+{{#if comment}}{{comment}}
+
+{{/if}}
+
+**Language:** `{{language}}`{{#if isSecurityDefiner}} | Security definer{{/if}}
+
+### Parameters
+
+{{#each parameters}}{{ordinalPosition}}. `{{name}}` `{{shortType type}}`{{#if hasDefault}} _(has default)_{{/if}} — mode: {{mode}}
+{{else}}_None_
+{{/each}}
+
+### Definition
+
+```sql
+{{{definition}}}
+```
+
+{{/each}}

@@ -1,43 +1,43 @@
-# Database Documentation
+# DVD Rental Database
 
-{{#with schemas.public}}
+A PostgreSQL database modelling a DVD rental store. It tracks the film catalog, physical inventory across stores, customers, staff, and rental transactions.
 
-## Films
-{{#find tables "film"}}
+## Entity Relationship Diagram
 
-The film table is the central table in the database. It has the following columns:
-
-| name | type | description |
-| ---- | ---- | ----------- |
-{{#each columns}}
-  | {{name}} | {{type.fullName}} | {{comment}} |
-{{/each}}
-
-It's linked to the following tables:
-{{#each references}}
-  - {{schemaName}}.{{tableName}}
-{{/each}}
-
-It's referenced by the following tables:
-{{#each referencedBy}}
-  - {{schemaName}}.{{tableName}}
-{{/each}}
-
-{{/find}}
-
+```mermaid
+erDiagram
+{{#each schemas.public.tables}}{{#each columns}}{{#each references}}    {{../../name}} }|--|| {{tableName}} : "{{../name}}"
+{{/each}}{{/each}}{{/each}}```
 
 ## Tables
-{{#each tables}}
-### {{schemaName}}.{{name}}
 
-{{comment}}
-
-| name | type | description |
-| ---- | ---- | ----------- |
-{{#each columns}}
-  | {{name}} | {{type.fullName}} | {{comment}} |
+| Table | Description |
+| ----- | ----------- |
+{{#each schemas.public.tables}}| [{{name}}](tables/{{name}}.md) | {{comment}} |
 {{/each}}
 
+## Views
+
+| View | Description |
+| ---- | ----------- |
+{{#each schemas.public.views}}| [{{name}}](views.md#{{name}}) | {{comment}} |
 {{/each}}
 
-{{/with}}
+## Enums
+
+{{#each schemas.public.enums}}
+### {{name}}
+
+Values: {{#each values}}`{{this}}`{{#unless @last}}, {{/unless}}{{/each}}
+
+{{/each}}
+
+## Functions & Procedures
+
+See [functions.md](functions.md) for full signatures and definitions.
+
+| Name | Returns | Description |
+| ---- | ------- | ----------- |
+{{#each schemas.public.functions}}| {{name}} | {{#if returnType.columns}}table{{else}}{{returnType}}{{/if}} | {{comment}} |
+{{/each}}{{#each schemas.public.procedures}}| {{name}} | _(procedure)_ | {{comment}} |
+{{/each}}

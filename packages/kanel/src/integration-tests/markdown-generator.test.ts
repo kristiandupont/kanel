@@ -214,6 +214,127 @@ Schema: {{entity.schema}}
     });
   });
 
+  describe("Built-in shortType helper", () => {
+    it("should strip schema prefix from type names", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table mdtest.items (
+          id serial primary key,
+          label text not null
+        );
+      `);
+
+      const templatePath = join(tempDir, "shorttype.md.hbs");
+      writeFileSync(
+        templatePath,
+        `{{#each entity.columns}}- {{name}}: {{shortType expandedType}}
+{{/each}}`,
+      );
+
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["mdtest"],
+        typescriptConfig: { enumStyle: "enum" },
+        generators: [
+          makeMarkdownGenerator({
+            targets: [
+              {
+                template: templatePath,
+                output: "docs/items.md",
+                perEntity: true,
+                filter: (entity) =>
+                  entity.type === "table" && entity.name === "items",
+              },
+            ],
+          }),
+        ],
+      };
+
+      await processDatabase(config);
+
+      const results = getResults();
+      const content = results["docs/items.md"].join("\n");
+      expect(content).toContain("- id: int4");
+      expect(content).toContain("- label: text");
+      expect(content).not.toContain("pg_catalog.");
+    });
+  });
+
+  describe("Custom helpers", () => {
+    it("should make registered helpers available in templates", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table mdtest.my_table (
+          id serial primary key
+        );
+      `);
+
+      const templatePath = join(tempDir, "custom-helper.md.hbs");
+      writeFileSync(templatePath, `# {{shout entity.name}}`);
+
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["mdtest"],
+        typescriptConfig: { enumStyle: "enum" },
+        generators: [
+          makeMarkdownGenerator({
+            helpers: {
+              shout: (value: string) => value.toUpperCase(),
+            },
+            targets: [
+              {
+                template: templatePath,
+                output: "docs/shouted.md",
+                perEntity: true,
+                filter: (entity) =>
+                  entity.type === "table" && entity.name === "my_table",
+              },
+            ],
+          }),
+        ],
+      };
+
+      await processDatabase(config);
+
+      const results = getResults();
+      const content = results["docs/shouted.md"].join("\n");
+      expect(content).toContain("# MY_TABLE");
+    });
+
+    it("should isolate helpers between generator invocations", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table mdtest.isolated (id serial primary key);
+      `);
+
+      const templatePath = join(tempDir, "isolation.md.hbs");
+      writeFileSync(templatePath, `{{#if (shout entity.name)}}has shout{{else}}no shout{{/if}}`);
+
+      // A second generator without the helper should not see helpers from
+      // a previous invocation
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["mdtest"],
+        typescriptConfig: { enumStyle: "enum" },
+        generators: [
+          makeMarkdownGenerator({
+            targets: [
+              {
+                template: templatePath,
+                output: "docs/isolated.md",
+                perEntity: true,
+                filter: (entity) =>
+                  entity.type === "table" && entity.name === "isolated",
+              },
+            ],
+          }),
+        ],
+      };
+
+      await expect(processDatabase(config)).rejects.toThrow();
+    });
+  });
+
   describe("Multiple targets", () => {
     it("should generate multiple files from different targets", async () => {
       const db = getKnex();

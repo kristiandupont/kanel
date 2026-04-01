@@ -1,0 +1,35 @@
+{{#with entity}}
+# {{name}}
+
+{{#if comment}}{{comment}}
+
+{{/if}}
+**Schema:** `{{schemaName}}`
+
+## Columns
+
+| Column | Type | Nullable | Default | References | Description |
+| ------ | ---- | -------- | ------- | ---------- | ----------- |
+{{#each columns}}| `{{name}}`{{#if isPrimaryKey}} PK{{/if}} | `{{shortType expandedType}}` | {{#if isNullable}}yes{{else}}no{{/if}} | {{#if defaultValue}}`{{{defaultValue}}}`{{/if}} | {{#each references}}→ [{{tableName}}]({{tableName}}.md).{{columnName}}{{/each}} | {{comment}} |
+{{/each}}
+
+## Foreign Keys
+
+{{#each columns}}{{#each references}}- `{{../name}}` → `{{schemaName}}.{{tableName}}.{{columnName}}`
+  - Constraint: `{{name}}`
+  - On delete: {{onDelete}} / On update: {{onUpdate}}
+{{/each}}{{/each}}
+
+## Indexes
+
+{{#each indices}}- `{{name}}`{{#if isPrimary}} — PRIMARY KEY{{/if}}{{#if isUnique}} — UNIQUE{{/if}}
+  Columns: {{#each columns}}`{{#if name}}{{name}}{{else}}{{definition}}{{/if}}`{{#unless @last}}, {{/unless}}{{/each}}
+{{else}}_None_
+{{/each}}
+
+## Check Constraints
+
+{{#each checks}}- `{{name}}`: `{{{clause}}}`
+{{else}}_None_
+{{/each}}
+{{/with}}

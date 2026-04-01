@@ -1,0 +1,23 @@
+# Views
+
+{{#each schemas.public.views}}
+## {{name}}
+
+{{#if comment}}{{comment}}
+
+{{/if}}
+
+### Columns
+
+| Column | Type | Nullable | Source | Description |
+| ------ | ---- | -------- | ------ | ----------- |
+{{#each columns}}| `{{name}}`{{#if isPrimaryKey}} PK{{/if}} | `{{shortType expandedType}}` | {{#if isNullable}}yes{{else}}no{{/if}} | {{#if source}}`{{source.schema}}.{{source.table}}.{{source.column}}`{{/if}} | {{comment}} |
+{{/each}}
+
+### Definition
+
+```sql
+{{{definition}}}
+```
+
+{{/each}}
