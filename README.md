@@ -19,7 +19,7 @@ Install with:
 $ npm i -D kanel
 ```
 
-To run, make sure you are in a folder that has a `.kanelrc.js` configuration file and that your database is running, and type:
+To run, make sure you are in a folder that has a `kanel.config.js` configuration file and that your database is running, and type:
 
 ```bash
 $ npx kanel
@@ -31,7 +31,7 @@ Example of running generation from code:
 
 ```typescript
 import { processDatabase } from "kanel";
-import config from "./kanelrc";
+import config from "./kanel.config.js";
 
 async function run() {
   await processDatabase(config);
@@ -42,7 +42,7 @@ run();
 
 ## Example
 
-To see an example of the result, check out the [/example](example) folder. It uses the [Sample Database](https://www.postgresqltutorial.com/postgresql-sample-database/) from www.postgresqltutorial.com.
+To see examples of the result, check out the [/examples](examples) folder. It uses the [Sample Database](https://www.postgresqltutorial.com/postgresql-sample-database/) from www.postgresqltutorial.com.
 
 ---
 
