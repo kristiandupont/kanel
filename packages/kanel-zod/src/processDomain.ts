@@ -1,20 +1,17 @@
 import type { DomainDetails } from "extract-pg-schema";
-import type { ConstantDeclaration, InstantiatedConfig } from "kanel";
+import type { ConstantDeclaration, PgTsGeneratorContext, TypeMap } from "kanel";
 
-import type { GenerateZodSchemasConfig } from "./GenerateZodSchemasConfig";
+import type { GetZodSchemaMetadata } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";
 
 const processDomain = (
   d: DomainDetails,
-  config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig,
+  getZodSchemaMetadata: GetZodSchemaMetadata,
+  zodTypeMap: TypeMap,
+  context: PgTsGeneratorContext,
 ): ConstantDeclaration | undefined => {
-  const { name } = config.getZodSchemaMetadata(
-    d,
-    undefined,
-    instantiatedConfig,
-  );
-  let zodType = config.zodTypeMap[d.innerType];
+  const { name } = getZodSchemaMetadata(d, undefined, context);
+  let zodType = zodTypeMap[d.innerType];
   if (!zodType) {
     zodType = "z.unknown()";
   }

@@ -165,10 +165,10 @@ const renderTsFile = (
   declarations: TsDeclaration[],
   outputPath: string,
 ): string[] => {
-  const { instantiatedConfig } = useKanelContext();
+  const { typescriptConfig } = useKanelContext();
   const importGenerator = new ImportGenerator(
     outputPath,
-    instantiatedConfig.importsExtension,
+    typescriptConfig.importsExtension,
   );
   const lines: string[] = [];
 

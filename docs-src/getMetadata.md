@@ -1,14 +1,67 @@
 # getMetadata
 
+::: info PgTsGenerator Configuration
+This is a **PgTsGenerator-specific** configuration option. It only applies when using `makePgTsGenerator()` to generate TypeScript types from PostgreSQL. Other generators (like MarkdownGenerator) don't use this function.
+:::
+
 ```typescript
 getMetadata?: (
   details: Details,
   generateFor: 'selector' | 'initializer' | 'mutator' | undefined,
-  config: InstantiatedConfig
+  builtinMetadata: TypeMetadata
 ) => TypeMetadata;
 ```
 
-This function will give Kanel the information it needs to create types from database items. There is a default implementation provided in [default-metadata-generators.ts](https://github.com/kristiandupont/kanel/blob/main/packages/kanel/src/default-metadata-generators.ts) which you can either use as is, as inspiration or you can write your own and call the default as a fallback if you want most cases to work like the default but with a few changes.
+This function allows you to customize how PostgreSQL types are transformed into TypeScript type metadata (name, path, comments, export style). It's configured inside `makePgTsGenerator()`, not at the top-level config.
+
+The key feature in V4 is that your function receives Kanel's **builtin metadata** as the third parameter. This makes it easy to compose your customizations on top of Kanel's defaults:
+
+```typescript
+import { makePgTsGenerator } from 'kanel';
+
+const config = {
+  generators: [
+    makePgTsGenerator({
+      getMetadata: (details, generateFor, builtinMetadata) => ({
+        ...builtinMetadata,
+        comment: ['My custom comment', ...(builtinMetadata.comment || [])],
+      }),
+    }),
+  ],
+};
+```
+
+::: tip V3 to V4 Migration
+In V3, this function received `InstantiatedConfig` as the third parameter and you had to import `defaultGetMetadata` to get the defaults. In V4, you receive the builtin metadata directly as a parameter, and you can access the context via `useKanelContext()` if needed.
+
+**V3 pattern (deprecated):**
+```typescript
+import { defaultGetMetadata } from 'kanel';
+
+module.exports = {
+  getMetadata: (details, generateFor, instantiatedConfig) => {
+    const defaults = defaultGetMetadata(details, generateFor, instantiatedConfig);
+    return { ...defaults, comment: ['Custom'] };
+  },
+};
+```
+
+**V4 pattern:**
+```typescript
+import { makePgTsGenerator } from 'kanel';
+
+module.exports = {
+  generators: [
+    makePgTsGenerator({
+      getMetadata: (details, generateFor, builtinMetadata) => ({
+        ...builtinMetadata,
+        comment: ['Custom'],
+      }),
+    }),
+  ],
+};
+```
+:::
 
 ## details
 
@@ -155,6 +208,35 @@ When generating metadata for a type that has properties (table, view, materializ
 
 For any table etc., Kanel can generate a selector which is the "primary" type that will be returned from a `select *` statement. Initializers are used when inserting a new row -- which basically means that columns that are nullable or have default values are marked as optional as you can initialize such a row without specifying said property. Finally, mutators are what you use in `update` statements, where any property is optional.
 
+## builtinMetadata
+
+The third parameter contains Kanel's default metadata implementation. This allows you to easily extend the defaults:
+
+```typescript
+getMetadata: (details, generateFor, builtinMetadata) => {
+  // Add custom comment while keeping everything else
+  return {
+    ...builtinMetadata,
+    comment: [
+      'Custom prefix',
+      ...(builtinMetadata.comment || []),
+    ],
+  };
+}
+```
+
+If you need access to the Kanel context (configuration, schemas, etc.), you can use `useKanelContext()`:
+
+```typescript
+import { useKanelContext } from 'kanel';
+
+getMetadata: (details, generateFor, builtinMetadata) => {
+  const context = useKanelContext();
+  // Access context.config, context.schemas, context.typescriptConfig
+  return builtinMetadata;
+}
+```
+
 ## Output
 
 The `TypeMetadata` type that your function should return is defined like this:
@@ -164,6 +246,7 @@ export type TypeMetadata = {
   name: string;
   comment: string[] | undefined;
   path: string;
+  exportAs?: 'named' | 'default';
 };
 ```
 
@@ -183,3 +266,9 @@ interface MemberAddress {
 You may want to use the incoming `details.comment` string here.
 
 The `path` field tells Kanel where (i.e. in which file) to place the type. Note that this field should _not_ include the `.ts` extension which is added automatically. The reason for this is that this field is also used for generating imports and those should not include extensions.
+
+The optional `exportAs` field controls how the type is exported. Defaults to `'default'` for selectors and `'named'` for initializers and mutators.
+
+## Example
+
+See the [ts-plus-zod example](https://github.com/kristiandupont/kanel/blob/main/examples/ts-plus-zod/kanel.config.js) for a real-world V4 implementation.

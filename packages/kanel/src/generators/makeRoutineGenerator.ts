@@ -2,7 +2,7 @@ import type { Kind, Schema } from "extract-pg-schema";
 import type { FunctionDetails } from "extract-pg-schema/build/kinds/extractFunction";
 import type { ProcedureDetails } from "extract-pg-schema/build/kinds/extractProcedure";
 
-import { useKanelContext } from "../context";
+import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import type {
   TsDeclaration,
   InterfaceDeclaration,
@@ -38,12 +38,9 @@ const makeMapper =
   (
     routineDetails: RoutineDetails,
   ): { path: Path; declaration: TsDeclaration }[] => {
-    const { instantiatedConfig } = useKanelContext();
+    const generatorContext = usePgTsGeneratorContext();
 
-    const metadata = instantiatedConfig.getRoutineMetadata?.(
-      routineDetails,
-      instantiatedConfig,
-    );
+    const metadata = generatorContext.getRoutineMetadata?.(routineDetails);
     if (!metadata) return undefined;
     const {
       parametersName,
@@ -65,7 +62,7 @@ const makeMapper =
           if (!t) {
             const sourceTypeName = routineDetails.parameters[index].type;
             if (sourceTypeName) {
-              t = resolveSimpleType(sourceTypeName, instantiatedConfig.typeMap);
+              t = resolveSimpleType(sourceTypeName, generatorContext.typeMap);
             }
           }
           const typeName = typeof t === "string" ? t : t.name;
@@ -93,8 +90,8 @@ const makeMapper =
       if ("returnType" in routineDetails) {
         const returnType = routineDetails.returnType;
         if (typeof returnType === "string") {
-          if (returnType in instantiatedConfig.typeMap) {
-            const typeDef = instantiatedConfig.typeMap[returnType];
+          if (returnType in generatorContext.typeMap) {
+            const typeDef = generatorContext.typeMap[returnType];
             let typeDefinitionLine: string;
             if (typeof typeDef === "string") {
               typeDefinitionLine = typeDef;
@@ -120,7 +117,7 @@ const makeMapper =
                 name: column.name,
                 typeName: resolveSimpleType(
                   column.type,
-                  instantiatedConfig.typeMap,
+                  generatorContext.typeMap,
                 ),
                 dimensions: 0,
                 isNullable: false,

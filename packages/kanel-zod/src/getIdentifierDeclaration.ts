@@ -1,22 +1,21 @@
 import type { TableDetails } from "extract-pg-schema";
 import type {
   ConstantDeclaration,
-  InstantiatedConfig,
+  PgTsGeneratorContext,
   TypeImport,
+  TypeMap,
 } from "kanel";
 
-import type {
-  GenerateZodSchemasConfig,
-  GetZodIdentifierMetadata,
-} from "./GenerateZodSchemasConfig";
+import type { GetZodIdentifierMetadata } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";
 
 const getIdentifierDeclaration = (
   details: TableDetails,
   getZodIdentifierMetadata: GetZodIdentifierMetadata,
-  config: GenerateZodSchemasConfig,
-  instantiatedConfig: InstantiatedConfig,
+  zodTypeMap: TypeMap,
+  castToSchema: boolean,
   nonCompositeTypeImports: Record<string, TypeImport>,
+  context: PgTsGeneratorContext,
 ): {
   name: string;
   originalName: string;
@@ -28,30 +27,27 @@ const getIdentifierDeclaration = (
     declaration: ConstantDeclaration;
   }[] = [];
 
-  if (details.kind === "table" && instantiatedConfig.generateIdentifierType) {
+  const pgTsContext = context;
+
+  if (details.kind === "table" && pgTsContext.generateIdentifierType) {
     const { columns } = details;
     const identifierColumns = columns.filter(
       (c) => c.isPrimaryKey && !c.reference,
     );
 
     identifierColumns.forEach((c) => {
-      const typescriptDeclaration = instantiatedConfig.generateIdentifierType(
+      const typescriptDeclaration = pgTsContext.generateIdentifierType!(
         c,
         details,
-        instantiatedConfig,
       );
 
-      const { name, comment } = getZodIdentifierMetadata(
-        c,
-        details,
-        instantiatedConfig,
-      );
+      const { name, comment } = getZodIdentifierMetadata(c, details, context);
 
       let zodType: string;
       const typeImports: TypeImport[] = [zImport];
 
-      if (c.type.fullName in config.zodTypeMap) {
-        const x = config.zodTypeMap[c.type.fullName];
+      if (c.type.fullName in zodTypeMap) {
+        const x = zodTypeMap[c.type.fullName];
         if (typeof x === "string") {
           zodType = x;
         } else {
@@ -70,7 +66,7 @@ const getIdentifierDeclaration = (
         comment,
         name,
         type: undefined,
-        value: config.castToSchema
+        value: castToSchema
           ? `${zodType} as unknown as z.Schema<${typescriptDeclaration.name}>`
           : `${zodType}.transform(value => value as ${typescriptDeclaration.name})`,
         exportAs: "named",

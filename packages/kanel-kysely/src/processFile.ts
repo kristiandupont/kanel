@@ -1,10 +1,10 @@
-import type {
-  CompositeDetails,
-  CompositeProperty,
-  InstantiatedConfig,
-  InterfacePropertyDeclaration,
-  TsFileContents,
-  TypeImport,
+import {
+  type CompositeDetails,
+  type CompositeProperty,
+  type InterfacePropertyDeclaration,
+  type PgTsGeneratorContext,
+  type TsFileContents,
+  type TypeImport,
 } from "kanel";
 
 import type MakeKyselyConfig from "./MakeKyselyConfig";
@@ -21,28 +21,25 @@ import type MakeKyselyConfig from "./MakeKyselyConfig";
 const processFile = (
   declarations: TsFileContents["declarations"],
   compositeDetails: CompositeDetails,
-  instantiatedConfig: InstantiatedConfig,
   path: string,
   makeKyselyConfig: MakeKyselyConfig,
+  pgTsContext: PgTsGeneratorContext,
 ): {
   modifiedDeclarations: TsFileContents["declarations"];
   tableImport: TypeImport;
   tableProperty: InterfacePropertyDeclaration;
 } => {
-  const { name: selectorName } = instantiatedConfig.getMetadata(
+  const { name: selectorName } = pgTsContext.getMetadata(
     compositeDetails,
     "selector",
-    instantiatedConfig,
   );
-  const { name: initializerName } = instantiatedConfig.getMetadata(
+  const { name: initializerName } = pgTsContext.getMetadata(
     compositeDetails,
     "initializer",
-    instantiatedConfig,
   );
-  const { name: mutatorName } = instantiatedConfig.getMetadata(
+  const { name: mutatorName } = pgTsContext.getMetadata(
     compositeDetails,
     "mutator",
-    instantiatedConfig,
   );
 
   let canInitialize = true;
@@ -62,7 +59,6 @@ const processFile = (
       selectorName,
       canInitialize,
       canMutate,
-      instantiatedConfig,
     );
 
   const modifiedDeclarations = declarations.map((declaration) => {
@@ -86,11 +82,10 @@ const processFile = (
               : compositeDetails.columns;
           const column = columns.find(
             (column) =>
-              instantiatedConfig.getPropertyMetadata(
+              pgTsContext.getPropertyMetadata(
                 column,
                 compositeDetails,
                 "selector",
-                instantiatedConfig,
               ).name === property.name,
           );
 

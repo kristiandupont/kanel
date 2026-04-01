@@ -7,20 +7,36 @@ import escapeIdentifier from "./ts-utilities/escapeIdentifier";
 import type { CompositeProperty } from "./generators/composite-types";
 import resolveType from "./generators/resolveType";
 import type {
-  GenerateIdentifierType,
-  GetMetadata,
-  GetPropertyMetadata,
-  GetRoutineMetadata,
+  GenerateIdentifierTypeV3,
+  GetMetadataV3,
+  GetPropertyMetadataV3,
+  GetRoutineMetadataV3,
 } from "./metadata-types";
+import { useKanelContext } from "./context";
 
 const toPascalCase = recase(null, "pascal");
 
 // #region defaultGetMetadata
-export const defaultGetMetadata: GetMetadata = (
-  details,
-  generateFor,
-  instantiatedConfig,
-) => {
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
+ * passed to your custom getMetadata function instead of importing this.
+ *
+ * Migration example:
+ * ```ts
+ * // V3 (deprecated):
+ * import { defaultGetMetadata } from 'kanel';
+ * getMetadata: (details, generateFor, instantiatedConfig) => {
+ *   const defaults = defaultGetMetadata(details, generateFor, instantiatedConfig);
+ *   return { ...defaults, comment: ['Custom'] };
+ * }
+ *
+ * // V4 (recommended):
+ * getMetadata: (details, generateFor, builtinMetadata) => {
+ *   return { ...builtinMetadata, comment: ['Custom'] };
+ * }
+ * ```
+ */
+export const defaultGetMetadata: GetMetadataV3 = (details, generateFor) => {
   const { comment: strippedComment } = tryParse(details.comment);
   const isAgentNoun = ["initializer", "mutator"].includes(generateFor);
 
@@ -30,20 +46,24 @@ export const defaultGetMetadata: GetMetadata = (
 
   const suffix = isAgentNoun ? `_${generateFor}` : "";
 
+  const context = useKanelContext();
+  const outputPath = context.config.outputPath || ".";
+
   return {
     name: toPascalCase(details.name + suffix),
     comment: [relationComment, ...(strippedComment ? [strippedComment] : [])],
-    path: join(
-      instantiatedConfig.outputPath,
-      details.schemaName,
-      toPascalCase(details.name),
-    ),
+    path: join(outputPath, details.schemaName, toPascalCase(details.name)),
+    exportAs: isAgentNoun ? "named" : "default",
   };
 };
 // #endregion defaultGetMetadata
 
 // #region defaultGetPropertyMetadata
-export const defaultGetPropertyMetadata: GetPropertyMetadata = (
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
+ * passed to your custom getPropertyMetadata function instead of importing this.
+ */
+export const defaultGetPropertyMetadata: GetPropertyMetadataV3 = (
   property,
   _details,
   generateFor,
@@ -64,7 +84,11 @@ export const defaultGetPropertyMetadata: GetPropertyMetadata = (
 // #endregion defaultGetPropertyMetadata
 
 // #region defaultGenerateIdentifierType
-export const defaultGenerateIdentifierType: GenerateIdentifierType = (
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinType parameter
+ * passed to your custom generateIdentifierType function instead of importing this.
+ */
+export const defaultGenerateIdentifierType: GenerateIdentifierTypeV3 = (
   column,
   details,
   _config,
@@ -96,6 +120,10 @@ export const defaultGenerateIdentifierType: GenerateIdentifierType = (
 // #endregion defaultGenerateIdentifierType
 
 // #region defaultPropertySortFunction
+/**
+ * @deprecated This is a V3 compatibility export. In V4, this is an internal builtin.
+ * If you need custom sorting, provide your own propertySortFunction in PgTsGeneratorConfig.
+ */
 export const defaultPropertySortFunction = (
   a: CompositeProperty,
   b: CompositeProperty,
@@ -115,19 +143,25 @@ export const defaultPropertySortFunction = (
 // #endregion defaultPropertySortFunction
 
 // #region defaultGetRoutineMetadata
-export const defaultGetRoutineMetadata: GetRoutineMetadata = (
-  details,
-  instantiatedConfig,
-) => ({
-  parametersName: `${details.name}_params`,
-  parameters: details.parameters.map(({ name }) => ({
-    name,
-    comment: [],
-  })),
+/**
+ * @deprecated This is a V3 compatibility export. In V4, use the builtinMetadata parameter
+ * passed to your custom getRoutineMetadata function instead of importing this.
+ */
+export const defaultGetRoutineMetadata: GetRoutineMetadataV3 = (details) => {
+  const context = useKanelContext();
+  const outputPath = context.config.outputPath || ".";
 
-  returnTypeName: `${details.name}_return_type`,
-  returnTypeComment: [`Return type for ${details.name}`],
+  return {
+    parametersName: `${details.name}_params`,
+    parameters: details.parameters.map(({ name }) => ({
+      name,
+      comment: [],
+    })),
 
-  path: join(instantiatedConfig.outputPath, details.schemaName, details.name),
-});
+    returnTypeName: `${details.name}_return_type`,
+    returnTypeComment: [`Return type for ${details.name}`],
+
+    path: join(outputPath, details.schemaName, details.name),
+  };
+};
 // #endregion defaultGetRoutineMetadata
