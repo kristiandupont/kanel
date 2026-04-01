@@ -78,7 +78,7 @@ generators: [
 
 Available built-in generators:
 - **`makePgTsGenerator()`** - PostgreSQL → TypeScript types (most common)
-- **`makeMarkdownGenerator()`** - PostgreSQL → Markdown documentation
+- **`makeMarkdownGenerator()`** - PostgreSQL → Markdown documentation (see [makeMarkdownGenerator](./makeMarkdownGenerator.md))
 
 You can also write custom generators for other languages or formats.
 

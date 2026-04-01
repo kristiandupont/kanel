@@ -24,6 +24,12 @@ export default {
         ],
       },
       {
+        text: "MarkdownGenerator",
+        items: [
+          { text: "makeMarkdownGenerator", link: "/makeMarkdownGenerator" },
+        ],
+      },
+      {
         text: "PgTsGenerator",
         items: [
           { text: "getMetadata", link: "/getMetadata" },
