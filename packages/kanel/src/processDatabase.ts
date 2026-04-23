@@ -218,9 +218,8 @@ const processV4Config = async (
     importsExtension = instantiatedConfig.importsExtension as any;
   } else {
     // Pure V4 mode - extract schemas directly
-    const schemasList = v4Config.schemaNames || ["public"];
     schemas = await extractSchemas(v4Config.connection, {
-      schemas: schemasList,
+      schemas: v4Config.schemaNames,
       typeFilter: v4Config.filter, // V4 uses filter
     });
 
