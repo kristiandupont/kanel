@@ -124,7 +124,9 @@ function wrapV3MetadataFunctions(
   }
 
   // Wrap generateIdentifierType
-  if (v3Config.generateIdentifierType) {
+  if (v3Config.generateIdentifierType === false) {
+    result.generateIdentifierType = false;
+  } else if (v3Config.generateIdentifierType) {
     const v3GenerateIdentifierType = v3Config.generateIdentifierType;
     result.generateIdentifierType = ((column, details, _defaultType) =>
       v3GenerateIdentifierType(
