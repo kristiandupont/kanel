@@ -389,6 +389,49 @@ describe("V4 Config", () => {
       // The id column should use a plain type (e.g. number) instead of an identifier type
       expect(content).not.toMatch(/OrdersId/);
     });
+
+    it("should use plain types for foreign key columns when generateIdentifierType is false", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.customers (
+          id serial primary key,
+          name text not null
+        );
+        create table v4test.orders (
+          id serial primary key,
+          customer_id integer not null references v4test.customers (id),
+          amount integer not null
+        );
+      `);
+
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["v4test"],
+        typescriptConfig: {
+          enumStyle: "enum",
+        },
+        generators: [
+          makePgTsGenerator({
+            generateIdentifierType: false,
+          }),
+        ],
+      };
+
+      await processDatabase(config);
+
+      const results = getResults();
+      const ordersFile = Object.entries(results).find(([key]) =>
+        key.includes("Orders"),
+      );
+
+      expect(ordersFile).toBeDefined();
+      const content = ordersFile![1].join("\n");
+
+      // Should NOT reference the identifier type from the referenced table
+      expect(content).not.toContain("CustomersId");
+      // The FK column should resolve to a plain number
+      expect(content).toContain("customer_id: number");
+    });
   });
 
   describe("Advanced Composition", () => {
