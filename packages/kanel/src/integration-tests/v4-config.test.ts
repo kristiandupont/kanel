@@ -349,6 +349,48 @@ describe("V4 Config", () => {
     });
   });
 
+  describe("Disable Identifier Type Generation", () => {
+    it("should not generate identifier types when generateIdentifierType is false", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v4test.orders (
+          id serial primary key,
+          amount integer not null
+        );
+      `);
+
+      const config: ConfigV4 = {
+        connection: getConnection(),
+        schemaNames: ["v4test"],
+        typescriptConfig: {
+          enumStyle: "enum",
+        },
+        generators: [
+          makePgTsGenerator({
+            generateIdentifierType: false,
+          }),
+        ],
+      };
+
+      await processDatabase(config);
+
+      const results = getResults();
+      const ordersFile = Object.entries(results).find(([key]) =>
+        key.includes("Orders"),
+      );
+
+      expect(ordersFile).toBeDefined();
+      const content = ordersFile![1].join("\n");
+
+      // Should NOT contain a branded/flavored identifier type declaration
+      expect(content).not.toContain("__brand");
+      expect(content).not.toContain("__flavor");
+
+      // The id column should use a plain type (e.g. number) instead of an identifier type
+      expect(content).not.toMatch(/OrdersId/);
+    });
+  });
+
   describe("Advanced Composition", () => {
     it("should allow full composition pattern with spreading builtin result", async () => {
       const config: ConfigV4 = {
