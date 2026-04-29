@@ -86,8 +86,12 @@ export function wrapGetPropertyMetadata(
  * Returns an InternalGenerateIdentifierType function (without the builtinType parameter).
  */
 export function wrapGenerateIdentifierType(
-  userFunction: GenerateIdentifierType | undefined,
+  userFunction: GenerateIdentifierType | false | undefined,
 ): InternalGenerateIdentifierType | undefined {
+  if (userFunction === false) {
+    return undefined;
+  }
+  
   if (!userFunction) {
     // Return a wrapper around the builtin
     return (column, details) => {
