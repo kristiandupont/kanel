@@ -107,7 +107,7 @@ If you're happy with Kanel's default branded types, you don't need to provide th
 
 ## How to Disable
 
-You can disable `generateIdentifierType` like this:
+You can disable default branded types (`generateIdentifierType`) like this:
 
 ```typescript
 module.exports = {
