@@ -91,7 +91,6 @@ export function wrapGenerateIdentifierType(
   if (userFunction === false) {
     return undefined;
   }
-  
   if (!userFunction) {
     // Return a wrapper around the builtin
     return (column, details) => {
