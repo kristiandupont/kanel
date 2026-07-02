@@ -1,5 +1,6 @@
 import type { EnumDetails } from "extract-pg-schema";
 import type { ConstantDeclaration, PgTsGeneratorContext } from "kanel";
+import { useKanelContext } from "kanel";
 
 import type { GetZodSchemaMetadata } from "./GenerateZodSchemasConfig";
 import zImport from "./zImport";
@@ -10,11 +11,11 @@ const processEnum = (
   context: PgTsGeneratorContext,
 ): ConstantDeclaration => {
   const { name } = getZodSchemaMetadata(e, undefined, context);
-  const lines: string[] = [
-    `z.enum([`,
-    ...e.values.map((v) => `  '${v}',`),
-    "])",
-  ];
+  const { enumStyle } = useKanelContext().typescriptConfig;
+  const lines: string[] =
+    enumStyle === "literal-union"
+      ? [`z.enum([`, ...e.values.map((v) => `  '${v}',`), "])"]
+      : [`z.enum(${context.getMetadata(e, undefined).name})`];
 
   const declaration: ConstantDeclaration = {
     declarationType: "constant",
