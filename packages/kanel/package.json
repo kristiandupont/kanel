@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/ramda": "0.32.0",
-    "testcontainers": "^11.5.1"
+    "testcontainers": "^12.0.0"
   },
   "peerDependencies": {
     "prettier": "^2.0.0 || ^3.0.0"
