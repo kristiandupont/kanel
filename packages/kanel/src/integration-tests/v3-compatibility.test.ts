@@ -224,6 +224,36 @@ describe("V3 Config Compatibility", () => {
       expect(aaaIndex).toBeLessThan(mmmIndex);
       expect(mmmIndex).toBeLessThan(zzzIndex);
     });
+    it("should disable identifier type generation when generateIdentifierType is false", async () => {
+      const db = getKnex();
+      await db.raw(`
+        create table v3test.invoices (
+          id serial primary key,
+          total integer not null
+        );
+      `);
+
+      const config: Config = {
+        connection: getConnection(),
+        outputPath,
+        generateIdentifierType: false,
+      };
+
+      await processDatabase(config);
+
+      const results = getResults();
+      const invoicesFile = Object.entries(results).find(([key]) =>
+        key.includes("Invoices"),
+      );
+
+      expect(invoicesFile).toBeDefined();
+      const content = invoicesFile![1].join("\n");
+
+      // Should NOT contain a branded/flavored identifier type
+      expect(content).not.toContain("__brand");
+      expect(content).not.toContain("__flavor");
+      expect(content).not.toMatch(/InvoicesId/);
+    });
   });
 
   describe("Hooks", () => {
