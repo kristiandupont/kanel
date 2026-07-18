@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { ViewColumn, TableDetails, ViewDetails } from "extract-pg-schema";
+import type { TableDetails, ViewDetails } from "extract-pg-schema";
 import resolveType from "./resolveType";
 import generateProperties from "./generateProperties";
 import { createTestContext, runWithContextSync } from "../context";
