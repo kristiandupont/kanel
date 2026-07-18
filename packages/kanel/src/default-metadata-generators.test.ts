@@ -4,6 +4,8 @@ import { defaultGenerateIdentifierType } from "./default-metadata-generators";
 import type { GenerateIdentifierTypeV3 } from "./metadata-types";
 import type { InstantiatedConfig } from "./config-types";
 import { createTestContext, runWithContextSync } from "./context";
+import { runWithPgTsGeneratorContextSync } from "./generators/pgTsGeneratorContext";
+import type { PgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
 
 // Mocked InstantiatedConfig
 const instantiatedConfig: InstantiatedConfig = {
@@ -23,19 +25,29 @@ const instantiatedConfig: InstantiatedConfig = {
 
 describe("defaultGenerateIdentifierType", () => {
   let testContext: ReturnType<typeof createTestContext>;
+  let pgTsContext: PgTsGeneratorContext;
 
   beforeEach(() => {
     testContext = createTestContext(instantiatedConfig);
+    pgTsContext = {
+      typeMap: {},
+      getMetadata: instantiatedConfig.getMetadata as any,
+      getPropertyMetadata: instantiatedConfig.getPropertyMetadata as any,
+      generateIdentifierType: instantiatedConfig.generateIdentifierType as any,
+      propertySortFunction: instantiatedConfig.propertySortFunction as any,
+    };
   });
 
   it("generates correct identifier type", () => {
     const result = runWithContextSync(testContext, () =>
-      defaultGenerateIdentifierType(
-        ...([
-          { name: "thing_id", type: { kind: "base", fullName: "text" } },
-          { name: "my_things", schemaName: "public" },
-          { typeMap: {} },
-        ] as Parameters<GenerateIdentifierTypeV3>),
+      runWithPgTsGeneratorContextSync(pgTsContext, () =>
+        defaultGenerateIdentifierType(
+          ...([
+            { name: "thing_id", type: { kind: "base", fullName: "text" } },
+            { name: "my_things", schemaName: "public" },
+            { typeMap: {} },
+          ] as Parameters<GenerateIdentifierTypeV3>),
+        ),
       ),
     );
 
@@ -49,12 +61,14 @@ describe("defaultGenerateIdentifierType", () => {
 
   it("generates correct identifier type with special characters", () => {
     const result = runWithContextSync(testContext, () =>
-      defaultGenerateIdentifierType(
-        ...([
-          { name: "special_col!'.", type: { kind: "base", fullName: "text" } },
-          { name: "special_table!'.", schemaName: "special_schema!'." },
-          { typeMap: {} },
-        ] as Parameters<GenerateIdentifierTypeV3>),
+      runWithPgTsGeneratorContextSync(pgTsContext, () =>
+        defaultGenerateIdentifierType(
+          ...([
+            { name: "special_col!'.", type: { kind: "base", fullName: "text" } },
+            { name: "special_table!'.", schemaName: "special_schema!'." },
+            { typeMap: {} },
+          ] as Parameters<GenerateIdentifierTypeV3>),
+        ),
       ),
     );
 
@@ -68,3 +82,4 @@ describe("defaultGenerateIdentifierType", () => {
     });
   });
 });
+
