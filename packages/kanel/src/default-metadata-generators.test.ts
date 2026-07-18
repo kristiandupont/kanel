@@ -64,7 +64,10 @@ describe("defaultGenerateIdentifierType", () => {
       runWithPgTsGeneratorContextSync(pgTsContext, () =>
         defaultGenerateIdentifierType(
           ...([
-            { name: "special_col!'.", type: { kind: "base", fullName: "text" } },
+            {
+              name: "special_col!'.",
+              type: { kind: "base", fullName: "text" },
+            },
             { name: "special_table!'.", schemaName: "special_schema!'." },
             { typeMap: {} },
           ] as Parameters<GenerateIdentifierTypeV3>),
@@ -82,4 +85,3 @@ describe("defaultGenerateIdentifierType", () => {
     });
   });
 });
-
