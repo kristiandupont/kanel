@@ -113,3 +113,11 @@ export const runWithPgTsGeneratorContext = async <T>(
   context: PgTsGeneratorContext,
   fn: () => Promise<T>,
 ): Promise<T> => pgTsGeneratorStorage.run(context, fn);
+
+/**
+ * Run a function within a PgTsGenerator context synchronously.
+ */
+export const runWithPgTsGeneratorContextSync = <T>(
+  context: PgTsGeneratorContext,
+  fn: () => T,
+): T => pgTsGeneratorStorage.run(context, fn);

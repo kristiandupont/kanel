@@ -3,13 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { defaultGenerateIdentifierType } from "./default-metadata-generators";
 import type { GenerateIdentifierTypeV3 } from "./metadata-types";
 import type { InstantiatedConfig } from "./config-types";
-import { createTestContext } from "./context";
-
-// TODO: Fix these tests - runWithContextSync doesn't exist
-// These tests were broken before the V4 refactor
-const runWithContextSync = (_context: unknown, _fn: () => unknown) => {
-  throw new Error("runWithContextSync is not implemented");
-};
+import { createTestContext, runWithContextSync } from "./context";
 
 // Mocked InstantiatedConfig
 const instantiatedConfig: InstantiatedConfig = {
@@ -27,8 +21,7 @@ const instantiatedConfig: InstantiatedConfig = {
   fileExtension: ".ts",
 };
 
-// TODO: These tests were broken before V4 refactor - need to implement runWithContextSync or rewrite
-describe.skip("defaultGenerateIdentifierType", () => {
+describe("defaultGenerateIdentifierType", () => {
   let testContext: ReturnType<typeof createTestContext>;
 
   beforeEach(() => {
