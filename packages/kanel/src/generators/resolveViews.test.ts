@@ -13,12 +13,11 @@ const mockTable: TableDetails = {
   columns: [
     {
       name: "id",
-      kind: "scalar",
       type: { fullName: "int4", kind: "base" },
       isNullable: false,
-    },
+    } as any,
   ],
-};
+} as any;
 
 const mockView: ViewDetails = {
   name: "user_view",
@@ -35,13 +34,13 @@ const mockView: ViewDetails = {
         table: "users",
         column: "id",
       },
-    } as ViewColumn,
+    } as any,
   ],
   informationSchemaValue: {
     table_schema: "public",
     table_name: "user_view",
   } as any,
-};
+} as any;
 
 const schemas = {
   public: {
@@ -63,10 +62,10 @@ const baseConfig: InstantiatedConfig = {
   enumStyle: "enum",
   preDeleteOutputFolder: false,
   getMetadata: vi.fn().mockReturnValue({ name: "Users", path: "users" }),
-  getPropertyMetadata: (p) => ({ name: p.name }),
+  getPropertyMetadata: (p) => ({ name: p.name, comment: [] }),
   generateIdentifierType: vi.fn(),
   propertySortFunction: vi.fn(),
-};
+} as any;
 
 describe("resolveViews config option", () => {
   it("resolves types from source when resolveViews is true", () => {
