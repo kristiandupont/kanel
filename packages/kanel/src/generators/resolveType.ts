@@ -112,7 +112,7 @@ const resolveType = (
   visited = new Map<CompositeProperty, TypeDefinition>(),
   originCompositeDetails: CompositeDetails = d,
 ): TypeDefinition => {
-  const { schemas } = useKanelContext();
+  const { schemas, config } = useKanelContext();
   const generatorContext = usePgTsGeneratorContext();
 
   // Check to see if we have already tried to resolve this column before.
@@ -140,7 +140,10 @@ const resolveType = (
     }
     // 3) If this is a view with a source (i.e. the table that it's based on),
     // get the type from the source.
-    if ((c as ViewColumn | MaterializedViewColumn).source) {
+    if (
+      config.resolveViews !== false &&
+      (c as ViewColumn | MaterializedViewColumn).source
+    ) {
       const source = (c as ViewColumn | MaterializedViewColumn).source;
       let target: TableDetails | ViewDetails | MaterializedViewDetails =
         schemas[source.schema].tables.find((t) => t.name === source.table);

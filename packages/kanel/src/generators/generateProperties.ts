@@ -19,7 +19,7 @@ const generateProperties = <D extends CompositeDetails>(
   details: D,
   generateFor: "selector" | "initializer" | "mutator",
 ): InterfacePropertyDeclaration[] => {
-  const { schemas } = useKanelContext();
+  const { schemas, config } = useKanelContext();
   const { getPropertyMetadata, propertySortFunction } =
     usePgTsGeneratorContext();
 
@@ -35,7 +35,10 @@ const generateProperties = <D extends CompositeDetails>(
     .map((p: CompositeProperty): InterfacePropertyDeclaration => {
       // If this is a (materialized or not) view column, we need to check
       // the source table to see if the column is nullable.
-      if ((p as ViewColumn | MaterializedViewColumn).source) {
+      if (
+        config.resolveViews !== false &&
+        (p as ViewColumn | MaterializedViewColumn).source
+      ) {
         const source = (p as ViewColumn | MaterializedViewColumn).source;
         const target: TableDetails | ViewDetails | MaterializedViewDetails =
           schemas[source.schema].tables.find((t) => t.name === source.table);
