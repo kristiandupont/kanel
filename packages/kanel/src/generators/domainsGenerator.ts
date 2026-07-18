@@ -23,7 +23,7 @@ const makeMapper =
       undefined,
     );
 
-    let typeDefinition: string[] = [];
+    let typeDefinition: string[];
     const typeImports: TypeImport[] = [];
 
     const mapped: TypeDefinition =

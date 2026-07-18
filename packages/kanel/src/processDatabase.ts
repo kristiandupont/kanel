@@ -90,11 +90,7 @@ function mergeOutput(base: Output, incoming: Output): Output {
 
 const deriveExtensions = (
   tsModuleFormat:
-    | "esm"
-    | "commonjs"
-    | "explicit-esm"
-    | "explicit-commonjs"
-    | undefined,
+    "esm" | "commonjs" | "explicit-esm" | "explicit-commonjs" | undefined,
   importsExtension: string | undefined,
 ): DerivedExtensions => {
   // If importsExtension is explicitly set, use legacy behavior
