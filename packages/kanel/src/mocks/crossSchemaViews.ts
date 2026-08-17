@@ -138,6 +138,56 @@ export const apiAccounts: ViewDetails = {
   informationSchemaValue: { table_schema: "api", table_name: "accounts" },
 } as any;
 
+/** A foreign table is a valid source too, and lives in its own schema list. */
+export const externalLedger = {
+  name: "ledger",
+  schemaName: "public",
+  kind: "foreignTable",
+  comment: null,
+  columns: [
+    { ...tableColumn("id", "pg_catalog.int4", false, true), source: null },
+    { ...tableColumn("memo", "pg_catalog.text", true), source: null },
+    /*
+     * A foreign table only reports nullability once it has been resolved, so
+     * `isNullable` is absent here on purpose -- adopting it would silently
+     * turn a nullable column non-null.
+     */
+    {
+      name: "note",
+      expandedType: "pg_catalog.text",
+      type: { fullName: "pg_catalog.text", kind: "base" },
+      comment: null,
+      defaultValue: null,
+      isArray: false,
+      generated: "NEVER",
+      references: [],
+      source: null,
+    },
+  ],
+  informationSchemaValue: { table_schema: "public", table_name: "ledger" },
+} as any;
+
+export const apiLedger: ViewDetails = {
+  name: "ledger",
+  schemaName: "api",
+  kind: "view",
+  comment: null,
+  definition: "select * from public.ledger",
+  columns: [
+    viewColumn("memo", "pg_catalog.text", {
+      schema: "public",
+      table: "ledger",
+      column: "memo",
+    }),
+    viewColumn("note", "pg_catalog.text", {
+      schema: "public",
+      table: "ledger",
+      column: "note",
+    }),
+  ],
+  informationSchemaValue: { table_schema: "api", table_name: "ledger" },
+} as any;
+
 /**
  * One more hop, this time within `api`. A reference to a relation in a schema
  * that is not on the search_path keeps its qualifier, so this arrives as a
@@ -228,12 +278,13 @@ const crossSchemaViews: Record<string, Schema> = {
     ...emptySchema,
     name: "public",
     tables: [accountRecords],
+    foreignTables: [externalLedger],
     views: [publicAccounts],
   },
   api: {
     ...emptySchema,
     name: "api",
-    views: [apiAccounts, apiAccountsDetails, apiRecords, apiSecrets],
+    views: [apiAccounts, apiAccountsDetails, apiLedger, apiRecords, apiSecrets],
   },
 };
 

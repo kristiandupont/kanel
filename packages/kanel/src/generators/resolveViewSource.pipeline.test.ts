@@ -67,6 +67,16 @@ describe("Generating from same-named views across schemas", () => {
     );
   });
 
+  it("keeps its own nullability when the origin reports none", () => {
+    const result = getResults();
+    expect(result["models/api/Ledger.ts"]).toEqual(
+      expect.arrayContaining([
+        "  memo: string | null;",
+        "  note: string | null;",
+      ]),
+    );
+  });
+
   it("resolves the identifier type through both views", () => {
     const result = getResults();
     expect(result["models/api/Accounts.ts"]).toEqual(

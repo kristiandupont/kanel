@@ -1,4 +1,6 @@
 import type {
+  ForeignTableColumn,
+  ForeignTableDetails,
   MaterializedViewColumn,
   MaterializedViewDetails,
   Schema,
@@ -13,10 +15,15 @@ import type { CompositeDetails, CompositeProperty } from "./composite-types";
 /** A relation that a view column can originate from. */
 export type SourceRelation =
   | TableDetails
+  | ForeignTableDetails
   | ViewDetails
   | MaterializedViewDetails;
 
-type SourceColumn = TableColumn | ViewColumn | MaterializedViewColumn;
+type SourceColumn =
+  | TableColumn
+  | ForeignTableColumn
+  | ViewColumn
+  | MaterializedViewColumn;
 
 /** The link extract-pg-schema records from a view column to its origin. */
 export type ViewSource = NonNullable<ViewColumn["source"]>;
@@ -70,6 +77,7 @@ const findInSchema = (
 ): SourceRelation | undefined =>
   [
     ...(schema?.tables ?? []),
+    ...(schema?.foreignTables ?? []),
     ...(schema?.views ?? []),
     ...(schema?.materializedViews ?? []),
   ].find(

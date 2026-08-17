@@ -5,10 +5,15 @@ import crossSchemaViews, {
   accountRecords,
   apiAccounts,
   apiAccountsDetails,
+  apiLedger,
   apiSecrets,
+  externalLedger,
   publicAccounts,
 } from "../mocks/crossSchemaViews";
 import { findOriginColumn, findSourceRelation } from "./resolveViewSource";
+import generateProperties from "./generateProperties";
+import { createTestContext, runWithContextSync } from "../context";
+import { runWithPgTsGeneratorContextSync } from "./pgTsGeneratorContext";
 
 const sourceOf = (view: ViewDetails, columnName: string) => {
   const column = view.columns.find((c) => c.name === columnName);
@@ -41,6 +46,8 @@ const pingPong = ["ping", "pong"].map(
       columns: [
         {
           name: "id",
+          type: { fullName: "pg_catalog.int4", kind: "base" },
+          isNullable: true,
           source: {
             schema: "api",
             table: index === 0 ? "pong" : "ping",
@@ -55,6 +62,31 @@ const withViews = (views: ViewDetails[]): Record<string, Schema> => ({
   ...crossSchemaViews,
   api: { ...crossSchemaViews.api, views },
 });
+
+/** Same harness as resolveViews.test.ts, for the cases that need a context. */
+const withContext = (schemas: Record<string, Schema>, fn: () => void) => {
+  const config = {
+    schemas,
+    typeMap: { "pg_catalog.int4": "number" },
+    resolveViews: true,
+    getMetadata: () => ({ name: "X", path: "x" }),
+    getPropertyMetadata: (p: { name: string }) => ({
+      name: p.name,
+      comment: [],
+    }),
+  } as any;
+
+  runWithContextSync(createTestContext(config), () =>
+    runWithPgTsGeneratorContextSync(
+      {
+        typeMap: config.typeMap,
+        getMetadata: config.getMetadata,
+        getPropertyMetadata: config.getPropertyMetadata,
+      } as any,
+      fn,
+    ),
+  );
+};
 
 describe("findSourceRelation", () => {
   it("finds a same-named view in another schema", () => {
@@ -75,6 +107,13 @@ describe("findSourceRelation", () => {
     const source = sourceOf(selfFeeding, "id");
     const schemas = withViews([selfFeeding]);
     expect(findSourceRelation(source, selfFeeding, schemas)).toBeUndefined();
+  });
+
+  it("resolves a foreign table as a source", () => {
+    const source = sourceOf(apiLedger, "memo");
+    expect(findSourceRelation(source, apiLedger, crossSchemaViews)).toBe(
+      externalLedger,
+    );
   });
 
   it("skips a same-named relation that does not carry the column", () => {
@@ -143,5 +182,25 @@ describe("findOriginColumn", () => {
     expect(
       findOriginColumn(sourceOf(ping, "id"), ping, schemas),
     ).toBeUndefined();
+  });
+});
+
+describe("nullability when the origin cannot be adopted", () => {
+  it("keeps the column's own value when the chain cannot be followed", () => {
+    const [ping, pong] = pingPong;
+    const schemas = withViews([ping, pong]);
+
+    withContext(schemas, () => {
+      const props = generateProperties(ping, "selector");
+      expect(props[0].isNullable).toBe(true);
+    });
+  });
+
+  it("keeps the column's own value when the origin reports none", () => {
+    withContext(crossSchemaViews, () => {
+      const props = generateProperties(apiLedger, "selector");
+      const note = props.find((p) => p.name === "note");
+      expect(note?.isNullable).toBe(true);
+    });
   });
 });

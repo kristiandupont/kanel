@@ -31,7 +31,9 @@ const generateProperties = <D extends CompositeDetails>(
       // intermediate views -- to see whether it is nullable.
       if (config.resolveViews !== false && hasSource(p)) {
         const origin = findOriginColumn(p.source, details, schemas);
-        if (origin) {
+        // A foreign table only reports nullability once it has been resolved,
+        // so leave our own value alone rather than overwriting it with nothing.
+        if (origin?.column.isNullable !== undefined) {
           p.isNullable = origin.column.isNullable;
         }
       }
