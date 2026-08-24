@@ -1,11 +1,3 @@
-import type {
-  MaterializedViewColumn,
-  MaterializedViewDetails,
-  TableColumn,
-  TableDetails,
-  ViewColumn,
-  ViewDetails,
-} from "extract-pg-schema";
 import * as R from "ramda";
 
 import { useKanelContext } from "../context";
@@ -14,6 +6,7 @@ import type { InterfacePropertyDeclaration } from "../ts-utilities/ts-declaratio
 import type TypeImport from "../ts-utilities/TypeImport";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
 import resolveType from "./resolveType";
+import { findOriginColumn, hasSource } from "./resolveViewSource";
 
 const generateProperties = <D extends CompositeDetails>(
   details: D,
@@ -33,25 +26,15 @@ const generateProperties = <D extends CompositeDetails>(
   const result: InterfacePropertyDeclaration[] = sortedPs
     .filter((p) => generateFor === "selector" || p.generated !== "ALWAYS")
     .map((p: CompositeProperty): InterfacePropertyDeclaration => {
-      // If this is a (materialized or not) view column, we need to check
-      // the source table to see if the column is nullable.
-      if (
-        config.resolveViews !== false &&
-        (p as ViewColumn | MaterializedViewColumn).source
-      ) {
-        const source = (p as ViewColumn | MaterializedViewColumn).source;
-        const target: TableDetails | ViewDetails | MaterializedViewDetails =
-          schemas[source.schema].tables.find((t) => t.name === source.table);
-
-        if (target) {
-          const column = (
-            target.columns as Array<
-              TableColumn | ViewColumn | MaterializedViewColumn
-            >
-          ).find((c) => c.name === source.column);
-          if (column) {
-            p.isNullable = column.isNullable;
-          }
+      // If this is a (materialized or not) view column, we need to follow it
+      // back to the column it originates from -- possibly through several
+      // intermediate views -- to see whether it is nullable.
+      if (config.resolveViews !== false && hasSource(p)) {
+        const origin = findOriginColumn(p.source, details, schemas);
+        // A foreign table only reports nullability once it has been resolved,
+        // so leave our own value alone rather than overwriting it with nothing.
+        if (origin?.column.isNullable !== undefined) {
+          p.isNullable = origin.column.isNullable;
         }
       }
 

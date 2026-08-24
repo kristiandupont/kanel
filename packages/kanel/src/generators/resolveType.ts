@@ -14,6 +14,7 @@ import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import type Details from "../Details";
 import type TypeDefinition from "../ts-utilities/TypeDefinition";
 import type { CompositeDetails, CompositeProperty } from "./composite-types";
+import { findSourceRelation, hasSource } from "./resolveViewSource";
 
 const getColumnFromReference = (
   reference: ColumnReference,
@@ -140,43 +141,9 @@ const resolveType = (
     }
     // 3) If this is a view with a source (i.e. the table that it's based on),
     // get the type from the source.
-    if (
-      config.resolveViews !== false &&
-      (c as ViewColumn | MaterializedViewColumn).source
-    ) {
-      const source = (c as ViewColumn | MaterializedViewColumn).source;
-      let target: TableDetails | ViewDetails | MaterializedViewDetails =
-        schemas[source.schema].tables.find((t) => t.name === source.table);
-
-      if (!target) {
-        target = schemas[source.schema].views.find(
-          (v) =>
-            v.name === source.table &&
-            v.name !== (d as ViewDetails).informationSchemaValue.table_name,
-        );
-      }
-      if (!target) {
-        target = schemas[source.schema].materializedViews.find(
-          (v) => v.name === source.table,
-        );
-      }
-      if (!target) {
-        target = schemas["public"]?.tables?.find(
-          (t) => t.name === source.table,
-        );
-      }
-      if (!target) {
-        target = schemas["public"]?.views?.find(
-          (v) =>
-            v.name === source.table &&
-            v.name !== (d as ViewDetails).informationSchemaValue.table_name,
-        );
-      }
-      if (!target) {
-        target = schemas["public"]?.materializedViews?.find(
-          (v) => v.name === source.table,
-        );
-      }
+    if (config.resolveViews !== false && hasSource(c)) {
+      const source = c.source;
+      const target = findSourceRelation(source, d, schemas);
 
       if (!target) {
         console.warn("Could not resolve source", source);
@@ -184,11 +151,7 @@ const resolveType = (
         return "unknown";
       }
 
-      const column = (
-        target.columns as Array<
-          TableColumn | ViewColumn | MaterializedViewColumn
-        >
-      ).find((c) => c.name === source.column);
+      const column = target.columns.find((col) => col.name === source.column);
 
       if (column) {
         return resolveType(
