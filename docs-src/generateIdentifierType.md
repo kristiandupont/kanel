@@ -104,3 +104,17 @@ Use `generateIdentifierType` when you want to:
 - Change how the underlying type is determined
 
 If you're happy with Kanel's default branded types, you don't need to provide this function.
+
+## How to Disable
+
+You can disable default branded types (`generateIdentifierType`) like this:
+
+```typescript
+module.exports = {
+  generators: [
+    makePgTsGenerator({
+      generateIdentifierType: false,
+    }),
+  ],
+};
+```
