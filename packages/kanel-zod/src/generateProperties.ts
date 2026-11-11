@@ -6,7 +6,6 @@ import {
   type TypeImport,
   type TypeMap,
 } from "kanel";
-import * as R from "ramda";
 
 export type ZodPropertyDeclaration = {
   name: string;
@@ -29,7 +28,7 @@ const generateProperties = <D extends CompositeDetails>(
     details.kind === "compositeType" ? details.attributes : details.columns;
 
   const sortedPs = pgTsContext.propertySortFunction
-    ? R.sort(pgTsContext.propertySortFunction, ps as any)
+    ? [...ps].sort(pgTsContext.propertySortFunction as any)
     : ps;
 
   const result: ZodPropertyDeclaration[] = sortedPs.map(

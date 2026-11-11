@@ -30,8 +30,7 @@
   },
   "devDependencies": {
     "extract-pg-schema": "^5.8.1",
-    "kanel": "*",
-    "vitest": "^5.0.0"
+    "kanel": "*"
   },
   "dependencies": {
     "@kristiandupont/recase": "^1.2.1"

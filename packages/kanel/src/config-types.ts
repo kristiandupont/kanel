@@ -1,5 +1,4 @@
 import type { PgType, Schema } from "extract-pg-schema";
-import type { ConnectionConfig } from "pg";
 
 import type { CompositeProperty } from "./generators/composite-types";
 import type {
@@ -10,7 +9,7 @@ import type {
 } from "./metadata-types";
 import type Output from "./Output";
 import type TypeMap from "./TypeMap";
-import type { ConfigV4 } from "./config-types-v4";
+import type { ConfigV4, ConnectionConfig } from "./config-types-v4";
 
 type Awaitable<T> = T | PromiseLike<T>;
 

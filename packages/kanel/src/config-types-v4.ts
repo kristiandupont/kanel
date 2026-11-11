@@ -1,5 +1,4 @@
-import type { PgType } from "extract-pg-schema";
-import type { ConnectionConfig } from "pg";
+import type { extractSchemas, PgType } from "extract-pg-schema";
 
 import type { CompositeProperty } from "./generators/composite-types";
 import type { TypeDeclaration } from "./ts-utilities/ts-declaration-types";
@@ -16,6 +15,11 @@ import type {
   TableDetails,
 } from "extract-pg-schema";
 import type { PgTsGeneratorContext } from "./generators/pgTsGeneratorContext";
+
+export type ConnectionConfig = Exclude<
+  Parameters<typeof extractSchemas>[0],
+  string
+>;
 
 type Awaitable<T> = T | PromiseLike<T>;
 

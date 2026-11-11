@@ -1,5 +1,5 @@
 import { extractSchemas } from "extract-pg-schema";
-import { rimraf } from "rimraf";
+import { rm } from "fs/promises";
 
 import type { Config, InstantiatedConfig } from "./config-types";
 import { isV3Config as detectV3Config } from "./config-types";
@@ -303,7 +303,7 @@ const processV4Config = async (
 
       if (preDeleteOutputFolder) {
         console.info(`Clearing old files in ${outputPath}`);
-        await rimraf(outputPath, { glob: true });
+        await rm(outputPath, { recursive: true, force: true });
       }
 
       filesToWrite.forEach((file) => writeFile(file));

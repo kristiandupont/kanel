@@ -1,52 +1,42 @@
-import chalk from "chalk";
 import fs from "fs";
-import optionator from "optionator";
 import path from "path";
+import { parseArgs } from "util";
 
 import type { Config } from "../config-types";
 import processDatabase from "../processDatabase";
 
 const { version } = require("../../package.json");
 
+const helpText = `Usage: kanel [options]
+
+  -h, --help             displays help
+  -v, --version          displays version
+  -c, --config path      Use this configuration file, overriding kanel.config.*
+
+Version ${version}`;
+
 export async function main(): Promise<void> {
-  console.info(chalk.greenBright("Kanel"));
+  // Bright green when writing to a terminal.
+  console.info(process.stdout.isTTY ? "\u001B[92mKanel\u001B[39m" : "Kanel");
 
-  const o = optionator({
-    prepend: "Usage: kanel [options]",
-    append: `Version ${version}`,
-    options: [
-      {
-        option: "help",
-        alias: "h",
-        type: "Boolean",
-        description: "displays help",
-      },
-      {
-        option: "version",
-        alias: "v",
-        type: "Boolean",
-        description: "displays version",
-      },
-      {
-        option: "config",
-        alias: "c",
-        type: "path::String",
-        description: "Use this configuration file, overriding kanel.config.*",
-      },
-    ],
-  });
-
-  let options;
+  let options: { help?: boolean; version?: boolean; config?: string };
 
   try {
-    options = o.parseArgv(process.argv);
+    options = parseArgs({
+      args: process.argv.slice(2),
+      options: {
+        help: { type: "boolean", short: "h" },
+        version: { type: "boolean", short: "v" },
+        config: { type: "string", short: "c" },
+      },
+    }).values;
   } catch (error) {
     console.error(error.message);
     process.exit(1);
   }
 
   if (options.help) {
-    console.info(o.generateHelp());
+    console.info(helpText);
     process.exit(0);
   }
 

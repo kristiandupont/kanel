@@ -1,5 +1,3 @@
-import * as R from "ramda";
-
 import { useKanelContext } from "../context";
 import { usePgTsGeneratorContext } from "./pgTsGeneratorContext";
 import type { InterfacePropertyDeclaration } from "../ts-utilities/ts-declaration-types";
@@ -20,7 +18,7 @@ const generateProperties = <D extends CompositeDetails>(
     details.kind === "compositeType" ? details.attributes : details.columns;
 
   const sortedPs = propertySortFunction
-    ? R.sort(propertySortFunction, ps as any)
+    ? [...ps].sort(propertySortFunction as any)
     : ps;
 
   const result: InterfacePropertyDeclaration[] = sortedPs
