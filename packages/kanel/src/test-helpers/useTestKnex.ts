@@ -60,11 +60,9 @@ const useTestKnex = (): readonly [
       connection: { ...connection, database: "postgres" },
     });
 
-    setupKnexInstance
-      .raw(`drop database ${databaseName} with (force)`)
-      .then(() => setupKnexInstance.destroy());
-
     await knexInstance.destroy();
+    await setupKnexInstance.raw(`drop database ${databaseName} with (force)`);
+    await setupKnexInstance.destroy();
   });
 
   return [() => knexInstance, databaseName, () => connection] as const;

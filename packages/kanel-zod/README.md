@@ -36,6 +36,7 @@ module.exports = {
   preRenderHooks: [generateZodSchemas],
 };
 ```
+
 ## Usage with `zodCamelCaseHook`
 
 This pre-render hook will transform all zod object properties to `camelCase`, for example:

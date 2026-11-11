@@ -154,8 +154,8 @@ describe("V4 Config", () => {
           makePgTsGenerator({
             getPropertyMetadata: (
               property,
-              details,
-              generateFor,
+              _details,
+              _generateFor,
               builtinMetadata,
             ) => {
               propertyCalls.push(property.name);
@@ -260,7 +260,7 @@ describe("V4 Config", () => {
         },
         generators: [
           makePgTsGenerator({
-            getMetadata: (details, generateFor, builtinMetadata) => {
+            getMetadata: (_details, _generateFor, builtinMetadata) => {
               generator1Calls.push("gen1");
               return builtinMetadata;
             },
@@ -336,7 +336,7 @@ describe("V4 Config", () => {
         },
         generators: [makePgTsGenerator()],
         postRenderHooks: [
-          async (path, lines) => {
+          async (_path, lines) => {
             hookCalls.push("postRender");
             return lines;
           },
@@ -359,7 +359,7 @@ describe("V4 Config", () => {
         },
         generators: [
           makePgTsGenerator({
-            getMetadata: (details, generateFor, builtinMetadata) =>
+            getMetadata: (_details, generateFor, builtinMetadata) =>
               // Full composition: spread builtin, override specific fields
               ({
                 ...builtinMetadata,
@@ -371,8 +371,8 @@ describe("V4 Config", () => {
               }),
             getPropertyMetadata: (
               property,
-              details,
-              generateFor,
+              _details,
+              _generateFor,
               builtinMetadata,
             ) =>
               // Spread builtin, conditionally override

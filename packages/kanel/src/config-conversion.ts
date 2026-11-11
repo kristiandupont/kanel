@@ -169,14 +169,14 @@ function printDeprecationWarning(): void {
  *
  * @param v3Config - The V3 configuration
  * @param instantiatedConfig - The instantiated V3 config (with resolved defaults)
- * @param schemas - The extracted database schemas
+ * @param _schemas - The extracted database schemas
  * @param options - Conversion options
  * @returns A V4 config that wraps the V3 behavior
  */
 export function convertV3ConfigToV4(
   v3Config: ConfigV3,
   instantiatedConfig: InstantiatedConfig,
-  schemas: Record<string, Schema>,
+  _schemas: Record<string, Schema>,
   options: V3ConversionOptions = {},
 ): ConfigV4 {
   // Print deprecation warning unless suppressed

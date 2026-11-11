@@ -9,7 +9,6 @@ export const setup = async (): Promise<void> => {
   if (process.arch === "arm64") {
     // Ryuk doesn't work on arm64 at the time of writing.
     // Disable and prune docker images manually
-    // eslint-disable-next-line no-process-env
     process.env["TESTCONTAINERS_RYUK_DISABLED"] = "true";
   }
 

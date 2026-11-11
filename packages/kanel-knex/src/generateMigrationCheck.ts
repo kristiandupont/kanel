@@ -19,7 +19,7 @@ const generateMigrationCheck: PgTsPreRenderHook = async (
     .orderBy("migration_time", "DESC")
     .limit(1);
 
-  db.destroy();
+  await db.destroy();
 
   const typeImports: TypeImport[] = [knexImport];
 

@@ -9,6 +9,7 @@ Core package that extracts a live PostgreSQL schema and generates TypeScript typ
 **Key types:** `Output.ts` (file output shapes), `Details.ts` (union of all PG object detail types), `Matcher.ts` (filtering logic), `TypeMap.ts` / `defaultTypeMap.ts` (PG→TS type mapping).
 
 **Subfolders:**
+
 - `cli/` — command-line entry point
 - `generators/` — one generator per PG object kind (table, enum, composite, domain, range, routine)
 - `hooks/` — pre/post-render hooks (index files, Prettier, tagged comments, generated headers)

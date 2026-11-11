@@ -84,14 +84,14 @@ module.exports = {
 
 ## Type Filter
 
-If you're using Kysely for migrations, you might want to filter the types of the migration tables, such as `kysely_migration` and `kysely_migration_lock`. The `kyselyTypeFilter` will do this for you. 
+If you're using Kysely for migrations, you might want to filter the types of the migration tables, such as `kysely_migration` and `kysely_migration_lock`. The `kyselyTypeFilter` will do this for you.
 
 ```ts
-  const { kyselyTypeFilter } = require("kanel-kysely");
+const { kyselyTypeFilter } = require("kanel-kysely");
 
-  module.exports = {
-    /// ... your config here.
+module.exports = {
+  /// ... your config here.
 
-    typeFilter: kyselyTypeFilter,
-  };
+  typeFilter: kyselyTypeFilter,
+};
 ```

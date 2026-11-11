@@ -11,15 +11,17 @@ $ npm i -D kanel-seeder
 Add `makeGenerateSeeds` as a generator in your V4 config:
 
 ```typescript
-import { makeGenerateSeeds } from 'kanel-seeder';
+import { makeGenerateSeeds } from "kanel-seeder";
 
 export default {
-  connection: { /* ... */ },
+  connection: {
+    /* ... */
+  },
   generators: [
     makePgTsGenerator(),
     makeGenerateSeeds({
-      srcPath: './seeds/mdconf',
-      dstPath: './seeds/generated',
+      srcPath: "./seeds/mdconf",
+      dstPath: "./seeds/generated",
     }),
   ],
 };

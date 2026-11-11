@@ -20,7 +20,7 @@ interface MakeKyselyConfig {
 export const defaultConfig: MakeKyselyConfig = {
   databaseFilename: "Database",
   includeSchemaNameInTableName: false,
-  getKyselyItemMetadata: (d, selectorName, canInitialize, canMutate) => ({
+  getKyselyItemMetadata: (_d, selectorName, canInitialize, canMutate) => ({
     tableInterfaceName: `${escapeIdentifier(selectorName)}Table`,
     selectableName: escapeIdentifier(selectorName),
     insertableName: canInitialize

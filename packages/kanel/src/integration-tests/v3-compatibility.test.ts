@@ -533,7 +533,7 @@ describe("V3 Config Compatibility", () => {
         enumStyle: "enum",
         resolveViews: true,
 
-        getMetadata: (details, generateFor, instantiatedConfig) => {
+        getMetadata: (details, _generateFor, instantiatedConfig) => {
           expect(instantiatedConfig).toBeDefined();
           return {
             name: toPascalCase(details.name),

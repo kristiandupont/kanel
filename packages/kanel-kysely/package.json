@@ -33,6 +33,6 @@
     "kanel": "*"
   },
   "dependencies": {
-    "@kristiandupont/recase": "^1.2.1"
+    "@kristiandupont/recase": "^1.4.2"
   }
 }
