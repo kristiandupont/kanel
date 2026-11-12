@@ -33,7 +33,7 @@
     "docs:build": "vitepress build docs-src"
   },
   "devDependencies": {
-    "@types/node": "^25.2.3",
+    "@types/node": "^26.0.0",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "vitepress": "^1.6.3",
