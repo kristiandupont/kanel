@@ -223,7 +223,7 @@ export type PgTsGeneratorConfig = {
   /** Metadata functions (no instantiatedConfig parameter) */
   getMetadata?: GetMetadata;
   getPropertyMetadata?: GetPropertyMetadata;
-  generateIdentifierType?: GenerateIdentifierType;
+  generateIdentifierType?: GenerateIdentifierType | false;
   getRoutineMetadata?: GetRoutineMetadata;
 
   /** Function to sort properties in generated interfaces */
