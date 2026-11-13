@@ -13,10 +13,14 @@ const generateMigrationCheck: PgTsPreRenderHook = async (
   const connection = config.connection;
   const db = knex({ client: "postgres", connection });
 
+  // Order by `id`, not `migration_time`: one `migrate.latest()` run records
+  // its migrations with timestamps that can be equal to the millisecond, and
+  // the latest one is then picked at random. `id` is assigned in the order
+  // migrations were applied.
   const [{ name: sourceMigration }] = await db
     .select("name")
     .from("knex_migrations")
-    .orderBy("migration_time", "DESC")
+    .orderBy("id", "DESC")
     .limit(1);
 
   await db.destroy();
@@ -27,12 +31,13 @@ const generateMigrationCheck: PgTsPreRenderHook = async (
     "/** This is the migration that was set when the types were generated. */",
     `export const sourceMigration = '${sourceMigration}';`,
     "",
-    "/** Gets the migration in the live database */",
+    "/** Gets the migration in the live database: the last one applied (highest",
+    " * `id`; `migration_time` can tie within one migrate run). */",
     "export const getCurrentMigration = async (knex: Knex): Promise<string> => {",
     "  const [{ name }] = await knex",
     "    .select('name')",
     "    .from('knex_migrations')",
-    "    .orderBy('migration_time', 'DESC')",
+    "    .orderBy('id', 'DESC')",
     "    .limit(1);",
     "  return name;",
     "};",
