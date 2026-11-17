@@ -20,7 +20,7 @@ export type InstantiatedConfig = {
 
   getMetadata: GetMetadataV3;
   getPropertyMetadata: GetPropertyMetadataV3;
-  generateIdentifierType?: GenerateIdentifierTypeV3;
+  generateIdentifierType?: GenerateIdentifierTypeV3 | false;
   getRoutineMetadata?: GetRoutineMetadataV3;
   propertySortFunction: (a: CompositeProperty, b: CompositeProperty) => number;
 
@@ -57,7 +57,7 @@ export type ConfigV3 = {
   typeFilter?: (pgType: PgType) => boolean;
   getMetadata?: GetMetadataV3;
   getPropertyMetadata?: GetPropertyMetadataV3;
-  generateIdentifierType?: GenerateIdentifierTypeV3;
+  generateIdentifierType?: GenerateIdentifierTypeV3 | false;
   propertySortFunction?: (a: CompositeProperty, b: CompositeProperty) => number;
   getRoutineMetadata?: GetRoutineMetadataV3;
 
