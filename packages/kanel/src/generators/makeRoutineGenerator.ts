@@ -54,7 +54,7 @@ const makeMapper =
     const parameterDeclaration: InterfaceDeclaration = {
       declarationType: "interface",
       name: parametersName,
-      comment: parameters.map(({ comment }) => comment).flat(),
+      comment: parameters.flatMap(({ comment }) => comment ?? []),
       exportAs: "named",
       properties: parameters.map(
         ({ name, typeOverride, nullableOverride, optionalOverride }, index) => {
