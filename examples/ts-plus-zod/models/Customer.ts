@@ -118,7 +118,7 @@ export interface CustomerMutator {
   active?: number | null;
 }
 
-export const customerId = z.number() as unknown as z.Schema<CustomerId>;
+export const customerId = z.number() as unknown as z.ZodType<CustomerId>;
 
 export const customer = z.object({
   customer_id: customerId,
@@ -131,7 +131,7 @@ export const customer = z.object({
   create_date: z.date(),
   last_update: z.date().nullable(),
   active: z.number().nullable(),
-}) as unknown as z.Schema<Customer>;
+}) as unknown as z.ZodType<Customer>;
 
 export const customerInitializer = z.object({
   customer_id: customerId.optional(),
@@ -144,7 +144,7 @@ export const customerInitializer = z.object({
   create_date: z.date().optional(),
   last_update: z.date().optional().nullable(),
   active: z.number().optional().nullable(),
-}) as unknown as z.Schema<CustomerInitializer>;
+}) as unknown as z.ZodType<CustomerInitializer>;
 
 export const customerMutator = z.object({
   customer_id: customerId.optional(),
@@ -157,4 +157,4 @@ export const customerMutator = z.object({
   create_date: z.date().optional(),
   last_update: z.date().optional().nullable(),
   active: z.number().optional().nullable(),
-}) as unknown as z.Schema<CustomerMutator>;
+}) as unknown as z.ZodType<CustomerMutator>;

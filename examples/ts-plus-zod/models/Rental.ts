@@ -87,7 +87,7 @@ export interface RentalMutator {
   last_update?: Date;
 }
 
-export const rentalId = z.number() as unknown as z.Schema<RentalId>;
+export const rentalId = z.number() as unknown as z.ZodType<RentalId>;
 
 export const rental = z.object({
   rental_id: rentalId,
@@ -97,7 +97,7 @@ export const rental = z.object({
   return_date: z.date().nullable(),
   staff_id: staffId,
   last_update: z.date(),
-}) as unknown as z.Schema<Rental>;
+}) as unknown as z.ZodType<Rental>;
 
 export const rentalInitializer = z.object({
   rental_id: rentalId.optional(),
@@ -107,7 +107,7 @@ export const rentalInitializer = z.object({
   return_date: z.date().optional().nullable(),
   staff_id: staffId,
   last_update: z.date().optional(),
-}) as unknown as z.Schema<RentalInitializer>;
+}) as unknown as z.ZodType<RentalInitializer>;
 
 export const rentalMutator = z.object({
   rental_id: rentalId.optional(),
@@ -117,4 +117,4 @@ export const rentalMutator = z.object({
   return_date: z.date().optional().nullable(),
   staff_id: staffId.optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<RentalMutator>;
+}) as unknown as z.ZodType<RentalMutator>;

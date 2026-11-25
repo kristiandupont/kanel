@@ -48,22 +48,22 @@ export interface CountryMutator {
   last_update?: Date;
 }
 
-export const countryId = z.number() as unknown as z.Schema<CountryId>;
+export const countryId = z.number() as unknown as z.ZodType<CountryId>;
 
 export const country = z.object({
   country_id: countryId,
   country: z.string(),
   last_update: z.date(),
-}) as unknown as z.Schema<Country>;
+}) as unknown as z.ZodType<Country>;
 
 export const countryInitializer = z.object({
   country_id: countryId.optional(),
   country: z.string(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<CountryInitializer>;
+}) as unknown as z.ZodType<CountryInitializer>;
 
 export const countryMutator = z.object({
   country_id: countryId.optional(),
   country: z.string().optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<CountryMutator>;
+}) as unknown as z.ZodType<CountryMutator>;

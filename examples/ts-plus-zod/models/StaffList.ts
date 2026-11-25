@@ -40,4 +40,4 @@ export const staffList = z.object({
   city: z.string(),
   country: z.string(),
   sid: z.number(),
-}) as unknown as z.Schema<StaffList>;
+}) as unknown as z.ZodType<StaffList>;

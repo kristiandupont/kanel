@@ -41,4 +41,4 @@ export const nicerButSlowerFilmList = z.object({
   length: z.number().nullable(),
   rating: mpaaRating.nullable(),
   actors: z.string(),
-}) as unknown as z.Schema<NicerButSlowerFilmList>;
+}) as unknown as z.ZodType<NicerButSlowerFilmList>;

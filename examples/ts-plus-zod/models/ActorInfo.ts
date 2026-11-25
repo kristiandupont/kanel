@@ -24,4 +24,4 @@ export const actorInfo = z.object({
   first_name: z.string(),
   last_name: z.string(),
   film_info: z.string(),
-}) as unknown as z.Schema<ActorInfo>;
+}) as unknown as z.ZodType<ActorInfo>;
