@@ -1,14 +1,24 @@
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { pathToFileURL } from "node:url";
+
 import type { Schema, TableColumn, TableDetails } from "extract-pg-schema";
 import type { ConstantDeclaration, KanelContext } from "kanel";
 import { makePgTsGenerator } from "kanel";
+import { ModuleKind, ScriptTarget, transpileModule } from "typescript";
 import { expect, it } from "vitest";
 
-import generateZodSchemas from "./generateZodSchemas";
+import generateZodSchemas, {
+  makeGenerateZodSchemas,
+} from "./generateZodSchemas";
 
 // kanel is CommonJS. Load its context module with require so that it is the
 // same instance that makePgTsGenerator and resolveType read from.
 const { runWithContext } =
   require("kanel/build/context") as typeof import("kanel/build/context");
+const { default: renderTsFile } =
+  require("kanel/build/ts-utilities/renderTsFile") as typeof import("kanel/build/ts-utilities/renderTsFile");
 
 const makeColumn = (
   name: string,
@@ -97,7 +107,9 @@ it("Should use the branded identifier schema for foreign keys into another schem
     (d) => d.declarationType === "constant" && d.name === "posts",
   ) as ConstantDeclaration;
 
-  expect(postsSchema.value).toContain("  auth_user_id: auth_usersId,");
+  expect(postsSchema.value).toContain(
+    "  auth_user_id: z.lazy(() => auth_usersId),",
+  );
   expect(postsSchema.value).toContain("  user_id: usersId,");
   expect(postsSchema.typeImports).toContainEqual(
     expect.objectContaining({
@@ -114,3 +126,93 @@ it("Should use the branded identifier schema for foreign keys into another schem
     }),
   );
 });
+
+it.each([true, false])(
+  "Should load and validate reciprocal cross-schema references with castToSchema=%s",
+  async (castToSchema) => {
+    const schemas = {
+      auth: makeSchema("auth", [
+        makeTable("auth", "users", [
+          makeColumn("id", "pg_catalog.uuid", { isPrimaryKey: true }),
+          makeColumn("primary_post_id", "pg_catalog.int4", {
+            references: [reference("public", "posts")],
+            isNullable: true,
+          }),
+        ]),
+      ]),
+      public: makeSchema("public", [
+        makeTable("public", "posts", [
+          makeColumn("id", "pg_catalog.int4", {
+            isPrimaryKey: true,
+            isIdentity: true,
+          }),
+          makeColumn("author_id", "pg_catalog.uuid", {
+            references: [reference("auth", "users")],
+          }),
+        ]),
+      ]),
+    };
+    const context: KanelContext = {
+      typescriptConfig: {
+        enumStyle: "literal-union",
+        importsExtension: ".mjs",
+      },
+      config: { connection: {}, schemas: ["auth", "public"] },
+      schemas,
+    };
+    const directory = mkdtempSync(join(process.cwd(), "generated-zod-"));
+
+    try {
+      await runWithContext(context, async () => {
+        const output = await makePgTsGenerator({
+          preRenderHooks: [makeGenerateZodSchemas({ castToSchema })],
+        })();
+        for (const [path, file] of Object.entries(output)) {
+          if (file.fileType !== "typescript") continue;
+          const source = renderTsFile(file.declarations, path).join("\n");
+          const { outputText } = transpileModule(source, {
+            compilerOptions: {
+              module: ModuleKind.ESNext,
+              target: ScriptTarget.ESNext,
+            },
+          });
+          const filename = join(directory, `${path}.mjs`);
+          mkdirSync(dirname(filename), { recursive: true });
+          writeFileSync(filename, outputText);
+        }
+      });
+
+      const usersUrl = pathToFileURL(join(directory, "auth/Users.mjs")).href;
+      const postsUrl = pathToFileURL(join(directory, "public/Posts.mjs")).href;
+      for (const entryUrl of [usersUrl, postsUrl]) {
+        execFileSync(process.execPath, [
+          "--input-type=module",
+          "--eval",
+          `
+            import assert from "node:assert/strict";
+            await import(${JSON.stringify(entryUrl)});
+            const { users, usersInitializer, usersMutator } = await import(${JSON.stringify(usersUrl)});
+            const { posts, postsInitializer, postsMutator } = await import(${JSON.stringify(postsUrl)});
+            const id = "123e4567-e89b-42d3-a456-426614174000";
+            assert.deepEqual(users.parse({ id, primary_post_id: 1 }), { id, primary_post_id: 1 });
+            assert.deepEqual(posts.parse({ id: 1, author_id: id }), { id: 1, author_id: id });
+            assert.equal(users.safeParse({ id, primary_post_id: "bad" }).success, false);
+            assert.equal(posts.safeParse({ id: 1, author_id: "bad" }).success, false);
+            assert.equal(users.safeParse({ id, primary_post_id: null }).success, true);
+            assert.equal(users.safeParse({ id }).success, false);
+            assert.equal(posts.safeParse({ id: 1, author_id: null }).success, false);
+            assert.equal(usersInitializer.safeParse({ id }).success, true);
+            assert.equal(postsInitializer.safeParse({ author_id: id }).success, true);
+            assert.equal(postsInitializer.safeParse({}).success, false);
+            assert.equal(usersMutator.safeParse({}).success, true);
+            assert.equal(postsMutator.safeParse({}).success, true);
+            assert.equal(usersMutator.safeParse({ primary_post_id: null }).success, true);
+            assert.equal(postsMutator.safeParse({ author_id: "bad" }).success, false);
+          `,
+        ]);
+      }
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  },
+);
