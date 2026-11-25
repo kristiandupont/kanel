@@ -3,6 +3,7 @@ import {
   type CompositeDetails,
   type CompositeProperty,
   type PgTsGeneratorContext,
+  type TypeDefinition,
   type TypeImport,
   type TypeMap,
 } from "kanel";
@@ -11,6 +12,23 @@ export type ZodPropertyDeclaration = {
   name: string;
   value: string;
   typeImports: TypeImport[];
+};
+
+// resolveType imports an identifier type from another schema under the alias
+// `${schemaName}_${name}`, so the zod schema is looked up in that schema and
+// imported under the same kind of alias.
+const getIdentifierImport = (
+  t: Exclude<TypeDefinition, string>,
+  schemaName: string,
+  identifierTypeImports: Record<string, TypeImport>,
+): TypeImport | undefined => {
+  const [typeImport] = t.typeImports;
+  if (t.typeImports.length !== 1 || typeImport.asName !== t.name) {
+    return identifierTypeImports[`${schemaName}.${t.name}`];
+  }
+  const targetSchemaName = t.name.slice(0, -(typeImport.name.length + 1));
+  const x = identifierTypeImports[`${targetSchemaName}.${typeImport.name}`];
+  return x && { ...x, asName: `${targetSchemaName}_${x.name}` };
 };
 
 const generateProperties = <D extends CompositeDetails>(
@@ -43,13 +61,14 @@ const generateProperties = <D extends CompositeDetails>(
       let zodType: string;
       const typeImports: TypeImport[] = [];
 
-      if (
-        typeof t !== "string" &&
-        `${details.schemaName}.${t.name}` in identifierTypeImports
-      ) {
-        const x = identifierTypeImports[`${details.schemaName}.${t.name}`];
-        typeImports.push(x);
-        zodType = x.name;
+      const identifierImport =
+        typeof t === "string"
+          ? undefined
+          : getIdentifierImport(t, details.schemaName, identifierTypeImports);
+
+      if (identifierImport) {
+        typeImports.push(identifierImport);
+        zodType = identifierImport.asName ?? identifierImport.name;
       } else if (p.type.fullName in zodTypeMap) {
         const x = zodTypeMap[p.type.fullName];
         if (typeof x === "string") {
