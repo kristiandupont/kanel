@@ -110,7 +110,7 @@ it("Should use the branded identifier schema for foreign keys into another schem
   expect(postsSchema.value).toContain(
     "  auth_user_id: z.lazy(() => auth_usersId),",
   );
-  expect(postsSchema.value).toContain("  user_id: usersId,");
+  expect(postsSchema.value).toContain("  user_id: z.lazy(() => usersId),");
   expect(postsSchema.typeImports).toContainEqual(
     expect.objectContaining({
       name: "usersId",
@@ -127,9 +127,17 @@ it("Should use the branded identifier schema for foreign keys into another schem
   );
 });
 
-it.each([true, false])(
-  "Should load and validate reciprocal cross-schema references with castToSchema=%s",
-  async (castToSchema) => {
+const moduleCases = [true, false].flatMap((castToSchema) =>
+  ["esm", "cjs"].map((format) => ({ castToSchema, format })),
+);
+
+it.each(
+  moduleCases.flatMap((options) =>
+    [false, true].map((mixedCycle) => ({ ...options, mixedCycle })),
+  ),
+)(
+  "Should load and validate cycles with castToSchema=$castToSchema, format=$format, mixedCycle=$mixedCycle",
+  async ({ castToSchema, format, mixedCycle }) => {
     const schemas = {
       auth: makeSchema("auth", [
         makeTable("auth", "users", [
@@ -147,15 +155,32 @@ it.each([true, false])(
             isIdentity: true,
           }),
           makeColumn("author_id", "pg_catalog.uuid", {
-            references: [reference("auth", "users")],
+            references: [
+              mixedCycle
+                ? reference("public", "comments")
+                : reference("auth", "users"),
+            ],
+            isNullable: mixedCycle,
           }),
         ]),
+        ...(mixedCycle
+          ? [
+              makeTable("public", "comments", [
+                makeColumn("id", "pg_catalog.uuid", { isPrimaryKey: true }),
+                makeColumn("author_id", "pg_catalog.uuid", {
+                  references: [reference("auth", "users")],
+                  isNullable: true,
+                }),
+              ]),
+            ]
+          : []),
       ]),
     };
+    const extension = format === "esm" ? ".mjs" : ".cjs";
     const context: KanelContext = {
       typescriptConfig: {
         enumStyle: "literal-union",
-        importsExtension: ".mjs",
+        importsExtension: extension,
       },
       config: { connection: {}, schemas: ["auth", "public"] },
       schemas,
@@ -172,19 +197,26 @@ it.each([true, false])(
           const source = renderTsFile(file.declarations, path).join("\n");
           const { outputText } = transpileModule(source, {
             compilerOptions: {
-              module: ModuleKind.ESNext,
+              module:
+                format === "esm" ? ModuleKind.ESNext : ModuleKind.CommonJS,
               target: ScriptTarget.ESNext,
             },
           });
-          const filename = join(directory, `${path}.mjs`);
+          const filename = join(directory, `${path}${extension}`);
           mkdirSync(dirname(filename), { recursive: true });
           writeFileSync(filename, outputText);
         }
       });
 
-      const usersUrl = pathToFileURL(join(directory, "auth/Users.mjs")).href;
-      const postsUrl = pathToFileURL(join(directory, "public/Posts.mjs")).href;
-      for (const entryUrl of [usersUrl, postsUrl]) {
+      const moduleUrl = (path: string) =>
+        pathToFileURL(join(directory, `${path}${extension}`)).href;
+      const usersUrl = moduleUrl("auth/Users");
+      const postsUrl = moduleUrl("public/Posts");
+      const commentsUrl = moduleUrl("public/Comments");
+      const entries = mixedCycle
+        ? [usersUrl, postsUrl, commentsUrl]
+        : [usersUrl, postsUrl];
+      for (const entryUrl of entries) {
         execFileSync(process.execPath, [
           "--input-type=module",
           "--eval",
@@ -200,14 +232,25 @@ it.each([true, false])(
             assert.equal(posts.safeParse({ id: 1, author_id: "bad" }).success, false);
             assert.equal(users.safeParse({ id, primary_post_id: null }).success, true);
             assert.equal(users.safeParse({ id }).success, false);
-            assert.equal(posts.safeParse({ id: 1, author_id: null }).success, false);
+            assert.equal(posts.safeParse({ id: 1, author_id: null }).success, ${mixedCycle});
+            assert.equal(posts.safeParse({ id: 1 }).success, false);
             assert.equal(usersInitializer.safeParse({ id }).success, true);
             assert.equal(postsInitializer.safeParse({ author_id: id }).success, true);
-            assert.equal(postsInitializer.safeParse({}).success, false);
+            assert.equal(postsInitializer.safeParse({}).success, ${mixedCycle});
             assert.equal(usersMutator.safeParse({}).success, true);
             assert.equal(postsMutator.safeParse({}).success, true);
             assert.equal(usersMutator.safeParse({ primary_post_id: null }).success, true);
             assert.equal(postsMutator.safeParse({ author_id: "bad" }).success, false);
+            if (${mixedCycle}) {
+              const { comments, commentsInitializer, commentsMutator } = await import(${JSON.stringify(commentsUrl)});
+              assert.deepEqual(comments.parse({ id, author_id: id }), { id, author_id: id });
+              assert.equal(comments.safeParse({ id, author_id: "bad" }).success, false);
+              assert.equal(comments.safeParse({ id, author_id: null }).success, true);
+              assert.equal(comments.safeParse({ id }).success, false);
+              assert.equal(commentsInitializer.safeParse({ id }).success, true);
+              assert.equal(commentsMutator.safeParse({}).success, true);
+              assert.equal(commentsMutator.safeParse({ author_id: "bad" }).success, false);
+            }
           `,
         ]);
       }

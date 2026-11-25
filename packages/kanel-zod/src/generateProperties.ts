@@ -68,9 +68,7 @@ const generateProperties = <D extends CompositeDetails>(
 
       if (identifierImport) {
         typeImports.push(identifierImport);
-        zodType = identifierImport.asName
-          ? `z.lazy(() => ${identifierImport.asName})`
-          : identifierImport.name;
+        zodType = `z.lazy(() => ${identifierImport.asName ?? identifierImport.name})`;
       } else if (p.type.fullName in zodTypeMap) {
         const x = zodTypeMap[p.type.fullName];
         if (typeof x === "string") {
