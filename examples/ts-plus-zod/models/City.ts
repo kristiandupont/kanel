@@ -58,25 +58,25 @@ export interface CityMutator {
   last_update?: Date;
 }
 
-export const cityId = z.number() as unknown as z.Schema<CityId>;
+export const cityId = z.number() as unknown as z.ZodType<CityId>;
 
 export const city = z.object({
   city_id: cityId,
   city: z.string(),
   country_id: countryId,
   last_update: z.date(),
-}) as unknown as z.Schema<City>;
+}) as unknown as z.ZodType<City>;
 
 export const cityInitializer = z.object({
   city_id: cityId.optional(),
   city: z.string(),
   country_id: countryId,
   last_update: z.date().optional(),
-}) as unknown as z.Schema<CityInitializer>;
+}) as unknown as z.ZodType<CityInitializer>;
 
 export const cityMutator = z.object({
   city_id: cityId.optional(),
   city: z.string().optional(),
   country_id: countryId.optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<CityMutator>;
+}) as unknown as z.ZodType<CityMutator>;

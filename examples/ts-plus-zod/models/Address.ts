@@ -94,7 +94,7 @@ export interface AddressMutator {
   last_update?: Date;
 }
 
-export const addressId = z.number() as unknown as z.Schema<AddressId>;
+export const addressId = z.number() as unknown as z.ZodType<AddressId>;
 
 export const address = z.object({
   address_id: addressId,
@@ -105,7 +105,7 @@ export const address = z.object({
   postal_code: z.string().nullable(),
   phone: z.string(),
   last_update: z.date(),
-}) as unknown as z.Schema<Address>;
+}) as unknown as z.ZodType<Address>;
 
 export const addressInitializer = z.object({
   address_id: addressId.optional(),
@@ -116,7 +116,7 @@ export const addressInitializer = z.object({
   postal_code: z.string().optional().nullable(),
   phone: z.string(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<AddressInitializer>;
+}) as unknown as z.ZodType<AddressInitializer>;
 
 export const addressMutator = z.object({
   address_id: addressId.optional(),
@@ -127,4 +127,4 @@ export const addressMutator = z.object({
   postal_code: z.string().optional().nullable(),
   phone: z.string().optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<AddressMutator>;
+}) as unknown as z.ZodType<AddressMutator>;

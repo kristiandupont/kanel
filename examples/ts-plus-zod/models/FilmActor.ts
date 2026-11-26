@@ -48,16 +48,16 @@ export const filmActor = z.object({
   actor_id: actorId,
   film_id: filmId,
   last_update: z.date(),
-}) as unknown as z.Schema<FilmActor>;
+}) as unknown as z.ZodType<FilmActor>;
 
 export const filmActorInitializer = z.object({
   actor_id: actorId,
   film_id: filmId,
   last_update: z.date().optional(),
-}) as unknown as z.Schema<FilmActorInitializer>;
+}) as unknown as z.ZodType<FilmActorInitializer>;
 
 export const filmActorMutator = z.object({
   actor_id: actorId.optional(),
   film_id: filmId.optional(),
   last_update: z.date().optional(),
-}) as unknown as z.Schema<FilmActorMutator>;
+}) as unknown as z.ZodType<FilmActorMutator>;

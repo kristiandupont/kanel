@@ -19,4 +19,4 @@ export const salesByStore = z.object({
   store: z.string(),
   manager: z.string(),
   total_sales: z.string(),
-}) as unknown as z.Schema<SalesByStore>;
+}) as unknown as z.ZodType<SalesByStore>;

@@ -44,4 +44,4 @@ export const customerList = z.object({
   country: z.string(),
   notes: z.string(),
   sid: z.number(),
-}) as unknown as z.Schema<CustomerList>;
+}) as unknown as z.ZodType<CustomerList>;

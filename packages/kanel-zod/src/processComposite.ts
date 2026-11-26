@@ -61,7 +61,7 @@ function makeDeclaration(
     ...properties.map((p) => `  ${escapeName(p.name)}: ${p.value},`),
   ];
   if (castToSchema) {
-    value.push(`}) as unknown as z.Schema<${typescriptTypeName}>`);
+    value.push(`}) as unknown as z.ZodType<${typescriptTypeName}>`);
   } else {
     value.push("})");
   }
