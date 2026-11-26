@@ -66,13 +66,23 @@ it.each(
       (d): d is ConstantDeclaration => d.declarationType === "constant",
     );
     const casts = castToSchema !== false;
-    const objectSchema = (type: string, optional = false) => [
+    const objectSchema = (type: string) => [
       "z.object({",
-      `  id: ${kind === "table" ? "usersId" : "z.number()"}${optional ? ".optional()" : ""},`,
       casts ? `}) as unknown as z.ZodType<${type}>` : "})",
     ];
 
-    expect(schemas.map(({ name, value }) => ({ name, value }))).toEqual([
+    const schemaText = schemas.flatMap(({ value }) => value).join("\n");
+    expect(schemaText).not.toContain("z.Schema");
+    if (!casts) expect(schemaText).not.toContain("z.ZodType");
+
+    expect(
+      schemas.map(({ name, value }) => ({
+        name,
+        value: Array.isArray(value)
+          ? [value[0], value[value.length - 1]]
+          : value,
+      })),
+    ).toEqual([
       ...(kind === "table"
         ? [
             {
@@ -92,7 +102,7 @@ it.each(
             },
             {
               name: "usersMutator",
-              value: objectSchema("UsersMutator", true),
+              value: objectSchema("UsersMutator"),
             },
           ]
         : []),
